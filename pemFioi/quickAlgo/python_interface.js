@@ -856,15 +856,19 @@ function LogicController(maxInstructions, subTask) {
 
   this.updateTaskIntro = function () {
     if(!this._mainContext.display) { return; }
+
     if($('.pythonIntro').length == 0) {
-      quickAlgoInterface.appendTaskIntro('<hr class="pythonIntroElement long" />'
+      quickAlgoInterface.appendPythonIntro(''
         + '<div class="pythonIntro pythonIntroElement long">'
         + '  <div class="pythonIntroSimple"></div>'
         + '  <div class="pythonIntroFull"></div>'
         + '  <div class="pythonIntroBtn"></div>'
-        + '</div>');
+        + '</div>', this.generateTaskIntro.bind(this));
     }
+    this.generateTaskIntro();
+  }
 
+  this.generateTaskIntro = function () {
     $('.pythonIntro').off('click', 'code');
     if(this._mainContext.infos.noPythonHelp) {
        $('.pythonIntroElement').css('display', 'none');
@@ -1045,7 +1049,7 @@ function LogicController(maxInstructions, subTask) {
 
     var controller = this;
     $('.pythonIntroSimple code, .pythonIntroFull code').not('.pflForbidden').on('click', function() {
-      quickAlgoInterface.toggleLongIntro(false);
+      quickAlgoInterface.toggleMoreDetails(false);
       if(controller._aceEditor) {
         controller._aceEditor.insert(this.getAttribute('data-code'));
         controller._aceEditor.focus();

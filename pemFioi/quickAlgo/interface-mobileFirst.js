@@ -969,7 +969,10 @@ var quickAlgoInterface = {
         }
         var levelIntroContent = $('#taskIntro').html();
         var hasLong = $('#taskIntro').find('.long').length;
-        if (hasLong) {
+        var needLongButton = true;
+        if(window.conceptViewer && conceptViewer.version == 2) {
+            conceptViewer.setIntroHtml(levelIntroContent);
+        } else if (hasLong) {
             $('#taskIntro').addClass('hasLongIntro');
             // if long version of introduction exists, append its content to #blocklyLibContent
             // with proper title and close button
@@ -979,49 +982,73 @@ var quickAlgoInterface = {
                 '<div id="taskIntroLong" style="display:none;" class="panel">' +
                     '<div class="panel-heading">'+
                         '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>' + this.strings.introDetailsTitle + '</h2>' +
-                        '<button type="button" class="closeLongIntro exit" onclick="quickAlgoInterface.toggleLongIntro(false);"><i class="fas fa-times"></i></button>' +
+                        '<button type="button" class="closeLongIntro exit" onclick="quickAlgoInterface.toggleMoreDetails(false);"><i class="fas fa-times"></i></button>' +
                     '</div><div class="panel-body">' +
                         levelIntroContent +
                     '</div>' +
                 '<div>';
             $('#blocklyLibContent').append(introLong);
-            var renderTaskIntro = '' +
-                '<div class="introContent">' +
-                '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
-                    levelIntroContent +
-                '</div>' +
-                '<div id="introControls">' +
-                    '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>' +
-                '</div>';
-            $('#taskIntro').html(renderTaskIntro);
-            quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
                 '<div class="introContent">' +
                 '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
                     levelIntroContent +
                 '</div>');
+            var needLongButton = false;
+        }
+
+        if(needLongButton) {
+            var renderTaskIntro = '' +
+                '<div class="introContent">' +
+                '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
+                    levelIntroContent +
+                '</div>' +
+                '<div id="introControls">' +
+                    '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleMoreDetails();"></button>' +
+                '</div>';
+            $('#taskIntro').html(renderTaskIntro);
+            quickAlgoInterface.toggleMoreDetails(false);
         }
         this.bindVideoBtns();
     },
 
-    appendTaskIntro: function(html) {
+    appendPythonIntro: function(html, callback) {
+        if(window.conceptViewer && conceptViewer.version == 2) {
+            conceptViewer.setPythonIntro(html, callback);
+            return;
+        }
+
         if(this.taskIntroContent === null) {
             this.taskIntroContent = $('#taskIntro').html();
         }
+        this.taskIntroContent += '<hr class="pythonIntroElement long" />';
         this.taskIntroContent += html;
         $('#taskIntro').html(this.taskIntroContent);
         this.setupTaskIntro();
     },
 
+    toggleMoreDetails: function(forceNewState) {
+        if(window.conceptViewer && conceptViewer.version == 2) {
+            // Use new version of conceptViewer
+            var newState = conceptViewer.toggle(forceNewState);
+        } else {
+            this.toggleLongIntro(forceNewState);
+            var newState = this.longIntroShown;
+        }
+
+        if(newState) {
+            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>' + this.strings.hideDetails + '</button>');
+        } else {
+            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>' + this.strings.showDetails + '</button>');
+        }
+    },
+
     toggleLongIntro: function(forceNewState) {
         if(forceNewState === false || this.longIntroShown) {
             $('#taskIntroLong').removeClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>' + this.strings.showDetails + '</button>');
             this.longIntroShown = false;
         } else {
             $('#taskIntroLong').addClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>' + this.strings.hideDetails + '</button>');
             this.longIntroShown = true;
         }
     },

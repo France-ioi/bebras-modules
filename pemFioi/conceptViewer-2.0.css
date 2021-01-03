@@ -1,0 +1,262 @@
+#conceptViewer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    z-index: 30;
+    border-left: 2px solid #f1f2f7;
+}
+
+.conceptViewer-tabs {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    background-color: #f1f2f7;
+    padding: 8px 0px 0px 8px;
+}
+
+.conceptViewer-tabs.tabs-area .li {
+    padding: 0 20px;
+}
+
+.conceptViewer-tabs.tabs-area .li a {
+    font-size: 16px;
+    text-transform: none;
+}
+
+.conceptViewer-tabs.tabs-area .li span {
+    font-size: 22px;
+}
+
+#conceptViewer .panel-body {
+    display: flex;
+    justify-content: stretch;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    max-height: calc(100% - 62px);
+}
+
+#conceptViewer .content {
+    flex: 1 1 0;
+    padding: 16px;
+    overflow: auto;
+}
+
+#conceptViewer .viewer {
+    width: 100%;
+    height: 100%;
+}
+
+#conceptViewer .toc {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#conceptViewer .toc a {
+    color: #4a90e2;
+    cursor: pointer;
+}
+
+#conceptViewer .panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+#conceptViewer .section-external-exit {
+    display: inline-flex;
+}
+#conceptViewer .exit {
+    cursor: pointer;
+    margin: 0 3px;
+}
+#conceptViewer .exit .icon {
+    font-size: 18px;
+    color: #4a90e2;
+}
+@media screen and (min-width: 481px){
+    #conceptViewer .navigationContent {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 100%;
+    }
+}
+#conceptViewer .navigation {
+    border-right: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+#conceptViewer .navigationLanguage {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 10px;
+}
+#conceptViewer .navigationLanguage {
+    position: relative;
+}
+#conceptViewer .showNavigationLanguage {
+    display: block;
+    background-color: #4a90e2;
+    color: #fff;
+    line-height: 20px;
+    padding: 5px 20px;
+    border-radius: 50px;
+    position: relative;
+    margin-left: 50px;
+}
+#conceptViewer .showNavigationLanguage::before {
+    content: "\f121";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 20px;
+    margin: 0 15px;
+    color: #4a90e2;
+    position: absolute;
+    left: -55px;
+}
+@media screen and (orientation: landscape) and (max-width: 768px) {
+    #conceptViewer .showNavigationLanguage {
+        margin-left: 0;
+    }
+    #conceptViewer .showNavigationLanguage::before {
+        content: normal;
+    }
+}
+#conceptViewer .showNavigationLanguage::after {
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 10px;
+}
+#conceptViewer .navigationLanguage ul {
+    position: absolute;
+    width: calc(100% - 4px);
+    list-style-type: none;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    left: 2px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity linear 150ms 25ms;
+    z-index: 1;
+}
+#conceptViewer #showNavigationLanguage:checked + ul {
+    visibility: visible;
+    opacity: 1;
+}
+#conceptViewer .navigationLanguage ul li {
+    line-height: 2em;
+    padding: 0 20px;
+    display: block;
+    cursor: pointer;
+}
+#conceptViewer .navigationLanguage ul li.selected {
+    background-color: #4a90e2;
+    color: #fff;
+}
+#conceptViewer .navigationContent ul {
+    list-style-type: none;
+    margin: 1em 0 0;
+    padding: 0;
+}
+#conceptViewer .navigationContent ul li {
+    line-height: 3em;
+    padding: 0 20px;
+    cursor: pointer;
+}
+#conceptViewer .navigationContent ul li.selected {
+    background-color: #4a90e2;
+    color: #fff;
+}
+#conceptViewer #showNavigationLanguage,
+#conceptViewer .showNavigationContent,
+#conceptViewer #showNavigationContent {
+    display: none;
+}
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    #conceptViewer .panel-body {
+        flex-direction: column;
+    }
+    #conceptViewer .navigation {
+        border: none;
+    }
+    #conceptViewer .navigationContent {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+    #conceptViewer .navigationContent {
+        position: relative;
+    }
+    #conceptViewer .showNavigationContent {
+        display: block;
+        background-color: #4a90e2;
+        color: #fff;
+        line-height: 20px;
+        padding: 5px 20px;
+        border-radius: 50px;
+        position: relative;
+        margin-left: 50px;
+    }
+    #conceptViewer .showNavigationContent::before {
+        content: "\f03a";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 20px;
+        margin: 0 15px;
+        color: #4a90e2;
+        position: absolute;
+        left: -55px;
+    }
+    #conceptViewer .showNavigationContent::after {
+        content: "\f107";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+    }
+    #conceptViewer .navigationContent ul {
+        position: absolute;
+        width: calc(100% - 4px);
+        list-style-type: none;
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        left: 2px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity linear 150ms 25ms;
+    }
+    #conceptViewer #showNavigationContent:checked + ul {
+        visibility: visible;
+        opacity: 1;
+    }
+    #conceptViewer .navigationContent ul li {
+        line-height: 2em;
+    }
+}
+#conceptViewer .viewer {
+    flex-grow: 1;
+}
+#conceptViewer .viewerContent { /* iframe */
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+#conceptViewer.conceptViewer-fullscreen .content {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+#conceptViewer.conceptViewer-fullscreen .section-external-exit {
+    display: none;
+}
