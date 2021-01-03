@@ -682,6 +682,9 @@ function LogicController(maxInstructions, subTask) {
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
 
+    // Clean up previous instances of the autocomplete
+    $('.ace_autocomplete').remove();
+
     if (!this._mainContext.disableAutoCompletion) {
       // we resize the completer window, because some functions are too big so we need more place:
       if (!this._aceEditor.completer) {
