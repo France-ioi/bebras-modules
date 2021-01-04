@@ -337,7 +337,7 @@ var quickAlgoInterface = {
                 authors: additional.about.authors,
 
                 // Normally this is how we set fr ect...
-                language: window.languageStrings,
+                language: window.stringsLanguage,
 
                 // he should be able to choose his version in case of share (TODO)
                 version: "1.0.0",
@@ -373,6 +373,14 @@ var quickAlgoInterface = {
                         // TODO: get the sensors
                     ]
                 }
+            },
+
+            // the code of the user
+            userCode: {
+                // the type of the code (blockly or python)
+                type: "blockly",
+                // The code of the user
+                code: code
             }
         };
 
