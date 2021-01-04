@@ -312,16 +312,20 @@ var quickAlgoInterface = {
         var additional = this.getAdditional();
         var code = this.getCode();
 
+        console.log(JSON.stringify(additional));
+        console.log(JSON.stringify(code));
+
+
         // TODO: in python & blockly, you need to get code + additional.
         // Simply create functions to get code and additional
     },
 
     getAdditional: function() {
-        // TODO: call in python or blockly the right function
+        return this.userTaskData;
     },
 
     getCode: function() {
-
+        return task.displayedSubTask.blocklyHelper.getCodeStr();
     },
 
     /**
