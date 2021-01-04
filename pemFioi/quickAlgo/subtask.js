@@ -84,6 +84,7 @@ var initBlocklySubTask = function(subTask, language) {
             canEditSubject: !!levelGridInfos.canEditSubject
          });
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         window.quickAlgoInterface.setSubtask(this);
       }
 
       this.blocklyHelper.loadContext(this.context);

@@ -21,6 +21,7 @@ var quickAlgoInterface = {
     options: {},
     capacityPopupDisplayed: {},
     userTaskData: null, // contain the subject and title, and also the about
+    subtask: null,
     keypadData: {
         value: '',
         callbackModify: null,
@@ -75,6 +76,10 @@ var quickAlgoInterface = {
         }
         this.fullscreen = false;
         this.updateFullscreenElements();
+    },
+
+    setSubtask: function(subtask) {
+        this.subtask = subtask;
     },
 
 
@@ -323,6 +328,7 @@ var quickAlgoInterface = {
         /*
         This is the format that we use to share our exercise
          */
+        // TODO: set the fields with subtask
         var toPublish = {
             // the title of the exercise
             title: additional.title,
