@@ -312,12 +312,72 @@ var quickAlgoInterface = {
         var additional = this.userTaskData;
         var code = task.displayedSubTask.blocklyHelper.getCodeStr();
 
-        console.log(JSON.stringify(additional));
-        console.log(JSON.stringify(code));
+        // to test output
+        // console.log(JSON.stringify(additional));
+        // console.log(JSON.stringify(code));
 
+        var quickpiFunctions = null;
+        if (this.context.findAllSensorsFunctions)
+            var quickpiFunctions = this.context.findAllSensorsFunctions();
 
-        // TODO: in python & blockly, you need to get code + additional.
-        // Simply create functions to get code and additional
+        /*
+        This is the format that we use to share our exercise
+         */
+        var toPublish = {
+            // the title of the exercise
+            title: additional.title,
+
+            // This is the subject, it is called "taskIntro" in the json editor
+            taskIntro: additional.subject,
+
+            // This are the meta data of the subject, PEMTaskMetaData is what we use inside of the editor
+            PEMTaskMetaData: {
+                // inside of the editor, authors is an array, in our case this is slightly different because it is a string,
+                // the owner of the task can write what he want there (website ect...)
+                authors: additional.about.authors,
+
+                // Normally this is how we set fr ect...
+                language: window.languageStrings,
+
+                // he should be able to choose his version in case of share (TODO)
+                version: "1.0.0",
+
+                // the license of the subject
+                license: additional.about.license
+            },
+            gridInfos: {
+                blocks: {
+                    // we are in testbed, this should be allways true because there are many blocks
+                    groupByCategory: true,
+
+                    generatedBlocks: {
+                        // the blocks for quickpi
+                        // TODO: for others too! (do if we are in quickpi we do this otherwise we skip (we can add it later)
+                        quickpi: {
+                            easy: quickpiFunctions
+                        }
+                    },
+                    // the standardBlocks for testbed, they should be all included by default.
+                    // TODO: copy the actual result of the subject and put them here
+                    standardBlocks: {
+                        includeAll: true,
+                        singleBlocks: {
+                            easy: ["controls_infiniteloop", "logic_boolean", "controls_if_else", "controls_if"]
+                        }
+                    }
+                },
+                customSensors: true,
+
+                quickPiSensors: {
+                    easy: [
+                        // TODO: get the sensors
+                    ]
+                }
+            }
+        };
+
+        console.log(JSON.stringify(toPublish));
+
     },
 
     /**
