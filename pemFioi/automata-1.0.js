@@ -48,6 +48,7 @@ function Automata(settings) {
    this.NFA;
    this.targetNFA = settings.targetNFA;
    this.callback = settings.callback;
+   this.mustBeDFA = settings.mustBeDFA;
 
    this.acceptedByRegex = settings.acceptedByRegex;
    this.acceptedByAutomaton = settings.acceptedByAutomaton;
@@ -740,6 +741,9 @@ function Automata(settings) {
 
       switch(mode){
          case 1:
+            if(this.mustBeDFA && !this.isDFA(this.graph)){
+               return { error: "This automaton is nondeterministic" };
+            }
             break;
          case 2:
             var regex = data;
