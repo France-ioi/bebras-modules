@@ -48,6 +48,11 @@ function LogicController(maxInstructions, subTask) {
     }
   };
 
+  this.getCodeStr = function() {
+    this.savePrograms(false);
+    return this.programs[0].blockly;
+  };
+
   this.loadPrograms = function () {
     if(this._aceEditor && this.programs[0].blockly) {
       this._aceEditor.setValue(''+this.programs[0].blockly);

@@ -309,8 +309,8 @@ var quickAlgoInterface = {
     },
 
     openShare: function() {
-        var additional = this.getAdditional();
-        var code = this.getCode();
+        var additional = this.userTaskData;
+        var code = task.displayedSubTask.blocklyHelper.getCodeStr();
 
         console.log(JSON.stringify(additional));
         console.log(JSON.stringify(code));
@@ -318,14 +318,6 @@ var quickAlgoInterface = {
 
         // TODO: in python & blockly, you need to get code + additional.
         // Simply create functions to get code and additional
-    },
-
-    getAdditional: function() {
-        return this.userTaskData;
-    },
-
-    getCode: function() {
-        return task.displayedSubTask.blocklyHelper.getCodeStr();
     },
 
     /**
