@@ -315,6 +315,8 @@ var quickAlgoInterface = {
 
     openShare: function() {
         var additional = this.userTaskData;
+
+        // code variable is not useful since we take the saved answer of the user from userTaskData.
         var code = task.displayedSubTask.blocklyHelper.getCodeStr();
 
         // to test output
@@ -325,72 +327,54 @@ var quickAlgoInterface = {
         if (this.context.findAllSensorsFunctions)
             var quickpiFunctions = this.context.findAllSensorsFunctions();
 
-        /*
-        This is the format that we use to share our exercise
-         */
-        // TODO: set the fields with subtask
-        var toPublish = {
+        var that = this;
+        // This is done as if it was a task.js
+        var subTaskToPublish = {
             // the title of the exercise
+            // we will have to move this to userTaskData during loading.
             title: additional.title,
 
-            // This is the subject, it is called "taskIntro" in the json editor
+            // taskIntro is the subject inside of the json editor.
+            // we will have to move this to userTaskData during loading.
             taskIntro: additional.subject,
 
-            // This are the meta data of the subject, PEMTaskMetaData is what we use inside of the editor
+            // This are the meta data of the subject, they have this format inside of the Json editor
+            // during load, we will take some information from here and put it in gridinfo (rebuild the about).
             PEMTaskMetaData: {
                 // inside of the editor, authors is an array, in our case this is slightly different because it is a string,
                 // the owner of the task can write what he want there (website ect...)
+                // we will have to move this to userTaskData during loading.
                 authors: additional.about.authors,
 
                 // Normally this is how we set fr ect...
                 language: window.stringsLanguage,
 
-                // he should be able to choose his version in case of share (TODO)
+                // The user should be able to select his version during share, for now one, there is no way to display
+                // the version to the user, but we can set it so later if we need it (example if we want to create a
+                // versioning system), then all the subject already have their own version.
                 version: "1.0.0",
 
-                // the license of the subject
+                // the license of the subject, during load we will have to move it to the userTaskData and about.
                 license: additional.about.license
             },
-            gridInfos: {
-                blocks: {
-                    // we are in testbed, this should be allways true because there are many blocks
-                    groupByCategory: true,
 
-                    generatedBlocks: {
-                        // the blocks for quickpi
-                        // TODO: for others too! (do if we are in quickpi we do this otherwise we skip (we can add it later)
-                        quickpi: {
-                            easy: quickpiFunctions
-                        }
-                    },
-                    // the standardBlocks for testbed, they should be all included by default.
-                    // TODO: copy the actual result of the subject and put them here
-                    standardBlocks: {
-                        includeAll: true,
-                        singleBlocks: {
-                            easy: ["controls_infiniteloop", "logic_boolean", "controls_if_else", "controls_if"]
-                        }
-                    }
-                },
-                customSensors: true,
+            // We just need to take the gridInfo from the exercise.
+            gridInfos: that.subtask.gridInfos,
 
-                quickPiSensors: {
-                    easy: [
-                        // TODO: get the sensors
-                    ]
-                }
-            },
+            // We juste take the data from the exercise which mean that we are compatible with everything.
+            data: that.subtask.data,
 
-            // the code of the user
-            userCode: {
-                // the type of the code (blockly or python)
-                type: "blockly",
-                // The code of the user
-                code: code
-            }
+            // We retrieve the saved answer of the user.
+            answer: that.subtask.answer
         };
 
-        console.log(JSON.stringify(toPublish));
+        // we remove the userTaskData from subTaskToPublish because the one that is present
+        // is not up to data, we have our additional that is up to date and that we will place inside of metadatas.
+        if (subTaskToPublish.userTaskData) {
+            delete subTaskToPublish.userTaskData;
+        }
+
+        console.log(JSON.stringify(subTaskToPublish));
 
     },
 
