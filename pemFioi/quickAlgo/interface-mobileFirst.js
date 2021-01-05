@@ -358,7 +358,11 @@ var quickAlgoInterface = {
 
             // We retrieve the saved answer of the user.
             // with this method, we can get the updated answer (after save) for all the levels.
-            answer: that.subtask.getAnswerObject()
+            answer: that.subtask.getAnswerObject(),
+
+            // This allow us to know if we have to load python or blockly
+            // TODO: find a way to know if we are in scratch or not
+            answerType: this.blocklyHelper.isBlockly ? "blockly" : "python"
         };
 
         // we remove the userTaskData from subTaskToPublish because the one that is present
