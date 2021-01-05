@@ -688,6 +688,8 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
         $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
 
+        $('#editorMenu div[rel=share]').toggleClass('interfaceToggled', hideControls.share !== false);
+
         var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
         $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
 
