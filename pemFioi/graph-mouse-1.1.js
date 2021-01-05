@@ -1473,6 +1473,7 @@ function GraphEditor(settings) {
    this.vertexLabelValidation = settings.vertexLabelValidation;
    this.writeContentCallback = settings.writeContentCallback;
    this.resizeTableVertexCallback = settings.resizeTableVertexCallback;
+   this.updateHandlersCallback = settings.updateHandlersCallback;
 
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -2518,6 +2519,9 @@ function GraphEditor(settings) {
       if(this.gridEnabled)
          this.setGridEnabled(this.gridEnabled.snapToGrid,this.gridEnabled.gridX,this.gridEnabled.gridY);
       this.setDefaultSettings();
+      if(this.updateHandlersCallback){
+         this.updateHandlersCallback();
+      }
    };
 
    this.editLabel = function(id,type) {
