@@ -176,6 +176,9 @@ function Automata(settings) {
          alphabet: this.alphabet,
          callback: this.callback,
          onDragEnd: this.callback,
+         updateHandlersCallback: function() {
+            self.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, true,"reset");
+         },
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
