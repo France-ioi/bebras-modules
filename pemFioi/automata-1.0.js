@@ -290,7 +290,7 @@ function Automata(settings) {
       }
       var e_c = dfa.find_equivalence_counterexamples(targetDFA);
       var equivalent = false;
-      if(!e_c[0] && !e_c[1]){
+      if(e_c[0] == null && e_c[1] == null){
          equivalent = true;
       }
       var noUnreachableDFA = dfa.without_unreachables();
@@ -848,7 +848,6 @@ function Automata(settings) {
          }
          this.NFA = nfaFromGraph.nfa;
       }
-
       var comp = this.compareWithTarget();
 
       if(comp.equivalent){
@@ -857,7 +856,7 @@ function Automata(settings) {
          }
          return { error: null };
       }
-      if(comp["e_c"][0]){
+      if(comp["e_c"][0] != null){
          this.setSequence(comp["e_c"][0]);
          var text = "The following string is "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
       }else{
