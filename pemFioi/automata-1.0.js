@@ -49,6 +49,7 @@ function Automata(settings) {
    this.targetNFA = settings.targetNFA;
    this.callback = settings.callback;
    this.mustBeDFA = settings.mustBeDFA;
+   this.singleStartingState = settings.singleStartingState;
 
    this.acceptedByRegex = settings.acceptedByRegex;
    this.acceptedByAutomaton = settings.acceptedByAutomaton;
@@ -717,6 +718,21 @@ function Automata(settings) {
       return true;
    };
 
+   this.hasSingleStartingState = function(graph) {
+      var vertices = graph.getAllVertices();
+      var nInitial = 0;
+      for(var vertex of vertices){
+         var info = graph.getVertexInfo(vertex);
+         if(info.initial){
+            nInitial++;
+            if(nInitial > 1){
+               return false;
+            }
+         }
+      }
+      return true;
+   };
+
    this.isWordAccepted = function(word) {
       /* is this word accepted by this.NFA and this.targetNFA */
       var acceptedByNFA = this.NFA.test(word);
@@ -741,6 +757,9 @@ function Automata(settings) {
 
       switch(mode){
          case 1:
+            if(this.singleStartingState && !this.hasSingleStartingState(this.graph)){
+               return { error: "This automaton has more than one starting state" };
+            }
             if(this.mustBeDFA && !this.isDFA(this.graph)){
                return { error: "This automaton is nondeterministic" };
             }
@@ -854,7 +873,7 @@ function Automata(settings) {
    }
    if(this.visualGraphJSON){
       this.initGraph();
-      this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
+      this.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, false,"reset");
    }
 
    if(settings.enabled){
