@@ -350,7 +350,6 @@ var quickAlgoInterface = {
             },
 
             // We just need to take the gridInfo from the exercise.
-            // TODO: sensors might be outdated. maybe use the sensors of answer instead.
             gridInfos: that.subtask.gridInfos,
 
             // We juste take the data from the exercise which mean that we are compatible with everything.
