@@ -314,18 +314,9 @@ var quickAlgoInterface = {
     },
 
     openShare: function() {
+        // this allow us to save the current answer of the user
+
         var additional = this.userTaskData;
-
-        // code variable is not useful since we take the saved answer of the user from userTaskData.
-        var code = task.displayedSubTask.blocklyHelper.getCodeStr();
-
-        // to test output
-        // console.log(JSON.stringify(additional));
-        // console.log(JSON.stringify(code));
-
-        var quickpiFunctions = null;
-        if (this.context.findAllSensorsFunctions)
-            var quickpiFunctions = this.context.findAllSensorsFunctions();
 
         var that = this;
         // This is done as if it was a task.js
@@ -365,7 +356,8 @@ var quickAlgoInterface = {
             data: that.subtask.data,
 
             // We retrieve the saved answer of the user.
-            answer: that.subtask.answer
+            // with this method, we can get the updated answer (after save) for all the levels.
+            answer: that.subtask.getAnswerObject()
         };
 
         // we remove the userTaskData from subTaskToPublish because the one that is present
@@ -375,7 +367,6 @@ var quickAlgoInterface = {
         }
 
         console.log(JSON.stringify(subTaskToPublish));
-
     },
 
     /**

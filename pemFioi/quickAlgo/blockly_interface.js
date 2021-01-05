@@ -611,17 +611,6 @@ function getBlocklyInterface(maxBlocks, subTask) {
          }
       },
 
-      /**
-       * This method allow us to get the code.
-       */
-      getCodeStr: function() {
-         this.savePrograms();
-         var xml = Blockly.Xml.textToDom(this.programs[this.codeId].blockly);
-         var additionalToRemove = xml.getElementsByTagName("additional")[0];
-         xml.removeChild(additionalToRemove);
-         return Blockly.Xml.domToText(xml);
-      },
-
       saveProgram: function() {
          this.savePrograms();
          var code = this.programs[this.codeId][this.languages[this.codeId]];
