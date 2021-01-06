@@ -214,9 +214,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             if(window.displayHelper) {
                displayHelper.displayLevel(state.level);
             }
+            var answer = mainTask.answer;
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
                displayHelper.setupLevels(defaultLevel, reloadWithCallbacks, levels);
+            }
+            if (answer) {
+               mainTask.reloadAnswerObject(answer)
             }
             callback();
          }

@@ -370,6 +370,9 @@ var quickAlgoInterface = {
             delete subTaskToPublish.gridInfos.userTaskData;
         }
 
+        $.post("http://localhost:3000", JSON.stringify(subTaskToPublish), function(data) {
+            alert(data);
+        });
         console.log(JSON.stringify(subTaskToPublish));
     },
 
