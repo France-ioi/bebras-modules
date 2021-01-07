@@ -182,6 +182,7 @@ function Automata(settings) {
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
+      this.graphEditor.setAllowMultipleInitial(!this.singleStartingState);
    };
 
    this.initStaticGraph = function() {
@@ -710,6 +711,9 @@ function Automata(settings) {
             var edges = graph.getEdgesFrom(vertex,child);
             for(var edge of edges){
                var edgeInfo = graph.getEdgeInfo(edge);
+               if(edgeInfo.label.length != 1){
+                  return false
+               }
                if(edgeLabel.includes(edgeInfo.label)){
                   return false;
                }else{
@@ -760,9 +764,9 @@ function Automata(settings) {
 
       switch(mode){
          case 1:
-            if(this.singleStartingState && !this.hasSingleStartingState(this.graph)){
-               return { error: "This automaton has more than one starting state" };
-            }
+            // if(this.singleStartingState && !this.hasSingleStartingState(this.graph)){
+            //    return { error: "This automaton has more than one starting state" };
+            // }
             if(this.mustBeDFA && !this.isDFA(this.graph)){
                return { error: "This automaton is nondeterministic" };
             }
