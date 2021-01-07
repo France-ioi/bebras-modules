@@ -2048,11 +2048,11 @@ function GraphEditor(settings) {
          }
       }
       if(this.initialEnabled){
-         if(this.allowMutlipleInitial){
-            this.addInitialIcon(vertexId);
-         }else{
-            var initial = this.getInitialOrTerminal(vertexId,"initial");
-            if(initial == null || initial == vertexId){
+         // if(this.allowMutlipleInitial){
+         //    this.addInitialIcon(vertexId);
+         // }else{
+         //    var initial = this.getInitialOrTerminal(vertexId,"initial");
+         //    if(initial == null || initial == vertexId){
                if(this.allowSimultaneousInitialAndTerminal){
                   this.addInitialIcon(vertexId);
                }else{
@@ -2061,8 +2061,8 @@ function GraphEditor(settings) {
                      this.addInitialIcon(vertexId);
                   }
                }
-            }
-         }
+            // }
+         // }
       }
    };
    this.removeIcons = function(id) {
@@ -2308,9 +2308,21 @@ function GraphEditor(settings) {
 
    this.setInitial = function(vID) {
       var info = graph.getVertexInfo(vID);
-      info.initial = !info.initial;
-      
+      info.initial = !info.initial;      
       graph.setVertexInfo(vID,info);
+
+      if(!self.allowMutlipleInitial){
+         var vertices = graph.getAllVertices();
+         for(var vertex of vertices){
+            if(vertex != vID){
+               var currInfo = graph.getVertexInfo(vertex);
+               if(currInfo.initial){
+                  currInfo.initial = false;      
+                  graph.setVertexInfo(vertex,currInfo);
+               }
+            }
+         }
+      }
       visualGraph.redraw();
       self.updateHandlers();
       
