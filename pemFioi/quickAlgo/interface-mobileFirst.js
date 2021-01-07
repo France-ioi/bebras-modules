@@ -370,10 +370,13 @@ var quickAlgoInterface = {
             delete subTaskToPublish.gridInfos.userTaskData;
         }
 
+        // TODO: change with "prod" url
+        var url = "file:///home/nicolas/stage/test/v01/QuickPi/dynamicTestbed/testbed/index.html";
+
         $.post("http://localhost:3000", JSON.stringify(subTaskToPublish), function(data) {
-            alert(data);
+            var parseUrl = url + "?id=" + data;
+            alert(parseUrl);
         });
-        console.log(JSON.stringify(subTaskToPublish));
     },
 
     /**
