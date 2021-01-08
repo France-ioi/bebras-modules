@@ -101,7 +101,7 @@ function Automata(settings) {
       this.enabled = enabled;
       if(this.visualGraphJSON){
          this.graphEditor.setEnabled(enabled);
-         this.reset.setEnabled(enabled);
+         // this.reset.setEnabled(enabled);
          
          this.graphEditor.setGraphDragEnabled(false);
          this.graphEditor.setScaleGraphEnabled(false);
@@ -167,6 +167,7 @@ function Automata(settings) {
          graphMouse: this.graphMouse,
          dragThreshold: 10,
          edgeThreshold: 20,
+         vertexThreshold: this.circleAttr.r,
          dragLimits: {
             minX: this.visualGraph.graphDrawer.circleAttr.r,
             maxX: this.graphPaper.width - this.visualGraph.graphDrawer.circleAttr.r,
@@ -176,9 +177,10 @@ function Automata(settings) {
          alphabet: this.alphabet,
          callback: this.callback,
          onDragEnd: this.callback,
-         updateHandlersCallback: function() {
-            self.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, true,"reset");
-         },
+         fuzzyClickCallback: this.resetAnimation,
+         // updateHandlersCallback: function() {
+         //    // self.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, true,"reset");
+         // },
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
@@ -681,6 +683,7 @@ function Automata(settings) {
    };
 
    this.resetAnimation = function() {
+      // console.log("reset")
       self.stopAnimation();
       if(self.cursor){
          self.sequencePaper.clear();
@@ -688,8 +691,9 @@ function Automata(settings) {
       if(self.beaver){
          self.beaver.remove();
       }
-      if(settings.resetCallback)
+      if(settings.resetCallback){
          settings.resetCallback();
+      }
    };
 
    this.isDFA = function(graph) {
@@ -879,7 +883,7 @@ function Automata(settings) {
    }
    if(this.visualGraphJSON){
       this.initGraph();
-      this.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, false,"reset");
+      // this.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, false,"reset");
    }
 
    if(settings.enabled){
