@@ -790,8 +790,8 @@ var quickAlgoLanguageStrings = {
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
       doYouWantToShare: "Do you want to share your project ?", // TODO: translate
-      yes: "sì",
-      no: "no",
+      yes: "sì", // TODO: verify
+      no: "no", // TODO: verify
       stopProgramDesc: "Partire dall'inizio",
       stepProgramDesc: "Esecuzione passo a passo",
       slowSpeedDesc: "Esegui su questo test",
