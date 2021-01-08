@@ -314,11 +314,15 @@ var quickAlgoInterface = {
     },
 
     openShare: function() {
-        // this allow us to save the current answer of the user
+        displayHelper.showPopupMessage("Voullez-vous partagez votre sujet ?", 'blanket', "Oui", this.shareSubject, "Non", null, null)
+    },
 
-        var additional = this.userTaskData;
+    shareSubject: function() {
+        // we take back quickAlgoInterface from global variable because the word "this" refer to displayHelper
+        var that = quickAlgoInterface;
 
-        var that = this;
+        var additional = that.userTaskData;
+
         // This is done as if it was a task.js
         var subTaskToPublish = {
             // the title of the exercise
@@ -361,7 +365,7 @@ var quickAlgoInterface = {
 
             // This allow us to know if we have to load python or blockly
             // TODO: find a way to know if we are in scratch or not
-            answerType: this.blocklyHelper.isBlockly ? "blockly" : "python"
+            answerType: that.blocklyHelper.isBlockly ? "blockly" : "python"
         };
 
         // we remove the userTaskData from subTaskToPublish because the one that is present
@@ -375,7 +379,8 @@ var quickAlgoInterface = {
 
         $.post("http://localhost:3000", JSON.stringify(subTaskToPublish), function(data) {
             var parseUrl = url + "?id=" + data;
-            alert(parseUrl);
+
+            displayHelper.showPopupMessage(that.strings.shareLink.replace("{url}", parseUrl), "blanket", "OK");
         });
     },
 

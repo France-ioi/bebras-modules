@@ -53,6 +53,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Voici votre url de partage : <code>{url}</code>",
       stopProgramDesc: "Repartir du début",
       stepProgramDesc: "Exécution pas à pas",
       slowSpeedDesc: "Exécuter sur ce test",
@@ -195,6 +196,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Here is your sharing link : <code>%1</code>",
       stopProgramDesc: "Restart from the beginning",
       stepProgramDesc: "Step-by-step execution",
       slowSpeedDesc: "Execute on this test",
@@ -338,6 +340,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
       stopProgramDesc: "Von vorne anfangen",
       stepProgramDesc: "Schritt für Schritt",
       slowSpeedDesc: "Langsame",
@@ -482,6 +485,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
       stopProgramDesc: "Reiniciar desde el principio",
       stepProgramDesc: "Ejecución paso a paso",
       slowSpeedDesc: "Ejecutar en esta prueba",
@@ -624,6 +628,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
       stopProgramDesc: "Začni znova",
       stepProgramDesc: "Izvajanje po korakih",
       slowSpeedDesc: "Počasi",
@@ -768,6 +773,7 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
       stopProgramDesc: "Partire dall'inizio",
       stepProgramDesc: "Esecuzione passo a passo",
       slowSpeedDesc: "Esegui su questo test",
