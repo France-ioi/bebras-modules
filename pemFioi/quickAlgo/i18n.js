@@ -54,6 +54,9 @@ var quickAlgoLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>",
+      doYouWantToShare: "Voullez-vous partager votre projet ?",
+      yes: "Oui",
+      no: "Non",
       stopProgramDesc: "Repartir du début",
       stepProgramDesc: "Exécution pas à pas",
       slowSpeedDesc: "Exécuter sur ce test",
@@ -196,7 +199,10 @@ var quickAlgoLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      shareLink: "Here is your sharing link : <code>%1</code>",
+      shareLink: "Here is your sharing link : <code>{url}</code>",
+      doYouWantToShare: "Do you want to share your project ?",
+      yes: "Yes",
+      no: "No",
       stopProgramDesc: "Restart from the beginning",
       stepProgramDesc: "Step-by-step execution",
       slowSpeedDesc: "Execute on this test",
@@ -341,6 +347,9 @@ var quickAlgoLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
+      doYouWantToShare: "Do you want to share your project ?", // TODO: translate
+      yes: "Ja", // TODO: verify
+      no: "Nein", // TODO: verify
       stopProgramDesc: "Von vorne anfangen",
       stepProgramDesc: "Schritt für Schritt",
       slowSpeedDesc: "Langsame",
@@ -486,6 +495,9 @@ var quickAlgoLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
+      doYouWantToShare: "Do you want to share your project ?", // TODO: translate
+      yes: "Si", // TODO: verify
+      no: "No", // TODO: verify
       stopProgramDesc: "Reiniciar desde el principio",
       stepProgramDesc: "Ejecución paso a paso",
       slowSpeedDesc: "Ejecutar en esta prueba",
@@ -629,6 +641,9 @@ var quickAlgoLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
+      doYouWantToShare: "Do you want to share your project ?", // TODO: translate
+      yes: "Ja", // TODO: verify
+      no: "št", // TODO: verify
       stopProgramDesc: "Začni znova",
       stepProgramDesc: "Izvajanje po korakih",
       slowSpeedDesc: "Počasi",
@@ -774,6 +789,9 @@ var quickAlgoLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       shareLink: "Voici votre url de partage : <code>{url}</code>", // TODO: translate
+      doYouWantToShare: "Do you want to share your project ?", // TODO: translate
+      yes: "sì",
+      no: "no",
       stopProgramDesc: "Partire dall'inizio",
       stepProgramDesc: "Esecuzione passo a passo",
       slowSpeedDesc: "Esegui su questo test",

@@ -314,7 +314,7 @@ var quickAlgoInterface = {
     },
 
     openShare: function() {
-        displayHelper.showPopupMessage("Voullez-vous partagez votre sujet ?", 'blanket', "Oui", this.shareSubject, "Non", null, null)
+        displayHelper.showPopupMessage(this.strings.doYouWantToShare, 'blanket', this.strings.yes, this.shareSubject, this.strings.no, null, null)
     },
 
     shareSubject: function() {
