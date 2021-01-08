@@ -1938,7 +1938,7 @@ function GraphEditor(settings) {
          var edgesFrom = graph.getEdgesFrom(id1,id2);
          var validParameters;
          var parameterSet = [
-            {/*"sweep":0,"large-arc":0,"radius-ratio":0*/},
+            {"sweep":0,"large-arc":0,"radius-ratio":0},
             {"sweep":0,"large-arc":0,"radius-ratio":1},
             {"sweep":1,"large-arc":0,"radius-ratio":1},
             {"sweep":0,"large-arc":0,"radius-ratio":0.75},
@@ -2008,6 +2008,13 @@ function GraphEditor(settings) {
             }
          }while(!validParameters);
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
+      }
+      for(var edge of edges){
+         var vInfo = visualGraph.getEdgeVisualInfo(edge);
+         if(!vInfo["radius-ratio"]){
+            vInfo = {};
+            visualGraph.setEdgeVisualInfo(edge,vInfo);
+         }
       }
       visualGraph.graphDrawer.refreshEdgePosition(id1,id2);
    };
