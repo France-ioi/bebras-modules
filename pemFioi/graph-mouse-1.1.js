@@ -845,6 +845,7 @@ function VertexDragAndConnect(settings) {
    this.startDragCallback = settings.startDragCallback;
    this.moveDragCallback = settings.moveDragCallback;
    this.clickHandlerCallback = settings.clickHandlerCallback;
+   this.fuzzyClickCallback = settings.fuzzyClickCallback;
 
    this.gridEnabled = false;
    this.gridX = null;
@@ -866,7 +867,7 @@ function VertexDragAndConnect(settings) {
       this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, true, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
    }else{
-      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
+      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, true, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
    }
    
@@ -921,6 +922,7 @@ function VertexDragAndConnect(settings) {
    };
 
    function onFuzzyClick(elementType, id) {
+      // console.log("onFuzzyClick",elementType,id)
       if(elementType === "edge") {
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
@@ -929,11 +931,14 @@ function VertexDragAndConnect(settings) {
          if(self.onEdgeSelect) {
             self.onEdgeSelect(id);
          }
-      }
-      else if(elementType === "edgeLabel"){
+      }else if(elementType === "edgeLabel"){
          return;
       }else{
          self.clickHandler(id);
+      }
+      if(self.fuzzyClickCallback){
+         // console.log("fuzzyClickCB")
+         self.fuzzyClickCallback();
       }
    }
 
@@ -947,6 +952,7 @@ function VertexDragAndConnect(settings) {
       self.isDragging = false;
       self.visualGraph.elementToFront(self.elementID);
       if(self.startDragCallback){
+         // console.log("startDragCallback")
          self.startDragCallback(self.elementID,x,y);
       }
    };
@@ -965,10 +971,10 @@ function VertexDragAndConnect(settings) {
          if(self.onDragEnd) {
             self.onDragEnd(self.elementID, isSnappedToGoodPosition);
          }
-         self.isDragging = false;
+         // self.isDragging = false;
          return;
       }
-      self.clickHandler(self.elementID,event.pageX,event.pageY);
+      // self.clickHandler(self.elementID,event.pageX,event.pageY);
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
@@ -1018,6 +1024,10 @@ function VertexDragAndConnect(settings) {
    this.clickHandler = function(id,x,y) {
       if(self.unselectAllEdges){
          self.unselectAllEdges();
+      }
+      if(self.isDragging){
+         self.isDragging = false;
+         return
       }
       if(self.vertexSelectEnabled && self.allowDeselection) {
          // Click on background or on the selected vertex -  deselect it.
@@ -1473,7 +1483,7 @@ function GraphEditor(settings) {
    this.vertexLabelValidation = settings.vertexLabelValidation;
    this.writeContentCallback = settings.writeContentCallback;
    this.resizeTableVertexCallback = settings.resizeTableVertexCallback;
-   this.updateHandlersCallback = settings.updateHandlersCallback;
+   // this.updateHandlersCallback = settings.updateHandlersCallback;
 
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -2531,9 +2541,9 @@ function GraphEditor(settings) {
       if(this.gridEnabled)
          this.setGridEnabled(this.gridEnabled.snapToGrid,this.gridEnabled.gridX,this.gridEnabled.gridY);
       this.setDefaultSettings();
-      if(this.updateHandlersCallback){
-         this.updateHandlersCallback();
-      }
+      // if(this.updateHandlersCallback){
+      //    this.updateHandlersCallback();
+      // }
    };
 
    this.editLabel = function(id,type) {
