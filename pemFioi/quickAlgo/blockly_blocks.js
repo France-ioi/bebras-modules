@@ -2526,33 +2526,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       /**
-       * This method allow us to check if there are any non-existent block that are used inside of the xml given
+       * This method allow us to check for not allowed blocks.
        * @param xml The code of the user
-       * @return An {Array} containing all ids of blocks that are not allowed but used.
+       * @param silent If not silent, then we will display error message on console when blocks are not allowed
+       * @param returnNotAllowed This will return notAllowed instead of a boolean
+       * @return A boolean which is true if there is any not allowed blocks if the parameter returnNotAllowed is false,
+       * otherwise it returns an array containing all not allowed blocks.
        */
-      checkNonexistentBlocks: function(xml) {
-         var allowed = this.getBlocksAllowed();
-         var blockList = xml.getElementsByTagName('block');
-         var notAllowed = [];
-         function checkBlock(block) {
-            var blockName = block.getAttribute('type');
-            if(!arrayContains(allowed, blockName)
-                && (blockName.substr(blockName.length - 9) != '_noShadow' || !arrayContains(allowed, blockName.substr(0, blockName.length - 9)))) {
-               notAllowed.push(block.getAttribute('id'));
-            }
+      checkBlocksAreAllowed: function(xml, silent, returnNotAllowed) {
+         if(!returnNotAllowed && this.includeBlocks && this.includeBlocks.standardBlocks
+             && this.includeBlocks.standardBlocks.includeAll) {
+            return true;
          }
-         for(var i=0; i<blockList.length; i++) {
-            checkBlock(blockList[i]);
-         }
-         if(xml.localName == 'block') {
-            // Also check the top element
-            checkBlock(xml);
-         }
-         return notAllowed;
-      },
-
-      checkBlocksAreAllowed: function(xml, silent) {
-         if(this.includeBlocks && this.includeBlocks.standardBlocks && this.includeBlocks.standardBlocks.includeAll) { return true; }
          var allowed = this.getBlocksAllowed();
          var blockList = xml.getElementsByTagName('block');
          var notAllowed = [];
@@ -2573,7 +2558,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          if(!silent && notAllowed.length > 0) {
             console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
          }
-         return !(notAllowed.length);
+         if (!returnNotAllowed)
+            return !(notAllowed.length);
+         else
+            return notAllowed;
       },
 
       cleanBlockAttributes: function(xml, origin) {

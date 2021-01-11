@@ -749,7 +749,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
          this.savePrograms();
 
          var xml = Blockly.Xml.textToDom(this.programs[this.codeId].blockly);
-         var notAllowed = this.checkNonexistentBlocks(xml);
+         var notAllowed = this.checkBlocksAreAllowed(xml, true, true);
          if (notAllowed.length > 0) {
             // if you want to display more, then you must remove the [0] and modify the function so that it call
             // the function that allow to put the block in glowing in every block of the list.
