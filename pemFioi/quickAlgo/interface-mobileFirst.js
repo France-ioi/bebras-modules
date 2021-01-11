@@ -364,6 +364,8 @@ var quickAlgoInterface = {
             answer: that.subtask.getAnswerObject()
         };
 
+        console.log(JSON.stringify(subTaskToPublish));
+
         // we remove the userTaskData from subTaskToPublish because the one that is present
         // is not up to date, we have our additional that is up to date and that we have placed inside of metadatas.
         if (subTaskToPublish.gridInfos.userTaskData) {
