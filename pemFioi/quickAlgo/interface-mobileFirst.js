@@ -365,7 +365,7 @@ var quickAlgoInterface = {
         };
 
         // we remove the userTaskData from subTaskToPublish because the one that is present
-        // is not up to data, we have our additional that is up to date and that we will place inside of metadatas.
+        // is not up to date, we have our additional that is up to date and that we have placed inside of metadatas.
         if (subTaskToPublish.gridInfos.userTaskData) {
             delete subTaskToPublish.gridInfos.userTaskData;
         }
