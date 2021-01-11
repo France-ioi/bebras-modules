@@ -1858,7 +1858,8 @@ var getContext = function (display, infos, curLevel) {
         var sensorFunction = context.findAllSensorsFunctions();
         // comparison only on length should be enough in almost all cases.
         if (sensorFunction.length !== infos.includeBlocks.generatedBlocks.quickpi.length) {
-            context.subTask.reloadFunctions(sensorFunction);
+            context.subTask.setFunctions(sensorFunction);
+            context.subTask.reloadLevel();
             return true;
         }
 

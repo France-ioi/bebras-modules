@@ -179,8 +179,14 @@ var initBlocklySubTask = function(subTask, language) {
       updateScores();
    };
 
-   subTask.reloadFunctions = function(newFunctions) {
+   /**
+    * This method allow us to set the functions, use subtask#reloadLevel after calling this function to enable it.
+    */
+   subTask.setFunctions = function(newFunctions) {
       subTask.gridInfos.includeBlocks.generatedBlocks.quickpi[this.level] = newFunctions;
+   };
+
+   subTask.reloadLevel = function() {
       var level = this.level;
       var answerObj = subTask.getAnswerObject();
       subTask.unloadLevel(function() {
