@@ -1526,6 +1526,7 @@ function GraphEditor(settings) {
    this.editInfo = {};
    this.edited = false; // true when label or content has just been modified
    this.selectedEdges = [];
+   this.maxEdgeLabelLength = settings.maxEdgeLabelLength;
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
@@ -1907,7 +1908,7 @@ function GraphEditor(settings) {
 
    this.setNewEdgeVisualInfo = function(edgeID,id1,id2) {
       var edges = graph.getEdgesBetween(id1,id2);
-
+      // console.log(edges)
       if(id1 === id2){
          if(edges.length <= 1)
             return;
@@ -1989,8 +1990,7 @@ function GraphEditor(settings) {
                var neighbors1 = graph.getNeighbors(id1);
                var neighbors2 = graph.getNeighbors(id2);
                var neighbors = neighbors1.concat(neighbors2);
-               for(var iNeighbor = 0; iNeighbor < neighbors.length; iNeighbor++){
-                  var neighbor = neighbors[iNeighbor];
+               for(var neighbor of neighbors){
                   if(neighbor != id1 && neighbor != id2 && areAligned(id1,id2,neighbor)){
                      var edges1 = graph.getEdgesBetween(id1,neighbor);
                      var edges2 = graph.getEdgesBetween(id2,neighbor);
@@ -2007,6 +2007,7 @@ function GraphEditor(settings) {
                }
             }
          }while(!validParameters);
+         // console.log(parameterSet[nTry])
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
       }
       for(var edge of edges){
@@ -2563,11 +2564,13 @@ function GraphEditor(settings) {
             var boxSize = visualGraph.graphDrawer.getBoxSize(content);
             var labelHeight = 2*attr["font-size"];
          }
+         var maxLength = self.maxVertexLabelLength || 100;
       }else if(type === "edge" && self.editEdgeLabelEnabled){
          $(document).off("keydown");
          var info = graph.getEdgeInfo(id);
          var attr = visualGraph.graphDrawer.edgeLabelAttr;
          var labelPos = visualGraph.graphDrawer.getLabelPos(id);
+         var maxLength = self.maxEdgeLabelLength || 100;
       }else{
          return
       }
@@ -2575,7 +2578,7 @@ function GraphEditor(settings) {
       var label = info.label || " ";
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[1].hide();
-      self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
+      self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\" maxlength=\""+maxLength+"\">");
       self.editInfo = {id: id, type: type, field: "label"};
       $("#"+paperId).css("position","relative");
 
