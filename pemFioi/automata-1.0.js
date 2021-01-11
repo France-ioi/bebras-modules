@@ -61,6 +61,7 @@ function Automata(settings) {
    this.enabled = false;
 
    this.margin = 10;
+   var animTime = 500;
 
    var sim;
    var comparisonMessages = [
@@ -588,7 +589,7 @@ function Automata(settings) {
       this.result = { message: nextStep.message, nEdges: nextStep.nEdges };
 
       var simStep = new SimulationStep();
-      var simAction = {onExec: animStep(nextStep,step), duration: 500, params: {}};
+      var simAction = {onExec: animStep(nextStep,step), duration: animTime, params: {}};
       var simEntry = {name: "entry"+step, action: simAction};
       simStep.addEntryAllParents(simEntry);
       sim.addStep(simStep);
@@ -659,21 +660,21 @@ function Automata(settings) {
          if(!vID){
             subTask.simulationFactory.destroy("sim");
          }else{
-            self.animate(step,vID,eID,callback);
+            self.animate(step,vID,eID,duration,callback);
          }
       }
    };
 
-   this.animate = function(step,vID,eID,callback) {
+   this.animate = function(step,vID,eID,duration,callback) {
       var xi = this.cursorX;
       var xf = this.seqLettersPos[step].x + this.margin/2 + this.seqLettersAttr["font-size"]/2;
       var translation = xf - xi;
       this.cursorX = xf;
-      var animCursor = new Raphael.animation({"transform":"...T"+translation+",0"},500,callback);
+      var animCursor = new Raphael.animation({"transform":"...T"+translation+",0"},duration,callback);
       subTask.raphaelFactory.animate("animCursor",this.cursor,animCursor);
 
       var transformStr = this.getTransformString(eID);
-      var animBeaver = new Raphael.animation({"transform":"..."+transformStr},500);
+      var animBeaver = new Raphael.animation({"transform":"..."+transformStr},duration);
       subTask.raphaelFactory.animate("animBeaver",this.beaver,animBeaver);
    };
 
