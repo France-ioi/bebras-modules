@@ -1767,23 +1767,23 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < alwaysIncluded.length; i++)
                 retSensorType.push(alwaysIncluded[i]);
 
-            // cleaning output so it correspond to the concept output
-            if (arrayContains(retSensorType, "quickpi_cloudstore"))
-                retSensorType.push("quickpi_cloud");
-            if (arrayContains(retSensorType, "quickpi_screen"))
-                retSensorType.push("quickpi_draw");
-            if (arrayContains(retSensorType, "quickpi_stick"))
-                retSensorType.push("quickpi_button");
-            if (arrayContains(retSensorType, "quickpi_irrecv"))
-                retSensorType.push("quickpi_ir_receiver");
-            if (arrayContains(retSensorType, "quickpi_irtrans"))
-                retSensorType.push("quickpi_ir_emitter");
-            if (arrayContains(retSensorType, "quickpi_light"))
-                retSensorType.push("quickpi_light_sensor");
-            if (arrayContains(retSensorType, "quickpi_magnetometer"))
-                retSensorType.push("quickpi_magneto");
-            if (arrayContains(retSensorType, "quickpi_sound"))
-                retSensorType.push("quickpi_microphone");
+            // some concepts have a different name than the sensor, we put here at left the name of the concept and at
+            // right the right sensor name.
+            var renamed = [
+                {concept: "quickpi_cloudstore", rename: "quickpi_cloud"},
+                {concept: "quickpi_screen", rename: "quickpi_draw"},
+                {concept: "quickpi_stick", rename: "quickpi_button"},
+                {concept: "quickpi_irrecv", rename: "quickpi_ir_receiver"},
+                {concept: "quickpi_irtrans", rename: "quickpi_ir_emitter"},
+                {concept: "quickpi_light", rename: "quickpi_light_sensor"},
+                {concept: "quickpi_magnetometer", rename: "quickpi_magneto"},
+                {concept: "quickpi_sound", rename: "quickpi_microphone"}
+            ];
+
+            for (var i = 0; i < renamed.length; i++) {
+                if (arrayContains(retSensorType, renamed[i].concept))
+                    retSensorType.push(renamed[i].rename);
+            }
 
             return retSensorType;
         })();
