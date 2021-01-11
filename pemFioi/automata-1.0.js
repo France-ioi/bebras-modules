@@ -61,6 +61,8 @@ function Automata(settings) {
    this.enabled = false;
 
    this.margin = 10;
+
+   var sim;
    var comparisonMessages = [
       [
          "accepted by the automaton but doesn't match the regex: ",
@@ -567,45 +569,34 @@ function Automata(settings) {
       return arrow;
    };
 
-   this.run = function(callback) {
-      this.initSequence();
+   this.run = function() {
+      sim = subTask.simulationFactory.create("sim");
       this.initBeaver();
-      this.result = null;
-      var edges = this.graph.getAllEdges();
-      for(edge of edges){
-         var info = this.graph.getEdgeInfo(edge);
-         if(!info.label || info.label === "?"){
-            this.result = { message: "missingLabel", nEdges: null};
-            if(callback)
-               callback(this.result);
-         }
-      }
-      this.loop(self.startID,0,callback);
+      this.loop(self.startID,0);
+      this.initSequence();
+      sim.setAutoPlay(true);
+      sim.play();
    };
 
-   this.loop = function(vID,step,callback) {
+   this.loop = function(vID,step) {
       var nextStep = self.checkNext(vID,step);
-      // console.log(nextStep)
-      vID = nextStep.vID;
-      var eID = nextStep.edgeID;
-      var oldEdgeID = null;
-      this.result = { message: nextStep.message, nEdges: nextStep.nEdges };
-      if(callback){
-         callback(this.result);
+      if(nextStep.epsilon){
+         this.sequence.splice(step,0,"ε");
       }
-      if(vID){
-         this.animate(step,vID,eID,function(){
-            if(oldEdgeID === eID)   // to avoid multiple calls when animated object is a set of elements
-               return;
-            oldEdgeID = eID;
+      vID = nextStep.vID;
 
-            step++;
-            if(!self.endID.includes(vID)){
-               subTask.delayFactory.create("delay"+step,function(){
-                  self.loop(vID,step,callback);
-               },100);
-            }
-         });
+      this.result = { message: nextStep.message, nEdges: nextStep.nEdges };
+
+      var simStep = new SimulationStep();
+      var simAction = {onExec: animStep(nextStep,step), duration: 500, params: {}};
+      var simEntry = {name: "entry"+step, action: simAction};
+      simStep.addEntryAllParents(simEntry);
+      sim.addStep(simStep);
+      if(vID){
+         step++;
+         if(!self.endID.includes(vID)){
+            self.loop(vID,step);
+         }
       }
    };
 
@@ -614,31 +605,63 @@ function Automata(settings) {
       var nextVertex = null;
       var way = null;
       var nEdges = 0;
+      var epsilon = false;
       if(children.length == 0){
          return { vID: null, edgeID: null, nEdges: 0, message: "noChildren"};
       }
-      
-      for(child of children){
-         var edges = this.graph.getEdgesFrom(vID,child);
-         for(edge of edges){
-            var info = this.graph.getEdgeInfo(edge);
-            if(info.label == this.sequence[step]){
-               if(nextVertex && nextVertex !== child){
-                  return { vID: null, edgeID: null, nEdges: 0, message: "tooManyWays" };
+      if(this.sequence[step]){
+         for(child of children){
+            var edges = this.graph.getEdgesFrom(vID,child);
+            for(edge of edges){
+               var info = this.graph.getEdgeInfo(edge);
+               if(info.label == this.sequence[step]){
+                  if(nextVertex && nextVertex !== child){
+                     return { vID: null, edgeID: null, nEdges: 0, message: "tooManyWays" };
+                  }
+                  nextVertex = nextVertex || child;
+                  way = way || edge;
+                  nEdges++;
                }
-               nextVertex = nextVertex || child;
-               way = way || edge;
-               nEdges++;
             }
          }
       }
       if(!nextVertex){
-         
+         for(child of children){
+            var edges = this.graph.getEdgesFrom(vID,child);
+            for(edge of edges){
+               var info = this.graph.getEdgeInfo(edge);
+               if(!info.label){
+                  if(nextVertex && nextVertex !== child){
+                     return { vID: null, edgeID: null, nEdges: 0, message: "tooManyWays" };
+                  }
+                  nextVertex = nextVertex || child;
+                  way = way || edge;
+                  nEdges++;
+                  epsilon = true;
+               }
+            }
+         }
+      }
+      // console.log(nextVertex)
+      if(!nextVertex){
          return { vID: null, edgeID: null, nEdges: 0, message: "noGoodWay" };
       }
       if(nextVertex !== this.endID)
-         return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "next" };
-      return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "success" };
+         return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "next", epsilon: epsilon };
+      return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "success", epsilon: epsilon };
+   };
+
+   function animStep(nextStep,step) {
+      return function(params,duration,callback){
+         // console.log(nextStep,step);
+         var vID = nextStep.vID;
+         var eID = nextStep.edgeID;
+         if(!vID){
+            subTask.simulationFactory.destroy("sim");
+         }else{
+            self.animate(step,vID,eID,callback);
+         }
+      }
    };
 
    this.animate = function(step,vID,eID,callback) {
@@ -657,6 +680,7 @@ function Automata(settings) {
    this.stopAnimation = function() {
       subTask.raphaelFactory.stopAnimate("animCursor");
       subTask.raphaelFactory.stopAnimate("animBeaver");
+      subTask.simulationFactory.destroy("sim");
    };
 
    this.getTransformString = function(eID) {
