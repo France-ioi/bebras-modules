@@ -178,9 +178,7 @@ function Automata(settings) {
          callback: this.callback,
          onDragEnd: this.callback,
          fuzzyClickCallback: this.resetAnimation,
-         // updateHandlersCallback: function() {
-         //    // self.reset = new PaperMouseEvent(self.graphPaperElementID, self.graphPaper, "click", self.resetAnimation, true,"reset");
-         // },
+         maxEdgeLabelLength: 1,
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
@@ -587,6 +585,7 @@ function Automata(settings) {
 
    this.loop = function(vID,step,callback) {
       var nextStep = self.checkNext(vID,step);
+      // console.log(nextStep)
       vID = nextStep.vID;
       var eID = nextStep.edgeID;
       var oldEdgeID = null;
@@ -634,6 +633,7 @@ function Automata(settings) {
          }
       }
       if(!nextVertex){
+         
          return { vID: null, edgeID: null, nEdges: 0, message: "noGoodWay" };
       }
       if(nextVertex !== this.endID)
@@ -715,7 +715,7 @@ function Automata(settings) {
             var edges = graph.getEdgesFrom(vertex,child);
             for(var edge of edges){
                var edgeInfo = graph.getEdgeInfo(edge);
-               if(edgeInfo.label.length != 1){
+               if(!edgeInfo.label || edgeInfo.label.length != 1){
                   return false
                }
                if(edgeLabel.includes(edgeInfo.label)){
