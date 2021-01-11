@@ -361,11 +361,7 @@ var quickAlgoInterface = {
 
             // We retrieve the saved answer of the user.
             // with this method, we can get the updated answer (after save) for all the levels.
-            answer: that.subtask.getAnswerObject(),
-
-            // This allow us to know if we have to load python or blockly
-            // TODO: find a way to know if we are in scratch or not
-            answerType: that.blocklyHelper.isBlockly ? "blockly" : "python"
+            answer: that.subtask.getAnswerObject()
         };
 
         // we remove the userTaskData from subTaskToPublish because the one that is present
@@ -374,11 +370,13 @@ var quickAlgoInterface = {
             delete subTaskToPublish.gridInfos.userTaskData;
         }
 
+        var answerType = that.blocklyHelper.isBlockly ? "blockly" : "python";
+
         // TODO: change with "prod" url
         var url = "file:///home/nicolas/stage/test/v01/QuickPi/dynamicTestbed/testbed/index.html";
 
         $.post("http://localhost:3000", JSON.stringify(subTaskToPublish), function(data) {
-            var parseUrl = url + "?id=" + data;
+            var parseUrl = url + "?language=" + answerType + "&id=" + data;
 
             displayHelper.showPopupMessage(that.strings.shareLink.replace("{url}", parseUrl), "blanket", "OK");
         });
