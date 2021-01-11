@@ -2575,7 +2575,7 @@ function GraphEditor(settings) {
          return
       }
       var fontSize = attr["font-size"] || 15;
-      var label = info.label || " ";
+      var label = info.label || "";
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[1].hide();
       self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\" maxlength=\""+maxLength+"\">");
