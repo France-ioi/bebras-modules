@@ -277,7 +277,7 @@ var quickPiLocalLanguageStrings = {
             noPortsAvailable: "Aucun port compatible avec ce {0} n'est disponible (type {1})",
             sensor: "capteur",
             actuator: "actionneur",
-            removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur ? Pensez à supprimer du code qui accède à cette actuateur si vous le faites.",
+            removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur ? Pensez à supprimer tout code qui accède à cet actuateur si vous le faites.",
             remove: "Retirer",
             keep: "Garder",
             minutesago: "Last seen {0} minutes ago",
@@ -709,7 +709,7 @@ var quickPiLocalLanguageStrings = {
             noPortsAvailable: "No hay ningún puerto compatible con {0} disponible (type {1})",
             sensor: "Sensor",
             actuator: "Actuador",
-            removeConfirmation: "¿Estás seguro de que deseas quitar este componente? Pensez à supprimer du code qui accède à cette actuateur si vous le faites.", // TODO: translate
+            removeConfirmation: "¿Estás seguro de que deseas quitar este componente? Pensez à supprimer tout code qui accède à cet actuateur si vous le faites.", // TODO: translate
             remove: "Eliminar",
             keep: "Mantener",
             minutesago: "Visto por última vez hace {0} minutos",
@@ -1136,7 +1136,7 @@ var quickPiLocalLanguageStrings = {
             noPortsAvailable: "Non è disponibile alcuna porta compatibile con questo {0} (type {1})",
             sensor: "sensore",
             actuator: "azionatore",
-            removeConfirmation: "Sei sicuro di voler rimuovere questo sensore o attuatore? Pensez à supprimer du code qui accède à cette actuateur si vous le faites.", // TODO: translate
+            removeConfirmation: "Sei sicuro di voler rimuovere questo sensore o attuatore? Pensez à supprimer tout code qui accède à cet actuateur si vous le faites.", // TODO: translate
             remove: "Rimuovi",
             keep: "Tieni",
             minutesago: "Last seen {0} minutes ago",
