@@ -314,12 +314,11 @@ var quickAlgoInterface = {
     },
 
     openShare: function() {
-        displayHelper.showPopupMessage(this.strings.doYouWantToShare, 'blanket', this.strings.yes, this.shareSubject, this.strings.no, null, null)
+        displayHelper.showPopupMessage(this.strings.doYouWantToShare, 'blanket', this.strings.yes, this.shareSubject.bind(this), this.strings.no, null, null)
     },
 
     shareSubject: function() {
-        // we take back quickAlgoInterface from global variable because the word "this" refer to displayHelper
-        var that = quickAlgoInterface;
+        var that = this;
 
         var additional = that.userTaskData;
 
