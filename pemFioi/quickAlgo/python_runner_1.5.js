@@ -17,6 +17,7 @@ function PythonInterpreter(context, msgCallback) {
   this._paused = false;
   this._isRunning = false;
   this._stepInProgress = false;
+  this._resetDone = true;
   this.stepMode = false;
   this._steps = 0;
   this._stepsWithoutAction = 0;
@@ -29,6 +30,13 @@ function PythonInterpreter(context, msgCallback) {
   this.availableModules = [];
   this._argumentsByBlock = {};
   this._definedFunctions = [];
+
+  this.nbNodes = 0;
+  this.curNode = 0;
+  this.readyNodes = [];
+  this.finishedNodes = [];
+  this.nodeStates = [];
+  this.waitingOnReadyNode = false;
 
   var that = this;
 
@@ -63,17 +71,28 @@ function PythonInterpreter(context, msgCallback) {
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
   };
 
-  this._skulptifyConst = function(name, value) {
+  this._skulptifyValue = function(value) {
     if(typeof value === "number") {
-      var handler = 'Sk.builtin.int_(' + value + ');';
+      var handler = 'Sk.builtin.int_(' + value + ')';
     } else if(typeof value === "boolean") {
-      var handler = 'Sk.builtin.bool(' + value.toString() + ');';
+      var handler = 'Sk.builtin.bool(' + value.toString() + ')';
     } else if(typeof value === "string") {
-      var handler = 'Sk.builtin.str(' + JSON.stringify(value) + ');';
+      var handler = 'Sk.builtin.str(' + JSON.stringify(value) + ')';
+    } else if(Array.isArray(value)) {
+      var list = [];
+      for(var i=0; i<value.length; i++) {
+        list.push(this._skulptifyValue(value[i]));
+      }
+      var handler = 'Sk.builtin.list([' + list.join(',') + '])';
     } else {
       throw "Unable to translate value '" + value + "' into a Skulpt constant.";
     }
-    return '\nmod.' + name + ' = new ' + handler + '\n';
+    return 'new ' + handler;
+  }
+
+  this._skulptifyConst = function(name, value) {
+    var handler = this._skulptifyValue(value);
+    return '\nmod.' + name + ' = ' + handler + ';\n';
   };
 
   this._injectFunctions = function () {
@@ -202,6 +221,7 @@ function PythonInterpreter(context, msgCallback) {
 
   this.skToJs = function(val) {
     // Convert Skulpt item to JavaScript
+    // TODO :: Might be partly replaceable with Sk.ffi.remapToJs
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else if(val instanceof Sk.builtin.func) {
@@ -310,7 +330,76 @@ function PythonInterpreter(context, msgCallback) {
     this._setTimeout(this._continue.bind(this), 10);
   };
 
+  this.allowSwitch = function(callback) {
+    // Tells the runner that we can switch the execution to another node
+    var curNode = context.curNode;
+    var ready = function(readyCallback) {
+      that.readyNodes[curNode] = function() {
+        readyCallback(callback);
+      };
+      if(that.waitingOnReadyNode) {
+        that.waitingOnReadyNode = false;
+        that.startNode(that.curNode, curNode);
+      }
+    };
+    this.readyNodes[curNode] = false;
+    this.startNextNode(curNode);
+    return ready;
+  };
+
+  this.defaultSelectNextNode = function(runner, previousNode) {
+    var i = previousNode + 1;
+    if(i >= runner.nbNodes) { i = 0; }
+    do {
+      if(runner.readyNodes[i]) {
+        break;
+      } else {
+        i++;
+      }
+      if(i >= runner.nbNodes) { i = 0; }
+    } while(i != previousNode);
+    return i;
+  };
+
+  // Allow the next node selection process to be customized
+  this.selectNextNode = this.defaultSelectNextNode;
+
+  this.startNextNode = function(curNode) {
+    // Start the next node when one has been switched from
+    var newNode = this.selectNextNode(this, curNode);
+    this._paused = true;
+    if(newNode == curNode) {
+      // No ready node
+      this.waitingOnReadyNode = true;
+    } else {
+      // TODO :: switch execution
+      this.startNode(curNode, newNode);
+    }
+  };
+
+  this.startNode = function(curNode, newNode) {
+    setTimeout(function() {
+      that.nodeStates[curNode] = that._debugger.suspension_stack.slice();
+      that._debugger.suspension_stack = that.nodeStates[newNode];
+      that.curNode = newNode;
+      var ready = that.readyNodes[newNode];
+      if(ready) {
+        that.readyNodes[newNode] = false;
+        context.setCurNode(newNode);
+        if(typeof ready == 'function') {
+          ready();
+        } else {
+          that._paused = false;
+          that._continue();
+        }
+      } else {
+        that.waitingOnReadyNode = true;
+      }
+    }, 0);
+  };
+
   this._createPrimitive = function (data) {
+    // TODO :: Might be replaceable with Sk.ffi.remapToPy
     if (data === undefined || data === null) {
       return Sk.builtin.none.none$;  // Reuse the same object.
     }
@@ -332,6 +421,21 @@ function PythonInterpreter(context, msgCallback) {
         skl.push(this._createPrimitive(data[i]));
       }
       result = new Sk.builtin.list(skl);
+    } else if (data) {
+      // Create a dict if it's an object with properties
+      var props = [];
+      for(var prop in data) {
+        if(data.hasOwnProperty(prop)) {
+          // We can pass a list [prop1name, prop1val, ...] to Skulpt's dict
+          // constructor ; however to work properly they need to be Skulpt
+          // primitives too
+          props.push(this._createPrimitive(prop));
+          props.push(this._createPrimitive(data[prop]));
+        }
+      }
+      if(props.length > 0) {
+        result = new Sk.builtin.dict(props);
+      }
     }
     return result;
   };
@@ -376,7 +480,17 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onFinished = function () {
-    this.stop();
+    this.finishedNodes[this.curNode] = true;
+    this.readyNodes[this.curNode] = false;
+
+    if(this.finishedNodes.indexOf(false) != -1) {
+      // At least one node is not finished
+      this.startNextNode(this.curNode);
+    } else {
+      // All nodes are finished, stop the execution
+      this.stop();
+    }
+
     try {
       this.context.infos.checkEndCondition(this.context, true);
     } catch (e) {
@@ -449,15 +563,32 @@ function PythonInterpreter(context, msgCallback) {
       this._maxIterWithoutAction = this._maxIterations;
     }
 
-    try {
-      var susp_handlers = {};
-      susp_handlers["*"] = this._debugger.suspension_handler.bind(this);
-      var promise = this._debugger.asyncToPromise(this._asyncCallback.bind(this), susp_handlers, this._debugger);
-      promise.then(this._debugger.success.bind(this._debugger), this._debugger.error.bind(this._debugger));
-    } catch (e) {
-      this._onOutput(e.toString() + "\n");
-      //console.log('exception');
+    var susp_handlers = {};
+    susp_handlers["*"] = this._debugger.suspension_handler.bind(this);
+
+    this.nbNodes = codes.length;
+    this.curNode = 0;
+    context.setCurNode(this.curNode);
+    this.readyNodes = [];
+    this.finishedNodes = [];
+    this.nodeStates = [];
+
+    for(var i = 0; i < codes.length ; i++) {
+      this.readyNodes.push(true);
+      this.finishedNodes.push(false);
+
+      try {
+        var promise = this._debugger.asyncToPromise(this._asyncCallback(this._editor_filename, codes[i]), susp_handlers, this._debugger);
+        promise.then(this._debugger.success.bind(this._debugger), this._debugger.error.bind(this._debugger));
+      } catch (e) {
+        this._onOutput(e.toString() + "\n");
+      }
+
+      this.nodeStates.push(this._debugger.suspension_stack);
+      this._debugger.suspension_stack = [];
     }
+
+    this._debugger.suspension_stack = this.nodeStates[0];
 
     this._resetInterpreterState();
     Sk.running = true;
@@ -563,6 +694,9 @@ function PythonInterpreter(context, msgCallback) {
     } else {
       var displayStr = value.toString();
     }
+    if(typeof value == 'boolean') {
+      displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
+    }
     if(varName) {
       displayStr = '' + varName + ' = ' + displayStr;
     }
@@ -615,11 +749,14 @@ function PythonInterpreter(context, msgCallback) {
     this._allowStepsWithoutDelay = 0;
 
     this._isRunning = false;
+    this._resetDone = false;
     this.stepMode = false;
     this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
+    this.waitingOnReadyNode = false;
     Sk.running = false;
+
     if(Sk.runQueue && Sk.runQueue.length > 0) {
       var nextExec = Sk.runQueue.shift();
       setTimeout(function () { nextExec.ctrl.runCodes(nextExec.codes); }, 100);
@@ -631,6 +768,15 @@ function PythonInterpreter(context, msgCallback) {
       this._resetCallstackOnNextStep = false;
       this._debugger.suspension_stack.pop();
     }
+  };
+
+  this.reset = function() {
+    if(this._resetDone) { return; }
+    if(this.isRunning()) {
+      this.stop();
+    }
+    this.context.reset();
+    this._resetDone = true;
   };
 
   this.step = function (resolve, reject) {
@@ -734,10 +880,12 @@ function PythonInterpreter(context, msgCallback) {
     this._debugger.add_breakpoint(this._editor_filename + ".py", bp, "0", isTemporary);
   };
 
-  this._asyncCallback = function () {
+  this._asyncCallback = function (editor_filename, code) {
     var dumpJS = false;
 
-    return Sk.importMainWithBody(this._editor_filename, dumpJS, this._code, true);
+    return function() {
+      return Sk.importMainWithBody(editor_filename, dumpJS, code, true);
+    };
   };
 
   this.signalAction = function () {
