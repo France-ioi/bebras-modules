@@ -317,6 +317,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.run = function(callback) {
+      if(subTask.validating) { return; }
       subTask.initRun(callback);
       subTask.blocklyHelper.run(subTask.context);
    };
@@ -344,6 +345,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.step = function () {
+      if(subTask.validating) { return; }
       subTask.context.changeDelay(200);
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
          this.initRun();
@@ -352,6 +354,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.stop = function() {
+      if(subTask.validating) { return; }
       this.clearAnalysis();
 
       if(this.context.runner) {
@@ -409,6 +412,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.pause = function() {
+      if(subTask.validating) { return; }
       if(this.context.runner) {
          this.context.runner.stepMode = true;
       }
@@ -416,6 +420,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.play = function() {
+      if(subTask.validating) { return; }
       this.clearAnalysis();
 
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
@@ -497,6 +502,7 @@ var initBlocklySubTask = function(subTask, language) {
       }
       window.subTaskValidationAttempts = 0;
       window.subTaskValidating = true;
+      subTask.validating = true;
 
       var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
@@ -512,6 +518,7 @@ var initBlocklySubTask = function(subTask, language) {
          };
          subTask.context.changeDelay(oldDelay);
          window.subTaskValidating = false;
+         subTask.validating = false;
          callback(results);
          return;
       }
@@ -615,6 +622,7 @@ var initBlocklySubTask = function(subTask, language) {
             };*/
          subTask.context.changeDelay(oldDelay);
          window.subTaskValidating = false;
+         subTask.validating = false;
          callback(results);
          window.quickAlgoInterface.updateBestAnswerStatus();
       }
