@@ -1,5 +1,10 @@
 var getContext = function (display, infos, curLevel) {
 
+    var config = {
+        max_port: 100
+    }
+
+    infos.checkEndEveryTurn = false;
 
     var config = {
         mistake_background_color: 'lightpink',
@@ -19,6 +24,7 @@ var getContext = function (display, infos, curLevel) {
             label: {
                 // Labels for the blocks
                 sendPacket: "send packet to IP",
+                scanPort: "scan port",
                 print: "print string",
                 getArgument: "get argument",
                 getArgumentsLength: "get amount of arguments"
@@ -26,6 +32,7 @@ var getContext = function (display, infos, curLevel) {
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
                 sendPacket: "sendPacket",
+                scanPort: 'scanPort',
                 print: "print",
                 getArgument: "getArgument",
                 getArgumentsLength: "getArgumentsLength"                
@@ -33,6 +40,7 @@ var getContext = function (display, infos, curLevel) {
             description: {
                 // Descriptions of the functions in Python (optional)
                 sendPacket: "sendPacket() Send packet to IP",
+                scanPort: "scanPort() Scan port",
                 print: "print() Print string",
                 getArgument: "getArgument() Get argument",
                 getArgumentsLength: "getArgumentsLength() Get total amount of arguments"                
@@ -41,11 +49,13 @@ var getContext = function (display, infos, curLevel) {
             startingBlockName: "Program", // Name for the starting block
             messages: {
                 success: 'Success!',
-                online: ': The device is online',
-                offline: ': The device is not connected',
-                no_device: ': No device at this IP',
+                online: 'The device is online',
+                offline: 'The device is not connected',
+                no_device: 'No device at this IP',
                 lines_count_mistake: 'Output contain extra lines or some lines missed',
-                line_mistake: 'Lines with mistake marked with red color'
+                line_mistake: 'Lines with mistake marked with red color',
+                open: 'Open',
+                closed: 'Closed'
             }
         }
     }
@@ -108,6 +118,38 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
+
+    var log = {
+
+        lines_max: 30,
+
+        add: function(str) {
+            if(!context.display) {
+                return
+            }
+            var log = $('#log');
+            var line = $('<div/>');
+            line.html(str);
+            log.append(line);            
+
+            var lines = log.find('div');
+            if(lines.length > this.lines_max) {
+                lines[0].remove();
+            }
+
+            line = line[0];
+            if('scrollIntoView' in line) {
+                line.scrollIntoView();
+            }
+        },
+
+
+        clear: function() {
+            $('#log').empty();
+        }
+    }
+
+
     var network = {
         data: {},
 
@@ -125,8 +167,9 @@ var getContext = function (display, infos, curLevel) {
                 var list = this.parseIP(data[i].ip);
                 for(var j=0; j<list.length; j++) {
                     this.data[list[j]] = {
-                        status: data[i].status,
-                        latency: this.getRandomLatency()
+                        status: data[i].status || 'online',
+                        latency: this.getRandomLatency(),
+                        ports: data[i].ports || null
                     }
                 }
             }
@@ -206,12 +249,30 @@ var getContext = function (display, infos, curLevel) {
             if(ip in this.data) {
                 res = this.data[ip];
             }
-            if(context.display && !silent) {
-                var el = $('<div/>');
-                el.html(ip + strings.messages[res.status]);
-                $('#log').append(el);                            
+            if(!silent) {
+                log.add(ip + strings.messages[res.status]);
             }
             return res;
+        },
+
+        scanPort: function(ip, port, silent) {
+            var status = 'no_device';
+            if(ip in this.data) {
+                var host = this.data[ip];
+                if('ports' in host && Array.isArray(host.ports) && host.ports.indexOf(port) !== -1) {
+                    status = 'open';
+                } else {
+                    status = 'closed';
+                }
+                if(!silent) {
+                    log.add(ip + ':' + port + ' ' + strings.messages[status]);
+                }                
+            } else if(!silent) {
+                log.add(ip + ' ' + strings.messages[status]);
+            }     
+            return {
+                status: status
+            }
         }
 
     };
@@ -248,68 +309,116 @@ var getContext = function (display, infos, curLevel) {
 
 
 
-    infos.checkEndEveryTurn = false;
-    infos.checkEndCondition = function (context, lastTurn) {
-        if(!lastTurn) {
-            return;
-        }
+    context.validator = {
 
-        // generate valid output
-        var expected_output = [
-            config.input_prefix + input.get()
-        ];
-        function addLine(ip) {
-            var res = network.sendPacket(ip, true);
-            var line = ip + ' ' + res.status + ' ' + res.latency + 'ms';
-            expected_output.push(line);
-        }
 
-        var cmd = input.getArgument(0);
-        if(cmd == 'scanip') {
-            addLine(input.getArgument(1));
-        } else if(cmd == 'scanips') {
+        validateUserOutput: function(expected_output) {
+            var user_output = output.get();
+
+            if(user_output.length != expected_output.length) {
+                context.success = false;
+                throw(strings.messages.lines_count_mistake);
+            }
+    
+            context.success = true;
+            for(var i=0; i<user_output.length; i++) {
+                var mistake = expected_output[i] != user_output[i];
+                if(mistake) {
+                    output.markMistakeLine(i);
+                }
+                context.success = context.success && !mistake;
+            }            
+        },
+
+
+        checkScanIP: function (context, lastTurn) {
+            if(!lastTurn) {
+                return;
+            }
+    
+            // generate valid output
+            var expected_output = [
+                config.input_prefix + input.get()
+            ];
+            function scanIp(ip) {
+                var res = network.sendPacket(ip, true);
+                var line = ip + ' ' + res.status + ' ' + res.latency + 'ms';
+                expected_output.push(line);
+            }
+    
+            var cmd = input.getArgument(0);
+            if(cmd == 'scanip') {
+                scanIp(input.getArgument(1));
+            } else if(cmd == 'scanips') {
+                var l = input.getArgumentsLength();
+                for(var i=1; i<l; i++) {
+                    var ip = input.getArgument(i);
+                    var ips = network.parseIP(ip);
+                    for(var j=0; j<ips.length; j++) {
+                        scanIp(ips[j]);
+                    }
+                }
+            } else if(cmd == 'scaniprange') {
+                var n1 = network.ip2int(input.getArgument(1));
+                var n2 = network.ip2int(input.getArgument(2));
+                for(var i=0; i<=n2; i++) {
+                    scanIp(network.int2ip(i));
+                }
+            }
+
+            this.validateUserOutput(expected_output);
+    
+            if(context.success) {
+                throw strings.messages.success;
+            } else {
+                throw strings.messages.line_mistake;
+            }
+        },
+
+
+        checkScanPort: function (context, lastTurn) {
+            if(!lastTurn) {
+                return;
+            }
+            
+            // generate valid output
+            var expected_output = [
+                config.input_prefix + input.get()
+            ];
+            function scanIp(ip) {
+                for(var i=1; i<=config.config; i++) {
+                    var res = network.scanPort(ip, i, true);
+                    if(res.status == 'open') {
+                        var line = ip + ':' + i + ' ' + res.status;
+                        expected_output.push(line);
+                    }
+                }
+            }            
+            
             var l = input.getArgumentsLength();
             for(var i=1; i<l; i++) {
                 var ip = input.getArgument(i);
                 var ips = network.parseIP(ip);
                 for(var j=0; j<ips.length; j++) {
-                    addLine(ips[j]);
+                    scanIp(ips[j]);
                 }
             }
-        } else if(cmd == 'scaniprange') {
-            var n1 = network.ip2int(input.getArgument(1));
-            var n2 = network.ip2int(input.getArgument(2));
-            for(var i=0; i<=n2; i++) {
-                addLine(network.int2ip(i));
+
+            this.validateUserOutput(expected_output);
+
+
+            context.success = true;
+            if(context.success) {
+                throw strings.messages.success;
+            } else {
+                throw strings.messages.line_mistake;
             }
-        }
-
-
-        // compare valid output with user output
-        var user_output = output.get();
-        
-
-        if(user_output.length != expected_output.length) {
-            context.success = false;
-            throw(strings.messages.lines_count_mistake);
-        }
-
-        context.success = true;
-        for(var i=0; i<user_output.length; i++) {
-            var mistake = expected_output[i] != user_output[i];
-            if(mistake) {
-                output.markMistakeLine(i);
-            }
-            context.success = context.success && !mistake;
-        };
-
-        if(context.success) {
-            throw strings.messages.success;
-        } else {
-            throw strings.messages.line_mistake;
         }
     }
 
+
+
+    
 
 
 
@@ -341,9 +450,8 @@ var getContext = function (display, infos, curLevel) {
             return;
         }
         $('#grid').html(`
-            <div style='height: 50%; width: 96%; text-align: left; margin: 0 2%' id='log'></div>
-            <hr>
-            <div style='height: 50%; width: 96%; text-align: left; margin: 0 2%' id='print'></div>
+            <div style='height: 49%; width: 96%; text-align: left; margin: 0 2%; overflow: scroll; border-bottom: 1px solid #999;' id='log'></div>
+            <div style='height: 49%; width: 96%; text-align: left; margin: 0 2%; overflow: scroll' id='print'></div>
         `);
         // Ask the parent to update sizes
         context.blocklyHelper.updateSize();
@@ -388,6 +496,11 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, res);
         },
 
+        scanPort: function(ip, port, callback) {
+            var res = network.scanPort(ip, port);
+            context.runner.noDelay(callback, res);
+        },
+
         print: function(str, callback) {
             output.print(str);
             context.runner.noDelay(callback);
@@ -404,6 +517,11 @@ var getContext = function (display, infos, curLevel) {
                     params: ['String'],
                     yieldsValue: true
                 },
+                {
+                    name: 'scanPort',
+                    params: ['String', 'Number'],
+                    yieldsValue: true
+                },                
                 {
                     name: 'print',
                     params: ['String']
