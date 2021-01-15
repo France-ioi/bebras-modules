@@ -1,4 +1,371 @@
 #error {
-    text-align: center;
-    height: 1em;
+   text-align: center;
+   height: 1em;
+}
+
+/* TABS & SWITCH */
+
+#tabs {
+   text-align: right;
+   margin: 1em 0;
+}
+#tabs > * {
+   display: inline-block;
+   vertical-align: middle;
+   font-weight: bold;
+   color: #4a4a4a;
+   margin: 0 0.2em;
+}
+#tabs span {
+   opacity: 0.5;
+}
+#tabs span.selectedTab {
+   opacity: 1;
+}
+#switchContainer {
+   width: 50px;
+   height: 15px;
+   background-color: #f2f2f2;
+   border-radius: 10px;
+   box-shadow: inset 0 1px 0 0 rgba(0,0,0,0.2);
+   cursor: pointer;
+   position: relative;
+}
+#switch {
+   width: 25px;
+   height: 15px;
+   background-color: #4990e2;
+   border-radius: 10px;
+   position: absolute;
+   top: 0;
+}
+
+/* PARSE INFO */
+#parseInfo {
+   display: flex;
+   justify-content: center;
+   align-items: flex-start;
+}
+#parseInfo > * {
+   box-sizing: border-box;
+}
+
+/* ACTION */
+#action {
+   margin-left: 15px;
+   flex-grow: 20;
+}
+#action h4 {
+   color: grey;
+   font-weight: normal;
+   margin-bottom: 0.5em;
+}
+
+/* PLAYER */
+#player {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: 10px;
+   border-radius: 25px;
+   background-color: #f2f2f2;
+}
+#player > * {
+   color: white;
+   font-size: 1em;
+   border-radius: 2em;
+   text-align: center;
+   box-sizing: border-box;
+}
+#play {
+   background-color: #4990e2;
+   padding: 10px 12px;
+   margin-right: 10px;
+}
+#stepBackward, #stepForward, #undo {
+   background-color: #4a4a4a;
+   padding: 10px 20px;
+   margin-left: 10px;
+}
+#undo {
+   font-weight: bold;
+}
+
+/* PROGRESS BAR */
+#progressBarClickArea {
+   flex-grow: 1;
+   height: 20px;
+   margin: 0 10px;
+   padding-top: 8px;
+}
+#progressBarContainer {
+   height: 4px;
+   background-color: grey;
+}
+#progressBar {
+   width: 0%;
+   height: 100%;
+   background-color: #4990e2;
+   position: relative;
+}
+#progressBarMarker {
+   width: 6px;
+   height: 6px;
+   background-color: white;
+   border: 3px solid #4990e2;
+   border-radius: 15px;
+   position: absolute;
+   right: -6px;
+   top: -4px;
+   z-index: 2;
+}
+
+/* STACK TABLE */
+#stackTableContainer {
+   position: relative;
+}
+#stackTable {
+   border: 2px solid #4990e2;
+   border-right: none;
+   border-collapse: collapse;
+   width: 100%;
+}
+#stackTable td {
+   border: 1px solid grey;
+   background-color: #f2f2f2;
+   text-align: center;
+   width: 2em;
+   height: 2em;
+}
+#stackTable td:last-child {
+   border-right: none;
+   color: grey;
+   text-align: right;
+   font-style: italic;
+   background-color: white;
+   width: auto;
+}
+#stackTable .State {
+   color: grey;
+}
+#stackTable .Symbol {
+   color: #4990e2;
+}
+#stackTable .stackElement.selected {
+   background-color: #4990e2;
+   color: white;
+}
+
+/* INPUT */
+#inputBar {
+   position: relative;
+   background-color: #f2f2f2;
+   margin-top: 5px;
+   border-top: 1px solid grey;
+   border-bottom: 2px solid #4990e2;
+}
+#inputBar h4 {
+   position: absolute;
+   top: -3em;
+}
+.inputChar {
+   display: inline-block;
+   width: 1.5em;
+   text-align: center;
+   color: #4a4a4a;
+   font-size: 1.5em;
+   padding: 0.1em 0;
+}
+.inputChar.read {
+   color: #4990e2;
+}
+.inputChar:first-of-type {
+   margin-left: 0.75em;
+}
+
+/* ACTION BUTTONS */
+#acceptButton, #errorButton {
+   border-radius: 1em;
+   float: right;
+   margin-top: 1em;
+   clear: right;
+}
+.actionButton {
+   background-color: #4990e2;
+   color: white;
+   width: 110px;
+   padding: 0.5em 0;
+   text-align: center;
+   font-weight: bold;
+   font-size: 0.9em;
+}
+#reduceBar, #shiftBar {
+   display: flex;
+   justify-content: flex-end;
+}
+.actionMessage {
+   padding: 0.5em 1em;
+   color: grey;
+   background-color: white;
+   border-radius: 0 5px 0 0;
+   box-sizing: border-box;
+}
+#reduceButton, #shiftButton {
+   border-radius: 0 0 5px 5px;
+}
+.buttonIcon {
+   font-size: 0.9em;
+   margin-right: 0.2em;
+}
+#shiftButton .buttonIcon {
+   margin-right: 0.5em;
+}
+
+/* CURSOR */
+#cursor {
+   position: absolute;
+   top: 0;
+   left: 0;
+   height: 2em;
+}
+#cursorBar {
+   height: 2em;
+   width: 0;
+   border: 1px solid #4990e2;
+   position: absolute;
+   top: 0;
+   left: 0;
+}
+#topCircle, #bottomCircle {
+   width: 6px;
+   height: 6px;
+   background-color: white;
+   border: 1px solid #4990e2;
+   border-radius: 5px;
+   position: absolute;
+   left: -3px;
+   z-index: 2;
+}
+#topCircle {
+   top: -4px;
+}
+#bottomCircle {
+   bottom: -6px;
+}
+
+/* PARSE TABLE */
+#parseTable {
+   position: relative
+}
+#parseTable table {
+   border-collapse: collapse;
+   border: 2px solid #4a4a4a;
+   text-align: center;
+}
+#parseTable table th {
+   background-color: #4a4a4a;
+   color: white;
+   border: 1px solid white;
+}
+/*#parseTable td {
+   background-color: #f2f2f2;
+   color: #4a4a4a;
+   border: 1px solid #4a4a4a;
+}*/
+#parseTable td .ruleMarker {
+   background-color: #4a4a4a;
+   border-radius: 1em;
+   color: white;
+   padding: 0.2em 0.5em;
+}
+#parseTable td .ruleMarkerIndex {
+   color: #f7aa28;
+}
+#rowHL, #colHL {
+   position: absolute;
+   border: 4px solid;
+   border-color: #4990e2;
+   pointer-events: none;
+}
+
+/* RULES */
+#rules {
+   flex-grow: 1;
+   flex-shrink: 0;
+   background-color: #f2f2f2;
+   border-radius: 0 5px 5px 0;
+   overflow: hidden;
+   font-weight: bold;
+}
+#rules h3 {
+   text-align: center;
+   padding: 1em;
+   margin: 0;
+   background-color: #4a4a4a;
+   color: white;
+   font-size: 1em;
+}
+#rules ul {
+   list-style: none;
+   padding: 0;
+}
+.rule {
+   padding: 0.2em 0.5em 0.2em 0;
+   margin: 0.5em 1em;
+   background-color: transparent;
+   color: #4a4a4a;
+   border-radius: 1em;
+}
+.ruleIndex {
+   flex-grow: 0;
+   background-color: #4a4a4a;
+   border-radius: 1em;
+   color: #f7aa28;
+   padding: 0.2em 0.5em;
+   margin-right: 0.5em;
+}
+.rule i {
+   color: grey;
+   margin: 0 0.5em;
+}
+.rule.previousRule {
+   background-color: #d9e3ef;
+}
+.rule.selected {
+   background-color: #4990e2;
+   color: white;
+}
+.rule.selected .ruleIndex) {
+   border-radius: 1em 0 0 1em;
+}
+.rule.selected i {
+   color: #f7aa28;
+}
+.rule .epsilon {
+   font-style: italic;
+}
+
+/*************************************/
+/* TREE */
+#tree {
+   display: flex;
+   justify-content: flex-start;
+   align-items: flex-start;
+}
+#reduceButton, #produceButton, #undo {
+   /*border-radius: 1em;*/
+   background-color: #4990e2;
+   color: white;
+   width: 110px;
+   padding: 0.5em 0;
+   text-align: center;
+   font-weight: bold;
+   font-size: 0.9em;
+}
+.buttonIcon {
+   font-size: 0.9em;
+   margin-right: 0.2em;
+}
+#reduceButton, #produceButton {
+   margin-bottom: 1em;
 }
