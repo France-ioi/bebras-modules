@@ -689,20 +689,31 @@ function Automata(settings) {
       var vertices = this.graph.getEdgeVertices(eID);
       var pos1 = this.visualGraph.getVertexVisualInfo(vertices[0]);
       var pos2 = this.visualGraph.getVertexVisualInfo(vertices[1]);
-      var transformString = "";
-      if(!edgeVisualInfo["radius-ratio"]){
-         transformString += "T"+(pos2.x - pos1.x)+","+(pos2.y - pos1.y);
+      var transformString;
+      if(vertices[0] == vertices[1]){
+         var alpha = edgeVisualInfo.angle*Math.PI/180;
+         var r = this.circleAttr.r;
+         var angle = -360;
+         var d = r*1.5; // dist from loop center
+         var cx = pos1.x + d*Math.cos(-alpha);
+         var cy = pos1.y + d*Math.sin(-alpha);
+         transformString = ["R",angle,cx,cy];
       }else{
-         var radiusRatio = edgeVisualInfo["radius-ratio"];
-         var l = edgeVisualInfo["large-arc"] || 0;
-         var s = edgeVisualInfo["sweep"] || 0;
-         var D = Math.sqrt(Math.pow((pos2.x - pos1.x),2) + Math.pow((pos2.y - pos1.y),2));
-         var R = radiusRatio * D;
-         var cPos = this.visualGraph.graphDrawer.getCenterPosition(R,s,l,pos1,pos2);
-         var angle = (s) ? 2*Math.asin(D/(2*R))*180/Math.PI : -2*Math.asin(D/(2*R))*180/Math.PI;
-         if(l)
-            angle = (s) ? (360 - angle)%360 : -(360 + angle)%360; 
-         transformString += "R"+angle+","+cPos.x+","+cPos.y+"R"+(-angle);
+         if(!edgeVisualInfo["radius-ratio"]){
+            transformString = ["T",(pos2.x - pos1.x),(pos2.y - pos1.y)];
+         }else{
+            var radiusRatio = edgeVisualInfo["radius-ratio"];
+            var l = edgeVisualInfo["large-arc"] || 0;
+            var s = edgeVisualInfo["sweep"] || 0;
+            var D = Math.sqrt(Math.pow((pos2.x - pos1.x),2) + Math.pow((pos2.y - pos1.y),2));
+            var R = radiusRatio * D;
+            var cPos = this.visualGraph.graphDrawer.getCenterPosition(R,s,l,pos1,pos2);
+            var angle = (s) ? 2*Math.asin(D/(2*R))*180/Math.PI : -2*Math.asin(D/(2*R))*180/Math.PI;
+            if(l){
+               angle = (s) ? (360 - angle)%360 : -(360 + angle)%360; 
+            }
+            transformString = ["R",angle,cPos.x,cPos.y,"R",(-angle)];
+         }
       }
       return transformString;
    };

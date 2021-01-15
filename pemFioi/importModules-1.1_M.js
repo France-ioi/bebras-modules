@@ -143,7 +143,7 @@ var importableModules = function () {
       // Language theory
       'automata-1.0': {src: modulesPath+"/pemFioi/automata-1.0.js", id: "automata-1.0"},
       'lr_parser-1.0': {src: modulesPath+"/pemFioi/LR_parser-1.0.js", id: "lr_parser-1.0"},
-      'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
+      // 'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
       'machines-grammar': {src: modulesPath+"/ext/machines/js/grammar.js", id: "machines-grammar"},
       'machines-lrclosuretable': {src: modulesPath+"/ext/machines/js/lrclosuretable.js", id: "machines-lrclosuretable"},
       'machines-lrtable': {src: modulesPath+"/ext/machines/js/lrtable.js", id: "machines-lrtable"},
