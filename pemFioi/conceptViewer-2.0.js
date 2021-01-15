@@ -514,6 +514,11 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
   if(!includeBlocks) { return []; }
   var concepts = ['language'];
 
+  // Blocks explained in another concept
+  var blocklyAliases = {
+    'controls_repeat_ext': 'controls_repeat'
+    };
+
   if(includeBlocks.standardBlocks) {
     var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
@@ -528,6 +533,8 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
     } else if(includeBlocks.standardBlocks.singleBlocks) {
       for(var b = 0; b<includeBlocks.standardBlocks.singleBlocks.length; b++) {
         var blockName = includeBlocks.standardBlocks.singleBlocks[b];
+        var blockAlias = blocklyAliases[blockName];
+        blockName = blockAlias ? blockAlias : blockName;
         if(allConceptsById['blockly_'+blockName]) {
           concepts.push(allConceptsById['blockly_'+blockName]);
         }
