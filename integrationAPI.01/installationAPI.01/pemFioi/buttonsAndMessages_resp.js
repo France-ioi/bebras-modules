@@ -39,6 +39,8 @@ window.displayHelper = {
    avatarType: "beaver",
    bUseFullWidth: false,
    responsive: false,
+   mobileMode: false, 
+   toggle_task: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -841,10 +843,35 @@ window.displayHelper = {
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
          $('#tabsMenu .li').on('click', function(event) {
+            if(displayHelper.responsive && displayHelper.mobileMode){
+               return
+            }
             event.preventDefault();
             var newLevel = $(this).children().attr('href').split('#')[1];
             displayHelper.setLevel(newLevel);
          });
+         if(this.responsive){
+            $('#tabsMenu .resp_version_arr').on('click', function(event) {
+               if(!displayHelper.responsive || !displayHelper.mobileMode){
+                  return
+               }
+               event.preventDefault();
+               var newLevel = $(this).attr('href').split('#')[1];
+               displayHelper.setLevel(newLevel);
+            });
+            $('#resp_switch div').on('click', function(event) {
+               if(!displayHelper.responsive || !displayHelper.mobileMode){
+                  return
+               }
+               var id = $(this).attr('id');
+               if(id == 'resp_switch_1' && displayHelper.toggle_task){
+                  displayHelper.toggle_task = false;
+               }else if(id == 'resp_switch_2' && !displayHelper.toggle_task){
+                  displayHelper.toggle_task = true;
+               }
+               displayHelper.toggleTask();
+            });
+         }
       }
 
       this.setLevel(initLevel);
@@ -883,7 +910,7 @@ window.displayHelper = {
       if (this.pointsAsStars) {
          var titleStarContainers = [];
          scoreHTML = '<span></span><span id="titleStars"></span>';
-         $('#task > h1').append(scoreHTML);
+         $('#task h1').append(scoreHTML);
          drawStars('titleStars', this.maxStars, 24, 0, 'normal');
       } else {
          // Disabled: doesn't work with new tabs layout.
@@ -929,13 +956,16 @@ window.displayHelper = {
       $('#tabsContainer').after('<div id="popupMessage"></div>');
       
       if(this.responsive){
-         $('#tabsContainer').append('<div id="resp_switch"></div>'); // switch for responsive layout
+         $('#tabsContainer').append('<div id="resp_switch"><div class="resp_sw_cont"><div id="resp_switch_1"><i class="fas fa-file-alt"></i></div></div>'+
+            '<div class="resp_sw_cont"><div id="resp_switch_2"><i class="fas fa-puzzle-piece"></i></div></div></div>'); // switch for responsive layout
          $('#tabsContainer').append('<div class="spacer" style="clear: both;"></div>');   // css bug fix
          for (var iLevel = 0; iLevel < levelNames.length; iLevel++) {   // responsive tabs
             var curLevel = levelNames[iLevel];
             var tabHTML = '<div class="resp_tabs">';
             if (this.pointsAsStars) {
+               tabHTML += '<span class="levelVersionCont">';
                tabHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_resp_' + this.levelsRanks[curLevel] + '"></span>';
+               tabHTML += '</span>';
             } else {
                tabHTML += this.strings["levelName_" + curLevel] + ' — ' +
                   '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
@@ -944,11 +974,32 @@ window.displayHelper = {
             $('#tab_'+curLevel).append(tabHTML);
             if(iLevel > 0){
                $('#tab_'+curLevel+' .resp_tabs').prepend($('<a href="#' + levelNames[iLevel - 1]+'" class="resp_version_arr resp_left_arr"><</a>'));
+               $('#tab_'+curLevel).append($('<a href="#' + levelNames[iLevel - 1]+'" class="resp_version_arr resp_left_arr"><</a>'));
             }
             if(iLevel < levelNames.length - 1){
                $('#tab_'+curLevel+' .resp_tabs').append($('<a href="#' + levelNames[iLevel + 1]+'" class="resp_version_arr resp_right_arr">></a>'));
+               $('#tab_'+curLevel).append($('<a href="#' + levelNames[iLevel + 1]+'" class="resp_version_arr resp_right_arr">></a>'));
             }
          }
+         this.toggleTask();
+      }
+   },
+   toggleTask: function() {
+      if(!this.responsive || !this.mobileMode){
+         $('#zone_1').show();
+         $('#zone_2').show();
+         return
+      }
+      if(!this.toggle_task){
+         $('#resp_switch_1').addClass('selected');
+         $('#resp_switch_2').removeClass('selected');
+         $('#zone_1').show();
+         $('#zone_2').hide();
+      }else{
+         $('#resp_switch_2').addClass('selected');
+         $('#resp_switch_1').removeClass('selected');
+         $('#zone_2').show();
+         $('#zone_1').hide();
       }
    },
 
@@ -994,13 +1045,20 @@ window.displayHelper = {
          var h = window.innerHeight;
          $('#task, #main_header').removeClass();
          $('#displayHelperAnswering').appendTo($('#zone_3'));
-         if(w >= 1200) {
+         if(w >= 800 && w/h >= 1) {
+            this.mobileMode = false;
             $('#task, #main_header').addClass('layout_1');
-         }else if(w >= 800){
+         }else if(w >= 800 && w/h < 1){
+            this.mobileMode = false;
             $('#task, #main_header').addClass('layout_2');
          }else if(w/h < 1){
+            this.mobileMode = true;
             $('#task, #main_header').addClass('layout_3');
+         }else{
+            this.mobileMode = true;
+            $('#task, #main_header').addClass('layout_4');
          }
+         this.toggleTask();
       // console.log('resp')
      }
    },
@@ -1743,7 +1801,7 @@ window.displayHelper = {
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
+                  return '<div style="margin: .2em 0; color: ' + color + '; a-weight: bold;">' + this.graderMessage + '</div>';
                }
             }
             break;
