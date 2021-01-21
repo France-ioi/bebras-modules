@@ -18,6 +18,9 @@ body {
 body > * {
    margin: 0 auto;
 }
+body * {
+   box-sizing: border-box;
+}
 
 a {
    color: #4D87CE;
@@ -181,6 +184,7 @@ textarea {
 #tabsContainer {
    position: relative;
    border-bottom: 2px solid #8d9daa;
+   min-width: 300px;
 }
 #tabsMenu {
    text-align: center;
@@ -240,9 +244,6 @@ h1 .stars {
    vertical-align: middle;
 }
 
-#tabsContainer {
-   /*position: relative;*/
-}
 .bestScore {
    position: absolute;
    right: 0;
@@ -365,6 +366,9 @@ h1 .stars {
     display: table;
     clear: both;
 }
+#zone_0 {
+   width: 100%;
+}
 #zone_1, #zone_2,
 .zone_1, .zone_2 {
 	margin: 0 auto;
@@ -388,33 +392,41 @@ h1 .stars {
 /* LAYOUT 1 (large screen) */
 #main_header.layout_1 table,
 #main_header.layout_2 table,
-#main_header.layout_3 table {
+#main_header.layout_3 table,
+#main_header.layout_4 table {
    width: 100% !important;
    margin: 0 !important;
+   min-width: 300px;
 }
 #main_header.layout_1 td,
 #main_header.layout_2 td,
-#main_header.layout_3 td {
+#main_header.layout_3 td,
+#main_header.layout_4 td {
    text-align: center;
 }
 .layout_1 h1,
 .layout_2 h1,
-.layout_3 h1 {
+.layout_3 h1,
+.layout_4 h1 {
    padding-left: 1em;
 }
 .layout_1 #tabsContainer #tabsMenu .resp_tabs, 
-.layout_2 #tabsContainer #tabsMenu .resp_tabs {
+.layout_2 #tabsContainer #tabsMenu .resp_tabs,
+.layout_1 #tabsContainer #tabsMenu .resp_version_arr, 
+.layout_2 #tabsContainer #tabsMenu .resp_version_arr {
+   display: none;
+}
+.layout_1 #resp_switch, 
+.layout_2 #resp_switch {
    display: none;
 }
 #task.layout_1,
 #task.layout_2,
-#task.layout_3 {
+#task.layout_3,
+#task.layout_4 {
    width: 100%;
 }
-.layout_1 [id^=zone],
-.layout_2 [id^=zone],
-.layout_3 [id^=zone]   {
-   box-sizing: border-box;
+[class^=layout_] [id^=zone]  {
    float: left;
    border: 2px dashed #a7e2a7;
 }
@@ -425,11 +437,13 @@ h1 .stars {
    width: 70%;
 }
 .layout_1 #zone_3,
-.layout_2 #zone_3 {
+.layout_2 #zone_3,
+.layout_3 #zone_3 {
    width: 100%;
 }
 .layout_1 .consigne #example,
-.layout_2 .consigne #example {
+.layout_2 .consigne #example,
+.layout_3 .consigne #example {
    border: 2px dashed #a7e2a7;
    padding: 10px;
 }
@@ -443,7 +457,7 @@ h1 .stars {
 }
 .layout_2 .consigne #text,
 .layout_2 .consigne #example {
-   box-sizing: border-box;
+   /*box-sizing: border-box;*/
 }
 .layout_2 .consigne #text {
    float: left;
@@ -456,41 +470,162 @@ h1 .stars {
 
 /**************************************************************/
 /* LAYOUT 3 */
-#main_header.layout_3 span {
+#main_header.layout_3 span,
+#main_header.layout_4 span {
    display: none;
 }
 .layout_3 h1 {
    font-size: 25px;
 }
-.layout_3 #tabsContainer #tabsMenu .resp_tabs {
+.layout_3 #tabsContainer #tabsMenu .resp_tabs,
+.layout_4 #tabsContainer #tabsMenu .resp_tabs {
    color: #000;
    font-size: 1.1em;
    font-weight: bold;
    padding: 8px;
 }
-.layout_3 #tabsContainer #tabsMenu a:not(.resp_version_arr) {
+.layout_3 #tabsContainer #tabsMenu a:not(.resp_version_arr),
+.layout_4 #tabsContainer #tabsMenu a:not(.resp_version_arr) {
    display: none;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_version_arr {
+.layout_3 #tabsContainer #tabsMenu a.resp_version_arr,
+.layout_4 #tabsContainer #tabsMenu a.resp_version_arr {
    width: 2em;
    padding: 0;
    opacity: 0.5;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_right_arr {
+.layout_3 #tabsContainer #tabsMenu a.resp_version_arr,
+.layout_4 #tabsContainer #tabsMenu a.resp_version_arr {
+   width: 2em;
+   padding: 0;
+   opacity: 0.5;
+}
+.layout_3 #tabsContainer #tabsMenu a.resp_right_arr,
+.layout_4 #tabsContainer #tabsMenu a.resp_right_arr {
    float: right;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_left_arr {
+.layout_3 #tabsContainer #tabsMenu a.resp_left_arr,
+.layout_4 #tabsContainer #tabsMenu a.resp_left_arr {
    float: left;
 }
-.layout_3 #tabsMenu .li:not(.current) {
+.layout_3 .li > a.resp_version_arr {
+   display: none !important;
+}
+.layout_3 #tabsMenu {
+   width: 70%;
+}
+.layout_3 #tabsMenu .li:not(.current),
+.layout_4 #tabsMenu .li:not(.current) {
    display: none;
 }
-.layout_3 #tabsMenu .li.current {
-   box-sizing: border-box;
-   width: 70%;
+.layout_3 #tabsMenu .li.current,
+.layout_4 #tabsMenu .li.current {
+   width: 100%;
    margin-left: 0;
+   margin-right: 0;
    float: left;
 }
+.layout_3 #resp_switch,
+.layout_4 #resp_switch {
+   width: 30%;
+   float: right;
+   text-align: center;
+   font-size: 16px;
+   font-weight: bold;
+}
+.layout_3 .resp_sw_cont,
+.layout_4 .resp_sw_cont {
+   width: 50%;
+   float: left;
+   padding: 2px;
+}
+.layout_3 .resp_sw_cont div,
+.layout_4 .resp_sw_cont div {
+   padding: 8px;
+   cursor: pointer;
+   background: #eaeaea;
+   border-radius: 5px;
+   border: 1px solid #8d9daa;
+   color: #bebebe;
+}
+.layout_3 .resp_sw_cont div.selected,
+.layout_4 .resp_sw_cont div.selected {
+   background: #88BB88;
+   color: white;
+}
+
+/**************************************************************/
+/* LAYOUT 4 */
+.layout_4 #zone_0 {
+   float: left;
+   width: 20%;
+}
+.layout_4 h1 {
+   /*display: inline !important;*/
+   padding-left: 0;
+   text-align: center;
+   font-size: 25px;
+}
+.layout_4 h1 span {
+   display: none;
+}
+.layout_4 h1 #titleStars {
+   display: block;
+   width: auto;
+   margin-top: 5px;
+}
+.layout_4 #tabsContainer {
+   min-width: 0;
+   border: none;
+}
+.layout_4 .levelVersionCont {
+   font-size: 16px;
+}
+.layout_4 .resp_tabs .resp_version_arr {
+   display: none !important;
+}
+.layout_4 .li > .resp_version_arr {
+   border: 1px solid #bebebe;
+   border-radius: 5px;
+   background: #F5F5F5;
+   width: 50% !important;
+}
+.layout_4 #tabsMenu .li {
+   border: none;
+}
+.layout_4 #resp_switch {
+   width: 100%;
+}
+.layout_4 .resp_sw_cont {
+   padding: 0;
+   margin: 5px 0;
+}
+.layout_4 .resp_sw_cont div {
+   padding: 5px;
+   border-radius: 0;
+   border: none;
+}
+.layout_4 #zone_1,
+.layout_4 #zone_2 {
+   float: right;
+   width: 80%;
+}
+.layout_4 #zone_3 {
+   float: left;
+   width: 20%;
+}
+.layout_4 #zone_3 #displayHelper_validate,
+.layout_4 #zone_3 #displayHelper_cancel {
+   display: block;
+}
+.layout_4 #zone_3 input {
+   min-width: 0;
+   width: 100%;
+   margin: 0;
+   border-radius: 0;
+}
+
+/**************************************************************/
 
 .consigne {
 	padding: 10px;
