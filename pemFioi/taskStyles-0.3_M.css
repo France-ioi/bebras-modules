@@ -432,9 +432,13 @@ h1 .stars {
 }
 .layout_1 #zone_1 {
    width: 30%;
+   overflow: auto !important;
+   height: auto !important;
 }
 .layout_1 #zone_2 {
    width: 70%;
+   overflow: auto !important;
+   height: auto !important;
 }
 .layout_1 #zone_3,
 .layout_2 #zone_3,
@@ -452,11 +456,10 @@ h1 .stars {
 /* LAYOUT 2 (>= 800px) */
 .layout_2 #zone_1, 
 .layout_2 #zone_2,
-.layout_2 #zone_3,
-.layout_3 #zone_1, 
-.layout_3 #zone_2,
-.layout_3 #zone_3 {
+.layout_2 #zone_3 {
    width: 100%;
+   overflow: auto !important;
+   height: auto !important;
 }
 .layout_2 .consigne #text,
 .layout_2 .consigne #example {
@@ -473,6 +476,11 @@ h1 .stars {
 
 /**************************************************************/
 /* LAYOUT 3 */
+.layout_3 #zone_1, 
+.layout_3 #zone_2,
+.layout_3 #zone_3 {
+   width: 100%;
+}
 #main_header.layout_3 span,
 #main_header.layout_4 span {
    display: none;
