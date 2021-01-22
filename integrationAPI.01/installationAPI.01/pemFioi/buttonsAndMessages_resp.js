@@ -993,13 +993,21 @@ window.displayHelper = {
       if(!this.toggle_task){
          $('#resp_switch_1').addClass('selected');
          $('#resp_switch_2').removeClass('selected');
-         $('#zone_1').show();
-         $('#zone_2').hide();
+         // $('#zone_1').show();
+         // $('#zone_2').hide();
+         $('#zone_1').css("overflow","auto");
+         $('#zone_1').css("height","auto");
+         $('#zone_2').css("overflow","hidden");
+         $('#zone_2').css("height",0);
       }else{
          $('#resp_switch_2').addClass('selected');
          $('#resp_switch_1').removeClass('selected');
-         $('#zone_2').show();
-         $('#zone_1').hide();
+         // $('#zone_2').show();
+         // $('#zone_1').hide();
+         $('#zone_2').css("overflow","auto");
+         $('#zone_2').css("height","auto");
+         $('#zone_1').css("overflow","hidden");
+         $('#zone_1').css("height",0);
       }
    },
 
