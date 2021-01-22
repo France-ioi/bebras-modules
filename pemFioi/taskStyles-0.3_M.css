@@ -622,7 +622,7 @@ h1 .stars {
    width: 80%;
 }
 .layout_4 #zone_3 {
-   float: left;
+   float: none;
    width: 20%;
 }
 .layout_4 #zone_3 #displayHelper_validate,
