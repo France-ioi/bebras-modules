@@ -452,7 +452,10 @@ h1 .stars {
 /* LAYOUT 2 (>= 800px) */
 .layout_2 #zone_1, 
 .layout_2 #zone_2,
-.layout_2 #zone_3 {
+.layout_2 #zone_3,
+.layout_3 #zone_1, 
+.layout_3 #zone_2,
+.layout_3 #zone_3 {
    width: 100%;
 }
 .layout_2 .consigne #text,
