@@ -259,6 +259,14 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.onChange = function() {
+      if(subTask.context.runner) {
+         if(subTask.context.display) {
+            subTask.context.runner.reset();
+         } else {
+            subTask.resetRunnerAfterGrading = true;
+         }
+      }
+
       if(subTask.waitBetweenExecutionsTimeout && window.quickAlgoInterface) {
          var msg = subTask.levelGridInfos.waitBetweenExecutions.message || window.languageStrings.waitBetweenExecutions;
          quickAlgoInterface.displayNotification('wait', msg, true);
@@ -517,10 +525,7 @@ var initBlocklySubTask = function(subTask, language) {
             iTestCase: 0
          };
          subTask.context.changeDelay(oldDelay);
-         window.subTaskValidating = false;
-         setTimeout(function() {
-            subTask.validating = false;
-            }, 2000);
+         subTask.postGrading();
          callback(results);
          return;
       }
@@ -623,10 +628,7 @@ var initBlocklySubTask = function(subTask, language) {
             fullResults: subTask.testCaseResults
             };*/
          subTask.context.changeDelay(oldDelay);
-         window.subTaskValidating = false;
-         setTimeout(function() {
-            subTask.validating = false;
-            }, 2000);
+         subTask.postGrading();
          callback(results);
          window.quickAlgoInterface.updateBestAnswerStatus();
       }
@@ -661,4 +663,16 @@ var initBlocklySubTask = function(subTask, language) {
 
       startEval();
    };
+
+   subTask.postGrading = function() {
+      window.subTaskValidating = false;
+      if(subTask.resetRunnerAfterGrading && subTask.context.runner) {
+         subTask.context.runner.reset();
+         subTask.resetRunnerAfterGrading = false;
+      }
+      setTimeout(function() {
+         subTask.validating = false;
+         }, 2000);
+   };
+
 }

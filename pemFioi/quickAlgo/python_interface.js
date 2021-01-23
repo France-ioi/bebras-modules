@@ -474,7 +474,7 @@ function LogicController(maxInstructions, subTask) {
    * @return {boolean}
    */
   this.skulptAnalysisEnabled = function() {
-    return (this.language === 'python' && typeof analyseSkulptState === 'function');
+    return (this.language === 'python' && typeof window.analyseSkulptState === 'function');
   };
 
   /**
@@ -751,18 +751,6 @@ function LogicController(maxInstructions, subTask) {
     var onEditorChange = function () {
       if(!that._aceEditor) { return; }
 
-      if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
-        that.clearSkulptAnalysis();
-
-        that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
-        that._mainContext.runner._editorMarker = null;
-      }
-
-      // Interrupt any ongoing execution
-      if(that._mainContext.runner) {
-         that._mainContext.runner.reset();
-      }
-
       if(window.quickAlgoInterface) {
         window.quickAlgoInterface.displayError(null);
       } else {
@@ -781,6 +769,10 @@ function LogicController(maxInstructions, subTask) {
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();
+
+      if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
+        that.clearSkulptAnalysis();
+      }
     };
     this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
