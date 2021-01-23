@@ -130,7 +130,13 @@ function pythonForbiddenLists(includeBlocks) {
       }
    };
 
-   removeForbidden(includeBlocks.pythonForceAllowed ? includeBlocks.pythonForceAllowed : []);
+   var pfa = includeBlocks.pythonForceAllowed ? includeBlocks.pythonForceAllowed : [];
+   removeForbidden(pfa);
+   for(var k=0; k<pfa.length; k++) {
+      if(!arrayContains(allowed, pfa[k])) {
+         allowed.push(pfa[k]);
+      }
+   }
 
    if(includeBlocks && includeBlocks.standardBlocks) {
       if(includeBlocks.standardBlocks.includeAll || includeBlocks.standardBlocks.includeAllPython) {
