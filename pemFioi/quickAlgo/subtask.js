@@ -518,7 +518,9 @@ var initBlocklySubTask = function(subTask, language) {
          };
          subTask.context.changeDelay(oldDelay);
          window.subTaskValidating = false;
-         subTask.validating = false;
+         setTimeout(function() {
+            subTask.validating = false;
+            }, 2000);
          callback(results);
          return;
       }
@@ -622,7 +624,9 @@ var initBlocklySubTask = function(subTask, language) {
             };*/
          subTask.context.changeDelay(oldDelay);
          window.subTaskValidating = false;
-         subTask.validating = false;
+         setTimeout(function() {
+            subTask.validating = false;
+            }, 2000);
          callback(results);
          window.quickAlgoInterface.updateBestAnswerStatus();
       }
