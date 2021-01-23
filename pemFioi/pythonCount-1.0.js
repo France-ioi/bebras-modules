@@ -130,6 +130,8 @@ function pythonForbiddenLists(includeBlocks) {
       }
    };
 
+   removeForbidden(includeBlocks.pythonForceAllowed ? includeBlocks.pythonForceAllowed : []);
+
    if(includeBlocks && includeBlocks.standardBlocks) {
       if(includeBlocks.standardBlocks.includeAll || includeBlocks.standardBlocks.includeAllPython) {
          // Everything is allowed
