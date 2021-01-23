@@ -302,9 +302,6 @@ function getBlocklyInterface(maxBlocks, subTask) {
 
       onChangeResetDisplayFct: function() {
          if(this.unloaded || this.reloading) { return; }
-         if(this.mainContext.runner) {
-            this.mainContext.runner.reset();
-         }
          this.highlightBlock(null);
          if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
