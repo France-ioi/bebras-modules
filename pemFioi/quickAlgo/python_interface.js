@@ -557,34 +557,49 @@ function LogicController(maxInstructions, subTask) {
     var completions = [];
 
     // we add completion on functions
-    if (this.includeBlocks && this.includeBlocks.generatedBlocks) {
-      for (var categoryIndex in this.includeBlocks.generatedBlocks) {
-        for (var funIndex in this.includeBlocks.generatedBlocks[categoryIndex]) {
-          var fun = this.includeBlocks.generatedBlocks[categoryIndex][funIndex];
-          var funInfos = this._getFunctionsInfo(fun);
-          var funProto = funInfos.proto;
-          var funHelp = funInfos.help;
-          var funSnippet = getSnippet(funProto);
-          completions.push({
-            caption: funProto,
-            snippet: funSnippet,
-            type: "snippet",
-            docHTML: "<b>" + funProto + "</b><hr></hr>" + funHelp
-          })
+    if (this.includeBlocks) {
+      if(this.includeBlocks.generatedBlocks) {
+        for (var categoryIndex in this.includeBlocks.generatedBlocks) {
+          for (var funIndex in this.includeBlocks.generatedBlocks[categoryIndex]) {
+            var fun = this.includeBlocks.generatedBlocks[categoryIndex][funIndex];
+            var funInfos = this._getFunctionsInfo(fun);
+            var funProto = funInfos.proto;
+            var funHelp = funInfos.help;
+            var funSnippet = getSnippet(funProto);
+            completions.push({
+              caption: funProto,
+              snippet: funSnippet,
+              type: "snippet",
+              docHTML: "<b>" + funProto + "</b><hr></hr>" + funHelp
+            });
+          }
+
+          if(this._mainContext.customConstants && this._mainContext.customConstants[categoryIndex]) {
+            var constList = this._mainContext.customConstants[categoryIndex];
+            for(var iConst=0; iConst < constList.length; iConst++) {
+              var name = constList[iConst].name;
+              if(this._mainContext.strings.constant && this._mainContext.strings.constant[name]) {
+                name = this._mainContext.strings.constant[name];
+              }
+              completions.push({
+                name: name,
+                value: name,
+                meta: this._strings.constant
+              });
+            }
+          }
         }
       }
-      if(this._mainContext.customConstants && this._mainContext.customConstants[categoryIndex]) {
-        var constList = this._mainContext.customConstants[categoryIndex];
-        for(var iConst=0; iConst < constList.length; iConst++) {
-          var name = constList[iConst].name;
-          if(this._mainContext.strings.constant && this._mainContext.strings.constant[name]) {
-            name = this._mainContext.strings.constant[name];
-          }
+
+      if(this.includeBlocks.pythonAdditionalFunctions) {
+        for(var i=0; i < this.includeBlocks.pythonAdditionalFunctions.length; i++) {
+          var func = this.includeBlocks.pythonAdditionalFunctions[i];
           completions.push({
-            name: name,
-            value: name,
-            meta: this._strings.constant
-          })
+            caption: func + '()',
+            snippet: getSnippet(func),
+            type: "snippet",
+            docHTML: "<b>" + func + "()</b><hr></hr>"
+          });
         }
       }
     }
@@ -802,16 +817,16 @@ function LogicController(maxInstructions, subTask) {
    * @param functionName The name of the function
    * @return {{help: string, proto: string, desc: *}} The informations about the function
    */
-  this._getFunctionsInfo = function(functionName) {
+  this._getFunctionsInfo = function(functionName, ignoreDoc) {
     var blockDesc = '', funcProto = '', blockHelp = '';
-    if (this._mainContext.docGenerator) {
+    if (!ignoreDoc && this._mainContext.docGenerator) {
       blockDesc = this._mainContext.docGenerator.blockDescription(functionName);
       funcProto = blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
       blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
     } else {
       var blockName = functionName;
-      var funcCode = this._mainContext.strings.code[blockName] || blockName;
-      blockDesc = this._mainContext.strings.description[blockName];
+      var funcCode = (!ignoreDoc && this._mainContext.strings.code[blockName]) || blockName;
+      blockDesc = (!ignoreDoc && this._mainContext.strings.description[blockName]);
       if(blockDesc) {
          blockDesc = blockDesc.replace(/@/g, funcCode);
       }
@@ -948,6 +963,18 @@ function LogicController(maxInstructions, subTask) {
           }
         }
       }
+
+      if(this.includeBlocks.pythonAdditionalFunctions) {
+        for(var i=0; i < this.includeBlocks.pythonAdditionalFunctions.length; i++) {
+          var infos = this._getFunctionsInfo(this.includeBlocks.pythonAdditionalFunctions[i], true);
+          var blockDesc = infos.desc;
+          var funcProto = infos.proto;
+          var blockHelp = infos.help;
+          fullHtml += '<li>' + blockDesc + '</li>';
+          simpleElements.push({func: funcProto, desc: blockHelp});
+        }
+      }
+
       simpleHtml += displaySimpleList(simpleElements);
       fullHtml += '</ul>';
 
