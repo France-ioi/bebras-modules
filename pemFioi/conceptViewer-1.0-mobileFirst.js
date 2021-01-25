@@ -396,18 +396,19 @@ function getConceptViewerBaseConcepts() {
         {id: 'language', name: "Création d'un programme", url: baseUrl+'#language', order: 101},
         {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print', order: 102},
         {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend', order: 103},
-        {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat', order: 104},
-        {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if', order: 105},
-        {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else', order: 106},
-        {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil', order: 107},
-        {id: 'blockly_controls_infiniteloop', name: 'Boucle infinie', url: baseUrl+'#blockly_controls_infiniteloop', order: 108},
-        {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation', order: 109},
-        {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat', order: 110},
-        {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable', order: 111},
-        {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list', order: 112},
-        {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function', order: 113},
-        {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands', order: 114},
-        {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments', order: 115}
+        {id: 'blockly_text_length', name: 'Longueur d\'une chaîne', url: baseUrl+'#blockly_text_length', order: 104},
+        {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat', order: 105},
+        {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if', order: 106},
+        {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else', order: 107},
+        {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil', order: 108},
+        {id: 'blockly_controls_infiniteloop', name: 'Boucle infinie', url: baseUrl+'#blockly_controls_infiniteloop', order: 109},
+        {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation', order: 110},
+        {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat', order: 111},
+        {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable', order: 112},
+        {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list', order: 113},
+        {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function', order: 114},
+        {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands', order: 115},
+        {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments', order: 116}
         ];
     return baseConcepts;
 }
