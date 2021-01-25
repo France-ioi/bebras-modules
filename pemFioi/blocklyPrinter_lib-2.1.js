@@ -111,14 +111,14 @@ var getContext = function(display, infos) {
 
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
-    var conceptBaseUrl = window.location.protocol + '//'
+   var conceptBaseUrl = window.location.protocol + '//'
         + 'static4.castor-informatique.fr/help/printer.html';
 
-        context.conceptList = [
-        {id: 'printer_introduction', name: 'Les entrées/sorties', url: conceptBaseUrl+'#printer_introduction'},
-        {id: 'printer_print', name: 'Afficher une ligne', url: conceptBaseUrl+'#printer_print'},
-        {id: 'printer_read', name: 'Lire une ligne', url: conceptBaseUrl+'#printer_read'}
-    ];
+   context.conceptList = [
+      {id: 'printer_introduction', name: 'Les entrées/sorties', url: conceptBaseUrl+'#printer_introduction', isBase: true},
+      {id: 'printer_print', name: 'Afficher une ligne', url: conceptBaseUrl+'#printer_print', isBase: true},
+      {id: 'printer_read', name: 'Lire une ligne', url: conceptBaseUrl+'#printer_read', isBase: true}
+   ];
 
    
    var cells = [];
