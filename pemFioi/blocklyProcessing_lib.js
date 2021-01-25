@@ -1238,7 +1238,7 @@ var getContext = function(display, infos) {
       }
    };
 
-   var conceptBaseUrl = window.location.protocol + '//'
+   var conceptBaseUrl = (window.location.protocol == 'https' ? 'https' : 'http') + '//'
         + 'static4.castor-informatique.fr/help/processing.html';
    context.conceptList = [
       {id: 'processing_introduction', name: 'Processing - introduction', url: conceptBaseUrl+'#processing_introduction'},

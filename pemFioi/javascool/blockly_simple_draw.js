@@ -102,7 +102,7 @@ var getContext = function(display, infos) {
     var strings = context.setLocalLanguageStrings(simple_draw_strings)
     var draw;
 
-    var conceptBaseUrl = window.location.protocol + '//'
+    var conceptBaseUrl = (window.location.protocol == 'https' ? 'https' : 'http') + '//'
         + 'static4.castor-informatique.fr/help/javascool.html';
     context.conceptList = [
         {id: 'javascool_introduction', name: 'La proglet algoDeMaths', url: conceptBaseUrl+'#javascool_introduction'},

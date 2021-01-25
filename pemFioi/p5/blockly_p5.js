@@ -143,7 +143,7 @@ var getContext = function(display, infos, curLevel) {
     var files;
     var logger;
 
-    var conceptBaseUrl = window.location.protocol + '//'
+    var conceptBaseUrl = (window.location.protocol == 'https' ? 'https' : 'http') + '//'
         + 'static4.castor-informatique.fr/help/p5.html';
 
     context.conceptList = [

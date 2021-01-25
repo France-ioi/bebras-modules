@@ -113,7 +113,7 @@ var getContext = function(display, infos) {
 
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
-   var conceptBaseUrl = window.location.protocol + '//'
+   var conceptBaseUrl = (window.location.protocol == 'https' ? 'https' : 'http') + '//'
         + 'static4.castor-informatique.fr/help/printer.html';
 
    context.conceptList = [
