@@ -606,7 +606,7 @@ var quickAlgoLanguageStrings = {
          functions: "Funkcije",
          read: "Branje",
          print: "Pisanje",
-         turtle: "Želva"
+         turtle: "Grafika"
       },
       exerciseTypeAbout: {
          default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
