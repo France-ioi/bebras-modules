@@ -110,6 +110,16 @@ var getContext = function(display, infos) {
    var context = quickAlgoContext(display, infos);
 
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
+
+    var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/printer.html';
+
+        context.conceptList = [
+        {id: 'printer_introduction', name: 'Les entrées/sorties', url: conceptBaseUrl+'#printer_introduction'},
+        {id: 'printer_print', name: 'Afficher une ligne', url: conceptBaseUrl+'#printer_print'},
+        {id: 'printer_read', name: 'Lire une ligne', url: conceptBaseUrl+'#printer_read'}
+    ];
+
    
    var cells = [];
    var texts = [];
