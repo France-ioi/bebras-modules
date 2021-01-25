@@ -1239,7 +1239,7 @@ var getContext = function(display, infos) {
    };
 
    var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
+        + 'static4.castor-informatique.fr/help/processing.html';
    context.conceptList = [
       {id: 'processing_introduction', name: 'Processing - introduction', url: conceptBaseUrl+'#processing_introduction'},
       {id: 'processing_environment', name: 'Environnement', url: conceptBaseUrl+'#processing_environment'},

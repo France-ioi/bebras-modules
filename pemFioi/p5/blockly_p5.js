@@ -144,9 +144,9 @@ var getContext = function(display, infos, curLevel) {
     var logger;
 
     var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
+        + 'static4.castor-informatique.fr/help/p5.html';
 
-        context.conceptList = [
+    context.conceptList = [
         {id: 'p5_introduction', name: 'La proglet exploSonore', url: conceptBaseUrl+'#p5_introduction'},
         {id: 'p5_playSignal', name: 'Lancer un signal prédéfini', url: conceptBaseUrl+'#p5_playSignal'},
         {id: 'p5_playRecord', name: 'Lancer un signal enregistré', url: conceptBaseUrl+'#p5_playRecord'},

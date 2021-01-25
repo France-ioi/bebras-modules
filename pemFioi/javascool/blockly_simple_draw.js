@@ -103,7 +103,7 @@ var getContext = function(display, infos) {
     var draw;
 
     var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
+        + 'static4.castor-informatique.fr/help/javascool.html';
     context.conceptList = [
         {id: 'javascool_introduction', name: 'La proglet algoDeMaths', url: conceptBaseUrl+'#javascool_introduction'},
         {id: 'javascool_setPoint', name: 'Tracer des points', url: conceptBaseUrl+'#javascool_setPoint'},
