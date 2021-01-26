@@ -165,6 +165,8 @@ function DatabaseHelper(options) {
     };
 
     this.validateResultByHash = function(hash) {
+       var testHash = this.calculateTableHash(last_table);
+       console.log(testHash);
         if(hash !== this.calculateTableHash(last_table)) {
             return 'incorrect_results';
         }

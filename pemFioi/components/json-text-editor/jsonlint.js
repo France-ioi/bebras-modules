@@ -300,21 +300,21 @@ var jsonlint = (function () {
                     var B = "";
                     this.lexer.showPosition
                       ? (B =
-                          "Parse error on line " +
+                          "Erreur de syntaxe ligne " +
                           (i + 1) +
                           ":\n" +
                           this.lexer.showPosition() +
-                          "\nExpecting " +
+                          "\nContenu attendu " +
                           A.join(", ") +
-                          ", got '" +
+                          ", lu à la place : '" +
                           this.terminals_[q] +
                           "'")
                       : (B =
-                          "Parse error on line " +
+                          "Erreur de syntaxe ligne " +
                           (i + 1) +
-                          ": Unexpected " +
+                          " ; Contenu non attendu : " +
                           (q == 1
-                            ? "end of input"
+                            ? "fin de l'entrée"
                             : "'" + (this.terminals_[q] || q) + "'")),
                       this.parseError(B, {
                         text: this.lexer.match,
@@ -325,7 +325,7 @@ var jsonlint = (function () {
                       });
                   }
                   if (k == 3) {
-                    if (q == m) throw new Error(B || "Parsing halted.");
+                    if (q == m) throw new Error(B || "Analyse stoppée.");
                     (j = this.lexer.yyleng),
                       (h = this.lexer.yytext),
                       (i = this.lexer.yylineno),
@@ -334,7 +334,7 @@ var jsonlint = (function () {
                   }
                   for (;;) {
                     if (l.toString() in g[s]) break;
-                    if (s == 0) throw new Error(B || "Parsing halted.");
+                    if (s == 0) throw new Error(B || "Analyse stoppée.");
                     o(1), (s = d[d.length - 1]);
                   }
                   (r = q),
@@ -345,9 +345,9 @@ var jsonlint = (function () {
                 }
                 if (t[0] instanceof Array && t.length > 1)
                   throw new Error(
-                    "Parse Error: multiple actions possible at state: " +
+                    "Erreur de syntaxe: plusieurs actions possible dans l'état : " +
                       s +
-                      ", token: " +
+                      ", élément : " +
                       q
                   );
                 switch (t[0]) {
@@ -512,9 +512,9 @@ var jsonlint = (function () {
                 }
                 if (this._input === "") return this.EOF;
                 this.parseError(
-                  "Lexical error on line " +
+                  "Erreur lexicale ligne " +
                     (this.yylineno + 1) +
-                    ". Unrecognized text.\n" +
+                    ". Texte non reconnu.\n" +
                     this.showPosition(),
                   { text: "", token: null, line: this.yylineno }
                 );
@@ -611,7 +611,7 @@ var jsonlint = (function () {
           return d.parse.apply(d, arguments);
         }),
         (c.main = function (d) {
-          if (!d[1]) throw new Error("Usage: " + d[0] + " FILE");
+          if (!d[1]) throw new Error("Utilisation : " + d[0] + " FILE");
           if (typeof process != "undefined")
             var e = a("fs").readFileSync(
               a("path").join(process.cwd(), d[1]),
