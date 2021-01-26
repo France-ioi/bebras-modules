@@ -458,9 +458,10 @@ h1 .stars {
 .layout_2 #zone_3,
 .layout_3 #zone_3 {
    width: 100%;
-   position: fixed;
+   /*position: fixed;*/
+   position: relative;
    height: 100px;
-   bottom: 0;
+   /*bottom: 0;*/
 }
 @supports (display: flex) {
 /*   #task {
@@ -692,6 +693,32 @@ h1 .stars {
    margin: 0;
    border-radius: 0;
 }
+.layout_4 #errorTable {
+   display: none;
+/*   border-collapse: collapse;
+   height: 100%;
+   width: 100%;
+   position: absolute;
+   top: 0;*/
+}
+/*.layout_1 #errorCell,
+.layout_2 #errorCell,
+.layout_3 #errorCell {
+   background: white;
+   margin: 0; 
+   vertical-align: middle;
+   text-align: center;
+}
+.layout_1 #errorTable i,
+.layout_2 #errorTable i,
+.layout_3 #errorTable i {
+   font-size: 20px;
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   cursor: pointer;
+   color: red;
+}*/
 
 /**************************************************************/
 
