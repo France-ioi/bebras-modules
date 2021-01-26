@@ -29,6 +29,8 @@ var getContext = function(display, infos) {
             eof: "finSaisie"
          },
          description: {
+            print: "print(texte) affiche le texte sur le terminal",
+            read: "input() retourne une chaîne : la prochaîne ligne de l'entrée"
          },
          startingBlockName: "Programme",
          messages: {
