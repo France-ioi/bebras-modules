@@ -1368,7 +1368,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "lists_sort_place",
-                  blocklyXml: "<block type='lists_sort_place'></block>"
+                  blocklyXml: "<block type='lists_sort_place'><field name='VAR'>{listVariable}</field></block>"
                },
                {
                   name: "lists_sort",
@@ -1386,7 +1386,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "lists_append",
-                  blocklyXml: "<block type='lists_append'></block>"
+                  blocklyXml: "<block type='lists_append'><field name='VAR'>{listVariable}</field></block>"
                }
             ],
             tables: [
@@ -1712,7 +1712,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   },
                   {
                      name: "lists_sort_place",
-                     blocklyXml: "<block type='lists_sort_place'></block>"
+                     blocklyXml: "<block type='lists_sort_place'><field name='VAR'>{listVariable}</field></block>"
                   }
                ],
             math: [
