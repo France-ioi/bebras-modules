@@ -41,6 +41,13 @@ window.displayHelper = {
    responsive: false,
    mobileMode: false, 
    toggle_task: false,
+   headerH: 71,   // in resp mode
+   versionHeaderH: [110,110,95,null],  // in resp mode
+   footerH: 100,  // in resp mode
+   availableH: null, // height for zone_2 in responsive mode
+   layout: 0,  // in resp mode
+   taskW: 770,
+   taskH: 300,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -851,6 +858,7 @@ window.displayHelper = {
             displayHelper.setLevel(newLevel);
          });
          if(this.responsive){
+            /* version arrows in mobile mode */
             $('#tabsMenu .resp_version_arr').on('click', function(event) {
                if(!displayHelper.responsive || !displayHelper.mobileMode){
                   return
@@ -859,6 +867,7 @@ window.displayHelper = {
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
             });
+            /* switch task in mobile mode */
             $('#resp_switch div').on('click', function(event) {
                if(!displayHelper.responsive || !displayHelper.mobileMode){
                   return
@@ -870,6 +879,10 @@ window.displayHelper = {
                   displayHelper.toggle_task = true;
                }
                displayHelper.toggleTask();
+            });
+            /* error frame */
+            $('#errorTable i').click(function() {
+               $("#errorTable").hide();
             });
          }
       }
@@ -996,7 +1009,8 @@ window.displayHelper = {
          // $('#zone_1').show();
          // $('#zone_2').hide();
          $('#zone_1').css("overflow","auto");
-         $('#zone_1').css("height","auto");
+         // $('#zone_1').css("height","auto");
+         $('#zone_1').css("height",this.availableH+'px');
          $('#zone_2').css("overflow","hidden");
          $('#zone_2').css("height",0);
       }else{
@@ -1005,7 +1019,8 @@ window.displayHelper = {
          // $('#zone_2').show();
          // $('#zone_1').hide();
          $('#zone_2').css("overflow","auto");
-         $('#zone_2').css("height","auto");
+         // $('#zone_2').css("height","auto");
+         $('#zone_2').css("height",this.availableH+'px');
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
       }
@@ -1052,22 +1067,36 @@ window.displayHelper = {
          var w = window.innerWidth;
          var h = window.innerHeight;
          $('#task, #main_header').removeClass();
+         $('#task').css("height",(h - this.headerH)+'px');
          $('#displayHelperAnswering').appendTo($('#zone_3'));
-         if(w >= 800 && w/h >= 1) {
+         // $('#zone_1, #zone_2').appendTo($('#zone_12'));
+         if(w >= 1200) {
             this.mobileMode = false;
-            $('#task, #main_header').addClass('layout_1');
-         }else if(w >= 800 && w/h < 1){
+            this.layout = 1;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            $('#zone_1').height(this.availableH);
+         }else if(w >= 800){
             this.mobileMode = false;
-            $('#task, #main_header').addClass('layout_2');
+            this.layout = 2;
+            var zone1H = $('#zone_1').height();
+            console.log(zone1H);
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+            $('#zone_1').height('auto');
          }else if(w/h < 1){
             this.mobileMode = true;
-            $('#task, #main_header').addClass('layout_3');
+            this.layout = 3;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
          }else{
             this.mobileMode = true;
-            $('#task, #main_header').addClass('layout_4');
+            this.layout = 4;
+            this.availableH = h - this.headerH;
          }
+         $('#zone_2').height(this.availableH);
+         $('#taskCont').height(this.taskH);
+         $('#taskCont').width(this.taskW);
+         $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+         $('#task, #main_header').addClass('layout_'+this.layout);
          this.toggleTask();
-      // console.log('resp')
      }
    },
 
