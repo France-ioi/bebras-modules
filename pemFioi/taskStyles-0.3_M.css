@@ -173,6 +173,7 @@ textarea {
 #success,
 #error {
    font-weight: bold;
+   text-align: center;
 }
 #success {
    color: blue;
@@ -390,10 +391,10 @@ h1 .stars {
 
 /**************************************************************/
 /* LAYOUT 1 (large screen) */
-#main_header.layout_1 table,
-#main_header.layout_2 table,
-#main_header.layout_3 table,
-#main_header.layout_4 table {
+#main_header[class^=layout_] {
+   height: 71px;
+}
+#main_header[class^=layout_] table {
    width: 100% !important;
    margin: 0 !important;
    min-width: 300px;
@@ -420,30 +421,86 @@ h1 .stars {
 .layout_2 #resp_switch {
    display: none;
 }
+.layout_1 #zone_0,
+.layout_2 #zone_0 {
+   height: 110px;
+}
 #task.layout_1,
 #task.layout_2,
 #task.layout_3,
 #task.layout_4 {
    width: 100%;
 }
+
 [class^=layout_] [id^=zone]  {
    float: left;
    border: 2px dashed #a7e2a7;
 }
+[class^=layout_] #taskCont {
+   margin: auto;
+} 
+#zone_12 {
+   float: none;
+   border: none;
+}
 .layout_1 #zone_1 {
    width: 30%;
    overflow: auto !important;
-   height: auto !important;
+   /*height: auto !important;*/
 }
 .layout_1 #zone_2 {
    width: 70%;
+   height: 100%;
    overflow: auto !important;
-   height: auto !important;
+   /*height: auto !important;*/
 }
 .layout_1 #zone_3,
 .layout_2 #zone_3,
 .layout_3 #zone_3 {
    width: 100%;
+   position: fixed;
+   height: 100px;
+   bottom: 0;
+}
+@supports (display: flex) {
+/*   #task {
+      display: flex;
+      flex-direction: column;
+   }
+   #task > * {
+      float: none;
+      position: static;
+   }
+   #zone_1 {
+
+   }*/
+}
+.layout_1 #errorTable,
+.layout_2 #errorTable,
+.layout_3 #errorTable {
+   border-collapse: collapse;
+   height: 100%;
+   width: 100%;
+   position: absolute;
+   top: 0;
+}
+.layout_1 #errorCell,
+.layout_2 #errorCell,
+.layout_3 #errorCell {
+   background: white;
+   margin: 0; 
+   vertical-align: middle;
+   text-align: center;
+}
+.layout_1 #errorTable i,
+.layout_2 #errorTable i,
+.layout_3 #errorTable i {
+   font-size: 20px;
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   cursor: pointer;
+   color: red;
 }
 .layout_1 .consigne #example,
 .layout_2 .consigne #example,
@@ -459,7 +516,7 @@ h1 .stars {
 .layout_2 #zone_3 {
    width: 100%;
    overflow: auto !important;
-   height: auto !important;
+   /*height: auto !important;*/
 }
 .layout_2 .consigne #text,
 .layout_2 .consigne #example {
@@ -709,4 +766,7 @@ h1 .stars {
 	color: red; 
 }
 
-#showSolutionButton {margin-top: 24px;}
+#showSolutionButton {
+   display: none;
+   margin-top: 24px;
+}
