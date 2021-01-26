@@ -1078,9 +1078,6 @@ window.displayHelper = {
          }else if(w >= 800){
             this.mobileMode = false;
             this.layout = 2;
-            var zone1H = $('#zone_1').height();
-            console.log(zone1H);
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
             $('#zone_1').height('auto');
          }else if(w/h < 1){
             this.mobileMode = true;
@@ -1091,11 +1088,19 @@ window.displayHelper = {
             this.layout = 4;
             this.availableH = h - this.headerH;
          }
+         $('#task, #main_header').addClass('layout_'+this.layout);
+         if(this.layout == 2){   // bug fix
+            var zone1H = $('#zone_1').height();
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+         }
          $('#zone_2').height(this.availableH);
          $('#taskCont').height(this.taskH);
          $('#taskCont').width(this.taskW);
-         $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
-         $('#task, #main_header').addClass('layout_'+this.layout);
+         if(this.availableH > this.taskH){
+            $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+         }else{
+            $('#taskCont').css('margin-top',0);
+         }
          this.toggleTask();
      }
    },
