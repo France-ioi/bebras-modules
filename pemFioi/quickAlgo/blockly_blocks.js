@@ -51,6 +51,7 @@ var blocklyToScratch = {
 
 // Allowed blocks that make another block allowed as well
 var blocklyAllowedSiblings = {
+   'controls_repeat_ext_noShadow': ['controls_repeat_ext'],
    'controls_whileUntil': ['controls_untilWhile'],
    'controls_untilWhile': ['controls_whileUntil'],
    'controls_if_else': ['controls_if'],
