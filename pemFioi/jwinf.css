@@ -2,8 +2,12 @@
 
 #tabsMenu .li {
     background: rgba(155, 177, 27, 0.47);
+    /*background: #f5fbe8;*/
 }
 
+#introGrid .playerControls span {
+background-color: #8ca405 !important;
+}
 
 #taskIntro {
     font-weight:normal;
@@ -12,11 +16,21 @@
 
 body {
     color: #333 !important;
+    background: #f5fbe8;
 }
 
 
 img.beaver {
-    content:url("../img/jwinf-fox.jpg");
+  display:none;
+}
+
+#popupMessage .message::before {
+content: url("../../img/jwinf-fox.png"); " "
+}
+
+
+img.messageArrow { 
+  display:none;
 }
 
 * {
