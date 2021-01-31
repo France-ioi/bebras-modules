@@ -2198,9 +2198,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
             if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']) {
                this.addBlocksAllowed(['procedures_defnoreturn', 'procedures_callnoreturn']);
-            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
                this.addBlocksAllowed(['procedures_defreturn', 'procedures_callnoreturn']);
-            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
                this.addBlocksAllowed(['procedures_ifreturn']);
             }
             categoriesInfos['functions'] = {
