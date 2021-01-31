@@ -30,6 +30,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          messages: {
+            input: "Entrée",
+            output: "Sortie",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
             tooFewChars: "Ligne trop courte : ligne ",
@@ -59,6 +61,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
+            input: "Eingang",
+            output: "Ausgabe",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile ",
@@ -67,6 +71,37 @@ var getContext = function(display, infos) {
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
+         }
+      },
+      sl: {
+         label: {
+            print: "écrire",
+            read: "lire une ligne",
+            readInteger: "lire un entier sur une ligne",
+            readFloat: "lire un nombre à virgule sur une ligne",
+            eof: "fin de la saisie"
+         },
+         code: {
+            print: "print",
+            read: "input",
+            readInteger: "lireEntier",
+            readFloat: "lireDecimal",
+            eof: "finSaisie"
+         },
+         description: {
+         },
+         startingBlockName: "Programme",
+         messages: {
+            input: "Vhod",
+            output: "Izhod",
+            outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
+            outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
+            tooFewChars: "Ligne trop courte : ligne ",
+            tooManyChars: "Ligne trop longue : ligne ",
+            tooFewLines: "Trop peu de lignes en sortie",
+            tooManyLines: "Trop de lignes en sortie",
+            correctOutput: "La sortie est correcte !",
+            moreThan100Moves: "La sortie est correcte, mais vous l'avez produite en plus de 100 étapes…"
          }
       },
       none: {
@@ -138,7 +173,7 @@ var getContext = function(display, infos) {
    context.resetDisplay = function() {
       this.delayFactory.destroyAll();
 
-      $("#grid").html("<div style='width:400px; margin:0; padding: 0; overflow:hidden;text-align:left;'><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>Output:</div><pre id='output' style='margin:0px;'>a</pre></div><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>Input:</div><pre id='input' style='margin:0px;'>a</pre></div><div>")
+      $("#grid").html("<div style='width:400px; margin:0; padding: 0; overflow:hidden;text-align:left;'><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.output + " :</div><pre id='output' style='margin:0px;'>a</pre></div><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.input + " :</div><pre id='input' style='margin:0px;'>a</pre></div><div>")
       
       
       $("#output").html("");
