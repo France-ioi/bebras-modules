@@ -42,8 +42,8 @@ window.displayHelper = {
    mobileMode: false, 
    toggle_task: false,
    headerH: 71,   // in resp mode
-   versionHeaderH: [110,110,95,null],  // in resp mode
-   footerH: 100,  // in resp mode
+   versionHeaderH: [100,100,85,49],  // in resp mode
+   footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
    layout: 0,  // in resp mode
    taskW: 770,
@@ -727,9 +727,11 @@ window.displayHelper = {
 
          $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
          $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
-         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+         // var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+         var addTaskHTML = '<div id="displayHelperAnswering">';
          // Place button placements at the end of HTML if they don't already exist
-         var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+         // var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+         var placementNames = ['graderMessage', 'cancel', 'validate',  'saved'];
          for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
             var placement = 'displayHelper_' + placementNames[iPlacement];
             if ($('#' + placement).length === 0) {
@@ -757,6 +759,26 @@ window.displayHelper = {
          if (self.timeoutMinutes > 0) {
             self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
          }
+      });
+
+      $('#displayHelperAnswering').appendTo($('#zone_3'));
+      $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i></div><div id="resp_switch_2"><i class="fas fa-pen"></i></div>'));
+      $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i></div>'));
+     // $('#displayHelperAnswering').before('<div class="zone_3_spacer"></div>');
+     // $('#displayHelperAnswering').after('<div class="zone_3_spacer"></div>');
+
+      /* switch task in mobile mode */
+      $('#resp_switch_1, #resp_switch_2').on('click', function(event) {
+         if(!displayHelper.responsive || !displayHelper.mobileMode){
+            return
+         }
+         var id = $(this).attr('id');
+         if(id == 'resp_switch_1' && displayHelper.toggle_task){
+            displayHelper.toggle_task = false;
+         }else if(id == 'resp_switch_2' && !displayHelper.toggle_task){
+            displayHelper.toggle_task = true;
+         }
+         displayHelper.toggleTask();
       });
    },
    unload: function() {
@@ -849,8 +871,13 @@ window.displayHelper = {
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
-         $('#tabsMenu .li').on('click', function(event) {
-            if(displayHelper.responsive && displayHelper.mobileMode){
+         $('#zone_0 #tabsMenu .li').on('click', function(event) {
+            if(displayHelper.layout == 3){
+               return
+            }
+            if(displayHelper.responsive && displayHelper.layout == 4){
+               /* click version in resp layout4 */
+               $('.layout_4 #tabsMenuAlt').show();
                return
             }
             event.preventDefault();
@@ -867,22 +894,16 @@ window.displayHelper = {
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
             });
-            /* switch task in mobile mode */
-            $('#resp_switch div').on('click', function(event) {
-               if(!displayHelper.responsive || !displayHelper.mobileMode){
-                  return
-               }
-               var id = $(this).attr('id');
-               if(id == 'resp_switch_1' && displayHelper.toggle_task){
-                  displayHelper.toggle_task = false;
-               }else if(id == 'resp_switch_2' && !displayHelper.toggle_task){
-                  displayHelper.toggle_task = true;
-               }
-               displayHelper.toggleTask();
+            // /* click version in resp layout4 */
+            $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
+               var newLevel = $(this).attr('id').split('stars_menu_')[1];
+               $('.layout_4 #tabsMenuAlt').hide();
+               displayHelper.setLevel(newLevel);
             });
+
             /* error frame */
-            $('#errorTable i').click(function() {
-               $("#errorTable").hide();
+            $('#error i:last-of-type').click(function() {
+               $("#error").hide();
             });
          }
       }
@@ -938,12 +959,19 @@ window.displayHelper = {
       var tabsInnerHTML = '';
       var nbLevels = 0;
       var levelNames = [];
-      for (curLevel in this.levelsRanks) {
+      for(var iLevel = 0; iLevel < this.levels.length; iLevel++) {
+         var curLevel = this.levels[iLevel];
          nbLevels++;
          levelNames.push(curLevel);
-         tabsInnerHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
+         tabsInnerHTML += '<span class="li ';
+         if(iLevel == 0){
+            tabsInnerHTML += 'first';
+         }else if(iLevel == this.levels.length - 1){
+            tabsInnerHTML += 'last';
+         }
+         tabsInnerHTML += '" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
-            tabsInnerHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
+            tabsInnerHTML += '<span class="levelLabel">' + this.strings.version.toUpperCase() + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
          } else {
             tabsInnerHTML += this.strings["levelName_" + curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
@@ -969,16 +997,20 @@ window.displayHelper = {
       $('#tabsContainer').after('<div id="popupMessage"></div>');
       
       if(this.responsive){
-         $('#tabsContainer').append('<div id="resp_switch"><div class="resp_sw_cont"><div id="resp_switch_1"><i class="fas fa-file-alt"></i></div></div>'+
-            '<div class="resp_sw_cont"><div id="resp_switch_2"><i class="fas fa-puzzle-piece"></i></div></div></div>'); // switch for responsive layout
-         $('#tabsContainer').append('<div class="spacer" style="clear: both;"></div>');   // css bug fix
+         // $('#tabsContainer').append('<div id="resp_switch"><div class="resp_sw_cont"><div id="resp_switch_1"><i class="fas fa-file-alt"></i></div></div>'+
+         //    '<div class="resp_sw_cont"><div id="resp_switch_2"><i class="fas fa-puzzle-piece"></i></div></div></div>'); // switch for responsive layout
+         // $('#tabsContainer').append('<div class="spacer" style="clear: both;"></div>');   // css bug fix
+         var tabsMenuAlt = '<div id="tabsMenuAlt"><span>'+this.strings.version+' :</span>';
          for (var iLevel = 0; iLevel < levelNames.length; iLevel++) {   // responsive tabs
             var curLevel = levelNames[iLevel];
             var tabHTML = '<div class="resp_tabs">';
             if (this.pointsAsStars) {
                tabHTML += '<span class="levelVersionCont">';
-               tabHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_resp_' + this.levelsRanks[curLevel] + '"></span>';
+               tabHTML += '<span class="levelLabel">' + this.strings.version.toUpperCase() + '</span><span id="stars_resp_' + this.levelsRanks[curLevel] + '"></span>';
+               tabHTML += '<div id="stars_resp_alt_' + this.levelsRanks[curLevel] + '"></div>';
                tabHTML += '</span>';
+               // tabsMenuAlt += '<div id="stars_menu_' + this.levelsRanks[curLevel] + '"></div>';
+               tabsMenuAlt += '<div id="stars_menu_' + curLevel + '"></div>';
             } else {
                tabHTML += this.strings["levelName_" + curLevel] + ' — ' +
                   '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
@@ -986,14 +1018,20 @@ window.displayHelper = {
             tabHTML += '</div>';
             $('#tab_'+curLevel).append(tabHTML);
             if(iLevel > 0){
-               $('#tab_'+curLevel+' .resp_tabs').prepend($('<a href="#' + levelNames[iLevel - 1]+'" class="resp_version_arr resp_left_arr"><</a>'));
-               $('#tab_'+curLevel).append($('<a href="#' + levelNames[iLevel - 1]+'" class="resp_version_arr resp_left_arr"><</a>'));
+               $('#tab_'+curLevel+' .resp_tabs').prepend($('<a href="#' + levelNames[iLevel - 1]+'" class="resp_version_arr resp_left_arr"><i class="fas fa-chevron-left"></i></a>'));
             }
             if(iLevel < levelNames.length - 1){
-               $('#tab_'+curLevel+' .resp_tabs').append($('<a href="#' + levelNames[iLevel + 1]+'" class="resp_version_arr resp_right_arr">></a>'));
-               $('#tab_'+curLevel).append($('<a href="#' + levelNames[iLevel + 1]+'" class="resp_version_arr resp_right_arr">></a>'));
+               $('#tab_'+curLevel+' .resp_tabs').append($('<a href="#' + levelNames[iLevel + 1]+'" class="resp_version_arr resp_right_arr"><i class="fas fa-chevron-right"></i></a>'));
             }
          }
+         tabsMenuAlt += '</div>';
+         $("#tabsContainer").prepend(tabsMenuAlt);
+         /* click version in resp layout4 */
+         // $('#tabsMenuAlt .stars').click(function() {
+         //    // console.log("click")
+         //    var newLevel = $(this).attr('id').split('stars_menu_')[1];
+         //    displayHelper.setLevel(newLevel);
+         // });
          this.toggleTask();
       }
    },
@@ -1006,21 +1044,17 @@ window.displayHelper = {
       if(!this.toggle_task){
          $('#resp_switch_1').addClass('selected');
          $('#resp_switch_2').removeClass('selected');
-         // $('#zone_1').show();
-         // $('#zone_2').hide();
-         $('#zone_1').css("overflow","auto");
-         // $('#zone_1').css("height","auto");
+         $('#zone_1').css("overflow","visible");
          $('#zone_1').css("height",this.availableH+'px');
          $('#zone_2').css("overflow","hidden");
+         $('#zone_2').css("min-height",0);
          $('#zone_2').css("height",0);
       }else{
          $('#resp_switch_2').addClass('selected');
          $('#resp_switch_1').removeClass('selected');
-         // $('#zone_2').show();
-         // $('#zone_1').hide();
-         $('#zone_2').css("overflow","auto");
-         // $('#zone_2').css("height","auto");
-         $('#zone_2').css("height",this.availableH+'px');
+         $('#zone_2').css("overflow","visible");
+         $('#zone_2').css("height","auto");
+         $('#zone_2').css("min-height",this.availableH+'px');
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
       }
@@ -1040,6 +1074,8 @@ window.displayHelper = {
       drawStars('stars_' + starsIdx, starsIdx, 14, rate, mode);
       if(this.responsive){
          drawStars('stars_resp_' + starsIdx, starsIdx, 14, rate, mode);
+         drawStars('stars_resp_alt_' + starsIdx, starsIdx, 18, rate, mode,true);
+         drawStars('stars_menu_' + level, starsIdx, 18, rate, mode,true);
       }
    },
 
@@ -1047,28 +1083,36 @@ window.displayHelper = {
       if (!this.bUseFullWidth) {
          return
       }
-      if(!this.responsive){
-         $('#valider').appendTo($('#displayHelper_validate'));
-         if(window.innerWidth >= 1200) {
-             $('#task').addClass('largeScreen');
-             $('#displayHelperAnswering').appendTo($('#zone_1'));
-         }
-         else {
-            $('#task').removeClass('largeScreen');
-            if ($('#showSolutionButton')) {
-               $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
-            }
-            else {
-               $('#displayHelperAnswering').appendTo($('#task'));
-            }
-        }
-     }else{
+     //  if(!this.responsive){
+     //     $('#valider').appendTo($('#displayHelper_validate'));
+     //     if(window.innerWidth >= 1200) {
+     //         $('#task').addClass('largeScreen');
+     //         $('#displayHelperAnswering').appendTo($('#zone_1'));
+     //     }
+     //     else {
+     //        $('#task').removeClass('largeScreen');
+     //        if ($('#showSolutionButton')) {
+     //           $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
+     //        }
+     //        else {
+     //           $('#displayHelperAnswering').appendTo($('#task'));
+     //        }
+     //    }
+     // }else{
       // console.log(window.innerWidth)
+         // $('#choose_view').remove();
          var w = window.innerWidth;
          var h = window.innerHeight;
          $('#task, #main_header').removeClass();
          $('#task').css("height",(h - this.headerH)+'px');
-         $('#displayHelperAnswering').appendTo($('#zone_3'));
+         $('#task').css("margin-top",this.headerH+'px');
+         $('#zone_1').css("overflow","visible");
+         $('#zone_2').css("overflow","visible");
+         // $('#displayHelperAnswering').appendTo($('#zone_3'));
+         // console.log($('#resp_switch_1').length)
+         if(!$('#zone_0 #tabsContainer').length){
+            $('#zone_0 h1').after($('#tabsContainer'));
+         }
          // $('#zone_1, #zone_2').appendTo($('#zone_12'));
          if(w >= 1200) {
             this.mobileMode = false;
@@ -1086,23 +1130,32 @@ window.displayHelper = {
          }else{
             this.mobileMode = true;
             this.layout = 4;
-            this.availableH = h - this.headerH;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
+            if(!$('#zone_3 #tabsContainer').length){
+               $('#tabsContainer').prependTo($('#zone_3'));
+            }
          }
          $('#task, #main_header').addClass('layout_'+this.layout);
          if(this.layout == 2){   // bug fix
             var zone1H = $('#zone_1').height();
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
          }
-         $('#zone_2').height(this.availableH);
-         $('#taskCont').height(this.taskH);
-         $('#taskCont').width(this.taskW);
-         if(this.availableH > this.taskH){
-            $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
-         }else{
-            $('#taskCont').css('margin-top',0);
-         }
+
+         this.updateTaskDimensions();
          this.toggleTask();
-     }
+     // }
+   },
+
+   updateTaskDimensions: function() {
+      $('#zone_2').css('min-height',this.availableH);
+      $('#taskCont').height(this.taskH);
+      $('#taskCont').width(this.taskW);
+      if(this.availableH > this.taskH){
+         $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+      }else{
+         $('#taskCont').css('margin-top',0);
+      }
+      // $('#taskCont').css('margin-bottom',this.footerH);
    },
 
    useFullWidth: function() {
@@ -1173,6 +1226,8 @@ window.displayHelper = {
       var self = this;
 
       var afterReload = function() {
+         displayHelper.updateTaskDimensions();
+         displayHelper.toggleTask();
          self.submittedScore = self.levelsScores[self.taskLevel];
          self.refreshMessages = true;
          self.checkAnswerChanged();
@@ -1852,7 +1907,7 @@ window.displayHelper = {
    },
    // TODO: rename function below to getFullFeedbackValidate, assuming it is not called from outside this file
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
-      var strValidate = this.strings.validate;
+      var strValidate = this.strings.validate.toUpperCase();
       if (this.customValidateString != undefined) {
          strValidate = this.customValidateString;
       }
@@ -1860,8 +1915,8 @@ window.displayHelper = {
          case 'saved_unchanged':
             if (this.graderMessage !== "") {
                if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
-                     disabledStr + '/>';
+                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" '+disabledStr + '/>';
+                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
                }
             }
             break;
@@ -1872,8 +1927,8 @@ window.displayHelper = {
                   return '<input type="button" value="' + this.strings.gradeThisAnswer + '" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
-                     disabledStr + '/>';
+                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' + disabledStr + '/>';
+                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
                }
             }
             break;
@@ -1884,8 +1939,8 @@ window.displayHelper = {
                      disabledStr + '/>';
                } else {
                   // was: Valider votre nouvelle réponse
-                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
-                     disabledStr + '/>';
+                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +  disabledStr + '/>';
+                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
                }
             }
             break;
@@ -1918,8 +1973,9 @@ window.displayHelper = {
       var disabledStr = this.readOnly ? ' disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' +
-               disabledStr + '/></div>';
+            var strRestart = this.strings.restart.toUpperCase();
+            // messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' + disabledStr + '/></div>';
+               messages.cancel = '<div onclick="displayHelper.restartAll();"><i class="fas fa-undo"></i><span>' + strRestart +'</span></div>';
          }
          messages.graderMessage = this.getFullFeedbackGraderMessage(taskMode);
          messages.validate = this.getFullFeedbackValidateMessage(taskMode, disabledStr);
@@ -2035,9 +2091,12 @@ window.displayHelper = {
    fills rate% of them in yellow from the left
    mode is "norma", "locked" or "useless"
 */
-function drawStars(id, nbStars, starWidth, rate, mode) {
+function drawStars(id, nbStars, starWidth, rate, mode,layout4) {
    $('#' + id).addClass('stars');
-
+   var starH = starWidth*0.95;
+   if(layout4){
+      // console.log(id,nbStars,starWidth,rate,mode)
+   }
    function clipPath(coords, xClip) {
       var result = [[coords[0][0], coords[0][1]]];
       var clipped = false;
@@ -2076,7 +2135,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       return result;
    }
 
-   var fillColors = { normal: 'white', locked: '#ddd', useless: '#ced' };
+   var fillColors = { normal: 'none', locked: '#ddd', useless: '#ced' };
    var strokeColors = { normal: 'black', locked: '#ddd', useless: '#444' };
    var starCoords = [[25, 60], [5, 37], [35, 30], [50, 5], [65, 30], [95, 37], [75, 60], [78, 90], [50, 77], [22, 90]];
    var fullStarCoords = [
@@ -2089,16 +2148,47 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       return;
    }
    $('#' + id).html('');
-   var paper = new Raphael(id, starWidth * nbStars, starWidth * 0.95);
+   if(!layout4){
+      var paper = new Raphael(id, starWidth * nbStars, starH);
+   }else{
+      var paper = new Raphael(id, 2*starWidth, 2*starH);
+   }
    for (var iStar = 0; iStar < nbStars; iStar++) {
       var scaleFactor = starWidth / 100;
-      var deltaX = iStar * starWidth;
-      var coordsStr = pathFromCoords(starCoords, iStar * 100);
+      var deltaX, deltaY;
+      if(!layout4){
+         deltaX = iStar * starWidth;
+         deltaY = 0;
+      }else{
+         switch(nbStars){
+            case 1:
+               deltaX = starWidth * 0.5;
+               deltaY = starH * 0.5;
+               break;
+            case 2:
+               deltaX = iStar*starWidth;
+               deltaY = starH * 0.5;
+               break;
+            case 3:
+               if(iStar < 2){
+                  deltaX = iStar*starWidth;
+                  deltaY = 0;
+               }else{
+                  deltaX = starWidth * 0.5;
+                  deltaY = starH;
+               }
+               break;
+            case 4:
+               deltaX = (iStar%2)*starWidth;
+               deltaY = Math.floor(iStar/2)*starH;
+         }
+      }
+      var coordsStr = pathFromCoords(starCoords);
 
       paper.path(coordsStr).attr({
          fill: fillColors[mode],
          stroke: 'none'
-      }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
+      }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',' + (deltaY / scaleFactor));
 
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
@@ -2108,14 +2198,14 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
             var star = paper.path(pathFromCoords(coords)).attr({
                fill: '#ffc90e',
                stroke: 'none'
-            }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ",0");
+            }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',' + (deltaY / scaleFactor));
          }
       }
       paper.path(coordsStr).attr({
          fill: 'none',
          stroke: strokeColors[mode],
          'stroke-width': 5 * scaleFactor
-      }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
+      }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',' + (deltaY / scaleFactor));
    }
 }
 
