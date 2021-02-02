@@ -1,10 +1,4 @@
-/*@media (max-width: 315px) {
-   .layout_3 #displayHelper_validate > div span {
-      display: none;
-   }
-   .layout_3 #displayHelper_validate > div i {
-      margin-right: 0;
-   }
+/*@supports (display: flex)
 }*/
 
 * {
@@ -34,7 +28,6 @@ body * {
 
 a {
    color: #4D87CE;
-   /*font-weight: bold;*/
    text-decoration: none;
 }
 
@@ -421,7 +414,6 @@ h1 .stars {
 /**************************************************************/
 /* ERROR */
 #error {
-   /*display: inline-block !important;*/
    display: inline-block;
    background: red;
    color: white;
@@ -431,7 +423,6 @@ h1 .stars {
    left: 0;
    padding: 10px 30px 10px 20px;
    max-width: 100%;
-   /*text-align: center;*/
 }
 #error i:first-of-type {
    margin-right: 10px;
@@ -455,7 +446,6 @@ h1 .stars {
 }
 
 #task {
-	width: 770px;
 	margin: 0 auto;
 }
 #task.largeScreen {
@@ -473,6 +463,7 @@ h1 .stars {
 #zone_12 {
    position: relative;
    float: left;
+   width: 100%;
 }
 #zone_1, #zone_2,
 .zone_1, .zone_2 {
@@ -480,7 +471,7 @@ h1 .stars {
 }
 #zone_2,
 .zone_2 {
-	width: 770px;
+	/*width: 770px;*/
 }
 .largeScreen #zone_1,
 .largeScreen #zone_2
@@ -504,6 +495,7 @@ h1 .stars {
 }
 #zone_012 {
    /*overflow: auto;*/
+   width: 100%;
 }
 
 /**************************************************************/
@@ -548,7 +540,6 @@ h1 .stars {
    margin: auto;
 } 
 #zone_12 {
-   /*float: none;*/
    border: none;
    margin-bottom: 50px;
 }
@@ -558,6 +549,8 @@ h1 .stars {
 .layout_1 #zone_2 {
    width: 70%;
    height: 100%;
+   position: absolute;
+   right: 0;
 }
 
 @supports (display: flex) {
