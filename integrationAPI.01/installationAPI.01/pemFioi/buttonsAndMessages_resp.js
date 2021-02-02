@@ -45,9 +45,11 @@ window.displayHelper = {
    versionHeaderH: [100,100,85,49],  // in resp mode
    footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
+   availableW: null, // width for zone_2 in responsive mode
    layout: 0,  // in resp mode
    taskW: 770,
    taskH: 300,
+   flexSupport: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -716,6 +718,13 @@ window.displayHelper = {
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
+      // console.log($('#zone_1'))
+      // if ('CSS' in window && CSS.supports('display', 'flex')){
+      //    this.flexSupport = true;
+      // }else{
+      //    this.flexSupport = false;
+      // }
+      // console.log(this.flexSupport)
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
@@ -1118,19 +1127,23 @@ window.displayHelper = {
             this.mobileMode = false;
             this.layout = 1;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableW = w*0.7;
             $('#zone_1').height(this.availableH);
          }else if(w >= 800){
             this.mobileMode = false;
             this.layout = 2;
+            this.availableW = w;
             $('#zone_1').height('auto');
          }else if(w/h < 1){
             this.mobileMode = true;
             this.layout = 3;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableW = w;
          }else{
             this.mobileMode = true;
             this.layout = 4;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
+            this.availableW = w - 50;
             if(!$('#zone_3 #tabsContainer').length){
                $('#tabsContainer').prependTo($('#zone_3'));
             }
@@ -1148,13 +1161,75 @@ window.displayHelper = {
 
    updateTaskDimensions: function() {
       $('#zone_2').css('min-height',this.availableH);
-      $('#taskCont').height(this.taskH);
-      $('#taskCont').width(this.taskW);
-      if(this.availableH > this.taskH){
-         $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+      var availableRatio = this.availableW/this.availableH;
+      var taskRatio = this.taskW/this.taskH;
+      if(availableRatio > taskRatio){
+         /* H limiting factor */
+         var limitingFactor = "H";
+         var availableLength = this.availableH;
+         var taskLength = this.taskH;
       }else{
-         $('#taskCont').css('margin-top',0);
+         /* W limiting factor */
+         var limitingFactor = "W";
+         var availableLength = this.availableW;
+         var taskLength = this.taskW;
       }
+      var scaleFactor = availableLength/taskLength;
+      // console.log(scaleFactor)
+      // if(!this.flexSupport){
+         // $('#taskCont').height(this.taskH);
+      if(limitingFactor == "W"){
+         var newTaskW = Math.min(this.taskW,this.availableW);
+         var newTaskH = this.taskH*scaleFactor;
+      }else{
+         var newTaskH = Math.min(this.taskH,this.availableH);
+         var newTaskW = this.taskW*scaleFactor;
+      }
+         $('#taskCont').width(this.taskW);
+         // $('#taskCont').height(newTaskH);
+      // }
+      $('#taskCont').css('transform','scale('+scaleFactor+')');
+      if(scaleFactor >= 1){
+         // console.log('scale >= 1')
+         if(this.availableH > this.taskH){
+            $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+         }else{
+            $('#taskCont').css('margin-top',0);
+         }
+         // console.log(limitingFactor)
+         if(limitingFactor == 'W'){
+            $('#taskCont').css('margin-left','auto');
+            // $('#taskCont').css('margin-left',0);
+         }else{
+            $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
+         }
+      }else{
+         // console.log('scale < 1')
+         if(this.availableH > this.taskH){
+            $('#taskCont').css('margin-top',(this.availableH - this.taskH/**scaleFactor*/)/2);
+         }else{
+            if(limitingFactor == 'W'){
+               $('#taskCont').css('margin-top',0);
+            }else{
+               $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2);
+            }
+         }
+         // if(this.availableW < this.taskW){
+         if(this.availableW < this.taskW){
+            // console.log("check",limitingFactor)*scaleFactor
+            if(limitingFactor == "W"){
+               $('#taskCont').css('margin-left',-this.taskW*(1 - scaleFactor)/2 );
+            }else{
+               // console.log('cas qui nous occupe');
+               var marginLeft = (this.availableW - this.taskW)/2;
+               $('#taskCont').css('margin-left',marginLeft);
+            }
+         }else{
+            $('#taskCont').css('margin-left','auto');
+         }
+      }
+      $('#zone_2').height(Math.max(this.availableH,this.taskH*scaleFactor));
+      $('#zone_2').width(this.availableW);
       // $('#taskCont').css('margin-bottom',this.footerH);
    },
 
