@@ -49,7 +49,8 @@ window.displayHelper = {
    layout: 0,  // in resp mode
    taskW: 770,
    taskH: 300,
-   flexSupport: false,
+   minTaskW: 500,
+   maxTaskW: 800,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -718,13 +719,6 @@ window.displayHelper = {
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
-      // console.log($('#zone_1'))
-      // if ('CSS' in window && CSS.supports('display', 'flex')){
-      //    this.flexSupport = true;
-      // }else{
-      //    this.flexSupport = false;
-      // }
-      // console.log(this.flexSupport)
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
@@ -1066,6 +1060,7 @@ window.displayHelper = {
          $('#zone_2').css("min-height",this.availableH+'px');
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
+         // this.updateTaskDimensions();
       }
    },
 
@@ -1175,19 +1170,26 @@ window.displayHelper = {
          var taskLength = this.taskW;
       }
       var scaleFactor = availableLength/taskLength;
-      // console.log(scaleFactor)
-      // if(!this.flexSupport){
-         // $('#taskCont').height(this.taskH);
+
       if(limitingFactor == "W"){
-         var newTaskW = Math.min(this.taskW,this.availableW);
+         var newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*scaleFactor);
          var newTaskH = this.taskH*scaleFactor;
       }else{
-         var newTaskH = Math.min(this.taskH,this.availableH);
+         var newTaskH =  Math.max(Math.min(this.taskH,this.availableH),this.taskH*scaleFactor);
          var newTaskW = this.taskW*scaleFactor;
       }
-         $('#taskCont').width(this.taskW);
-         // $('#taskCont').height(newTaskH);
-      // }
+      if(newTaskW < this.minTaskW){
+         newTaskW = this.minTaskW;
+      }
+      if(newTaskW > this.maxTaskW){
+         newTaskW = this.maxTaskW;
+      }
+      scaleFactor = newTaskW/this.taskW;
+      newTaskH = this.taskH*scaleFactor;
+
+      $('#taskCont').width(this.taskW);
+      // $('#taskCont').height(newTaskH);
+      // console.log(limitingFactor,scaleFactor,this.taskW,this.availableW,newTaskW)
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
          // console.log('scale >= 1')
@@ -1209,7 +1211,13 @@ window.displayHelper = {
             $('#taskCont').css('margin-top',(this.availableH - this.taskH/**scaleFactor*/)/2);
          }else{
             if(limitingFactor == 'W'){
-               $('#taskCont').css('margin-top',0);
+               // console.log('cas qui nous occupe',this.taskH < this.availableH);
+               if(this.taskH < this.availableH){
+                  $('#taskCont').css('margin-top',0);
+               }else{
+                  // console.log('cas qui nous occupe');
+                  $('#taskCont').css('margin-top',-newTaskH*(1 - scaleFactor)/2);
+               }
             }else{
                $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2);
             }
@@ -1220,7 +1228,6 @@ window.displayHelper = {
             if(limitingFactor == "W"){
                $('#taskCont').css('margin-left',-this.taskW*(1 - scaleFactor)/2 );
             }else{
-               // console.log('cas qui nous occupe');
                var marginLeft = (this.availableW - this.taskW)/2;
                $('#taskCont').css('margin-left',marginLeft);
             }
@@ -1228,8 +1235,24 @@ window.displayHelper = {
             $('#taskCont').css('margin-left','auto');
          }
       }
-      $('#zone_2').height(Math.max(this.availableH,this.taskH*scaleFactor));
-      $('#zone_2').width(this.availableW);
+      // console.log(this.availableW,newTaskW)
+      $('#zone_2').height(Math.max(this.availableH,newTaskH));
+      $('#zone_2').width(Math.max(this.availableW,newTaskW));
+      if(this.layout != 1/* && this.layout != 4*/){
+         $('#zone_0, #zone_1').width(Math.max(this.availableW,newTaskW));
+      // }else if(this.layout == 4){
+      //    $('#zone_0, #zone_1').width(Math.max(this.availableW + 50,newTaskW));
+      }else{
+         $('#zone_0').width('100%');
+         $('#zone_1').width('30%')
+      }
+      if(this.layout == 4 && this.availableW < newTaskW){
+         $('#zone_2').width(newTaskW + 50);
+         $('#zone_1').css('padding-right',50);
+      }else{
+         $('#zone_1').css('padding-right',0);
+         // $('#zone_2').css('margin-right','0');
+      }
       // $('#taskCont').css('margin-bottom',this.footerH);
    },
 
