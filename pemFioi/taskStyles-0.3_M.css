@@ -699,6 +699,13 @@ h1 .stars {
    margin-right: 50px;
    margin-bottom: 0;
 }
+/*.layout_4 #zone_1,
+.layout_4 #zone_2,
+.layout_4 #zone_12,
+.layout_4 #zone_012 {
+   padding-right: 50px;
+}*/
+
 .layout_4 #zone_3 {
    width: 50px;
    height: 100%;
