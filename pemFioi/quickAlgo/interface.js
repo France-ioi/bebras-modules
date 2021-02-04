@@ -302,5 +302,6 @@ var quickAlgoInterface = {
       window.saveSvgAsPng(svg[0], name, options);
    },
 
-   updateControlsDisplay: function() {}
+   updateControlsDisplay: function() {},
+   setValidating: function() {}
 };

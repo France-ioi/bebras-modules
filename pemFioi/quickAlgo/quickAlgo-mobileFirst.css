@@ -911,6 +911,9 @@ p {
   width: 30px;
   text-align: center;
 }
+#introGrid .speedControls.speedControlsDisabled .playerControls .icon span {
+  background-color: #9b9b9b;
+}
 #introGrid .playerControls .icon:not(.playPause) span {
   color: #fff;
   background-color: #4a90e2;
