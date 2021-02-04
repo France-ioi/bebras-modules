@@ -363,6 +363,7 @@ h1 .stars {
    position: fixed;
    height: 50px;
    bottom: 0;
+   background: #eeeeee;
 }
 #displayHelperAnswering {
    display: inline;
@@ -407,7 +408,7 @@ h1 .stars {
    display: none;
 }
 
-[id^=resp_switch], #showSolution {
+[id^=resp_switch] {
    display: none;
 }
 
@@ -552,14 +553,44 @@ h1 .stars {
    position: absolute;
    right: 0;
 }
-
-@supports (display: flex) {
-
+.layout_1 #zone_3 #showSolution,
+.layout_2 #zone_3 #showSolution,
+.layout_1 #zone_3 #showExercice,
+.layout_2 #zone_3 #showExercice  {
+   position: absolute;
+   width: 150px;
+   height: 45px;
+   text-align: center;
+   font-weight: bold;
+   font-size: 14px;
+   color: #787878;
+   padding: 15px;
+   border-radius: 0 0 10px 10px;
+   cursor: pointer;
 }
+.layout_1 #zone_3 #showSolution.selected,
+.layout_2 #zone_3 #showSolution.selected,
+.layout_1 #zone_3 #showExercice.selected,
+.layout_2 #zone_3 #showExercice.selected {
+   background: white;
+}
+.layout_1 #zone_3 #showSolution,
+.layout_2 #zone_3 #showSolution {
+   left: 150px;
+}
+.layout_1 #zone_3 #showExercice,
+.layout_2 #zone_3 #showExercice {
+   left: 0;
+}
+.layout_1 #zone_3 #showSolution i,
+.layout_2 #zone_3 #showSolution i {
+   display: none;
+}
+
 .layout_1 .consigne #example,
 .layout_2 .consigne #example,
 .layout_3 .consigne #example {
-   border: 2px dashed #a7e2a7;
+   /*border: 2px dashed #a7e2a7;*/
    padding: 10px;
 }
 
@@ -646,6 +677,12 @@ h1 .stars {
 .layout_3 #zone_3 > div,
 .layout_4 #zone_3 > div {
    display: block;
+}
+.layout_3 #zone_3 #showExercice,
+.layout_4 #zone_3 #showExercice,
+.layout_3 #zone_3 #showSolution span,
+.layout_4 #zone_3 #showSolution span  {
+   display: none;
 }
 .layout_3 [id^=resp_sw],
 .layout_3 #showSolution {
