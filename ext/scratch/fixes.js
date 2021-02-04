@@ -1152,6 +1152,7 @@ Blockly.JavaScript['control_repeat'] = function(block) {
   code += 'for (var ' + loopVar + ' = 0; ' +
       loopVar + ' < ' + endVar + '; ' +
       loopVar + '++) {\n' +
+      "reportBlockValue('" + block.id + "', " + loopVar + "+1, '@@LOOP_ITERATION@@');\n" +
       branch + '}\n';
   return code;
 };
