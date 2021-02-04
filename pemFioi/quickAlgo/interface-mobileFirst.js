@@ -1302,7 +1302,7 @@ var quickAlgoInterface = {
 
         var html = '' +
             '<div id="quickAlgo-keypad"><div class="keypad">' +
-            '   <div class="keypad-exit" data-btn="C"><span class="fas fa-times"></span></div>' +
+//            '   <div class="keypad-exit" data-btn="C"><span class="fas fa-times"></span></div>' +
             '   <div class="keypad-row">' +
             '       <'+screenType+' class="keypad-value"></'+screenType+'>' +
             '   </div>' +
