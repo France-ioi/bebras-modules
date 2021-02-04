@@ -1246,6 +1246,10 @@ window.displayHelper = {
             var w = window.innerWidth;
             var zone2Perc = 100*newTaskW/w;
             var zone1Perc = 100 - zone2Perc;
+            if(zone2Perc < 60){
+               zone2Perc = 60;
+               zone1Perc = 40;
+            }
             $('#taskCont').css('margin-left','auto');
          }else{
             var zone2Perc = 70;
