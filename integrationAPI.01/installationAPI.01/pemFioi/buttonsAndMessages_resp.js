@@ -1238,22 +1238,28 @@ window.displayHelper = {
       // console.log(this.availableW,newTaskW)
       $('#zone_2').height(Math.max(this.availableH,newTaskH));
       $('#zone_2').width(Math.max(this.availableW,newTaskW));
-      if(this.layout != 1/* && this.layout != 4*/){
+      if(this.layout != 1){
          $('#zone_0, #zone_1').width(Math.max(this.availableW,newTaskW));
-      // }else if(this.layout == 4){
-      //    $('#zone_0, #zone_1').width(Math.max(this.availableW + 50,newTaskW));
       }else{
          $('#zone_0').width('100%');
-         $('#zone_1').width('30%')
+         if(newTaskW < this.availableW){
+            var w = window.innerWidth;
+            var zone2Perc = 100*newTaskW/w;
+            var zone1Perc = 100 - zone2Perc;
+            $('#taskCont').css('margin-left','auto');
+         }else{
+            var zone2Perc = 70;
+            var zone1Perc = 30;
+         }
+         $('#zone_1').width(zone1Perc+'%');
+         $('#zone_2').width(zone2Perc+'%');
       }
       if(this.layout == 4 && this.availableW < newTaskW){
          $('#zone_2').width(newTaskW + 50);
          $('#zone_1').css('padding-right',50);
       }else{
          $('#zone_1').css('padding-right',0);
-         // $('#zone_2').css('margin-right','0');
       }
-      // $('#taskCont').css('margin-bottom',this.footerH);
    },
 
    useFullWidth: function() {
