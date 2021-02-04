@@ -511,6 +511,9 @@ var initBlocklySubTask = function(subTask, language) {
       window.subTaskValidationAttempts = 0;
       window.subTaskValidating = true;
       subTask.validating = true;
+      if(display) {
+        quickAlgoInterface.setValidating(true);
+      }
 
       var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
@@ -672,7 +675,8 @@ var initBlocklySubTask = function(subTask, language) {
       }
       setTimeout(function() {
          subTask.validating = false;
-         }, 2000);
+         quickAlgoInterface.setValidating(false);
+         }, 1000);
    };
 
 }

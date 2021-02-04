@@ -1203,6 +1203,10 @@ var quickAlgoInterface = {
         this.displayNotification('error', message, lock);
     },
 
+    setValidating: function(mode) {
+        $('.speedControls').toggleClass('speedControlsDisabled', mode);
+    },
+
     makeTestResult: function(results, link) {
         return '' +
             '<span class="testResults">' +
