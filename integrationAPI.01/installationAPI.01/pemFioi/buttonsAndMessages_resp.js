@@ -766,9 +766,29 @@ window.displayHelper = {
 
       $('#displayHelperAnswering').appendTo($('#zone_3'));
       $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i></div><div id="resp_switch_2"><i class="fas fa-pen"></i></div>'));
-      $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i></div>'));
-     // $('#displayHelperAnswering').before('<div class="zone_3_spacer"></div>');
-     // $('#displayHelperAnswering').after('<div class="zone_3_spacer"></div>');
+      $('#zone_3').append($('<div id="showExercice" class="selected"><span>EXERCICE</span></div>'));
+      $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
+
+      $('#showExercice').click(function(ev) {
+         if($(this).hasClass('selected')){
+            return
+         }
+         $('#solution').hide();
+         $('#showSolution').removeClass('selected')
+         $('#showExercice').addClass('selected')
+      });
+       $('#showSolution').click(function(ev) {
+         if($(this).hasClass('selected')){
+            $('#solution').hide();
+            $('#showSolution').removeClass('selected');
+            $('#showExercice').addClass('selected');
+         }else{
+            $('#solution').show();
+            $('#showSolution').addClass('selected');
+            $('#showExercice').removeClass('selected');
+         }
+         
+      });
 
       /* switch task in mobile mode */
       $('#resp_switch_1, #resp_switch_2').on('click', function(event) {
@@ -783,6 +803,7 @@ window.displayHelper = {
          }
          displayHelper.toggleTask();
       });
+      // console.log(views)
    },
    unload: function() {
       if (this.taskDelayWarningTimeout) {
