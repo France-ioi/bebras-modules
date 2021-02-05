@@ -23,6 +23,7 @@ window.displayHelper = {
    taskSelector: '#task',
    hideValidateButton: false,
    hideRestartButton: false,
+   hideSolutionButton: false,
    confirmRestartAll: true,
    showScore: false,
    refreshMessages: true,
@@ -42,7 +43,7 @@ window.displayHelper = {
    mobileMode: false, 
    toggle_task: false,
    headerH: 71,   // in resp mode
-   versionHeaderH: [100,100,85,49],  // in resp mode
+   versionHeaderH: [95,95,86,49],  // in resp mode
    footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
    availableW: null, // width for zone_2 in responsive mode
@@ -769,28 +770,23 @@ window.displayHelper = {
       $('#zone_3').append($('<div id="showExercice" class="selected"><span>EXERCICE</span></div>'));
       $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
 
+      if(!views.solution || this.hideSolutionButton){
+         $('#showExercice, #showSolution').hide();
+         $('#zone_3').addClass('noSolution');
+      }
+
       $('#showExercice').click(function(ev) {
          if($(this).hasClass('selected')){
             return
          }
          displayHelper.showSolution(false);
-         // $('#solution').hide();
-         // $('#showSolution').removeClass('selected')
-         // $('#showExercice').addClass('selected')
       });
        $('#showSolution').click(function(ev) {
          if($(this).hasClass('selected')){
             displayHelper.showSolution(false);
-            // $('#solution').hide();
-            // $('#showSolution').removeClass('selected');
-            // $('#showExercice').addClass('selected');
          }else{
             displayHelper.showSolution(true);
-            // $('#solution').show();
-            // $('#showSolution').addClass('selected');
-            // $('#showExercice').removeClass('selected');
          }
-         
       });
 
       /* switch task in mobile mode */
@@ -1123,73 +1119,54 @@ window.displayHelper = {
       if (!this.bUseFullWidth) {
          return
       }
-     //  if(!this.responsive){
-     //     $('#valider').appendTo($('#displayHelper_validate'));
-     //     if(window.innerWidth >= 1200) {
-     //         $('#task').addClass('largeScreen');
-     //         $('#displayHelperAnswering').appendTo($('#zone_1'));
-     //     }
-     //     else {
-     //        $('#task').removeClass('largeScreen');
-     //        if ($('#showSolutionButton')) {
-     //           $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
-     //        }
-     //        else {
-     //           $('#displayHelperAnswering').appendTo($('#task'));
-     //        }
-     //    }
-     // }else{
-      // console.log(window.innerWidth)
-         // $('#choose_view').remove();
-         var w = window.innerWidth;
-         var h = window.innerHeight;
+     
+      var w = window.innerWidth;
+      var h = window.innerHeight;
 
-         // $('#task, #main_header').removeClass('layout_1 layout_2 layout_3 layout_4');
-         $('#task, #main_header').removeClass();
-         $('#task').css("height",(h - this.headerH)+'px');
-         $('#task').css("margin-top",this.headerH+'px');
-         $('#zone_1').css("overflow","visible");
-         $('#zone_2').css("overflow","visible");
-         // $('#displayHelperAnswering').appendTo($('#zone_3'));
-         // console.log($('#resp_switch_1').length)
-         if(!$('#zone_0 #tabsContainer').length){
-            $('#zone_0 h1').after($('#tabsContainer'));
+      $('#task, #main_header').removeClass();
+      $('#task').css("height",(h - this.headerH)+'px');
+      $('#task').css("margin-top",this.headerH+'px');
+      $('#zone_1').css("overflow","visible");
+      $('#zone_2').css("overflow","visible");
+      // $('#displayHelperAnswering').appendTo($('#zone_3'));
+      // console.log($('#resp_switch_1').length)
+      if(!$('#zone_0 #tabsContainer').length){
+         $('#zone_0 h1').after($('#tabsContainer'));
+      }
+      // $('#zone_1, #zone_2').appendTo($('#zone_12'));
+      if(w >= 1200) {
+         this.mobileMode = false;
+         this.layout = 1;
+         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+         this.availableW = w*0.7;
+         $('#zone_1').height(this.availableH);
+      }else if(w >= 800){
+         this.mobileMode = false;
+         this.layout = 2;
+         this.availableW = w;
+         $('#zone_1').height('auto');
+      }else if(w/h < 1){
+         this.mobileMode = true;
+         this.layout = 3;
+         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+         this.availableW = w;
+      }else{
+         this.mobileMode = true;
+         this.layout = 4;
+         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
+         this.availableW = w - 50;
+         if(!$('#zone_3 #tabsContainer').length){
+            $('#tabsContainer').prependTo($('#zone_3'));
          }
-         // $('#zone_1, #zone_2').appendTo($('#zone_12'));
-         if(w >= 1200) {
-            this.mobileMode = false;
-            this.layout = 1;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-            this.availableW = w*0.7;
-            $('#zone_1').height(this.availableH);
-         }else if(w >= 800){
-            this.mobileMode = false;
-            this.layout = 2;
-            this.availableW = w;
-            $('#zone_1').height('auto');
-         }else if(w/h < 1){
-            this.mobileMode = true;
-            this.layout = 3;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-            this.availableW = w;
-         }else{
-            this.mobileMode = true;
-            this.layout = 4;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
-            this.availableW = w - 50;
-            if(!$('#zone_3 #tabsContainer').length){
-               $('#tabsContainer').prependTo($('#zone_3'));
-            }
-         }
-         $('#task, #main_header').addClass('layout_'+this.layout);
-         if(this.layout == 2){   // bug fix
-            var zone1H = $('#zone_1').height();
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
-         }
+      }
+      $('#task, #main_header').addClass('layout_'+this.layout);
+      if(this.layout == 2){   // bug fix
+         var zone1H = $('#zone_1').height();
+         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+      }
 
-         this.updateTaskDimensions();
-         this.toggleTask();
-     // }
+      this.updateTaskDimensions();
+      this.toggleTask();
    },
 
    updateTaskDimensions: function() {
@@ -1301,6 +1278,11 @@ window.displayHelper = {
          $('#zone_1').css('padding-right',50);
       }else{
          $('#zone_1').css('padding-right',0);
+      }
+      if(newTaskH + 50 > this.availableH){
+         $('#zone_3').addClass('vertical_scroll');
+      }else{
+         $('#zone_3').removeClass('vertical_scroll');
       }
    },
 
