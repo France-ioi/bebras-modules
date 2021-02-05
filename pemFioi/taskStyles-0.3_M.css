@@ -157,8 +157,8 @@ textarea {
 .question h1,
 #solution {
    display: none;
-   margin-bottom: 0.4em;
-   margin-top: 0.4em;
+   margin-bottom: 50px;
+   margin-top: 0;
 }
 #taskIntro {
    border: 1px solid #8d9daa;
@@ -400,6 +400,33 @@ h1 .stars {
    background: #f5a623;
    margin: 0 10px;
 }
+
+[alkindi] #displayHelper_validate,
+[alkindi] #displayHelper_cancel {
+   display: inline-block;
+   margin-top: 12px;
+}
+[alkindi] #displayHelper_validate > div,
+[alkindi] #displayHelper_cancel > div {
+   border-radius: 5px;
+   width: 150px;
+   font-size: 12px;
+   text-align: center;
+}
+[alkindi] #displayHelper_validate > div i,
+[alkindi] #displayHelper_cancel > div i {
+   display: none;
+   font-size: 14px;
+}
+[alkindi] #displayHelper_validate > div {
+   background: #88bb88;
+   margin-right: 10px;
+}
+[alkindi] #displayHelper_cancel > div {
+   background: #30242b;
+   margin: 0 10px;
+}
+
 #displayHelper_saved {
    margin: .6em;
 }
@@ -469,10 +496,6 @@ h1 .stars {
 #zone_1, #zone_2,
 .zone_1, .zone_2 {
 	margin: 0 auto;
-}
-#zone_2,
-.zone_2 {
-	/*width: 770px;*/
 }
 .largeScreen #zone_1,
 .largeScreen #zone_2
@@ -700,6 +723,12 @@ h1 .stars {
 .layout_3 #showSolution {
    float: right;
 }
+.layout_3 #zone_3 #showSolution.selected,
+.layout_4 #zone_3 #showSolution.selected {
+   /*background: white;*/
+   background: #4a90e2;
+   color: white;
+}
 .layout_3 [id^=resp_sw] i,
 .layout_3 #showSolution i,
 .layout_4 [id^=resp_sw] i,
@@ -728,6 +757,34 @@ h1 .stars {
 .layout_3 #displayHelper_validate > div i {
    margin-right: 5px;
 }
+[alkindi].layout_3 #displayHelper_cancel > div,
+[alkindi].layout_3 #displayHelper_validate > div,
+[alkindi].layout_4 #displayHelper_cancel > div,
+[alkindi].layout_4 #displayHelper_validate > div {
+   width: auto;
+   border-radius: 50px;
+}
+[alkindi].layout_3 #displayHelper_cancel > div {
+   padding: 6px 8px;
+}
+[alkindi].layout_3 #displayHelper_cancel > div span {
+   display: none
+}
+[alkindi].layout_3 #displayHelper_cancel > div i,
+[alkindi].layout_3 #displayHelper_validate > div i,
+[alkindi].layout_4 #displayHelper_cancel > div i,
+[alkindi].layout_4 #displayHelper_validate > div i {
+   display: inline;
+}
+[alkindi].layout_3 #displayHelper_cancel > div i {
+   margin-right: 0;
+}
+[alkindi].layout_3 #displayHelper_validate > div span {
+   font-size: 12px;
+}
+[alkindi].layout_3 #displayHelper_validate > div i {
+   margin-right: 5px;
+}
 
 /**************************************************************/
 /* LAYOUT 4 */
@@ -736,17 +793,10 @@ h1 .stars {
    margin-right: 50px;
    margin-bottom: 0;
 }
-/*.layout_4 #zone_1,
-.layout_4 #zone_2,
-.layout_4 #zone_12,
-.layout_4 #zone_012 {
-   padding-right: 50px;
-}*/
 
 .layout_4 #zone_3 {
    width: 50px;
    height: 100%;
-   /*min-height: 361px;*/
    position: fixed;
    right: 0;
    bottom: 0;
@@ -755,13 +805,7 @@ h1 .stars {
 .layout_4 #tabsContainer {
    display: none;
 }
-.layout_4 .resp_tabs {
-   /*padding-top: 50%;*/
-   /*padding: 1px;*/
-   /*margin:1px;*/
-}
 .layout_4 .levelVersionCont {
-   /*font-size: 16px;*/
    display: block;
    margin-top: 50%;
    transform: translateY(-50%);
@@ -786,7 +830,6 @@ h1 .stars {
    display: none;
 } 
 .layout_4 #tabsMenuAlt {
-   /*display: block;*/
    background: #eeeeee;
    position: fixed;
    right: 0;
