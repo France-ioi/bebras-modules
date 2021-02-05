@@ -773,19 +773,22 @@ window.displayHelper = {
          if($(this).hasClass('selected')){
             return
          }
-         $('#solution').hide();
-         $('#showSolution').removeClass('selected')
-         $('#showExercice').addClass('selected')
+         displayHelper.showSolution(false);
+         // $('#solution').hide();
+         // $('#showSolution').removeClass('selected')
+         // $('#showExercice').addClass('selected')
       });
        $('#showSolution').click(function(ev) {
          if($(this).hasClass('selected')){
-            $('#solution').hide();
-            $('#showSolution').removeClass('selected');
-            $('#showExercice').addClass('selected');
+            displayHelper.showSolution(false);
+            // $('#solution').hide();
+            // $('#showSolution').removeClass('selected');
+            // $('#showExercice').addClass('selected');
          }else{
-            $('#solution').show();
-            $('#showSolution').addClass('selected');
-            $('#showExercice').removeClass('selected');
+            displayHelper.showSolution(true);
+            // $('#solution').show();
+            // $('#showSolution').addClass('selected');
+            // $('#showExercice').removeClass('selected');
          }
          
       });
@@ -833,6 +836,18 @@ window.displayHelper = {
       this.taskLevel = '';
       this.initLevelVars();
       return true;
+   },
+
+   showSolution: function(show) {
+      if(show){
+         $('#solution').show();
+         $('#showSolution').addClass('selected');
+         $('#showExercice').removeClass('selected');
+      }else{
+         $('#solution').hide();
+         $('#showSolution').removeClass('selected');
+         $('#showExercice').addClass('selected');
+      }
    },
 
    initLevelVars: function() {
@@ -1128,6 +1143,8 @@ window.displayHelper = {
          // $('#choose_view').remove();
          var w = window.innerWidth;
          var h = window.innerHeight;
+
+         // $('#task, #main_header').removeClass('layout_1 layout_2 layout_3 layout_4');
          $('#task, #main_header').removeClass();
          $('#task').css("height",(h - this.headerH)+'px');
          $('#task').css("margin-top",this.headerH+'px');
@@ -1338,6 +1355,7 @@ window.displayHelper = {
       $('#tabsMenu .li').removeClass('prev next');
       $('#tabsMenu .li.current').prev().addClass('prev');
       $('#tabsMenu .li.current').next().addClass('next');
+      this.showSolution(false);
    },
 
    setLevel: function(newLevel, force) {
@@ -2036,7 +2054,7 @@ window.displayHelper = {
    },
    // TODO: rename function below to getFullFeedbackValidate, assuming it is not called from outside this file
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
-      var strValidate = this.strings.validate.toUpperCase();
+      var strValidate = ($('#task[alkindi]').length > 0) ? this.strings.validate : this.strings.validate.toUpperCase();
       if (this.customValidateString != undefined) {
          strValidate = this.customValidateString;
       }
@@ -2102,7 +2120,7 @@ window.displayHelper = {
       var disabledStr = this.readOnly ? ' disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            var strRestart = this.strings.restart.toUpperCase();
+            var strRestart = ($('#task[alkindi]').length > 0) ? this.strings.restart : this.strings.restart.toUpperCase();
             // messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' + disabledStr + '/></div>';
                messages.cancel = '<div onclick="displayHelper.restartAll();"><i class="fas fa-undo"></i><span>' + strRestart +'</span></div>';
          }
