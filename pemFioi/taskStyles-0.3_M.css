@@ -154,7 +154,10 @@ textarea {
    border-radius: 6px;
  }
 #task h1,
-.question h1,
+.question h1 {
+   margin-bottom: 10px;
+   margin-top: 10px;
+}
 #solution {
    display: none;
    margin-bottom: 50px;
@@ -575,6 +578,10 @@ h1 .stars {
    height: 100%;
    position: absolute;
    right: 0;
+}
+.layout_1 #zone_3.noSolution.vertical_scroll,
+.layout_2 #zone_3.noSolution.vertical_scroll {
+   background: none;
 }
 .layout_1 #zone_3 #showSolution,
 .layout_2 #zone_3 #showSolution,
