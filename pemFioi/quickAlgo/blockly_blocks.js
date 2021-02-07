@@ -2024,17 +2024,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var colours = this.getDefaultColours();
 
          // Reset the flyoutOptions for the variables and the procedures
-         Blockly.Variables.flyoutOptions = {
-            any: false,
-            anyButton: !!this.includeBlocks.groupByCategory,
-            fixed: [],
-            includedBlocks: {get: true, set: true, incr: true},
-            shortList: true
-         };
-
-         Blockly.Procedures.flyoutOptions = {
-            includedBlocks: {noret: false, ret: false, ifret: false}
-         };
+         Blockly.Variables.resetFlyoutOptions();
+         Blockly.Procedures.resetFlyoutOptions();
 
          // Initialize allBlocksAllowed
          this.allBlocksAllowed = [];
@@ -2176,6 +2167,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
 
+         if(typeof this.includeBlocks.procedures !== 'undefined') {
+            var proceduresOptions = this.includeBlocks.procedures;
+            if(proceduresOptions.noret) { Blockly.Procedures.flyoutOptions.includedBlocks['noret'] = true; }
+            if(proceduresOptions.ret) { Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true; }
+            if(proceduresOptions.ifret) { Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true; }
+            Blockly.Procedures.flyoutOptions.disableArgs = !!proceduresOptions.disableArgs;
+         }
+
          var singleBlocks = stdInclude.singleBlocks;
          for(var iBlock = 0; iBlock < singleBlocks.length; iBlock++) {
             var blockName = singleBlocks[iBlock];
@@ -2219,6 +2218,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
+         Blockly.Variables.flyoutOptions.anyButton = !!this.includeBlocks.groupByCategory;
          if (typeof this.includeBlocks.variables !== 'undefined') {
             Blockly.Variables.flyoutOptions.fixed = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : [];
             if (typeof this.includeBlocks.variablesOnlyBlocks !== 'undefined') {
