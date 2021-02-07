@@ -21,10 +21,10 @@ var pythonCountPatterns = [
    {pattern: /^\w+/, block: true},
 
    // Strings
-   {pattern: /^'''(?:[^\\']|\\.|'[^']|'[^'])+'''/, block: true},
-   {pattern: /^'(?:[^\\']|\\.)+'/, block: true},
-   {pattern: /^"""(?:[^\\"]|\\.|"[^"]|""[^"])+"""/, block: true},
-   {pattern: /^"(?:[^\\"]|\\.)+"/, block: true},
+   {pattern: /^'''(?:[^\\']|\\.|'[^']|'[^'])*'''/, block: true},
+   {pattern: /^'(?:[^\\']|\\.)*'/, block: true},
+   {pattern: /^"""(?:[^\\"]|\\.|"[^"]|""[^"])*"""/, block: true},
+   {pattern: /^"(?:[^\\"]|\\.)*"/, block: true},
 
    // Operators
    {pattern: /^[+*\/%=!<>&|^~]+/, block: true},
@@ -194,10 +194,10 @@ function pythonForbidden(code, includeBlocks) {
    code = removeFromPatterns(code, removePatterns);
 
    var stringPatterns = [
-      /'''(?:[^\\']|\\.|'[^']|'[^'])+'''/,
-      /'(?:[^\\']|\\.)+'/,
-      /"""(?:[^\\"]|\\.|"[^"]|""[^"])+"""/,
-      /"(?:[^\\"]|\\.)+"/
+      /'''(?:[^\\']|\\.|'[^']|'[^'])*'''/,
+      /'(?:[^\\']|\\.)*'/,
+      /"""(?:[^\\"]|\\.|"[^"]|""[^"])*"""/,
+      /"(?:[^\\"]|\\.)*"/
       ];
 
    code2 = removeFromPatterns(code, stringPatterns);
