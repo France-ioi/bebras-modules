@@ -1013,6 +1013,17 @@ def getServoAngle(pin):
 
     return angle
 
+def setContinousServoDirection(pin, direction):
+    if direction > 0:
+        angle = 0
+    elif direction < 0:
+        angle = 180
+    else:
+        angle = 90
+
+    setServoAngle(pin, angle)
+
+
 def readGrovePiADC(pin):
     pin = normalizePin(pin)
 
