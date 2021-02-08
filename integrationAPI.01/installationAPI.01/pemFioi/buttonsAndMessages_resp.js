@@ -766,8 +766,8 @@ window.displayHelper = {
       });
 
       $('#displayHelperAnswering').appendTo($('#zone_3'));
-      $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i></div><div id="resp_switch_2"><i class="fas fa-pen"></i></div>'));
-      $('#zone_3').append($('<div id="showExercice" class="selected"><span>EXERCICE</span></div>'));
+      $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i><span>ÉNONCÉ</span></div><div id="resp_switch_2"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
+      $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
       $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
 
       if(!views.solution || this.hideSolutionButton){
@@ -1032,9 +1032,6 @@ window.displayHelper = {
       $('#tabsContainer').after('<div id="popupMessage"></div>');
       
       if(this.responsive){
-         // $('#tabsContainer').append('<div id="resp_switch"><div class="resp_sw_cont"><div id="resp_switch_1"><i class="fas fa-file-alt"></i></div></div>'+
-         //    '<div class="resp_sw_cont"><div id="resp_switch_2"><i class="fas fa-puzzle-piece"></i></div></div></div>'); // switch for responsive layout
-         // $('#tabsContainer').append('<div class="spacer" style="clear: both;"></div>');   // css bug fix
          var tabsMenuAlt = '<div id="tabsMenuAlt"><span>'+this.strings.version+' :</span>';
          for (var iLevel = 0; iLevel < levelNames.length; iLevel++) {   // responsive tabs
             var curLevel = levelNames[iLevel];
@@ -1084,6 +1081,7 @@ window.displayHelper = {
          $('#zone_2').css("overflow","hidden");
          $('#zone_2').css("min-height",0);
          $('#zone_2').css("height",0);
+         $('#zone_3').addClass('hideButtons');
       }else{
          $('#resp_switch_2').addClass('selected');
          $('#resp_switch_1').removeClass('selected');
@@ -1092,6 +1090,8 @@ window.displayHelper = {
          $('#zone_2').css("min-height",this.availableH+'px');
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
+         $('#zone_3').removeClass('hideButtons');
+
          // this.updateTaskDimensions();
       }
    },
