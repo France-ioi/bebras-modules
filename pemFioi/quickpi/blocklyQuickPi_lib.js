@@ -46,6 +46,7 @@ var quickPiLocalLanguageStrings = {
             setServoAngle: "mettre le servo %1 à l'angle %2",
             getServoAngle: "angle du servo %1",
 
+            setContinousServoDirection: "la direction du servo continu  %1 %2",
 
             drawPoint: "dessiner un pixel en x₀: %1 y₀: %2",
             isPointSet: "pixel affiché en x₀: %1 y₀: %2",
@@ -170,6 +171,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage",
             sendIRMessage: "sendIRMessage",
             presetIRMessage: "presetIRMessage",
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection",
         },
         description: {
             // Descriptions of the functions in Python (optional)
@@ -252,6 +256,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage(irrec, timeout) attends un message infrarouge pendant le temps donné en millisecondes et le renvois",
             sendIRMessage: "sendIRMessage(irtrans, name) envoi un message infrarouge précédement configurer avec le nom donné",
             presetIRMessage: "presetIRMessage(name, data) configure un message infrarouge de nom name et de donné data",
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection(servo, direction)",
         },
         constant: {
         },
@@ -532,6 +539,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "esperar un mensaje de infrarrojos : %1 durante : %2 ms",
             sendIRMessage: "enviar el mensaje por infrarrojos %2 por %1",
             presetIRMessage: "preparar un mensaje de infrarrojos con el nombre %1 y el contenido %2",
+
+            //Continous servo
+            setContinousServoDirection: "cambiar la dirección del servomotor continuo %1 %2",
         },
         code: {
             // Names of the functions in Python, or Blockly translated in JavaScript
@@ -617,6 +627,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage",
             sendIRMessage: "sendIRMessage",
             presetIRMessage: "presetIRMessage",
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection",
         },
         description: {
             // Descriptions of the functions in Python (optional)
@@ -699,6 +712,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage(irrec, timeout) espera por un mensaje infrarrojo y lo devuelve durante el tiempo dado en milisegundos",
             sendIRMessage: "sendIRMessage(irtrans, name) envia un mensaje infrarrojo previamente configurado con el nombre dado",
             presetIRMessage: "presetIRMessage(name, data) configura un mensaje infrarrojo con el nombre y datos dados",
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection(servo, direction) cambia la dirección de un servomotor",
         },
         constant: {
         },
@@ -936,6 +952,7 @@ var quickPiLocalLanguageStrings = {
             setServoAngle: "metti il servomotore %1 all'angolo %2",
             getServoAngle: "angolo del servomotore %1",
 
+            setContinousServoDirection: "imposta la direzione continua del servo %1 %2",
 
             drawPoint: "draw pixel",
             isPointSet: "is pixel set in screen",
@@ -1060,6 +1077,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage",
             sendIRMessage: "sendIRMessage",
             presetIRMessage: "presetIRMessage",
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection",
         },
         description: {
             // Descriptions of the functions in Python (optional)
@@ -1141,7 +1161,10 @@ var quickPiLocalLanguageStrings = {
             // IR Remote
             readIRMessage: "readIRMessage(irrec, timeout) wait for an IR message during the given time and then return it", // TODO: Translate
             sendIRMessage: "sendIRMessage(irtrans, name) send an IR message previously configured with the given name", // TODO: Translate
-            presetIRMessage: "presetIRMessage(name, data) configure an IR message with the given name and data" // TODO: Translate
+            presetIRMessage: "presetIRMessage(name, data) configure an IR message with the given name and data", // TODO: Translate
+
+            //Continous servo
+            setContinousServoDirection: "setContinousServoDirection(servo, direction)",           
         },
         constant: {
         },
@@ -1407,6 +1430,9 @@ var quickPiLocalLanguageStrings = {
             readIRMessage: "readIRMessage",
             sendIRMessage: "sendIRMessage",
             presetIRMessage: "presetIRMessage",
+
+            //Continous servo  
+            setContinousServoDirection: "setContinousServoDirection",
         }
     }
 }
@@ -8936,6 +8962,26 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
+    context.quickpi.setContinousServoDirection = function (name, direction, callback) {
+        var sensor = findSensorByName(name, true);
+
+        if (direction > 0)
+            angle = 0;
+        else if (direction < 0)
+            angle = 180;
+        else
+            angle = 90;
+
+        context.registerQuickPiEvent(name, angle);
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var command = "setServoAngle(\"" + name + "\"," + angle + ")";
+            cb = context.runner.waitCallback(callback);
+            context.quickPiConnection.sendCommand(command, cb);
+        }
+    };
+
     context.quickpi.readRotaryAngle = function (name, callback) {
         var sensor = findSensorByName(name, true);
 
@@ -10145,7 +10191,6 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     }
                 },
-
                 {
                     name: "setServoAngle", params: ["String", "Number"], blocklyJson: {
                         "args0": [
@@ -10168,6 +10213,19 @@ var getContext = function (display, infos, curLevel) {
                             },
                         ]
                     }
+                },
+                {
+                    name: "setContinousServoDirection", params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("servo")
+                            },
+                            { 
+                                "type": "field_dropdown", "name": "PARAM_1", "options": [["forward", "1"], ["backwards", "-1"], ["stop", "0"]] 
+                            },
+
+                        ]
+                    },
                 },
                 {
                     name: "setInfraredState", params: ["String", "Number"], blocklyJson: {
