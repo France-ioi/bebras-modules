@@ -299,7 +299,7 @@ var getContext = function(display, infos, curLevel) {
             transportableSquare: "quadrat",
             greenCell: "feldGruen",
             brownCell: "feldBraun",
-            markedCell: "feldMarikiert",
+            markedCell: "feldMarkiert",
             platformInFront: "vorPlattform",
             addPlatformAbove: "bauePlattformDarueber",
             addPlatformInFront: "bauePlattformDavor",
