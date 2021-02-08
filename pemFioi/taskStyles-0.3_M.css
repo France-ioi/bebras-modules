@@ -277,8 +277,7 @@ h1 .stars {
    padding: 10px;
 }
 [alkindi] .consigne {
-   background: #F5F5F5;
-   border-radius: 5px;
+   background: white;
    font-size: 14px;
    color: #30242B;
    padding: 0;
@@ -286,18 +285,21 @@ h1 .stars {
 }
 [alkindi] .consigne h3 {
    display: block;
-   background: #88BB88;
+   background: white;
    font-size: 14px;
-   color: white;
-   border-radius: 5px 5px 0 0;
+   /*color: white;*/
+   color: #88BB88;
+   /*border-radius: 5px 5px 0 0;*/
+   border-bottom: 1px solid #88BB88;
    text-align: center;
    margin: 0;
    padding: 13px;
 }
 [alkindi] .consigne h3 i {
-   display: block;
-   float: left;
-   width: 20px;
+   /*display: block;*/
+   /*float: left;*/
+   /*width: 20px;*/
+   margin-right: 20px;
 }
 [alkindi] .consigne #text {
    padding: 20px;
