@@ -1,6 +1,3 @@
-/*@supports (display: flex)
-}*/
-
 * {
    -moz-user-select: -moz-none;
    -webkit-user-select: none;
@@ -243,6 +240,9 @@ textarea {
 #tabsMenu .li .levelLabel {
    margin-right: 1em;
 }
+[alkindi] #tabsMenu .li.current .levelLabel {
+   color: #88bb88;
+}
 #tabsMenu .li.lockedLevel a {
    color: #ddd;
 }
@@ -258,9 +258,6 @@ textarea {
 [id^=stars_resp_alt_], #tabsMenuAlt {
    display: none;
 }
-
-/**************************************************************/
-
 h1 span {
    display: inline-block;
    width: .8em;
@@ -272,6 +269,43 @@ h1 .stars {
 .stars {
    vertical-align: middle;
 }
+
+/**************************************************************/
+/* CONSIGNE */
+
+.consigne {
+   padding: 10px;
+}
+[alkindi] .consigne {
+   background: #F5F5F5;
+   border-radius: 5px;
+   font-size: 14px;
+   color: #30242B;
+   padding: 0;
+   margin: 20px;
+}
+[alkindi] .consigne h3 {
+   display: block;
+   background: #88BB88;
+   font-size: 14px;
+   color: white;
+   border-radius: 5px 5px 0 0;
+   text-align: center;
+   margin: 0;
+   padding: 13px;
+}
+[alkindi] .consigne h3 i {
+   display: block;
+   float: left;
+   width: 20px;
+}
+[alkindi] .consigne #text {
+   padding: 20px;
+   padding-bottom: 10px;
+   padding-top: 0px;
+}
+
+/**************************************************************/
 
 .bestScore {
    position: absolute;
@@ -361,6 +395,7 @@ h1 .stars {
 
 /**************************************************************/
 /* ZONE_3 */
+
 #zone_3 {
    width: 100%;
    position: fixed;
@@ -598,11 +633,13 @@ h1 .stars {
    border-radius: 0 0 10px 10px;
    cursor: pointer;
 }
-.layout_1 #zone_3 #showSolution.selected,
-.layout_2 #zone_3 #showSolution.selected,
-.layout_1 #zone_3 #showExercice.selected,
-.layout_2 #zone_3 #showExercice.selected {
+.layout_1 #zone_3 .selected,
+.layout_2 #zone_3 .selected {
    background: white;
+}
+[alkindi].layout_1 #zone_3 .selected,
+[alkindi].layout_2 #zone_3 .selected {
+   color: #88bb88 !important;
 }
 .layout_1 #zone_3 #showSolution,
 .layout_2 #zone_3 #showSolution {
@@ -612,9 +649,9 @@ h1 .stars {
 .layout_2 #zone_3 #showExercice {
    left: 0;
 }
-.layout_1 #zone_3 #showSolution i,
-.layout_2 #zone_3 #showSolution i {
-   display: none;
+.layout_1 #zone_3 [id^=show] i,
+.layout_2 #zone_3 [id^=show] i {
+   margin-right: 10px;
 }
 
 .layout_1 .consigne #example,
@@ -702,16 +739,14 @@ h1 .stars {
 }
 .layout_3 #zone_3 {
    background: #eeeeee;
-   min-width: 301px;
+   min-width: 366px;
 }
 .layout_3 #zone_3 > div,
 .layout_4 #zone_3 > div {
    display: block;
 }
 .layout_3 #zone_3 #showExercice,
-.layout_4 #zone_3 #showExercice,
-.layout_3 #zone_3 #showSolution span,
-.layout_4 #zone_3 #showSolution span  {
+.layout_4 #zone_3 #showExercice {
    display: none;
 }
 .layout_3 [id^=resp_sw],
@@ -723,18 +758,33 @@ h1 .stars {
    cursor: pointer;
    float: left;
 }
+[alkindi].layout_3 [id^=resp_sw],
+[alkindi].layout_3 #showSolution,
+[alkindi].layout_4 [id^=resp_sw],
+[alkindi].layout_4 #showSolution {
+   color: #6d6d6d;
+}
 .layout_3 div.selected {
    background: #4a90e2;
    color: white;
+}
+[alkindi].layout_3 div.selected,
+[alkindi].layout_4 div.selected {
+   background: white;
+   color: #88bb88;
 }
 .layout_3 #showSolution {
    float: right;
 }
 .layout_3 #zone_3 #showSolution.selected,
 .layout_4 #zone_3 #showSolution.selected {
-   /*background: white;*/
    background: #4a90e2;
    color: white;
+}
+[alkindi].layout_3 #zone_3 #showSolution.selected,
+[alkindi].layout_4 #zone_3 #showSolution.selected {
+   background: white;
+   color: #88bb88;
 }
 .layout_3 [id^=resp_sw] i,
 .layout_3 #showSolution i,
@@ -744,9 +794,44 @@ h1 .stars {
    margin-left: 50%;
    transform: translate(-50%,-50%);
 }
+.layout_3 [id^=resp_sw] span,
+.layout_3 #showSolution span,
+.layout_4 [id^=resp_sw] span,
+.layout_4 #showSolution span {
+   display: none;
+}
+.layout_3 .hideButtons [id^=resp_sw],
+.layout_3 .hideButtons #showSolution {
+   width: auto;
+   font-size: 14px;
+   padding: 15px;
+   font-weight: bold;
+}
+.layout_3 .hideButtons [id^=resp_sw] i,
+.layout_3 .hideButtons #showSolution i {
+   margin: 0 10px 0 0;
+   transform: none;
+}
+.layout_3 .hideButtons [id^=resp_sw] span,
+.layout_3 .hideButtons #showSolution span {
+   display: inline;
+   position: relative;
+}
+.layout_3 .hideButtons #resp_switch_2 {
+   border-right: 1px solid #d5d5d5;
+}
 .layout_3 #displayHelperAnswering {
    position: static;
    float: left;
+}
+[alkindi].layout_3 #displayHelperAnswering,
+[alkindi].layout_4 #displayHelperAnswering {
+   background: white;
+   border-radius: 0;
+}
+[alkindi].layout_3 .hideButtons #displayHelperAnswering,
+[alkindi].layout_4 .hideButtons #displayHelperAnswering {
+   display: none;
 }
 
 .layout_3 #displayHelper_cancel > div {
@@ -764,8 +849,10 @@ h1 .stars {
 .layout_3 #displayHelper_validate > div i {
    margin-right: 5px;
 }
+[alkindi].layout_3 #displayHelper_validate > div {
+   width: 100px;
+}
 [alkindi].layout_3 #displayHelper_cancel > div,
-[alkindi].layout_3 #displayHelper_validate > div,
 [alkindi].layout_4 #displayHelper_cancel > div,
 [alkindi].layout_4 #displayHelper_validate > div {
    width: auto;
@@ -778,7 +865,7 @@ h1 .stars {
    display: none
 }
 [alkindi].layout_3 #displayHelper_cancel > div i,
-[alkindi].layout_3 #displayHelper_validate > div i,
+/*[alkindi].layout_3 #displayHelper_validate > div i,*/
 [alkindi].layout_4 #displayHelper_cancel > div i,
 [alkindi].layout_4 #displayHelper_validate > div i {
    display: inline;
@@ -852,6 +939,9 @@ h1 .stars {
    margin: 0 10px;
    color: #4a90e2;
 }
+[alkindi].layout_4 #tabsMenuAlt > span {
+   color: #88bb88;
+}
 .layout_4 #tabsMenuAlt > .stars {
    width: 50px;
    height: 50px;
@@ -868,11 +958,13 @@ h1 .stars {
 .layout_4 [id^=resp_sw],
 .layout_4 #showSolution {
    position: fixed;
-   background: white;
-   color: #4a90e2;
+   /*background: white;*/
+   background: #eeeeee;
+   /*color: #4a90e2;*/
    height: 50px;
    width: 50px;
    cursor: pointer;
+   /*font-size: 16px;*/
 }
 .layout_4 div.selected {
    background: #4a4a4a;
@@ -881,10 +973,18 @@ h1 .stars {
 .layout_4 #resp_switch_1 {
    right: 0;
    bottom: 190px;
+   border-top: 1px solid #d5d5d5;
 }
+
 .layout_4 #resp_switch_2 {
    right: 0;
    bottom: 140px;
+}
+.layout_4 .hideButtons #resp_switch_2 {
+   border-bottom: 1px solid #d5d5d5;
+}
+.layout_4 .hideButtons #resp_switch_1 {
+   border-top: none;
 }
 .layout_4 #showSolution {
    bottom: 0;
@@ -923,12 +1023,8 @@ h1 .stars {
 
 /**************************************************************/
 
-.consigne {
-	padding: 10px;
-}
-.
 #displayHelperAnswering {
-	padding: 10px;
+	/*padding: 10px;*/
 }
 
 .exemple
