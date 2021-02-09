@@ -43,15 +43,19 @@ window.displayHelper = {
    mobileMode: false, 
    toggle_task: false,
    headerH: 71,   // in resp mode
-   versionHeaderH: [95,95,86,49],  // in resp mode
+   versionHeaderH: [93,93,85,48],  // in resp mode
    footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
    availableW: null, // width for zone_2 in responsive mode
    layout: 0,  // in resp mode
    taskW: 770,
    taskH: 300,
+   newTaskW: 0,
+   newTaskH: 0,
    minTaskW: 500,
    maxTaskW: 800,
+   verticalScroll: false,
+   horizontalScroll: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -770,6 +774,11 @@ window.displayHelper = {
       $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
       $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
 
+      $('#task').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
+      $('#task').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
+      $('#task').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
+      $('#task').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
+
       if(!views.solution || this.hideSolutionButton){
          $('#showExercice, #showSolution').hide();
          $('#zone_3').addClass('noSolution');
@@ -802,6 +811,8 @@ window.displayHelper = {
          }
          displayHelper.toggleTask();
       });
+
+      $(window).scroll(displayHelper.updateScrollArrows);
       // console.log(views)
    },
    unload: function() {
@@ -1128,8 +1139,10 @@ window.displayHelper = {
       $('#task').css("margin-top",this.headerH+'px');
       $('#zone_1').css("overflow","visible");
       $('#zone_2').css("overflow","visible");
+      // $('#zone_0').height(this.versionHeaderH[this.layout])
       // $('#displayHelperAnswering').appendTo($('#zone_3'));
       // console.log($('#resp_switch_1').length)
+      $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
       if(!$('#zone_0 #tabsContainer').length){
          $('#zone_0 h1').after($('#tabsContainer'));
       }
@@ -1187,38 +1200,71 @@ window.displayHelper = {
       var scaleFactor = availableLength/taskLength;
 
       if(limitingFactor == "W"){
-         var newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*scaleFactor);
-         var newTaskH = this.taskH*scaleFactor;
+         this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*scaleFactor);
+         this.newTaskH = this.taskH*scaleFactor;
       }else{
-         var newTaskH =  Math.max(Math.min(this.taskH,this.availableH),this.taskH*scaleFactor);
-         var newTaskW = this.taskW*scaleFactor;
+         this.newTaskH =  Math.max(Math.min(this.taskH,this.availableH),this.taskH*scaleFactor);
+         this.newTaskW = this.taskW*scaleFactor;
       }
-      if(newTaskW < this.minTaskW){
-         newTaskW = this.minTaskW;
+      if(this.newTaskW < this.minTaskW){
+         this.newTaskW = this.minTaskW;
       }
-      if(newTaskW > this.maxTaskW){
-         newTaskW = this.maxTaskW;
+      if(this.newTaskW > this.maxTaskW){
+         this.newTaskW = this.maxTaskW;
       }
-      scaleFactor = newTaskW/this.taskW;
-      newTaskH = this.taskH*scaleFactor;
+      scaleFactor = this.newTaskW/this.taskW;
+      this.newTaskH = this.taskH*scaleFactor;
+      // console.log(newTaskH,this.availableH);
+      this.updateTaskCSS(scaleFactor,limitingFactor);
+      
+      if(this.newTaskH > this.availableH){
+         $('#zone_3').addClass('vertical_scroll');
+         this.verticalScroll = true;
+         // console.log(limitingFactor);
+         if(limitingFactor == 'H' && this.newTaskW < this.maxTaskW){
+            this.newTaskW = Math.min(this.availableW,this.maxTaskW);
+            scaleFactor = this.newTaskW/this.taskW;
+            this.newTaskH = this.taskH*scaleFactor;
+            this.updateTaskCSS(scaleFactor,limitingFactor);
+         }
+      }else{
+         $('#zone_3').removeClass('vertical_scroll');
+         this.verticalScroll = false;
+      }
+      if(this.newTaskW > this.availableW){
+         this.horizontalScroll = true;
+      }else{
+         $('#zone_3').removeClass('vertical_scroll');
+         this.horizontalScroll = false;
+      }
+      this.updateScrollArrows();
+   },
 
+   updateTaskCSS: function(scaleFactor,limitingFactor) {
       $('#taskCont').width(this.taskW);
       // $('#taskCont').height(newTaskH);
       // console.log(limitingFactor,scaleFactor,this.taskW,this.availableW,newTaskW)
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
-         // console.log('scale >= 1')
          if(this.availableH > this.taskH){
             $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
          }else{
-            $('#taskCont').css('margin-top',0);
+            if(this.verticalScroll){
+               $('#taskCont').css('margin-top',(this.newTaskH - this.taskH)/2);
+            }else{
+               $('#taskCont').css('margin-top',0);
+            }
          }
          // console.log(limitingFactor)
          if(limitingFactor == 'W'){
             $('#taskCont').css('margin-left','auto');
             // $('#taskCont').css('margin-left',0);
          }else{
-            $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
+            if(this.verticalScroll){
+               $('#taskCont').css('margin-left','auto');
+            }else{
+               $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
+            }
          }
       }else{
          // console.log('scale < 1')
@@ -1231,7 +1277,7 @@ window.displayHelper = {
                   $('#taskCont').css('margin-top',0);
                }else{
                   // console.log('cas qui nous occupe');
-                  $('#taskCont').css('margin-top',-newTaskH*(1 - scaleFactor)/2);
+                  $('#taskCont').css('margin-top',-this.newTaskH*(1 - scaleFactor)/2);
                }
             }else{
                $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2);
@@ -1251,15 +1297,15 @@ window.displayHelper = {
          }
       }
       // console.log(this.availableW,newTaskW)
-      $('#zone_2').height(Math.max(this.availableH,newTaskH));
-      $('#zone_2').width(Math.max(this.availableW,newTaskW));
+      $('#zone_2').height(Math.max(this.availableH,this.newTaskH));
+      $('#zone_2').width(Math.max(this.availableW,this.newTaskW));
       if(this.layout != 1){
-         $('#zone_0, #zone_1').width(Math.max(this.availableW,newTaskW));
+         $('#zone_0, #zone_1').width(Math.max(this.availableW,this.newTaskW));
       }else{
          $('#zone_0').width('100%');
-         if(newTaskW < this.availableW){
+         if(this.newTaskW < this.availableW){
             var w = window.innerWidth;
-            var zone2Perc = 100*newTaskW/w;
+            var zone2Perc = 100*this.newTaskW/w;
             var zone1Perc = 100 - zone2Perc;
             if(zone2Perc < 60){
                zone2Perc = 60;
@@ -1273,16 +1319,42 @@ window.displayHelper = {
          $('#zone_1').width(zone1Perc+'%');
          $('#zone_2').width(zone2Perc+'%');
       }
-      if(this.layout == 4 && this.availableW < newTaskW){
-         $('#zone_2').width(newTaskW + 50);
+      if(this.layout == 4 && this.availableW < this.newTaskW){
+         $('#zone_2').width(this.newTaskW + 50);
          $('#zone_1').css('padding-right',50);
       }else{
          $('#zone_1').css('padding-right',0);
       }
-      if(newTaskH + 50 > this.availableH){
-         $('#zone_3').addClass('vertical_scroll');
+   },
+
+   updateScrollArrows: function() {
+      // console.log('updateScrollArrows')
+      var layout = displayHelper.layout;
+      var topThreshold = displayHelper.versionHeaderH[layout - 1];
+      if(layout == 2){
+         topThreshold += $('#zone_1').height();
+      }
+      if(displayHelper.verticalScroll && $(window).scrollTop() > topThreshold){
+         $('#scroll_arr_up').show();
       }else{
-         $('#zone_3').removeClass('vertical_scroll');
+         $('#scroll_arr_up').hide();
+      }
+      console.log($(window).scrollTop(), displayHelper.newTaskH - displayHelper.availableH)
+      if(displayHelper.verticalScroll && $(window).scrollTop() < displayHelper.newTaskH - displayHelper.availableH){
+         $('#scroll_arr_down').show();
+      }else{
+         $('#scroll_arr_down').hide();
+      }
+      // console.log(displayHelper.horizontalScroll,$(window).scrollLeft())
+      if(displayHelper.horizontalScroll && $(window).scrollLeft() > 0){
+         $('#scroll_arr_left').show();
+      }else{
+         $('#scroll_arr_left').hide();
+      }
+      if(displayHelper.horizontalScroll && $(window).scrollLeft() < displayHelper.newTaskW - displayHelper.availableW){
+         $('#scroll_arr_right').show();
+      }else{
+         $('#scroll_arr_right').hide();
       }
    },
 
