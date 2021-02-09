@@ -537,6 +537,9 @@ h1 .stars {
 .zone_1, .zone_2 {
 	margin: 0 auto;
 }
+#zone_2 {
+   position: relative;
+}
 .largeScreen #zone_1,
 .largeScreen #zone_2
 {
@@ -560,6 +563,44 @@ h1 .stars {
 #zone_012 {
    /*overflow: auto;*/
    width: 100%;
+}
+#task > [id^=scroll_arr_] {
+   display: none;
+   background: #4a90e2;
+   width: 30px;
+   height: 30px;
+   font-size: 18px;
+   color: white;
+   position: fixed;
+   text-align: center;
+   border-radius: 15px;
+}
+#task[alkindi] > [id^=scroll_arr_] {
+   background: #88bb88;
+}
+#task > [id^=scroll_arr_] i {
+   margin-top: 50%;
+   transform: translateY(-50%);
+}
+#task > #scroll_arr_up, 
+#task > #scroll_arr_down {
+   right: 30px;
+}
+#task > #scroll_arr_up {
+   top: 81px;
+}
+#task > #scroll_arr_down {
+   bottom: 60px;
+}
+#task > #scroll_arr_left, 
+#task > #scroll_arr_right {
+   bottom: 60px;
+}
+#task > #scroll_arr_left {
+   left: 10px;
+}
+#task > #scroll_arr_right {
+   right: 30px;
 }
 
 /**************************************************************/
