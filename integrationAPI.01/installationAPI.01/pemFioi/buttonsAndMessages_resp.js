@@ -813,6 +813,12 @@ window.displayHelper = {
       });
 
       $(window).scroll(displayHelper.updateScrollArrows);
+      $(window).on({
+          // 'touchmove': displayHelper.updateScrollArrows
+          // function(e) {
+          //     console.log(e.target)
+          // }
+      });
       // console.log(views)
    },
    unload: function() {
@@ -1105,6 +1111,7 @@ window.displayHelper = {
 
          // this.updateTaskDimensions();
       }
+      this.updateScrollArrows();
    },
 
    updateStarsAtLevel: function(level) {
@@ -1217,7 +1224,7 @@ window.displayHelper = {
       // console.log(newTaskH,this.availableH);
       this.updateTaskCSS(scaleFactor,limitingFactor);
       
-      if(this.newTaskH > this.availableH){
+      if(Math.floor(this.newTaskH) > Math.ceil(this.availableH)){
          $('#zone_3').addClass('vertical_scroll');
          this.verticalScroll = true;
          // console.log(limitingFactor);
@@ -1231,7 +1238,7 @@ window.displayHelper = {
          $('#zone_3').removeClass('vertical_scroll');
          this.verticalScroll = false;
       }
-      if(this.newTaskW > this.availableW){
+      if(Math.floor(this.newTaskW) > Math.ceil(this.availableW)){
          this.horizontalScroll = true;
       }else{
          $('#zone_3').removeClass('vertical_scroll');
@@ -1329,17 +1336,22 @@ window.displayHelper = {
 
    updateScrollArrows: function() {
       // console.log('updateScrollArrows')
+      // console.log($('body').scrollLeft())
       var layout = displayHelper.layout;
       var topThreshold = displayHelper.versionHeaderH[layout - 1];
       if(layout == 2){
          topThreshold += $('#zone_1').height();
+      }
+      if(layout >= 3 && $('#resp_switch_1').hasClass('selected')){
+         $('[id^=scroll_arr_]').hide();
+         return
       }
       if(displayHelper.verticalScroll && $(window).scrollTop() > topThreshold){
          $('#scroll_arr_up').show();
       }else{
          $('#scroll_arr_up').hide();
       }
-      console.log($(window).scrollTop(), displayHelper.newTaskH - displayHelper.availableH)
+      // console.log($(window).scrollTop(), displayHelper.newTaskH - displayHelper.availableH)
       if(displayHelper.verticalScroll && $(window).scrollTop() < displayHelper.newTaskH - displayHelper.availableH){
          $('#scroll_arr_down').show();
       }else{
