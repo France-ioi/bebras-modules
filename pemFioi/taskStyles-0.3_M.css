@@ -926,6 +926,17 @@ h1 .stars {
 /**************************************************************/
 /* LAYOUT 4 */
 
+#task.layout_4 > #scroll_arr_up, 
+#task.layout_4 > #scroll_arr_down,
+#task.layout_4 > #scroll_arr_right {
+   right: 60px;
+}
+#task.layout_4 > #scroll_arr_down,
+#task.layout_4 > #scroll_arr_left, 
+#task.layout_4 > #scroll_arr_right {
+   bottom: 10px;
+}
+
 .layout_4 #zone_12 {
    margin-right: 50px;
    margin-bottom: 0;
