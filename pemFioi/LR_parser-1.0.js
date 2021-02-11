@@ -31,7 +31,21 @@ function LR_Parser(settings,subTask,answer) {
          str = str.replace('{' + i + '}', '<strong>' + values[i] + '</strong>');
       }
       return str;
-   }
+   };
+   this.itemToString = function(item) {
+      var str = '';
+      str += item.rule.nonterminal+' '+arrow;
+      for(var iDev = 0; iDev <= item.rule.development.length; iDev++){
+         if(iDev == item.dotIndex){
+            str += ' '+dot;
+         }
+         if(item.rule.development[iDev]){
+            str += ' '+item.rule.development[iDev];
+         }
+      }
+      return str
+   };
+   this.gotoInformation = {}; // for explanation
 
 
    this.mode = settings.mode;
@@ -70,15 +84,10 @@ function LR_Parser(settings,subTask,answer) {
    this.reductionMarkerR = 10;
 
    this.timeOutID;
-   this.animationTime = 1000;
+   this.animationTime = settings.animationTime || 1000;
    this.token;
 
    this.divID = settings.divID,
-   // this.parseInfoID = "parseInfo";
-   // this.parseTableID = "parseTable";
-   // this.graphPaperID = "graphPaper";
-   // this.tabsID = "tabs";
-   // this.tabsContainerID = "tabsCont";
    this.sideTable = false;
    this.rowHL = null;
    this.colHL = null;
@@ -739,8 +748,6 @@ function LR_Parser(settings,subTask,answer) {
       });      
       */   
    this.displayExplanation = function(key, values) {
-      // console.log(key,values)
-      // return;
       $('#explanations').html(key ? this.formatExplanation(key, values) : '');
    }
 
@@ -1871,12 +1878,31 @@ function LR_Parser(settings,subTask,answer) {
          prevStates.push(this.stack[col][0]);
       }
 
-      this.displayExplanation('reduce2', {
-         popped_states: prevStates.slice(1).join(', '),
-         non_terminal: nonTerminal,
+      this.displayExplanation(false);        
+       
+      var prevState = prevStates[prevStates.length - 1];  
+      var items = this.lrClosureTable.kernels[prevState].items;
+      for(var item of items){
+         if(item.rule.index == this.selectedRule){
+            break;
+         }
+      }
+      // console.log(this.itemToString(item));
+      this.gotoInformation = {
+         popped_states: prevStates.slice(1).join(','),
          top_state: prevStates[0],
+         non_terminal: nonTerminal,
          new_state: goto
-      });               
+      };
+
+      this.displayExplanation('reduce1', {
+         symbol: this.input[this.inputIndex],
+         non_terminal: nonTerminal,
+         item: this.itemToString(item),
+         popped_states: prevStates.slice(1).join(','),
+         RHS: this.grammar.rules[self.selectedRule].development.join(' ')
+      });           
+      // console.log("reduc1");
 
       var state = prevStates.pop();
    
@@ -1971,6 +1997,7 @@ function LR_Parser(settings,subTask,answer) {
                   /* prevent double callback */
                   return
                }
+               // console.log("goto");
                if(!firstStepOnly){
                   self.goto(newStackElement[0]);
                   self.arrangeEdgeHL();
@@ -1999,6 +2026,7 @@ function LR_Parser(settings,subTask,answer) {
             });
             self.simulationStep++;
             self.currentState = goto;
+            console.log("goto 1998");
             self.goto(goto);
             self.saveAnswer();
             $("#reduceButton span").text("REDUCE");
@@ -2010,6 +2038,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.goto = function(newState) {
       // console.log("goto "+newState)
+      this.displayExplanation('reduce2', this.gotoInformation); 
       var col = this.stack.length - 1;
       $(".stackElement.State[data_col="+col+"]").text(newState);
       $(".stackElement.State[data_col="+col+"]").css("opacity",0);
@@ -2017,6 +2046,13 @@ function LR_Parser(settings,subTask,answer) {
       self.highlightRule(self.selectedRule);
       self.updateState(true,"goto");
       self.displayMessage("reduce","GOTO "+newState);
+      // console.log(prevStates,nonTerminal);
+      // self.displayExplanation('reduce2', {
+      //    popped_states: prevStates.slice(1).join(', '),
+      //    non_terminal: nonTerminal,
+      //    top_state: prevStates[0],
+      //    new_state: newState
+      // }); 
       self.currentVertex = self.getStateID(newState);
       self.arrangeEdgeHL();
       if(this.mode == 2){
@@ -3402,6 +3438,7 @@ function LR_Parser(settings,subTask,answer) {
                   goto: cellContent
                });
                self.currentState = cellContent;
+               console.log("goto 3409");
                self.goto(cellContent);
                self.waitingForGoto = false;
                self.saveAnswer();
