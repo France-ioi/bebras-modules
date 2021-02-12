@@ -735,11 +735,17 @@ window.displayHelper = {
 
          $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
          $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
-         // var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
-         var addTaskHTML = '<div id="displayHelperAnswering">';
+         if(!self.responsive){
+            var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+         }else{
+            var addTaskHTML = '<div id="displayHelperAnswering">';
+         }
          // Place button placements at the end of HTML if they don't already exist
-         // var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
-         var placementNames = ['graderMessage', 'cancel', 'validate',  'saved'];
+         if(!self.responsive){
+            var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+         }else{
+            var placementNames = ['graderMessage', 'cancel', 'validate',  'saved'];
+         }
          for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
             var placement = 'displayHelper_' + placementNames[iPlacement];
             if ($('#' + placement).length === 0) {
@@ -769,56 +775,70 @@ window.displayHelper = {
          }
       });
 
-      $('#displayHelperAnswering').appendTo($('#zone_3'));
-      $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i><span>ÉNONCÉ</span></div><div id="resp_switch_2"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
-      $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
-      $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
+      if(this.responsive){
+         $('#displayHelperAnswering').appendTo($('#zone_3'));
+         $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i><span>ÉNONCÉ</span></div><div id="resp_switch_2"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
+         $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
+         $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
 
-      $('#task').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
-      $('#task').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
-      $('#task').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
-      $('#task').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
+         // $('#task').append('<span id="error"><i class="fas fa-exclamation-triangle"></i><span id="errorMsg"></span><i class="fas fa-times"></i></span>');
+         // console.log('load')
 
-      if(!views.solution || this.hideSolutionButton){
-         $('#showExercice, #showSolution').hide();
-         $('#zone_3').addClass('noSolution');
-      }
+         $('#task').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
+         $('#task').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
+         $('#task').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
+         $('#task').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
 
-      $('#showExercice').click(function(ev) {
-         if($(this).hasClass('selected')){
-            return
+         if(!views.solution || this.hideSolutionButton){
+            $('#showExercice, #showSolution').hide();
+            $('#zone_3').addClass('noSolution');
          }
-         displayHelper.showSolution(false);
-      });
-       $('#showSolution').click(function(ev) {
-         if($(this).hasClass('selected')){
+
+         $('#showExercice').click(function(ev) {
+            if($(this).hasClass('selected')){
+               return
+            }
             displayHelper.showSolution(false);
-         }else{
-            displayHelper.showSolution(true);
-         }
-      });
+         });
+         
+         $('#showSolution').click(function(ev) {
+            if($(this).hasClass('selected')){
+               displayHelper.showSolution(false);
+            }else{
+               displayHelper.showSolution(true);
+            }
+         });
 
-      /* switch task in mobile mode */
-      $('#resp_switch_1, #resp_switch_2').on('click', function(event) {
-         if(!displayHelper.responsive || !displayHelper.mobileMode){
-            return
-         }
-         var id = $(this).attr('id');
-         if(id == 'resp_switch_1' && displayHelper.toggle_task){
-            displayHelper.toggle_task = false;
-         }else if(id == 'resp_switch_2' && !displayHelper.toggle_task){
-            displayHelper.toggle_task = true;
-         }
-         displayHelper.toggleTask();
-      });
+         /* switch task in mobile mode */
+         $('#resp_switch_1, #resp_switch_2').on('click', function(event) {
+            if(!displayHelper.responsive || !displayHelper.mobileMode){
+               return
+            }
+            var id = $(this).attr('id');
+            if(id == 'resp_switch_1' && displayHelper.toggle_task){
+               displayHelper.toggle_task = false;
+            }else if(id == 'resp_switch_2' && !displayHelper.toggle_task){
+               displayHelper.toggle_task = true;
+            }
+            displayHelper.toggleTask();
+         });
 
-      $(window).scroll(displayHelper.updateScrollArrows);
-      $(window).on({
-          // 'touchmove': displayHelper.updateScrollArrows
-          // function(e) {
-          //     console.log(e.target)
-          // }
-      });
+         $(window).scroll(displayHelper.updateScrollArrows);
+         $(window).on({
+             // 'touchmove': displayHelper.updateScrollArrows
+             // function(e) {
+             //     console.log(e.target)
+             // }
+         });
+      }else{
+         $('#zone_0 > *').prependTo($('#task'));
+         $('#task #tabsContainer').after($('<div id="taskContent"></div>'));
+         $('#zone_1, #zone_2').appendTo($('#taskContent'));
+         $('#taskCont > *').prependTo($('#zone_2'));
+         $('#zone_012, #zone_12, #zone_3, #taskCont').remove();
+      }      
+      $('#tabsContainer').after('<div id="popupMessage"></div>');
+
       // console.log(views)
    },
    unload: function() {
@@ -923,20 +943,27 @@ window.displayHelper = {
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
-         $('#zone_0 #tabsMenu .li').on('click', function(event) {
-            if(displayHelper.layout == 3){
-               return
-            }
-            if(displayHelper.responsive && displayHelper.layout == 4){
-               /* click version in resp layout4 */
-               $('.layout_4 #tabsMenuAlt').show();
-               return
-            }
-            event.preventDefault();
-            var newLevel = $(this).children().attr('href').split('#')[1];
-            displayHelper.setLevel(newLevel);
-         });
-         if(this.responsive){
+
+         if(!this.responsive){
+            $('#tabsMenu .li').on('click', function(event) {
+               event.preventDefault();
+               var newLevel = $(this).children().attr('href').split('#')[1];
+               displayHelper.setLevel(newLevel);
+            });
+         }else{
+            $('#zone_0 #tabsMenu .li').on('click', function(event) {
+               if(displayHelper.layout == 3){
+                  return
+               }
+               if(displayHelper.responsive && displayHelper.layout == 4){
+                  /* click version in resp layout4 */
+                  $('.layout_4 #tabsMenuAlt').show();
+                  return
+               }
+               event.preventDefault();
+               var newLevel = $(this).children().attr('href').split('#')[1];
+               displayHelper.setLevel(newLevel);
+            });
             /* version arrows in mobile mode */
             $('#tabsMenu .resp_version_arr').on('click', function(event) {
                if(!displayHelper.responsive || !displayHelper.mobileMode){
@@ -946,7 +973,7 @@ window.displayHelper = {
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
             });
-            // /* click version in resp layout4 */
+            /* click version in resp layout4 */
             $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
@@ -1046,7 +1073,6 @@ window.displayHelper = {
          self.updateLayout();
       }, 100);
 
-      $('#tabsContainer').after('<div id="popupMessage"></div>');
       
       if(this.responsive){
          var tabsMenuAlt = '<div id="tabsMenuAlt"><span>'+this.strings.version+' :</span>';
@@ -1075,12 +1101,7 @@ window.displayHelper = {
          }
          tabsMenuAlt += '</div>';
          $("#tabsContainer").prepend(tabsMenuAlt);
-         /* click version in resp layout4 */
-         // $('#tabsMenuAlt .stars').click(function() {
-         //    // console.log("click")
-         //    var newLevel = $(this).attr('id').split('stars_menu_')[1];
-         //    displayHelper.setLevel(newLevel);
-         // });
+
          this.toggleTask();
       }
    },
@@ -1137,56 +1158,72 @@ window.displayHelper = {
       if (!this.bUseFullWidth) {
          return
       }
-     
-      var w = window.innerWidth;
-      var h = window.innerHeight;
-
-      $('#task, #main_header').removeClass();
-      $('#task').css("height",(h - this.headerH)+'px');
-      $('#task').css("margin-top",this.headerH+'px');
-      $('#zone_1').css("overflow","visible");
-      $('#zone_2').css("overflow","visible");
-      // $('#zone_0').height(this.versionHeaderH[this.layout])
-      // $('#displayHelperAnswering').appendTo($('#zone_3'));
-      // console.log($('#resp_switch_1').length)
-      $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
-      if(!$('#zone_0 #tabsContainer').length){
-         $('#zone_0 h1').after($('#tabsContainer'));
-      }
-      // $('#zone_1, #zone_2').appendTo($('#zone_12'));
-      if(w >= 1200) {
-         this.mobileMode = false;
-         this.layout = 1;
-         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-         this.availableW = w*0.7;
-         $('#zone_1').height(this.availableH);
-      }else if(w >= 800){
-         this.mobileMode = false;
-         this.layout = 2;
-         this.availableW = w;
-         $('#zone_1').height('auto');
-      }else if(w/h < 1){
-         this.mobileMode = true;
-         this.layout = 3;
-         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-         this.availableW = w;
-      }else{
-         this.mobileMode = true;
-         this.layout = 4;
-         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
-         this.availableW = w - 50;
-         if(!$('#zone_3 #tabsContainer').length){
-            $('#tabsContainer').prependTo($('#zone_3'));
+      if(!this.responsive){
+         $('#valider').appendTo($('#displayHelper_validate'));
+         if(window.innerWidth >= 1200) {
+             $('#task').addClass('largeScreen');
+             $('#displayHelperAnswering').appendTo($('#zone_1'));
          }
-      }
-      $('#task, #main_header').addClass('layout_'+this.layout);
-      if(this.layout == 2){   // bug fix
-         var zone1H = $('#zone_1').height();
-         this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
-      }
+         else {
+            $('#task').removeClass('largeScreen');
+            if ($('#showSolutionButton')) {
+               $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
+            }
+            else {
+               $('#displayHelperAnswering').appendTo($('#task'));
+            }
+        }
+      }else{
+         var w = window.innerWidth;
+         var h = window.innerHeight;
 
-      this.updateTaskDimensions();
-      this.toggleTask();
+         $('#task, #main_header').removeClass();
+         $('#task').css("height",(h - this.headerH)+'px');
+         $('#task').css("margin-top",this.headerH+'px');
+         $('#zone_1').css("overflow","visible");
+         $('#zone_2').css("overflow","visible");
+         // $('#zone_0').height(this.versionHeaderH[this.layout])
+         // $('#displayHelperAnswering').appendTo($('#zone_3'));
+         // console.log($('#resp_switch_1').length)
+         $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
+         if(!$('#zone_0 #tabsContainer').length){
+            $('#zone_0 h1').after($('#tabsContainer'));
+         }
+         // $('#zone_1, #zone_2').appendTo($('#zone_12'));
+         if(w >= 1200) {
+            this.mobileMode = false;
+            this.layout = 1;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableW = w*0.7;
+            $('#zone_1').height(this.availableH);
+         }else if(w >= 800){
+            this.mobileMode = false;
+            this.layout = 2;
+            this.availableW = w;
+            $('#zone_1').height('auto');
+         }else if(w/h < 1){
+            this.mobileMode = true;
+            this.layout = 3;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableW = w;
+         }else{
+            this.mobileMode = true;
+            this.layout = 4;
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
+            this.availableW = w - 50;
+            if(!$('#zone_3 #tabsContainer').length){
+               $('#tabsContainer').prependTo($('#zone_3'));
+            }
+         }
+         $('#task, #main_header').addClass('layout_'+this.layout);
+         if(this.layout == 2){   // bug fix
+            var zone1H = $('#zone_1').height();
+            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+         }
+
+         this.updateTaskDimensions();
+         this.toggleTask();
+      }
    },
 
    updateTaskDimensions: function() {
@@ -1439,8 +1476,10 @@ window.displayHelper = {
       var self = this;
 
       var afterReload = function() {
-         displayHelper.updateTaskDimensions();
-         displayHelper.toggleTask();
+         if(displayHelper.reponsive){
+            displayHelper.updateTaskDimensions();
+            displayHelper.toggleTask();
+         }
          self.submittedScore = self.levelsScores[self.taskLevel];
          self.refreshMessages = true;
          self.checkAnswerChanged();
@@ -2128,8 +2167,11 @@ window.displayHelper = {
          case 'saved_unchanged':
             if (this.graderMessage !== "") {
                if (!this.hideValidateButton && !this.hasSolution) {
-                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" '+disabledStr + '/>';
-                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  if(!this.responsive){
+                     return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" '+disabledStr + '/>';
+                  }else{
+                     return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  }
                }
             }
             break;
@@ -2140,8 +2182,11 @@ window.displayHelper = {
                   return '<input type="button" value="' + this.strings.gradeThisAnswer + '" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' + disabledStr + '/>';
-                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  if(!this.responsive){
+                     return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' + disabledStr + '/>';
+                  }else{
+                     return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  }
                }
             }
             break;
@@ -2152,8 +2197,11 @@ window.displayHelper = {
                      disabledStr + '/>';
                } else {
                   // was: Valider votre nouvelle réponse
-                  // return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +  disabledStr + '/>';
-                  return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  if(!this.responsive){
+                     return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +  disabledStr + '/>';
+                  }else{
+                     return '<div onclick="displayHelper.callValidate();"><i class="fas fa-check"></i><span>' + strValidate +'</span></div>';
+                  }
                }
             }
             break;
@@ -2187,8 +2235,11 @@ window.displayHelper = {
       if (this.showScore) {
          if (!this.hideRestartButton) {
             var strRestart = ($('#task[alkindi]').length > 0) ? this.strings.restart : this.strings.restart.toUpperCase();
-            // messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' + disabledStr + '/></div>';
+            if(!this.responsive){
+               messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' + disabledStr + '/></div>';
+            }else{
                messages.cancel = '<div onclick="displayHelper.restartAll();"><i class="fas fa-undo"></i><span>' + strRestart +'</span></div>';
+            }
          }
          messages.graderMessage = this.getFullFeedbackGraderMessage(taskMode);
          messages.validate = this.getFullFeedbackValidateMessage(taskMode, disabledStr);
@@ -2295,6 +2346,19 @@ window.displayHelper = {
          }
       }
       callback(scores[bestLevel], messages[bestLevel] + " (" + this.strings["levelVersionName_" + bestLevel] + ")");
+   },
+
+   displayError: function(msg) {
+      if(this.responsive){
+         $("#error").html('<i class="fas fa-exclamation-triangle"></i><span id="errorMsg">'+msg+'</span> <i class="fas fa-times"></i>');
+         if(msg){
+            $("#error").show();
+         }else{
+            $("#error").hide();
+         }
+      }else{
+         $("#displayHelper_graderMessage").html(msg);
+      }
    }
 };
 
