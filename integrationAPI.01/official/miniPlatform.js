@@ -462,6 +462,9 @@ $(document).ready(function() {
             }
             if (success) {success();}
          };
+         platform.log = function(data, success, error) {
+            if (success) {success();}
+         };
          var taskOptions = {};
          try {
             var strOptions = getUrlParameter("options");

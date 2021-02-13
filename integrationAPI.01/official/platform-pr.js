@@ -87,6 +87,9 @@ if (!isCrossDomain()) {
       openUrl: function(url, success, error) {
          return platform.parent_platform.openUrl(url, success, error);
       },
+      log: function(data, success, error) {
+         return platform.parent_platform.log(data, success, error);
+      },
       initCallback: function(callback) {
          this.initCallbackFun = callback;
          if (platform.initDone) {
@@ -252,6 +255,15 @@ if (!isCrossDomain()) {
       if (!error) error = function() {console.error(arguments);};
       platform.chan.call({method: "platform.openUrl",
          params: url,
+         error: error,
+         success: success
+      });
+   };
+   platform.log = function(data, success, error) {
+      if (!success) success = function(){};
+      if (!error) error = function() {console.error(arguments);};
+      platform.chan.call({method: "platform.log",
+         params: data,
          error: error,
          success: success
       });
