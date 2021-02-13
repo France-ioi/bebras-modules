@@ -667,6 +667,18 @@ function extractLevelSpecific(item, level) {
 }
 
 
+function sendErrorLog() {
+   // Send errors to the platform
+   var args = Array.prototype.slice.call(arguments);
+   var key = args.join(':');
+   if(key == window.lastErrorLogSentKey) { return; }
+   try {
+      window.platform.log(["error", args]);
+   } catch(e) {}
+}
+
+window.onerror = sendErrorLog;
+
 $('document').ready(function() {
    platform.initWithTask(window.task);
 });

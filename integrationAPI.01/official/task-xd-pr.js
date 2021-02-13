@@ -123,6 +123,10 @@ function Task(iframe, callback) {
          platform.openUrl(url, trans.complete, trans.error);
          trans.delayReturn(true);
       });
+      this.chan.bind('platform.log', function (trans, data) {
+         platform.log(data, trans.complete, trans.error);
+         trans.delayReturn(true);
+      });
    };
 }
 
@@ -309,7 +313,8 @@ Platform.prototype.updateDisplay = function(data, success, error) {
       this.task.iframe.height(parseInt(height)+40);success();
    }
 };
-Platform.prototype.openUrl = function(url) {error('platform.openUrl is not defined!');};
+Platform.prototype.openUrl = function(url, success, error) {error('platform.openUrl is not defined!');};
+Platform.prototype.log = function(data, success, error) { if(success) { success(); }};
 Platform.prototype.getTaskParams = function(key, defaultValue, success, error) {
    var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false, options: {}};
    if (key) {
