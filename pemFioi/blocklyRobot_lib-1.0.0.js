@@ -100,7 +100,10 @@ var getContext = function(display, infos, curLevel) {
                shootCondition_noShadow: "retour départ tir direction %1",
                connect: "brancher un câble",
                onMale: "sur une prise mâle",
-               onFemale: "sur une prise femelle"
+               onFemale: "sur une prise femelle",
+               dropPlatformInFront: "construire une plateforme devant",
+               dropPlatformAbove: "construire une plateforme au-dessus"
+               
             },
             code: {
                row: "ligneRobot",
@@ -153,7 +156,9 @@ var getContext = function(display, infos, curLevel) {
                shootCondition_noShadow: "tirerCondition",
                connect: "brancherCable",
                onMale: "surMale",
-               onFemale: "surFemelle"
+               onFemale: "surFemelle",
+               dropPlatformInFront: "construirePlateformeDevant",
+               dropPlatformAbove: "construirePlateformeAuDessus"
             },
             description: {
                forward: "avancer() fait avancer le robot d'une case",
@@ -268,7 +273,10 @@ var getContext = function(display, infos, curLevel) {
                shootCondition_noShadow: "laser shot returning to starting point in direction %1",
                connect: "plug a wire",
                onMale: "to a male plug",
-               onFemale: "to a female plug"
+               onFemale: "to a female plug",
+               dropPlatformInFront: "drop platform in front",
+               dropPlatformAbove: "drop platform above"
+               
             },
             code: {
                row: "robotRow",
@@ -314,7 +322,9 @@ var getContext = function(display, infos, curLevel) {
                shootCondition_noShadow: "shootOnCondition",
                connect: "plugCable",
                onMale: "onMalePlug",
-               onFemale: "onFemalePlug"
+               onFemale: "onFemalePlug",
+               dropPlatformInFront: "dropPlatformInFront",
+               dropPlatformAbove: "dropPlatformAbove"
             },
             messages: {
                leavesGrid: "The robot exits the grid!",
@@ -411,7 +421,9 @@ var getContext = function(display, infos, curLevel) {
                shoot: "disparar el láser en la dirección %1",
                shoot_noShadow: "disparar el laser en la dirección %1",
                shootCondition: "dirección del tiro de retorno %1",
-               shootCondition_noShadow: "dirección del tiro de retorno %1"
+               shootCondition_noShadow: "dirección del tiro de retorno %1",
+               dropPlatformInFront: "construir una plataforma adelante",
+               dropPlatformAbove: "construir una plataforma arriba"
             },
             code: {
                row: "filaRobot",
@@ -453,7 +465,9 @@ var getContext = function(display, infos, curLevel) {
                shoot: "dispararLaser",
                shoot_noShadow: "dispararLaser",
                shootCondition: "condicionDisparo",
-               shootCondition_noShadow: "condicionDisparo"
+               shootCondition_noShadow: "condicionDisparo",
+               dropPlatformInFront: "construirPlataformaAdelante",
+               dropPlatformAbove: "construirPlataformaArriba"
             },
             messages: {
                leavesGrid: "¡El robot salió de la cuadrícula!",
@@ -1917,66 +1931,6 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       gears: {
-         newBlocks: [
-           {
-             name: "dropPlatformInFront",
-             strings: {
-               fr: {
-                 label: "construire une plateforme devant",
-                 code: "construirePlateformeDevant"
-               },
-               es: {
-                  label: "construir una plataforma adelante",
-                  code: "construirPlataformaAdelante"
-               }
-             },
-             category: "robot",
-             type: "actions",
-             block: {
-               name: "dropPlatformInFront"
-             },
-             func: function(callback) {
-               if(this.nbPlatforms == 0)
-                  throw(window.languageStrings.messages.failureNotEnoughPlatform);
-               var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
-               if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-                  throw(window.languageStrings.messages.failureDropPlatform);
-               }
-               this.nbPlatforms -= 1;
-               this.dropObject({type: "platform"}, coords);
-               this.callCallback(callback);
-             }
-           },
-            {
-             name: "dropPlatformAbove",
-             strings: {
-               fr: {
-                 label: "construire une plateforme au-dessus",
-                 code: "construirePlateformeAuDessus"
-               },
-               es: {
-                  label: "construir una plataforma arriba",
-                  code: "construirPlataformaArriba"
-               }
-             },
-             category: "robot",
-             type: "actions",
-             block: {
-               name: "dropPlatformAbove"
-             },
-             func: function(callback) {
-               if(this.nbPlatforms == 0)
-                  throw(window.languageStrings.messages.failureNotEnoughPlatform);
-               var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
-               if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-                  throw(window.languageStrings.messages.failureDropPlatform);
-               }
-               this.nbPlatforms -= 1;
-               this.dropObject({type: "platform"}, coords);
-               this.callCallback(callback);
-             }
-           }
-         ],
          backgroundColor: "#f2f1e3",
          hasGravity: true,
          bagSize: 1,
@@ -2073,7 +2027,7 @@ var getContext = function(display, infos, curLevel) {
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 }
+            white: { num: 7, color: "shadow.png", side: 60, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -2087,6 +2041,33 @@ var getContext = function(display, infos, curLevel) {
             obstacle: { num: 6, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
+      },
+      packages: {
+         bagSize: 1,
+         containerSize: 1,
+         hasGravity: true,
+         backgroundColor: "#a0cc97",
+         borderColor: "#81a279",
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4 },
+            box: { num: 2, img: "box.png", side: 60, isContainer: true, zOrder: 2, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            books: { num: 3, img: "books.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
+            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1, canBeOutside: true },         
+            count_books: { num: 5, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isWithdrawable === true;
+               }).length;
+            }, side: 60, isWritable: true, fontColor: "#b23f65", fontBold: true, zOrder: 2, offsetX: 20, offsetY: 17},
+            count_needs: { num: 6, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isContainer === true;
+               })[0].containerSize;
+            }, side: 60, isWritable: true, fontColor: "#377f61", fontBold: true, zOrder: 3, offsetX: -20, offsetY: -17},
+            platform: { num: 7, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
+            platform_left: { num: 8, img: "platform_left.png", side: 60, isObstacle: true, zOrder: 0 },
+            platform_right: { num: 9, img: "platform_right.png", side: 60, isObstacle: true, zOrder: 0 },
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
       },
       paint: {
          newBlocks: [
@@ -2962,6 +2943,42 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "onFemale", yieldsValue: true },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropPlatformInFront",
+      type: "actions",
+      block: { name: "dropPlatformInFront" },
+      func: function(callback) {
+         if(this.nbPlatforms == 0)
+            throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            
+         var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
+         if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+            throw(window.languageStrings.messages.failureDropPlatform);
+         }
+         this.nbPlatforms -= 1;
+         this.dropObject({type: "platform"}, coords);
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropPlatformAbove",
+      type: "actions",
+      block: { name: "dropPlatformAbove" },
+      func: function(callback) {
+         if(this.nbPlatforms == 0)
+            throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            
+         var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
+         if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+            throw(window.languageStrings.messages.failureDropPlatform);
+         }
+         this.nbPlatforms -= 1;
+         this.dropObject({type: "platform"}, coords);
+         this.callCallback(callback);
       }
    });
    
