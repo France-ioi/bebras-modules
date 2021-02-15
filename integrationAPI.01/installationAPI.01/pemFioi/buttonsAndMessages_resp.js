@@ -953,7 +953,6 @@ window.displayHelper = {
          }else{
             $('#zone_0 #tabsMenu .li').on('click', function(event) {
                if(displayHelper.layout == 3){
-                  displayHelper.updateTaskDimensions();
                   return
                }
                if(displayHelper.responsive && displayHelper.layout == 4){
@@ -965,6 +964,7 @@ window.displayHelper = {
                var newLevel = $(this).children().attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
                displayHelper.updateTaskDimensions();
+               // displayHelper.centerInstructions();
             });
             /* version arrows in mobile mode */
             $('#tabsMenu .resp_version_arr').on('click', function(event) {
@@ -974,12 +974,18 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
+               displayHelper.updateTaskDimensions();
+               displayHelper.toggleTask();
+               // displayHelper.centerInstructions();
             });
             /* click version in resp layout4 */
             $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
                displayHelper.setLevel(newLevel);
+               displayHelper.updateTaskDimensions();
+               displayHelper.toggleTask();
+               // displayHelper.centerInstructions();
             });
 
             /* error frame */
@@ -1122,6 +1128,7 @@ window.displayHelper = {
          $('#zone_2').css("min-height",0);
          $('#zone_2').css("height",0);
          $('#zone_3').addClass('hideButtons');
+         this.centerInstructions();
       }else{
          $('#resp_switch_2').addClass('selected');
          $('#resp_switch_1').removeClass('selected');
@@ -1131,8 +1138,6 @@ window.displayHelper = {
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
          $('#zone_3').removeClass('hideButtons');
-
-         this.updateTaskDimensions();
       }
       this.updateScrollArrows();
    },
@@ -1284,6 +1289,10 @@ window.displayHelper = {
          this.horizontalScroll = false;
       }
       this.updateScrollArrows();
+      this.centerInstructions();
+   },
+
+   centerInstructions: function() {
       if(this.layout != 2){
          var zone1H = $('#zone_1').height();
          var consigneH = $('#zone_1 > .consigne').height();
