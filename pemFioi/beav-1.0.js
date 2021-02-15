@@ -341,19 +341,19 @@ Beav.Navigator.getVersion = function(){
    }
    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
-   return M.join(' ');
+   return M
 }
 
-Beav.Navigator.supportsResponsiveMode = function() {
-   if(Beav.Navigator.isIE8){
+Beav.Navigator.supportsResponsive = function() {
+   if(Beav.Navigator.isIE8()){
       return false
    }
    var navVersion = Beav.Navigator.getVersion();
-   if(navVersion.indexOf('MSIE') != -1){
+   if(navVersion[0].toLowerCase() == 'msie'){
       return false
    }
-   if(navVersion.indexOf('Firefox') != -1){
-      
+   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 5){
+      return false
    }
    return true
 }
