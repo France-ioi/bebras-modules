@@ -574,6 +574,7 @@ h1 .stars {
    position: fixed;
    text-align: center;
    border-radius: 15px;
+   cursor: pointer;
 }
 #task[alkindi] > [id^=scroll_arr_] {
    background: #88bb88;
