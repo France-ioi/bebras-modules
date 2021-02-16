@@ -1248,6 +1248,70 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      packages: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le livre",
+               dropObject: "déposer le livre",
+               withdrawNum_noShadow: "ramasser %1 livres",
+               dropNum_noShadow: "déposer %1 livres",
+               nbWithdrawables: "nombre de livres sur la case",
+               containerSize: "nombre de livres commandés",
+               onObject: "livres sur la case",
+               onContainer: "sur un carton",
+            },
+            code: {
+               withdrawObject: "ramasserLivre",
+               dropObject: "deposerLivre",
+               onObject: "surLivres",
+               onContainer: "surCarton",
+               nbWithdrawables: "nbLivresSur",
+               containerSize: "nbLivresCommandes",
+            },
+            description: {
+               withdrawObject: "ramasserLivre() ramasse le livre qui se trouve sur la case",
+               dropObject: "deposerLivre() dépose sur la case le livre transporté",
+               onObject: "surLivres() indique s'il y a un ou des livres sur la case",
+               onContainer: "surCarton() indique s'il y a un carton sur la case",
+               nbWithdrawables: "nbLivresSur() indique combien de livres sont sur la case",
+               containerSize: "nbLivresCommandes() indique combien de livres sont commandés pour ce carton",
+               dropNum: "deposer(nbLivres) dépose nLivres livres sur la case",
+               withdrawNum: "ramasser(nbLivres) ramasse nbLivres livres sur la case",
+            },
+            messages: {
+               emptyBag: "Le robot ne porte pas de livre !",
+               tooManyObjects: "Le robot porte déjà un livre !",
+               successContainersFilled: "Bravo, tous les cartons sont pleins. Les colis vont pouvoir être livrés !",
+               failureContainersFilled: "Tous les livres n'ont pas été mis en carton.",
+               failureContainersFilledLess: "Il reste au moins un livre à ranger dans un carton.",
+               failureContainersFilledBag: "Il faut ranger les livres dans un carton !",
+               failureDropObject: "Ce carton est déjà plein.",
+            }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger la bola",
+               dropObject: "soltar la bola",
+               onObject: "sobre una bola",
+               onContainer: "sobre un agujero",
+            },
+            code: {
+               withdrawObject: "recogerBola",
+               dropObject: "soltarBola",
+               onObject: "sobreBola",
+               onContainer: "sobreAgujero",
+            },   
+            messages: {
+               emptyBag: "¡El robot no carga ninguna bola!",
+               tooManyObjects: "¡El robot ya está cargando una bola!",
+               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
+               failureContainersFilled: "Hay bolas en lugares incorrectos.",
+               failureContainersFilledLess: "Aún falta colocar una bola.",
+               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
+            }
+         }
+      },
       paint: {
          fr: {
              label: {
@@ -2051,21 +2115,20 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4 },
             box: { num: 2, img: "box.png", side: 60, isContainer: true, zOrder: 2, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
-            books: { num: 3, img: "books.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
-            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1, canBeOutside: true },         
+            books: { num: 3, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1 },
+            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1, canBeOutside: true },         
             count_books: { num: 5, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isWithdrawable === true;
                }).length;
-            }, side: 60, isWritable: true, fontColor: "#b23f65", fontBold: true, zOrder: 2, offsetX: 20, offsetY: 17},
+            }, side: 60, isWritable: true, fontColor: "#752a43", fontBold: true, zOrder: 2, offsetX: -20, offsetY: -12},
             count_needs: { num: 6, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isContainer === true;
                })[0].containerSize;
-            }, side: 60, isWritable: true, fontColor: "#377f61", fontBold: true, zOrder: 3, offsetX: -20, offsetY: -17},
-            platform: { num: 7, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
-            platform_left: { num: 8, img: "platform_left.png", side: 60, isObstacle: true, zOrder: 0 },
-            platform_right: { num: 9, img: "platform_right.png", side: 60, isObstacle: true, zOrder: 0 },
+            }, side: 60, isWritable: true, fontColor: "#666666", fontBold: true, zOrder: 3, offsetX: 0, offsetY: 13},
+            platform: { num: 7, img: "shelf.png", side: 60, isObstacle: true, zOrder: 0 },
+            square_platform: { num: 8, img: "square_shelf.png", side: 60, isObstacle: true, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -3825,6 +3888,7 @@ var getContext = function(display, infos, curLevel) {
       
       object.row = coords.row;
       object.col = coords.col;
+      
       var itemsOn = context.getItemsOn(coords.row, coords.col);
       var maxi = object.zOrder;
       if(maxi === undefined) {
