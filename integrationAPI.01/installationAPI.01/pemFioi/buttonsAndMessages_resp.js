@@ -830,6 +830,29 @@ window.displayHelper = {
              //     console.log(e.target)
              // }
          });
+
+         /* scroll with arrows */
+         $('[id^=scroll_arr_]').click(function(ev) {
+            var animTime = 200;
+            var step = 500;
+            var id = $(this).attr('id');
+            // console.log(id)
+            switch(id){
+               case 'scroll_arr_down':
+                  var scrollObj = { scrollTop: $(window).scrollTop() + step};
+                  break;
+               case 'scroll_arr_up':
+                  var scrollObj = { scrollTop: $(window).scrollTop() - step};
+                  break;
+               case 'scroll_arr_left':
+                  var scrollObj = { scrollLeft: $(window).scrollLeft() - step};
+                  break;
+               case 'scroll_arr_right':
+                  var scrollObj = { scrollLeft: $(window).scrollLeft() + step};
+
+            }
+            $('html, body').animate( scrollObj, animTime );
+         });
       }else{
          $('#zone_0 > *').prependTo($('#task'));
          $('#task #tabsContainer').after($('<div id="taskContent"></div>'));
@@ -1290,6 +1313,7 @@ window.displayHelper = {
       }
       this.updateScrollArrows();
       this.centerInstructions();
+      // console.log('vertical_scroll :', this.verticalScroll,this.availableH)
    },
 
    centerInstructions: function() {
