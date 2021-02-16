@@ -90,7 +90,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
-      displayHelper.timeoutMinutes = 30;
+      displayHelper.timeoutMinutes = subTask.gridInfos.timeoutMinutes ? subTask.gridInfos.timeoutMinutes : 30;
 
       var curIncludeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);
 
