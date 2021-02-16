@@ -1010,11 +1010,6 @@ window.displayHelper = {
                displayHelper.toggleTask();
                // displayHelper.centerInstructions();
             });
-
-            /* error frame */
-            $('#error i:last-of-type').click(function() {
-               $("#error").hide();
-            });
          }
       }
 
@@ -2402,6 +2397,9 @@ window.displayHelper = {
          }else{
             $("#error").hide();
          }
+         $('#error i:last-of-type').click(function() {
+            $("#error").hide();
+         });
       }else{
          $("#displayHelper_graderMessage").html(msg);
       }
