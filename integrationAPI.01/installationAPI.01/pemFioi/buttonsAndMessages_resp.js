@@ -1199,7 +1199,7 @@ window.displayHelper = {
             }
         }
       }else{
-         var w = window.innerWidth;
+         var w = document.documentElement.clientWidth || document.body.clientWidth;
          var h = window.innerHeight;
 
          $('#task, #main_header').removeClass();
@@ -1389,7 +1389,7 @@ window.displayHelper = {
       }else{
          $('#zone_0').width('100%');
          if(this.newTaskW < this.availableW){
-            var w = window.innerWidth;
+            var w = document.documentElement.clientWidth || document.body.clientWidth;
             var zone2Perc = 100*this.newTaskW/w;
             var zone1Perc = 100 - zone2Perc;
             if(zone2Perc < 60){
@@ -2191,7 +2191,7 @@ window.displayHelper = {
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<div style="margin: .2em 0; color: ' + color + '; a-weight: bold;">' + this.graderMessage + '</div>';
+                  return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
                }
             }
             break;
