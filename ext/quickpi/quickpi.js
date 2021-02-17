@@ -2013,6 +2013,7 @@ def readDistance(name):
 
 def displayText(line1, line2=""):
     ret =  nameToHandler("screen1", "screen")
+    sensor =  nameToDef("screen1", "screen")
 
     if ret is not None:
         sensor = ret[0]
@@ -2021,13 +2022,7 @@ def displayText(line1, line2=""):
         return handler(line1, line2)
 
 def displayText2Lines(line1, line2=""):
-    ret =  nameToHandler("screen1", "screen")
-
-    if ret is not None:
-        sensor = ret[0]
-        handler = ret[1]
-
-        return handler(line1, line2)
+    return displayText(line1, line2)
 
 def readTemperature(name):
     ret =  nameToHandler(name, "temperature")
@@ -2307,8 +2302,11 @@ def calibrateCompassGame():
     start = time.time()
     while not done and (time.time() - start) < 30:
         magvalues =  readMagnetometerLSM303C(False, False)
-        accelvalues =  reaAccelerometerLSM303C()
-
+        if isBMX160:
+            accelvalues = readAccelBMI160()
+        else:
+            accelvalues =  reaAccelerometerLSM303C()
+        
         x_accel = accelvalues[0]
         y_accel = accelvalues[1]
 
