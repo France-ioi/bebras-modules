@@ -26,7 +26,7 @@ var makeTurtle = function(coords) {
       }
    }
    this.reset(5);
-   
+
    this.turn = function(angle) {
       angle = parseInt(angle);
       this.directionDeg = (this.directionDeg + angle) % 360;
@@ -70,7 +70,7 @@ var makeTurtle = function(coords) {
          this.drawingContext.stroke();
       }
 
-      this.placeTurtle();      
+      this.placeTurtle();
    }
    this.start_painting = function() {
       this.paint = true;
@@ -84,7 +84,7 @@ var makeTurtle = function(coords) {
          this.turtle.src = this.turtle.src = this.turtle.getAttribute("penup");
       }
    }
-   
+
    this.set_colour = function(colour) {
       this.drawingContext.strokeStyle = colour;
    }
@@ -376,7 +376,7 @@ var getContext = function(display, infos) {
             inputvalue: "inputvalue"
          },
          description: {
-            
+
          },
          startingBlockName: "Program of the turtle",
          messages: {
@@ -405,7 +405,7 @@ var getContext = function(display, infos) {
    var texts = [];
    var scale = 1;
    var paper;
-   
+
    context.turtle = {displayTurtle : new makeTurtle(infos.coords), displaySolutionTurtle : new makeTurtle(infos.coords), invisibleTurtle : new makeTurtle(infos.coords), invisibleSolutionTurtle : new makeTurtle(infos.coords)};
 
    switch (infos.blocklyColourTheme) {
@@ -452,7 +452,7 @@ var getContext = function(display, infos) {
       else {
          context.defaultGridInfos = gridInfos;
       }
-      
+
       if (context.display && gridInfos) {
          context.resetDisplay();
 
@@ -462,7 +462,7 @@ var getContext = function(display, infos) {
          context.turtle.displayTurtle.reset(context.infos.turtleStepSize, gridInfos.coords || infos.coords);
          context.turtle.displaySolutionTurtle.reset(context.infos.turtleStepSize, gridInfos.coords || infos.coords);
       }
-    
+
       function createMeACanvas() {
          var canvas = document.createElement('canvas');
          canvas.width = 300;
@@ -475,14 +475,14 @@ var getContext = function(display, infos) {
          //document.body.appendChild(canvas); // for debug
          return canvas;
       }
-      
+
       if (gridInfos) {
          context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
          context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
 
          context.turtle.invisibleTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
          context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
-         
+
          context.drawSolution = gridInfos.drawSolution;
          context.inputValue   = gridInfos.inputValue;
 
@@ -495,7 +495,7 @@ var getContext = function(display, infos) {
 
    context.resetDisplay = function() {
       var turtleFileName = "turtle.svg";
-      
+
       if ($("#turtleImg").length > 0) {
          turtleFileName = $("#turtleImg").attr("src");
       }
@@ -503,14 +503,14 @@ var getContext = function(display, infos) {
       if ($("#turtleUpImg").length > 0) {
          turtleUpFileName = $("#turtleUpImg").attr("src");
       }
-      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
-      
+      $("#grid").html("<div id='output'  style='height: 304px;width: 304px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
+
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
       context.turtle.displayTurtle.fixTurtle(); // TODO :: find a way to define whether the turtle needs fixing or not
       context.turtle.displayTurtle.reset();
-      
-      context.updateScale(); // does nothing for now 
+
+      context.updateScale(); // does nothing for now
    };
 
    context.unload = function() {
@@ -534,27 +534,27 @@ var getContext = function(display, infos) {
          callback = param;
          param = 0;
       }
-         
+
       callOnAllTurtles(function(turtle) {
          turtle.move(param);
       })
-      
+
       context.waitDelay(callback);
    }
-   
+
    context.turtle.movebackamount = function(param, callback) {
       if (typeof callback == "undefined") {
          callback = param;
          param = 0;
       }
-         
+
       callOnAllTurtles(function(turtle) {
          turtle.move(-param);
       });
-      
+
       context.waitDelay(callback);
    }
-   
+
    // DEPRECATED
    context.turtle.turn = function(param, callback) {
       callOnAllTurtles(function(turtle) {
@@ -573,7 +573,7 @@ var getContext = function(display, infos) {
             degree = 0;
          }
       }
-   
+
       callOnAllTurtles(function(turtle) {
          if (direction.search('l') != -1) {
             turtle.turn(degree);
@@ -582,7 +582,7 @@ var getContext = function(display, infos) {
             turtle.turn(-degree);
          }
       });
-      
+
       context.waitDelay(callback);
    }
 
@@ -616,7 +616,7 @@ var getContext = function(display, infos) {
    }
    context.turtle.turnleft = function(callback) {
       context.turtle.turnleftamount(90, callback);
-   }   
+   }
    context.turtle.turnright = function(callback) {
       context.turtle.turnrightamount(90, callback);
    }
@@ -645,7 +645,6 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_europe = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_nikolaus = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_nikolaus = context.turtle.turnrightamount;
-   
 
    context.turtle.colour2 = function(colour, callback) {
       if (typeof callback == "undefined") {
@@ -660,11 +659,11 @@ var getContext = function(display, infos) {
       context.waitDelay(callback);
    }
    context.turtle.colourvalue = context.turtle.colour2;
-   
+
    var defaultMoveAmount = 1;
    if(context.infos.defaultMoveAmount != undefined)
       defaultMoveAmount = context.infos.defaultMoveAmount;
-   
+
    context.customBlocks = {
       turtle: {
          turtle: [
