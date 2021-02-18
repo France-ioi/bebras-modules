@@ -2113,10 +2113,18 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#a0cc97",
          borderColor: "#81a279",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4 },
+            green_robot: { img: "green_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4, customDisplay: function(obj) {
+            	if(context.bag.length != 0)
+            		obj.img = "green_robot_book.png";
+            	else
+            		obj.img = "green_robot.png";
+            } },
             box: { num: 2, img: "box.png", side: 60, isContainer: true, zOrder: 2, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
             books: { num: 3, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1 },
-            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1, canBeOutside: true },         
+            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
+            	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
+            		obj.offsetY = -5;
+            } },         
             count_books: { num: 5, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isWithdrawable === true;
@@ -3343,6 +3351,11 @@ var getContext = function(display, infos, curLevel) {
       var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
       var y = (infos.cellSide * item.row + infos.topMargin) * scale;
       var itemType = infos.itemTypes[item.type];
+      
+      if(item.customDisplay !== undefined) {
+      	item.customDisplay(item);
+      }
+      
       if(item.img) {
          item.element = paper.image(imgUrlWithPrefix(item.img), x, y, item.side * item.nbStates * scale, item.side * scale);
       }
@@ -3869,10 +3882,14 @@ var getContext = function(display, infos, curLevel) {
             }
             redisplayItem(item);
          }
+         
          object.zOrder = maxi + 0.000001;
          resetItem(object, true);
+         
          context.checkContainer(coords);
       }
+      
+      redisplayItem(this.getRobot());
    };
    
    context.dropObject = function(object, coords) {
@@ -3902,6 +3919,7 @@ var getContext = function(display, infos, curLevel) {
       }
       resetItem(object, true);
       context.checkContainer(coords);
+      redisplayItem(this.getRobot());
    };
    
    context.turnLeft = function(callback) {
