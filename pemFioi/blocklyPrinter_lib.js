@@ -30,8 +30,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          messages: {
-            input: "Entrée",
-            output: "Sortie",
+            input: "Entrée :",
+            output: "Sortie :",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
             tooFewChars: "Ligne trop courte : ligne ",
@@ -61,8 +61,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
-            input: "Eingang",
-            output: "Ausgabe",
+            input: "Eingabe:",
+            output: "Ausgabe:",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile ",
@@ -92,8 +92,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          messages: {
-            input: "Vhod",
-            output: "Izhod",
+            input: "Vhod:",
+            output: "Izhod:",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
             tooFewChars: "Ligne trop courte : ligne ",
@@ -173,7 +173,7 @@ var getContext = function(display, infos) {
    context.resetDisplay = function() {
       this.delayFactory.destroyAll();
 
-      $("#grid").html("<div style='width:400px; margin:0; padding: 0; overflow:hidden;text-align:left;'><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.output + " :</div><pre id='output' style='margin:0px;'>a</pre></div><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.input + " :</div><pre id='input' style='margin:0px;'>a</pre></div><div>")
+      $("#grid").html("<div style='width:400px; margin:0; padding: 0; overflow:hidden;text-align:left;'><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.output + "</div><pre id='output' style='margin:0px;'>a</pre></div><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>" + this.strings.messages.input + "</div><pre id='input' style='margin:0px;'>a</pre></div><div>")
       
       
       $("#output").html("");
