@@ -855,6 +855,7 @@ function VertexDragAndConnect(settings) {
    this.dragEnabled = false;
    this.vertexSelectEnabled = false;
    this.allowDeselection = true;   // to deal with graph editorcontent validation
+   this.clickThroughDrag = settings.clickThroughDrag;
 
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
@@ -974,7 +975,9 @@ function VertexDragAndConnect(settings) {
          // self.isDragging = false;
          return;
       }
-      // self.clickHandler(self.elementID,event.pageX,event.pageY);
+      if(self.clickThroughDrag){
+         self.clickHandler(self.elementID,event.pageX,event.pageY);
+      }
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
