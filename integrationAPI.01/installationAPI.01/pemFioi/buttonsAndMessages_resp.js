@@ -1183,6 +1183,7 @@ window.displayHelper = {
       if (!this.bUseFullWidth) {
          return
       }
+      const layout1Breakpoint = this.taskW / 0.6;
       if(!this.responsive){
          $('#valider').appendTo($('#displayHelper_validate'));
          if(window.innerWidth >= 1200) {
@@ -1215,7 +1216,7 @@ window.displayHelper = {
             $('#zone_0 h1').after($('#tabsContainer'));
          }
          // $('#zone_1, #zone_2').appendTo($('#zone_12'));
-         if(w >= 1200) {
+         if(w >= layout1Breakpoint) {
             this.mobileMode = false;
             this.layout = 1;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
@@ -1430,7 +1431,7 @@ window.displayHelper = {
          $('#scroll_arr_up').hide();
       }
       // console.log($(window).scrollTop(), displayHelper.newTaskH - displayHelper.availableH)
-      if(displayHelper.verticalScroll && $(window).scrollTop() < displayHelper.newTaskH - displayHelper.availableH){
+      if(displayHelper.verticalScroll && $(window).scrollTop() < displayHelper.newTaskH - displayHelper.availableH - 1){
          $('#scroll_arr_down').show();
       }else{
          $('#scroll_arr_down').hide();
