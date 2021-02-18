@@ -1,0 +1,106 @@
+@import url('../_common/modules/fonts/fontAwesome/css/all.css');
+body {
+   font-size: 16px;
+   color: #666666;
+}
+body * {
+   box-sizing: border-box;
+}
+
+#task {
+   width: 100%;
+   /*max-width: 1024px;*/
+   min-width: 750px;
+}
+
+/*** TABS ***/
+#tabs {
+   height: 60px;
+   background-color: #666666;
+   position: relative;
+   padding-top: 1px;
+}
+#tabs div[id^=tab_] {
+   width: 200px;
+   height: 49px;
+   margin: 10px;
+   margin-bottom: 0;
+   font-weight: bold;
+   display: inline-block;
+   padding-top: 1em;
+   padding-left: 1em;
+   cursor: pointer;
+}
+#tabs i {
+   margin: 0 1em;
+}
+#restartButton {
+   float: right;
+   color: white;
+   border: 1px solid white;
+   width: 230px;
+   height: 40px;
+   border-radius: 20px;
+   text-align: center;
+   margin: 10px 20px 0 0;
+   font-weight: bold;
+   padding: 10px;
+   cursor: pointer;
+}
+
+/*** instructions ***/
+#instructions {
+   margin: auto;
+   margin-top: 2em;
+   text-align: justify;
+   min-width: 400px;
+   max-width: 700px;
+   padding: 1px;
+}
+hr {
+   border-top: #666666;
+   opacity: 0.5;
+   margin-bottom: 2em;
+}
+h2 {
+   text-align: center;
+}
+#instructions img {
+   display: block;
+   margin: auto;
+   margin-bottom: 1em;
+}
+#startButton {
+   margin: auto;
+   background-color: #e05d13;
+   width: 200px;
+   text-align: center;
+   color: white;
+   font-weight: bold;
+   height: 50px;
+   border-radius: 25px;
+   padding: 1em;
+}
+
+/*** resolution ***/
+#resolution {
+   position: relative;
+   /*touch-action: none;*/
+}
+
+/*** error ***/
+#error {
+   background-color: #fb0048;
+   border-radius: 2em;
+   color: white;
+   position: absolute;
+/*   top: 0px;
+   right: 40%;*/
+   padding: 1em;
+   text-align: center;
+   max-width: 90%;
+   z-index: 2;
+}
+#error i {
+   margin-right: 1em;
+}
