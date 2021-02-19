@@ -784,10 +784,10 @@ window.displayHelper = {
          // $('#task').append('<span id="error"><i class="fas fa-exclamation-triangle"></i><span id="errorMsg"></span><i class="fas fa-times"></i></span>');
          // console.log('load')
 
-         $('#task').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
-         $('#task').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
-         $('#task').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
-         $('#task').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
+         $('#zone_012').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
+         $('#zone_012').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
+         $('#zone_012').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
+         $('#zone_012').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
 
          if(!views.solution || this.hideSolutionButton){
             $('#showExercice, #showSolution').hide();
@@ -824,6 +824,7 @@ window.displayHelper = {
          });
 
          $(window).scroll(displayHelper.updateScrollArrows);
+         $('#zone_12').scroll(displayHelper.updateScrollArrows);
          $(window).on({
              // 'touchmove': displayHelper.updateScrollArrows
              // function(e) {
@@ -851,7 +852,7 @@ window.displayHelper = {
                   var scrollObj = { scrollLeft: $(window).scrollLeft() + step};
 
             }
-            $('html, body').animate( scrollObj, animTime );
+            $('html, body, #zone_12').animate( scrollObj, animTime );
          });
       }else{
          $('#zone_0 > *').prependTo($('#task'));
@@ -1200,8 +1201,8 @@ window.displayHelper = {
             }
         }
       }else{
-         var w = document.documentElement.clientWidth || document.body.clientWidth;
-         var h = window.innerHeight;
+         var w = Math.floor(document.documentElement.clientWidth || document.body.clientWidth);
+         var h = Math.floor(window.innerHeight);
 
          $('#task, #main_header').removeClass();
          $('#task').css("height",(h - this.headerH)+'px');
@@ -1220,8 +1221,9 @@ window.displayHelper = {
             this.mobileMode = false;
             this.layout = 1;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-            this.availableW = w*0.7;
+            this.availableW = Math.floor(w*0.7);
             $('#zone_1').height(this.availableH);
+            $('#zone_12').css("overflow-x","initial");
          }else if(w >= 800){
             this.mobileMode = false;
             this.layout = 2;
@@ -1240,6 +1242,9 @@ window.displayHelper = {
             if(!$('#zone_3 #tabsContainer').length){
                $('#tabsContainer').prependTo($('#zone_3'));
             }
+         }
+         if (this.layout !== 1) {
+            $('#zone_12').css("overflow-x","auto");
          }
          $('#task, #main_header').addClass('layout_'+this.layout);
          if(this.layout == 2){   // bug fix
@@ -1271,9 +1276,7 @@ window.displayHelper = {
 
       if(limitingFactor == "W"){
          this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*scaleFactor);
-         this.newTaskH = this.taskH*scaleFactor;
       }else{
-         this.newTaskH =  Math.max(Math.min(this.taskH,this.availableH),this.taskH*scaleFactor);
          this.newTaskW = this.taskW*scaleFactor;
       }
       if(this.newTaskW < this.minTaskW){
@@ -1284,7 +1287,6 @@ window.displayHelper = {
       }
       scaleFactor = this.newTaskW/this.taskW;
       this.newTaskH = this.taskH*scaleFactor;
-      // console.log(newTaskH,this.availableH);
       this.updateTaskCSS(scaleFactor,limitingFactor);
       
       if(Math.floor(this.newTaskH) > Math.ceil(this.availableH)){
@@ -1330,13 +1332,14 @@ window.displayHelper = {
       $('#taskCont').width(this.taskW);
       // $('#taskCont').height(newTaskH);
       // console.log(limitingFactor,scaleFactor,this.taskW,this.availableW,newTaskW)
+      var fixingOffset = 5;
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
          if(this.availableH > this.taskH){
-            $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2);
+            $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2 - fixingOffset);
          }else{
             if(this.verticalScroll){
-               $('#taskCont').css('margin-top',(this.newTaskH - this.taskH)/2);
+               $('#taskCont').css('margin-top',(this.newTaskH - this.taskH)/2 - fixingOffset);
             }else{
                $('#taskCont').css('margin-top',0);
             }
@@ -1363,10 +1366,10 @@ window.displayHelper = {
                   $('#taskCont').css('margin-top',0);
                }else{
                   // console.log('cas qui nous occupe');
-                  $('#taskCont').css('margin-top',-this.newTaskH*(1 - scaleFactor)/2);
+                  $('#taskCont').css('margin-top',-this.newTaskH*(1 - scaleFactor)/2 - fixingOffset);
                }
             }else{
-               $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2);
+               $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2 - fixingOffset);
             }
          }
          // if(this.availableW < this.taskW){
@@ -1382,11 +1385,12 @@ window.displayHelper = {
             $('#taskCont').css('margin-left','auto');
          }
       }
-      // console.log(this.availableW,newTaskW)
+      // console.log(this.availableH,this.newTaskH)
       $('#zone_2').height(Math.max(this.availableH,this.newTaskH));
       $('#zone_2').width(Math.max(this.availableW,this.newTaskW));
       if(this.layout != 1){
-         $('#zone_0, #zone_1').width(Math.max(this.availableW,this.newTaskW));
+         $('#zone_0').width('100%');
+         $('#zone_1').width(Math.max(this.availableW,this.newTaskW));
       }else{
          $('#zone_0').width('100%');
          if(this.newTaskW < this.availableW){
@@ -1425,7 +1429,7 @@ window.displayHelper = {
          $('[id^=scroll_arr_]').hide();
          return
       }
-      if(displayHelper.verticalScroll && $(window).scrollTop() > topThreshold){
+      if(displayHelper.verticalScroll && $(window).scrollTop() > 0){
          $('#scroll_arr_up').show();
       }else{
          $('#scroll_arr_up').hide();
@@ -1436,13 +1440,13 @@ window.displayHelper = {
       }else{
          $('#scroll_arr_down').hide();
       }
-      // console.log(displayHelper.horizontalScroll,$(window).scrollLeft())
-      if(displayHelper.horizontalScroll && $(window).scrollLeft() > 0){
+      // console.log(displayHelper.horizontalScroll,$('#zone_12').scrollLeft())
+      if(displayHelper.horizontalScroll && $('#zone_12').scrollLeft() > 0){
          $('#scroll_arr_left').show();
       }else{
          $('#scroll_arr_left').hide();
       }
-      if(displayHelper.horizontalScroll && $(window).scrollLeft() < displayHelper.newTaskW - displayHelper.availableW){
+      if(displayHelper.horizontalScroll && $('#zone_12').scrollLeft() < displayHelper.newTaskW - displayHelper.availableW){
          $('#scroll_arr_right').show();
       }else{
          $('#scroll_arr_right').hide();
