@@ -165,7 +165,7 @@
                     score: score,
                     feedback: {
                         correct_answer: [grader],
-                        mistakes: answer,
+                        mistakes: score ? [] : answer,
                         messages: []
                     }
                 }
