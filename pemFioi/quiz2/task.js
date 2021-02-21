@@ -319,7 +319,13 @@
 
             task.showViews = function(views, callback) {
                 q.toggleSolutions(!!views.solution);
-                callback()
+                if(views.solution) {
+                    task.getAnswer(function(answer) {
+                        task.gradeAnswer(answer, null, callback);
+                        });
+                } else {
+                    callback();
+                }
             }
 
             task.getDefaultAnswerObject = function() {
