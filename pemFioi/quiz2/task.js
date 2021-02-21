@@ -307,6 +307,7 @@
 
 
     task.load = function(views, success) {
+        var lastViews = views;
         task_token.init()
 
         platform.getTaskParams(null, null, function(taskParams) {
@@ -318,14 +319,9 @@
             window.quiz_ui = q;
 
             task.showViews = function(views, callback) {
+                lastViews = views;
                 q.toggleSolutions(!!views.solution);
-                if(views.solution) {
-                    task.getAnswer(function(answer) {
-                        task.gradeAnswer(answer, null, callback);
-                        });
-                } else {
-                    callback();
-                }
+                callback();
             }
 
             task.getDefaultAnswerObject = function() {
@@ -355,8 +351,11 @@
             task.reloadAnswer = function(answer, callback) {
                 try {
                     //console.log('task.reloadAnswer', answer)
-                    answer = JSON.parse(answer);
-                    this.reloadAnswerObject(answer);
+                    var answerObject = JSON.parse(answer);
+                    this.reloadAnswerObject(answerObject);
+                    if(lastViews.solution) {
+                        task.gradeAnswer(answer, null, function () {});
+                    }
                 } catch(e) {
                     console.error('Quiz: answer parsing error.')
                 }
