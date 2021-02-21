@@ -164,6 +164,7 @@
                 return {
                     score: score,
                     feedback: {
+                        correct_answer: [grader],
                         mistakes: answer,
                         messages: []
                     }
