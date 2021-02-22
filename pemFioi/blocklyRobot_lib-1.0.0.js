@@ -3583,22 +3583,24 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.tryToBeOn = function(row, col) {
+      // Returns whether the robot can move to row, col
+      // true : yes, false : no but move ignored, string : no and throw error
       if(!context.isInGrid(row, col)) {
          if(infos.ignoreInvalidMoves)
             return false;
-         throw(strings.messages.leavesGrid);
+         return strings.messages.leavesGrid;
       }
       
       if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
          if(infos.ignoreInvalidMoves)
             return false;
-         throw(strings.messages.obstacle);
+         return strings.messages.obstacle;
       }
       
       if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
          if(infos.ignoreInvalidMoves)
             return false;
-         throw(strings.messages.failureProjectile);
+         return strings.messages.failureProjectile;
       }
       return true;
    };
@@ -3679,7 +3681,9 @@ var getContext = function(display, infos, curLevel) {
       }
       
       context.advanceTime(1);
-      context.waitDelay(callback);
+      if(callback) {
+         context.waitDelay(callback);
+      }
    };
    
    context.moveItem = function(item, newRow, newCol) {
@@ -3940,70 +3944,94 @@ var getContext = function(display, infos, curLevel) {
    context.forward = function(callback) {
       var robot = context.getRobot();
       var coords = context.coordsInFront();
-      if(!context.tryToBeOn(coords.row, coords.col)) {
+      var ttbo = context.tryToBeOn(coords.row, coords.col);
+      if(ttbo === true) {
+         if(infos.hasGravity) {
+            context.fall(robot, coords.row, coords.col, callback);
+         } else {
+            context.nbMoves++;
+            context.moveRobot(coords.row, coords.col, robot.dir, callback);
+         }
+      } else if(ttbo === false) {
          context.waitDelay(callback);
-      }
-      if(infos.hasGravity) {
-         context.fall(robot, coords.row, coords.col, callback);
-      }
-      else {
-         context.nbMoves++;
-         context.moveRobot(coords.row, coords.col, robot.dir, callback);
+      } else {
+         context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
+         throw ttbo;
       }
    };
    
    context.backwards = function(callback) {
       var robot = context.getRobot();
       var coords = context.coordsInFront(2);
-      if(!context.tryToBeOn(coords.row, coords.col)) {
+      var ttbo = context.tryToBeOn(coords.row, coords.col);
+      if(ttbo === true) {
+         if(infos.hasGravity) {
+            context.fall(robot, coords.row, coords.col, callback);
+         } else {
+            context.nbMoves++;
+            context.moveRobot(coords.row, coords.col, robot.dir, callback);
+         }
+      } else if(ttbo === false) {
          context.waitDelay(callback);
-      }
-      if(infos.hasGravity) {
-         context.fall(robot, coords.row, coords.col, callback);
-      }
-      else {
-         context.nbMoves++;
-         context.moveRobot(coords.row, coords.col, robot.dir, callback);
+      } else {
+         context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
+         throw ttbo;
       }
    };
    
    context.north = function(callback) {
       var item = context.getRobot();
-      if(!context.tryToBeOn(item.row - 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
+      var ttbo = context.tryToBeOn(item.row - 1, item.col);
+      if(ttbo === true) {
          context.nbMoves++;
          context.moveRobot(item.row - 1, item.col, 3, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row - 1/4, item.col, 3);
+         throw ttbo;
       }
    };
    
    context.south = function(callback) {
       var item = context.getRobot();
-      if(!context.tryToBeOn(item.row + 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
+      var ttbo = context.tryToBeOn(item.row + 1, item.col);
+      if(ttbo === true) {
          context.nbMoves++;
          context.moveRobot(item.row + 1, item.col, 1, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row + 1/4, item.col, 1);
+         throw ttbo;
       }
    };
    
    context.east = function(callback) {
       var item = context.getRobot();
-      if(!context.tryToBeOn(item.row, item.col + 1)) {
-         context.waitDelay(callback);
-      } else {
+      var ttbo = context.tryToBeOn(item.row, item.col + 1);
+      if(ttbo === true) {
          context.nbMoves++;
          context.moveRobot(item.row, item.col + 1, 0, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row, item.col + 1/4, 0);
+         throw ttbo;
       }
    };
    
    context.west = function(callback) {
       var item = context.getRobot();
-      if(!context.tryToBeOn(item.row, item.col - 1)) {
-         context.waitDelay(callback);
-      } else {
+      var ttbo = context.tryToBeOn(item.row, item.col - 1);
+      if(ttbo === true) {
          context.nbMoves++;
          context.moveRobot(item.row, item.col - 1, 2, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row, item.col - 1/4, 2);
+         throw ttbo;
       }
    };
    
