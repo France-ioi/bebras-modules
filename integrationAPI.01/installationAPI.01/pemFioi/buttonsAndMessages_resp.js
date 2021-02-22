@@ -1201,7 +1201,7 @@ window.displayHelper = {
             }
         }
       }else{
-         var w = Math.floor(document.documentElement.clientWidth || document.body.clientWidth);
+         var w = Math.floor(window.innerWidth - this.getScrollbarWidth());
          var h = Math.floor(window.innerHeight);
 
          $('#task, #main_header').removeClass();
@@ -1234,6 +1234,7 @@ window.displayHelper = {
             this.layout = 3;
             this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
             this.availableW = w;
+            $('#zone_1').height('auto');
          }else{
             this.mobileMode = true;
             this.layout = 4;
@@ -1255,6 +1256,28 @@ window.displayHelper = {
          this.updateTaskDimensions();
          this.toggleTask();
       }
+   },
+
+   getScrollbarWidth: function () {
+      // Creating invisible container
+      const outer = document.createElement('div');
+      outer.style.width = '200px';
+      outer.style.visibility = 'hidden';
+      outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+      outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+      document.body.appendChild(outer);
+
+      // Creating inner element and placing it in the container
+      const inner = document.createElement('div');
+      outer.appendChild(inner);
+
+      // Calculating difference between container's full width and the child width
+      const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+
+      // Removing temporary elements from the DOM
+      outer.parentNode.removeChild(outer);
+
+      return scrollbarWidth;
    },
 
    updateTaskDimensions: function() {
@@ -1288,7 +1311,7 @@ window.displayHelper = {
       scaleFactor = this.newTaskW/this.taskW;
       this.newTaskH = this.taskH*scaleFactor;
       this.updateTaskCSS(scaleFactor,limitingFactor);
-      
+
       if(Math.floor(this.newTaskH) > Math.ceil(this.availableH)){
          $('#zone_3').addClass('vertical_scroll');
          this.verticalScroll = true;
@@ -1385,8 +1408,7 @@ window.displayHelper = {
             $('#taskCont').css('margin-left','auto');
          }
       }
-      // console.log(this.availableH,this.newTaskH)
-      $('#zone_2').height(Math.max(this.availableH,this.newTaskH));
+      $('#zone_2').height(Math.max(this.availableH,this.verticalScroll ? this.newTaskH + 60 : this.newTaskH));
       $('#zone_2').width(Math.max(this.availableW,this.newTaskW));
       if(this.layout != 1){
          $('#zone_0').width('100%');
@@ -1394,7 +1416,7 @@ window.displayHelper = {
       }else{
          $('#zone_0').width('100%');
          if(this.newTaskW < this.availableW){
-            var w = document.documentElement.clientWidth || document.body.clientWidth;
+            var w = Math.floor(window.innerWidth - this.getScrollbarWidth());
             var zone2Perc = 100*this.newTaskW/w;
             var zone1Perc = 100 - zone2Perc;
             if(zone2Perc < 60){
