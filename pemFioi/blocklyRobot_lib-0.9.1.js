@@ -877,14 +877,19 @@ var getContext = function(display, infos, curLevel) {
       }
       var item = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront(0);
-      if (!checkTileAllowed(coords.row, coords.col)) {
+      var cta = checkTileAllowed(coords.row, coords.col);
+      if(cta === true) {
+         if (infos.hasGravity) {
+            context.fall(item, coords, callback);
+         } else {
+            context.nbMoves++;
+            moveRobot(coords.row, coords.col, item.dir, callback);
+         }
+      } else if(cta === false) {
          context.waitDelay(callback);
-      }
-      if (infos.hasGravity) {
-         context.fall(item, coords, callback);
       } else {
-         context.nbMoves++;
-         moveRobot(coords.row, coords.col, item.dir, callback);
+         moveRobot(item.row + (coords.row - item.row) / 4, item.col + (coords.col - item.col) / 4, item.dir);
+         throw cta;
       }
    };
 
@@ -1157,11 +1162,15 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!checkTileAllowed(item.row, item.col + 1)) {
-         context.waitDelay(callback);
-      } else {
+      var cta = checkTileAllowed(item.row, item.col + 1);
+      if(cta === true) {
          context.nbMoves++;
          moveRobot(item.row, item.col + 1, 0, callback);
+      } else if(cta === false) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row, item.col + 1/4, 0);
+         throw cta;
       }
    };
 
@@ -1170,11 +1179,15 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!checkTileAllowed(item.row, item.col - 1)) {
-         context.waitDelay(callback);
-      } else {
+      var cta = checkTileAllowed(item.row, item.col - 1);
+      if(cta === true) {
          context.nbMoves++;
          moveRobot(item.row, item.col - 1, 2, callback);
+      } else if(cta === false) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row, item.col - 1/4, 2);
+         throw cta;
       }
    };
 
@@ -1183,11 +1196,15 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!checkTileAllowed(item.row - 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
+      var cta = checkTileAllowed(item.row - 1, item.col);
+      if(cta === true) {
          context.nbMoves++;
          moveRobot(item.row - 1, item.col, 3, callback);
+      } else if(cta === false) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row - 1/4, item.col, 3);
+         throw cta;
       }
    };
 
@@ -1196,11 +1213,15 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!checkTileAllowed(item.row + 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
+      var cta = checkTileAllowed(item.row + 1, item.col);
+      if(cta === true) {
          context.nbMoves++;
          moveRobot(item.row + 1, item.col, 1, callback);
+      } else if(cta === false) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row + 0.25, item.col, 1);
+         throw cta;
       }
    };
 
@@ -1906,7 +1927,9 @@ var getContext = function(display, infos, curLevel) {
          }
          $("#nbMoves").html(context.nbMoves);
       }
-      context.waitDelay(callback);
+      if(callback) {
+         context.waitDelay(callback);
+      }
    };
 
    context.getItems = function(row, col, filters) {
@@ -1941,14 +1964,14 @@ var getContext = function(display, infos, curLevel) {
          if (infos.ignoreInvalidMoves) {
             return false;
          }
-         throw(context.strings.messages.leavesGrid);
+         return context.strings.messages.leavesGrid;
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
          if (infos.ignoreInvalidMoves) {
             return false;
          }
-         throw(strings.obstacle);
+         return strings.obstacle;
       }
       return true;
    };
