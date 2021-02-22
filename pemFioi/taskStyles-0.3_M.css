@@ -564,7 +564,7 @@ h1 .stars {
    /*overflow: auto;*/
    width: 100%;
 }
-#task > [id^=scroll_arr_] {
+#task [id^=scroll_arr_] {
    display: none;
    background: #4a90e2;
    width: 30px;
@@ -576,31 +576,31 @@ h1 .stars {
    border-radius: 15px;
    cursor: pointer;
 }
-#task[alkindi] > [id^=scroll_arr_] {
+#task[alkindi] [id^=scroll_arr_] {
    background: #88bb88;
 }
-#task > [id^=scroll_arr_] i {
+#task [id^=scroll_arr_] i {
    margin-top: 50%;
    transform: translateY(-50%);
 }
-#task > #scroll_arr_up, 
-#task > #scroll_arr_down {
+#task #scroll_arr_up,
+#task #scroll_arr_down {
    right: 30px;
 }
-#task > #scroll_arr_up {
-   top: 81px;
+#task #scroll_arr_up {
+   top: 103px;
 }
-#task > #scroll_arr_down {
+#task #scroll_arr_down {
    bottom: 60px;
 }
-#task > #scroll_arr_left, 
-#task > #scroll_arr_right {
+#task #scroll_arr_left,
+#task #scroll_arr_right {
    bottom: 60px;
 }
-#task > #scroll_arr_left {
+#task #scroll_arr_left {
    left: 10px;
 }
-#task > #scroll_arr_right {
+#task #scroll_arr_right {
    right: 30px;
 }
 
@@ -927,14 +927,14 @@ h1 .stars {
 /**************************************************************/
 /* LAYOUT 4 */
 
-#task.layout_4 > #scroll_arr_up, 
-#task.layout_4 > #scroll_arr_down,
-#task.layout_4 > #scroll_arr_right {
+#task.layout_4 #scroll_arr_up,
+#task.layout_4 #scroll_arr_down,
+#task.layout_4 #scroll_arr_right {
    right: 60px;
 }
-#task.layout_4 > #scroll_arr_down,
-#task.layout_4 > #scroll_arr_left, 
-#task.layout_4 > #scroll_arr_right {
+#task.layout_4 #scroll_arr_down,
+#task.layout_4 #scroll_arr_left,
+#task.layout_4 #scroll_arr_right {
    bottom: 10px;
 }
 
