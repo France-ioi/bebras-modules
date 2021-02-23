@@ -115,7 +115,7 @@
                         var answer = $(this);
                         var mistake = feedback.correct_answer.indexOf(i) === -1;
                         var selected = answer.hasClass('selected');
-                        var wrong = (!mistake) != (!selected);
+                        var wrong = (!mistake) == (!selected);
                         if(!wrong) {
                             return;
                         }
