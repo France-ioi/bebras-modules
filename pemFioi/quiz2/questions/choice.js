@@ -254,12 +254,14 @@
                     answers.each(function(i) {
                         var answer = $(this);
                         var mistake = feedback.correct_answer.indexOf(i) === -1;
-                        if(!mistake) {
+                        var selected = answer.hasClass('selected');
+                        var wrong = (!mistake) == (!selected);
+                        if(!wrong) {
                             return;
                         }
 
                         if(Quiz.params.feedback_on_wrong_choices == 'all' ||
-                            Quiz.params.feedback_on_wrong_choices == 'selected_only' && answer.hasClass('selected')) {
+                            (Quiz.params.feedback_on_wrong_choices == 'selected_only' && selected)) {
                             answer.addClass('mistake');
                             Quiz.common.toggleAlertMessage(
                                 answer,
