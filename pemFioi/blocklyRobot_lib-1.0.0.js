@@ -3663,19 +3663,17 @@ var getContext = function(display, infos, curLevel) {
       context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
       
       if(context.display) {
-         if(animate) {
-            attr = itemAttributes(item);
-            context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
-         }
-         else {
-            attr = itemAttributes(item);
-            if(infos.actionDelay > 0) {
+         attr = itemAttributes(item);
+         if(infos.actionDelay > 0) {
+            if(animate) {
+               context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
+            } else {
                context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
                   item.element.attr(attr);
                }, infos.actionDelay / 2);
-            } else {
-               item.element.attr(attr);
             }
+         } else {
+            item.element.attr(attr);
          }
          $("#nbMoves").html(context.nbMoves);
       }
