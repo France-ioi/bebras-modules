@@ -25,6 +25,7 @@ var importableModules = function () {
       'visual-graph-1.1': {src: modulesPath+"/pemFioi/visual-graph-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.1.js"},
       'graph-mouse-1.0': {src: modulesPath+"/pemFioi/graph-mouse-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.0.js"},
       'graph-mouse-1.1': {src: modulesPath+"/pemFioi/graph-mouse-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.1.js"},
+      'graph-mouse-1.2': {src: modulesPath+"/pemFioi/graph-mouse-1.2.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.2.js"},
       'crane-1.0': {src: modulesPath+"/pemFioi/crane-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/crane-1.0.js"},
       'grid-1.0': {src: modulesPath+"/pemFioi/grid-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.0.js"},
       'grid-1.1': {src: modulesPath+"/pemFioi/grid-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.1.js"},
