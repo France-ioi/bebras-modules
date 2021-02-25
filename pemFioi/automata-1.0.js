@@ -902,10 +902,10 @@ function Automata(settings) {
       }
       if(comp["e_c"][0] != null){
          this.setSequence(comp["e_c"][0]);
-         var text = "The following string is "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
+         var text = "The following string is "+comparisonMessages[mode - 1][0]+'<code>'+comp["e_c"][0]+'</code>';
       }else{
          this.setSequence(comp["e_c"][1]);
-         var text = "The following string is "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
+         var text = "The following string is "+comparisonMessages[mode - 1][1]+'<code>'+comp["e_c"][1]+'</code>';
       }
       if(mode != 7){
          this.run();
@@ -1042,7 +1042,7 @@ function AutomataTask(subTask, loadLevel, loadAnswer, saveAnswer, initPaper, get
       answer = saveAnswer();
       subTask.getGrade(function(res) {
          if(res.successRate < 1) {
-            $("#feedback").text(res.message);
+            $("#feedback").html(res.message);
          } else {
             displayHelper.validate("stay");
          }
