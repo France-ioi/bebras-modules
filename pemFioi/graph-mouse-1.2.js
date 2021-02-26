@@ -856,7 +856,6 @@ function VertexDragAndConnect(settings) {
    this.dragEnabled = false;
    this.vertexSelectEnabled = false;
    this.allowDeselection = true;   // to deal with graph editorcontent validation
-   this.clickThroughDrag = settings.clickThroughDrag;
 
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
@@ -869,7 +868,7 @@ function VertexDragAndConnect(settings) {
       this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, true, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
    }else{
-      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, true, true, true, 
+      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
    }
    
@@ -924,7 +923,7 @@ function VertexDragAndConnect(settings) {
    };
 
    function onFuzzyClick(elementType, id) {
-      console.log("onFuzzyClick",elementType,id)
+      // console.log("onFuzzyClick",elementType,id)
       if(elementType === "edge") {
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
@@ -976,9 +975,7 @@ function VertexDragAndConnect(settings) {
          // self.isDragging = false;
          return;
       }
-      if(self.clickThroughDrag){
-         self.clickHandler(self.elementID,event.pageX,event.pageY);
-      }
+      self.clickHandler(self.elementID,event.pageX,event.pageY);  // because drag event interferes with click event on chrome
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
