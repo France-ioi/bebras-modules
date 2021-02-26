@@ -38,8 +38,8 @@ var getContext = function(display, infos) {
             inputEmpty: "Votre programme a essayé de lire l'entrée alors qu'il n'y avait plus aucune ligne à lire !",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
-            tooFewChars: "Ligne trop courte : ligne ",
-            tooManyChars: "Ligne trop longue : ligne ",
+            tooFewChars: "La ligne {0} de la sortie de votre programme est plus courte qu'attendue.",
+            tooManyChars: "La ligne {0} de la sortie de votre programme est plus longue qu'attendue.",
             tooFewLines: "Trop peu de lignes en sortie",
             tooManyLines: "Trop de lignes en sortie",
             correctOutput: "La sortie est correcte !",
@@ -87,8 +87,8 @@ var getContext = function(display, infos) {
             inputEmpty: "Your program tried to read the input while there is no line left to read!",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
-            tooFewChars: "Zeile zu kurz: Zeile ",
-            tooManyChars: "Zeile zu lang: Zeile ",
+            tooFewChars: "Zeile zu kurz: Zeile {0}",
+            tooManyChars: "Zeile zu lang: Zeile {0}",
             tooFewLines: "Zu wenig Zeilen ausgegeben",
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
@@ -411,12 +411,12 @@ var getContext = function(display, infos) {
 
          if (actualLine.length < expectedLine.length) {
             this.success = false;
-            throw(strings.messages.tooFewChars + (iLine + 1)); // add line info iLine + 1
+            throw(strings.messages.tooFewChars.format(iLine + 1)); // add line info iLine + 1
          }
          
          if (actualLine.length > expectedLine.length) {
             this.success = false;
-            throw(strings.messages.tooManyChars + (iLine + 1)); // add line info iLine + 1
+            throw(strings.messages.tooManyChars.format(iLine + 1)); // add line info iLine + 1
          }
       }
 
