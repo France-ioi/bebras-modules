@@ -170,7 +170,7 @@ function Automata(settings) {
          graphMouse: this.graphMouse,
          dragThreshold: 10,
          edgeThreshold: 20,
-         vertexThreshold: this.circleAttr.r,
+         vertexThreshold: 0,
          dragLimits: {
             minX: this.visualGraph.graphDrawer.circleAttr.r,
             maxX: this.graphPaper.width - this.visualGraph.graphDrawer.circleAttr.r,
