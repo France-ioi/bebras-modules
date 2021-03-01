@@ -638,12 +638,14 @@ function Automata(settings) {
                return currPath
             }
             var nextPath = this.getPath(nextIndex,currPath,child,accepts);
-            var lastEdge = nextPath[nextPath.length - 1];
-            if(accepts && this.NFA.final.includes(lastEdge.child)){
-               return nextPath
-            }
-            if(!accepts){
-               return nextPath
+            if(nextPath){
+               var lastEdge = nextPath[nextPath.length - 1];
+               if(accepts && this.NFA.final.includes(lastEdge.child)){
+                  return nextPath
+               }
+               if(!accepts){
+                  return nextPath
+               }
             }
          }
       }else{
