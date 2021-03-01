@@ -240,6 +240,12 @@ function Automata(settings) {
          x: pos.x,
          y: pos.y
       });
+      this.beaver.click(function() {
+         self.stopAnimation();
+         self.beaver.remove();
+         self.beaver = null;
+         $('#feedback').html('');
+      });
    };
 
    this.nfaFromGraph = function(graph) {
@@ -573,99 +579,110 @@ function Automata(settings) {
    this.run = function() {
       sim = subTask.simulationFactory.create("sim");
       this.initBeaver();
-      this.loop(self.startID,0);
-      this.initSequence();
-      sim.setAutoPlay(true);
-      sim.play();
+      var accepts = this.NFA.accepts(this.sequence);
+      var path = this.getPath(0,[],'v_0',accepts);
+      if(path.length > 0){
+         this.loop(path,0);
+         this.initSequence();
+         sim.setAutoPlay(true);
+         sim.play();
+      }
    };
 
-   this.loop = function(vID,step) {
-      var nextStep = self.checkNext(vID,step);
-      if(nextStep.epsilon){
+   this.loop = function(path,step) {
+      if(!path[step]){
+         return
+      }
+      var edgeID = path[step].edge;
+      var vID = path[step].child;
+      var epsilon = path[step].epsilon;
+      if(epsilon){
          this.sequence.splice(step,0,"ε");
       }
-      vID = nextStep.vID;
+      var stepData = { vID: vID, edgeID: edgeID };
+      if(this.endID.includes(vID)){
+         this.result = { message: "success" };
+      }else if(path.length < step + 1){
+         this.result = { message: "next", nEdges: 1 };
+      }else{
+         this.result = { message: "noGoodWay", nEdges: 1 };
+      }
 
-      this.result = { message: nextStep.message, nEdges: nextStep.nEdges };
-
-      var simStep = new SimulationStep();
-      var simAction = {onExec: animStep(nextStep,step), duration: animTime, params: {}};
-      var simEntry = {name: "entry"+step, action: simAction};
-      simStep.addEntryAllParents(simEntry);
-      sim.addStep(simStep);
-      if(vID){
+      if(edgeID){
+         var simStep = new SimulationStep();
+         var simAction = {onExec: animStep(edgeID,step), duration: animTime, params: {}};
+         var simEntry = {name: "entry"+step, action: simAction};
+         simStep.addEntryAllParents(simEntry);
+         sim.addStep(simStep);
          step++;
          if(!self.endID.includes(vID)){
-            self.loop(vID,step);
+            self.loop(path,step);
          }
+      }
+   };
+
+   this.getPath = function(i,path,state,accepts) {
+      if(this.NFA.final.includes(state)){
+         return path
+      }
+      var nextEdges = this.checkNext(state, i);
+      if(nextEdges.length > 0){
+         for(var edge of nextEdges){
+            var edgeID = edge.edge;
+            var epsilon = edge.epsilon;
+            var child = edge.child;
+            var nextIndex = (epsilon) ? i : i + 1;
+            var currPath = path.slice();
+            currPath.push(edge);
+            if(this.NFA.final.includes(state)){
+               return currPath
+            }
+            var nextPath = this.getPath(nextIndex,currPath,child,accepts);
+            var lastEdge = nextPath[nextPath.length - 1];
+            if(accepts && this.NFA.final.includes(lastEdge.child)){
+               return nextPath
+            }
+            if(!accepts){
+               return nextPath
+            }
+         }
+      }else{
+         return path
       }
    };
 
    this.checkNext = function(vID,step) {
       var children = this.graph.getChildren(vID);
-      var nextVertex = null;
-      var way = null;
-      var nEdges = 0;
-      var epsilon = false;
+      var nextEdges = [];
       if(children.length == 0){
-         return { vID: null, edgeID: null, nEdges: 0, message: "noChildren"};
+         return nextEdges;
       }
-      if(this.sequence[step]){
-         for(child of children){
-            var edges = this.graph.getEdgesFrom(vID,child);
-            for(edge of edges){
-               var info = this.graph.getEdgeInfo(edge);
-               if(info.label == this.sequence[step]){
-                  if(nextVertex && nextVertex !== child){
-                     return { vID: null, edgeID: null, nEdges: 0, message: "tooManyWays" };
-                  }
-                  nextVertex = nextVertex || child;
-                  way = way || edge;
-                  nEdges++;
-               }
+      for(child of children){
+         var edges = this.graph.getEdgesFrom(vID,child);
+         for(edge of edges){
+            var info = this.graph.getEdgeInfo(edge);
+            if(info.label == this.sequence[step] || !info.label){
+               nextEdges.push({ edge: edge, epsilon: !info.label, child: child });
             }
          }
       }
-      if(!nextVertex){
-         for(child of children){
-            var edges = this.graph.getEdgesFrom(vID,child);
-            for(edge of edges){
-               var info = this.graph.getEdgeInfo(edge);
-               if(!info.label){
-                  if(nextVertex && nextVertex !== child){
-                     return { vID: null, edgeID: null, nEdges: 0, message: "tooManyWays" };
-                  }
-                  nextVertex = nextVertex || child;
-                  way = way || edge;
-                  nEdges++;
-                  epsilon = true;
-               }
-            }
-         }
-      }
-      // console.log(nextVertex)
-      if(!nextVertex){
-         return { vID: null, edgeID: null, nEdges: 0, message: "noGoodWay" };
-      }
-      if(nextVertex !== this.endID)
-         return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "next", epsilon: epsilon };
-      return { vID: nextVertex, edgeID: way, nEdges: nEdges, message: "success", epsilon: epsilon };
+      return nextEdges
    };
 
    function animStep(nextStep,step) {
       return function(params,duration,callback){
          // console.log(nextStep,step);
-         var vID = nextStep.vID;
-         var eID = nextStep.edgeID;
-         if(!vID){
+         // var vID = nextStep.vID;
+         var eID = nextStep;
+         if(!eID){
             subTask.simulationFactory.destroy("sim");
          }else{
-            self.animate(step,vID,eID,duration,callback);
+            self.animate(step,eID,duration,callback);
          }
       }
    };
 
-   this.animate = function(step,vID,eID,duration,callback) {
+   this.animate = function(step,eID,duration,callback) {
       var xi = this.cursorX;
       var xf = this.seqLettersPos[step].x + this.margin/2 + this.seqLettersAttr["font-size"]/2;
       var translation = xf - xi;
