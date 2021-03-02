@@ -3,8 +3,12 @@
    height: 1em;
 }
 #explanations {
-   height: 2em;
+   min-height: 2em;
    text-align: center;
+}
+code, pre {
+   color: #3f7cc2;
+   font-family: monospace;
 }
 
 /* TABS & SWITCH */
