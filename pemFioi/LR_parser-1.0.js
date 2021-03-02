@@ -5,16 +5,16 @@ function LR_Parser(settings,subTask,answer) {
    this.strings = {
       explanations: {
          // +
-         shift: 'The lookahead symbol {symbol} is read from the input and state {state} is pushed onto the stack.',
+         shift: 'The lookahead symbol <code>{symbol}</code> is read from the input and state <code>{state}</code> is pushed onto the stack.',
          //         
-         reduce1: 'Lookahead symbol {symbol} is in the Follow set of the LHS non-terminal ({non_terminal}) for the item {item}, thus states {popped_states} are popped from the stack that represent {RHS} in the derivation.',
-         reduce2: 'The top element after popping {popped_states} is {top_state}, that leads to state {new_state} with the non-terminal {non_terminal}, which is pushed onto the stack.',
+         reduce1: 'Lookahead symbol <code>{symbol}</code> is in the Follow set of the LHS non-terminal (<code>{non_terminal}</code>) for the item <code>{item}</code>, thus states <code>{popped_states}</code> are popped from the stack that represent <code>{RHS}</code> in the derivation.',
+         reduce2: 'The top element after popping <code>{popped_states}</code> is <code>{top_state}</code>, that leads to state <code>{new_state}</code> with the non-terminal <code>{non_terminal}</code>, which is pushed onto the stack.',
          //+
-         error: 'No shift or reduce operations possible at state {state} for lookahead symbol {symbol}',
+         error: 'No shift or reduce operations possible at state <code>{state}</code> for lookahead symbol <code>{symbol}</code>',
          //?
          not_accepted: 'The input is fully read, and no reduction is possible, so the input is in the language of the grammar.',
          //+
-         accepted: 'The input is fully read, and the current state {state} has the item {base_reduction_item}, so the input is accepted.'
+         accepted: 'The input is fully read, and the current state <code>{state}</code> has the item <code>{base_reduction_item}</code>, so the input is accepted.'
       }
    }
    this.formatExplanation = function(key, values) {
@@ -747,8 +747,15 @@ function LR_Parser(settings,subTask,answer) {
          RHS: 'TODO'
       });      
       */   
-   this.displayExplanation = function(key, values) {
-      $('#explanations').html(key ? this.formatExplanation(key, values) : '');
+   this.displayExplanation = function(key, values, concat) {
+      var newExpl = key ? this.formatExplanation(key, values) : '';
+      if(concat){
+         var oldExpl = $('#explanations').html();
+         var newExpl = '<p>' + oldExpl + '</p><p>' + newExpl + '</p>';
+      }else{
+         newExpl = '<p>' + newExpl + '</p>';
+      }
+      $('#explanations').html(newExpl);
    }
 
    this.initActionInfo = function() {
@@ -2038,7 +2045,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.goto = function(newState) {
       // console.log("goto "+newState)
-      this.displayExplanation('reduce2', this.gotoInformation); 
+      this.displayExplanation('reduce2', this.gotoInformation, true); 
       var col = this.stack.length - 1;
       $(".stackElement.State[data_col="+col+"]").text(newState);
       $(".stackElement.State[data_col="+col+"]").css("opacity",0);
