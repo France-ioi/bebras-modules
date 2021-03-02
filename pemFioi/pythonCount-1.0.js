@@ -171,6 +171,10 @@ function pythonForbiddenLists(includeBlocks) {
       removeForbidden(['var_assign']);
    }
 
+   if(includeBlocks && includeBlocks.procedures && (includeBlocks.procedures.ret || includeBlocks.procedures.noret)) {
+      removeForbidden(['def']);
+   }
+
    return {forbidden: forbidden, allowed: allowed};
 }
 
@@ -186,6 +190,10 @@ function removeFromPatterns(code, patterns) {
 
 function pythonForbidden(code, includeBlocks) {
    var forbidden = pythonForbiddenLists(includeBlocks).forbidden;
+
+   if(includeBlocks && includeBlocks.procedures && includeBlocks.procedures.disableArgs) {
+      forbidden.push('def_args');
+   }
 
    // Remove comments and strings before scanning
    var removePatterns = [
@@ -240,6 +248,12 @@ function pythonForbidden(code, includeBlocks) {
          if(re.exec(code)) {
             // Forbidden keyword found
             return '= (assignation de variable)'; // TODO :: i18n ?
+         }
+      } else if(forbidden[i] == 'def_args') {
+         var re = /def\s*\w+\([^\s]+\)/;
+         if(re.exec(code)) {
+            // Forbidden keyword found
+            return 'fonction avec arguments'; // TODO :: i18n ?
          }
       } else if(forbidden[i] != 'strings') {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
