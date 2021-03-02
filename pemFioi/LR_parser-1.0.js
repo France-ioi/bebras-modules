@@ -537,6 +537,7 @@ function LR_Parser(settings,subTask,answer) {
                   if(symbol == "S" && iChar >= this.input.length - 1){
                      this.actionSequence[this.actionSequence.length - 1]["goto"] = this.getTerminalState();
                      success = true;
+                     this.actionSequence.push({ actionType: 'accept' });
                   }
                   
                   /* create derivation tree */
@@ -1413,6 +1414,11 @@ function LR_Parser(settings,subTask,answer) {
          case "error":
             self.refuseInput();
             break;
+         case 'accept':
+            if(self.currentState == self.getTerminalState()){
+               if(!self.accept)
+                  self.acceptInput();
+            } 
       }
    };
 
@@ -2816,10 +2822,10 @@ function LR_Parser(settings,subTask,answer) {
          // var animTime = (action == "shift") ? this.animationTime*0.8 : this.animationTime;
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
       }
-      if(this.currentState == this.getTerminalState()){
-         if(!this.accept)
-            this.acceptInput();
-      }     
+      // if(this.currentState == this.getTerminalState()){
+      //    if(!this.accept)
+      //       this.acceptInput();
+      // }     
    };
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
