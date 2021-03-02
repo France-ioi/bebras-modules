@@ -4,21 +4,29 @@ var makeTurtle = function(coords) {
    this.reset = function(stepsize, newcoords) {
       this.x = 150;
       this.y = 150;
+
+      this.directionDeg = 0;
+      this.direction = 0;
+
       var initcoords = newcoords || coords;
       if(initcoords) {
          this.x = initcoords.x;
          this.y = initcoords.y;
+
+         if (initcoords.dir) {
+           this.directionDeg = initcoords.dir,
+           this.direction = this.directionDeg*Math.PI/180;
+        }
       }
-      this.stepsize = 1;
-      this.directionDeg = 0;
-      this.direction = 0;
+
       this.paint = true;
       this.stepsize = 5;
+
       if (this.drawingContext)
          this.drawingContext.clearRect(0, 0, 300, 300);
       if (this.turtle) {
          this.turtle.src = this.turtle.getAttribute("pendown");
-         this.turtle.style.transform = "none";
+         this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
          this.placeTurtle();
       }
       if (stepsize) {
@@ -36,8 +44,6 @@ var makeTurtle = function(coords) {
 
       this.direction = this.directionDeg*Math.PI/180;
       if (this.turtle) {
-         // TODO :: Do we need to put "none" first?
-         this.turtle.style.transform = "none";
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
       }
    }
