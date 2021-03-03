@@ -244,11 +244,6 @@ function LR_Parser(settings,subTask,answer) {
          fill: this.colors.yellow
       }
    };
-   // this.selectedCellAttr = {
-   //    "background-color": this.colors.blue,
-   //    color: "white",
-   //    border: "1px solid "+this.colors.lightgrey
-   // };
    this.cellHighlightAttr = {
       position: "absolute",
       border: "4px solid",
@@ -559,12 +554,15 @@ function LR_Parser(settings,subTask,answer) {
                         // console.log(treeIndex);
                         treeIndex = (2*inputIndex + 1 >= treeIndex) ? 2*inputIndex + 1 : treeIndex; 
                      }
-                     
+                     var actionIndex = this.actionSequence.length - 1;
+                     if(this.actionSequence[actionIndex].actionType == 'accept'){
+                        actionIndex--; // bug fix due to final accept step
+                     }
                      if(nbRedChar <= 1){
                         if(this.derivationTree[treeIndex]){
-                           this.derivationTree[treeIndex].push([ruleIndex,this.actionSequence.length - 1]);
+                           this.derivationTree[treeIndex].push([ruleIndex,actionIndex]);
                         }else{
-                           this.derivationTree[treeIndex] = [[ruleIndex,this.actionSequence.length - 1]];
+                           this.derivationTree[treeIndex] = [[ruleIndex,actionIndex]];
                         }
                         if(this.derivationTree[treeIndex].length > this.treeHeight){
                            this.treeHeight = this.derivationTree[treeIndex].length;
@@ -597,11 +595,11 @@ function LR_Parser(settings,subTask,answer) {
                                  if(!this.derivationTree[i]){
                                     this.derivationTree[i] = [];
                                  }
-                                 this.derivationTree[i].push(["",this.actionSequence.length - 1]);
+                                 this.derivationTree[i].push(["",actionIndex]);
                               }
                            }
                            if(i == treeIndex){
-                              this.derivationTree[i].push([ruleIndex,this.actionSequence.length - 1]);
+                              this.derivationTree[i].push([ruleIndex,actionIndex]);
                            }
                            if(this.derivationTree[i].length > this.treeHeight){
                               this.treeHeight = this.derivationTree[i].length;
@@ -1433,7 +1431,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.treeAnim = function(step,reverse,anim) {
-      // console.log("tree");
       if(!this.treeElements[step]){
          return
       }
@@ -2032,7 +2029,6 @@ function LR_Parser(settings,subTask,answer) {
             });
             self.simulationStep++;
             self.currentState = goto;
-            // console.log("goto 1998");
             self.goto(goto);
             self.saveAnswer();
             $("#reduceButton span").text("REDUCE");
@@ -2052,13 +2048,7 @@ function LR_Parser(settings,subTask,answer) {
       self.highlightRule(self.selectedRule);
       self.updateState(true,"goto");
       self.displayMessage("reduce","GOTO "+newState);
-      // console.log(prevStates,nonTerminal);
-      // self.displayExplanation('reduce2', {
-      //    popped_states: prevStates.slice(1).join(', '),
-      //    non_terminal: nonTerminal,
-      //    top_state: prevStates[0],
-      //    new_state: newState
-      // }); 
+
       self.currentVertex = self.getStateID(newState);
       self.arrangeEdgeHL();
       if(this.mode == 2){
@@ -2840,11 +2830,7 @@ function LR_Parser(settings,subTask,answer) {
          // var previousState = this.stack[this.stack.length - 2][0];
          // var animTime = (action == "shift") ? this.animationTime*0.8 : this.animationTime;
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
-      }
-      // if(this.currentState == this.getTerminalState()){
-      //    if(!this.accept)
-      //       this.acceptInput();
-      // }     
+      }   
    };
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
@@ -3539,7 +3525,6 @@ function LR_Parser(settings,subTask,answer) {
    /** derivation tree **/
 
    this.updateTree = function() {
-      // console.log("updateTree");
       this.updateTreePaper();
       this.fixConflict();
       this.treeClickableElements = {};
@@ -3562,7 +3547,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.displayTree = function(tree,level,parentCol) {
-      // console.log("displayTree");
       var children = [];
       for(var col in tree){
          if(col == "nonTerminal" || col == "path"){
@@ -4412,172 +4396,11 @@ function LR_Parser(settings,subTask,answer) {
       // $("#"+parseTable+" td.selected").css(this.selectedCellAttr);
    };
 
-   this.styleRules = function() {
-      // $("#rules").css({
-      //    "flex-grow": "1",
-      //    "flex-shrink": "0",
-      //    "background-color": this.colors.lightgrey,
-      //    "border-radius": "0 5px 5px 0",
-      //    "overflow": "hidden",
-      //    "font-weight": "bold"
-      // });
-      // $("#rules h3").css({
-      //    "text-align": "center",
-      //    padding: "1em",
-      //    margin: 0,
-      //    "background-color": this.colors.black,
-      //    color: "white",
-      //    "font-size": "1em"
-      // });
-      // $("#rules ul").css({
-      //    "list-style": "none",
-      //    padding: 0
-      // });
-      // $(".rule").css({
-
-      //    padding: "0.2em 0.5em 0.2em 0",
-      //    margin: "0.5em 1em",
-      //    "background-color": "transparent",
-      //    color: this.colors.black,
-      //    "border-radius": "1em"
-      // });
-      // $(".ruleIndex").css({
-      //    "flex-grow": "0",
-      //    "background-color": this.colors.black,
-      //    "border-radius": "1em",
-      //    // color: "white",
-      //    color: this.colors.yellow,
-      //    padding: "0.2em 0.5em",
-      //    "margin-right": "0.5em"
-      // });
-      // $(".rule i").css({
-      //    color: "grey",
-      //    margin: "0 0.5em"
-      // });
-      // $(".rule.previousRule").css({
-      //    "background-color": "#d9e3ef"
-      // });
-      // $(".rule.selected").css({
-      //    "background-color": this.colors.blue,
-      //    color: "white"
-      // });
-      // $(".rule.selected .ruleIndex").css({
-      //    "border-radius": "1em 0 0 1em",
-      // });
-      // $(".rule.selected i").css({
-      //    color: this.colors.yellow
-      // });
-      // $(".rule .epsilon").css({
-      //    "font-style": "italic"
-      // })
-   };
-
-   this.styleProgressBar = function() {
-      // $("#progressBarClickArea").css({
-      //    "flex-grow": "1",
-      //    height: "20px",
-      //    margin: "0 10px",
-      //    "padding-top": "8px"
-      // });
-      // $("#progressBarContainer").css({
-      //    height: "4px",
-      //    "background-color": "grey",
-      // });
-      // $("#progressBar").css({
-      //    width: "0%",
-      //    height: "100%",
-      //    "background-color": this.colors.blue,
-      //    position: "relative"
-      // });
-      // $("#progressBarMarker").css({
-      //    width: "6px",
-      //    height: "6px",
-      //    "background-color": "white",
-      //    border: "3px solid "+this.colors.blue,
-      //    "border-radius": "15px",
-      //    position: "absolute",
-      //    right: "-6px",
-      //    top: "-4px",
-      //    "z-index": 2
-      // });
-   };
-
-   this.styleStackTable = function() {
-      // $("#stackTableContainer").css({
-      //    position: "relative"
-      // });
-      // $("#stackTable").css({
-      //    border: "2px solid "+this.colors.blue,
-      //    "border-right": "none",
-      //    "border-collapse": "collapse",
-      //    "width": "100%"
-      // });
-      // $("#stackTable td").css({
-      //    border: "1px solid grey",
-      //    "background-color": this.colors.lightgrey,
-      //    "text-align": "center",
-      //    width: "2em",
-      //    height: "2em"
-      // });
-      // $("#stackTable td:last-child").css({
-      //    "border-right": "none",
-      //    color: "grey",
-      //    "text-align": "right",
-      //    "font-style": "italic",
-      //    "background-color": "white",
-      //    width: "auto"
-      // });
-      // $("#stackTable .State").css({
-      //    color: "grey"
-      // });
-      // $("#stackTable .Symbol").css({
-      //    color: this.colors.blue
-      // });
-      // $("#stackTable .stackElement.selected").css({
-      //    "background-color": this.colors.blue,
-      //    color: "white"
-      // });
-   };
-
-   this.styleInput = function() {
-      // $("#inputBar").css({
-      //    position: "relative",
-      //    "background-color": this.colors.lightgrey,
-      //    "margin-top": "5px",
-      //    "border-top": "1px solid grey",
-      //    "border-bottom": "2px solid "+this.colors.blue
-      // });
-      // $("#inputBar h4").css({
-      //    position: "absolute",
-      //    top: "-3em"
-      // });
-      // $(".inputChar").css({
-      //    display: "inline-block",
-      //    width: "1.5em",
-      //    "text-align": "center",
-      //    color: this.colors.black,
-      //    "font-size": "1.5em",
-      //    padding: "0.1em 0"
-      // });
-      // $(".inputChar.read").css({
-      //    color: this.colors.blue
-      // });
-      // $(".inputChar:first-of-type").css({
-      //    "margin-left": "0.75em"
-      // });
-   }; 
-
    this.styleDerivationTree = function() {
-      // if(this.mode < 6){
-         var charWidth = $("#inputBar .inputChar").width();
-         var charHeight = $("#inputBar .inputChar").height()*0.7;
-         var treeWidth = this.input.length*charWidth;
-      // }else{
-      //    var charWidth = this.treeCharSize;
-      //    var charHeight = this.treeCharSize*0.7;
-      //    var treeWidth = (this.input.length + 1)*charWidth;
-      // }
-      // var treeWidth = this.input.length*charWidth;
+      // console.log('styleDerivationTree')
+      var charWidth = $("#inputBar .inputChar").width();
+      var charHeight = $("#inputBar .inputChar").height()*0.7;
+      var treeWidth = this.input.length*charWidth;
       var treeHeight = (2*this.treeHeight + 1)*charHeight;
 
       $("#derivationTree").css({
@@ -4693,7 +4516,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      // if(this.mode < 6)
+      // console.log(this.treeElements,this.actionSequence,this.derivationTree)
       for(var actionIndex in this.treeElements){
          var elements = this.treeElements[actionIndex];
          for(var el of elements){
