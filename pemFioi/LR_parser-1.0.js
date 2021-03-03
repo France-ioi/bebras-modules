@@ -2487,6 +2487,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.updateStackPreview = function(rule,goto) {
+      // console.log('updateStackPreview');
       var attr = this.stackPreviewAttr;
       var localStack = JSON.parse(JSON.stringify(this.stack));
       if(rule || rule == 0){
@@ -2516,7 +2517,7 @@ function LR_Parser(settings,subTask,answer) {
          top: 0,
          left: tableMarginLeft - stackPreviewW - 2
       });
-      this.stackPreview.rect(0,headerH,stackPreviewW,stackPreviewH - headerH).attr(attr.background).toBack();
+      this.stackPreview.rect(0,headerH,stackPreviewW,Math.max(0,stackPreviewH - headerH)).attr(attr.background).toBack();
       var lastPos = null;
       var x = stackPreviewW/2;
 
@@ -4259,7 +4260,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.style = function() {
-      // TODO :: put all that into the CSS file...
       // console.log("style")
       $("#"+this.divID).css({
          "font-size": "80%"
@@ -4362,38 +4362,15 @@ function LR_Parser(settings,subTask,answer) {
             });
          }
       }
-      // $("#parseTable").css({
-      //    position: "relative"
-      // });
-      // $("#parseTable table").css({
-      //    "border-collapse": "collapse",
-      //    border: "2px solid "+this.colors.black,
-      //    "text-align": "center"
-      // });
-      // $("#parseTable table th").css({
-      //    "background-color": this.colors.black,
-      //    color: "white",
-      //    border: "1px solid white"
-      // });
+
       $("#parseTable td").css(this.cellAttr);
       if(this.mode >= 4){
          $("#parseTable td[data_symbol]").css({
             cursor: "pointer"
          })
       }
-      // $("#parseTable td .ruleMarker").css({
-      //    "background-color": this.colors.black,
-      //    "border-radius": "1em",
-      //    color: "white",
-      //    padding: "0.2em 0.5em"
-      // });
-      // $("#parseTable td .ruleMarkerIndex").css({
-      //    color: this.colors.yellow,
-      //    // "font-weight": "bold"
-      // });
 
       $("#rowHL, #colHL").css(this.cellHighlightAttr);
-      // $("#"+parseTable+" td.selected").css(this.selectedCellAttr);
    };
 
    this.styleDerivationTree = function() {
