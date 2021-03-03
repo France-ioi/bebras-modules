@@ -238,7 +238,7 @@ var cloneSkuptValue = function cloneSkuptValue(value) {
 };
 
 // To filter the internal variables of Skulpt.
-var variablesBeginWithIgnore = ['__name__', '__doc__', '__package__', '__file__', '$compareres', '$loadgbl', '$binop'];
+var variablesBeginWithIgnore = ['__name__', '__doc__', '__package__', '__file__', '$compareres', '$loadgbl', '$binop', '__refs__'];
 /**
  * Filter the variable names by removing those useed internally by Skulpt.
  *
