@@ -86,8 +86,9 @@ function LR_Parser(settings,subTask,answer) {
    this.timeOutID;
    this.animationTime = settings.animationTime || 1000;
    this.token;
+   this.showLog = settings.showLog;
 
-   this.divID = settings.divID,
+   this.divID = settings.divID;
    this.sideTable = false;
    this.rowHL = null;
    this.colHL = null;
@@ -336,6 +337,12 @@ function LR_Parser(settings,subTask,answer) {
       }
       html += '<div id="parseInfo"></div>';
 
+      if(this.showLog){
+         html += '<div id="logTable">'
+         html += '<table><thead><tr><th>STACK</th><th>INPUT</th><th>ACTION</th></tr></thead><tbody></tbody></table>';
+         html += '</div>';
+      }
+
       $("#"+this.divID).html(html);
 
       this.initParser();
@@ -360,6 +367,9 @@ function LR_Parser(settings,subTask,answer) {
       this.style();
       if(this.mode < 6){
          this.updateState(false,"init");
+         // if(this.showLog){
+         //    this.updateLogTable();
+         // }
       }
       this.initHandlers();
       if(this.mode >= 3 && this.mode < 6){
@@ -1825,23 +1835,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.getTerminalState = function() {
-      // var initVertex = this.getStateID(0);
-      // if(initVertex){
-      //    var children = this.graph.getChildren(initVertex);
-
-      //    for(var child of children){
-      //       var edges = this.graph.getEdgesFrom(initVertex,child);
-      //       if(edges.length > 0){
-      //          var edgeInfo = this.graph.getEdgeInfo(edges[0]);
-      //          if(edgeInfo.label == this.grammar.rules[0].nonterminal){
-      //             var vertexInfo = this.graph.getVertexInfo(child);
-      //             if(vertexInfo.terminal){
-      //                return vertexInfo.label;
-      //             }
-      //          }
-      //       }
-      //    }
-      // }
       var vertices = this.graph.getAllVertices();
       for(var vertex of vertices){
          var info = this.graph.getVertexInfo(vertex);
@@ -1942,7 +1935,7 @@ function LR_Parser(settings,subTask,answer) {
          $(".rule").removeClass("selected");
          this.selectedRule = null;
          // this.styleRules();
-         this.updateStackTable();
+         this.updateStackTable(false,true);
 
          this.updateState(anim,"reduction");
          this.arrangeEdgeHL();
@@ -2039,7 +2032,7 @@ function LR_Parser(settings,subTask,answer) {
             });
             self.simulationStep++;
             self.currentState = goto;
-            console.log("goto 1998");
+            // console.log("goto 1998");
             self.goto(goto);
             self.saveAnswer();
             $("#reduceButton span").text("REDUCE");
@@ -2147,13 +2140,12 @@ function LR_Parser(settings,subTask,answer) {
          this.highlightPrevState(this.currentState);
       }
       this.selectedStackElements = [];
-      this.updateStackTable();
+      this.updateStackTable(false,!anim);
       this.updateCursor(!(reverse || !anim));
       this.updateState(!(reverse || !anim),"shift");
-      // console.log(this.selectedState)
    };
 
-   this.updateStackTable = function(noGoto) {
+   this.updateStackTable = function(noGoto,noAnim) {
       var html = "";
       for(var iData = 0; iData < this.stackData.length; iData++) {
          html += "<tr>";
@@ -2173,7 +2165,34 @@ function LR_Parser(settings,subTask,answer) {
          this.currentState = this.stack[this.stack.length - 1][0];
          this.currentVertex = this.getStateID(this.currentState);
       }
-      // console.log("updateStack "+this.currentState);
+      if(this.showLog){
+         this.updateLogTable(noAnim);
+      }
+   };
+
+   this.updateLogTable = function(noAnim) {
+      var step = this.simulationStep;
+      var stackStr = '';
+      var inputStr = this.input.slice(this.inputIndex);
+      if(this.stack.length < 2){
+         $('#logTable .logLine').remove();
+      }
+      if(noAnim === true || this.stack.length < 2){
+         var action = this.actionSequence[step];
+      }else{
+         var action = this.actionSequence[step + 1];
+      }
+      var actionStr = action.actionType;
+      if(actionStr == 's'){
+         actionStr += action.state;
+      }else if(actionStr == 'r'){
+         actionStr += (action.rule + 1);
+      }
+      for(var stack of this.stack){
+         stackStr += '<code>'+stack[1]+'</code>'+stack[0];
+      }
+      var newLine = '<tr class="logLine"><td>'+stackStr+'</td><td><code>'+inputStr+'</code></td><td>'+actionStr+'</td>';
+      $('#logTable tbody').append(newLine)
    };
 
    this.updateCursor = function(anim) {
@@ -3451,7 +3470,7 @@ function LR_Parser(settings,subTask,answer) {
                   goto: cellContent
                });
                self.currentState = cellContent;
-               console.log("goto 3409");
+               // console.log("goto 3409");
                self.goto(cellContent);
                self.waitingForGoto = false;
                self.saveAnswer();

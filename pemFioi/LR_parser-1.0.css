@@ -265,12 +265,14 @@ code, pre {
 #parseTable {
    position: relative
 }
-#parseTable table {
+#parseTable table, 
+#logTable table {
    border-collapse: collapse;
    border: 2px solid #4a4a4a;
    text-align: center;
 }
-#parseTable table th {
+#parseTable table th,
+#logTable table th {
    background-color: #4a4a4a;
    color: white;
    border: 1px solid white;
@@ -294,6 +296,19 @@ code, pre {
    border: 4px solid;
    border-color: #4990e2;
    pointer-events: none;
+}
+
+/* LOG TABLE */
+
+#logTable table {
+   margin: 1em auto;
+}
+#logTable td,
+#logTable th {
+   background-color: #f2f2f2;
+   color: #4a4a4a;
+   border: 1px solid #4a4a4a;
+   padding: 0.5em 1em;
 }
 
 /* RULES */
