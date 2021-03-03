@@ -2199,7 +2199,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                this.addBlocksAllowed(['procedures_defnoreturn', 'procedures_callnoreturn']);
             }
             if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
-               this.addBlocksAllowed(['procedures_defreturn', 'procedures_callnoreturn']);
+               this.addBlocksAllowed(['procedures_defreturn', 'procedures_callreturn']);
             }
             if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
                this.addBlocksAllowed(['procedures_ifreturn']);
