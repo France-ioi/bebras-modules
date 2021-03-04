@@ -1596,9 +1596,13 @@ function LR_Parser(settings,subTask,answer) {
       if(col == 0){
          return
       }
-
       if($(".stackElement[data_col="+col+"]").hasClass("selected")){
-         for(var iCol = 0; iCol <= col; iCol++){
+         if(col == self.stack.length - 1){
+            var lastColToUnselect = col;
+         }else{
+            var lastColToUnselect = col - 1;
+         }
+         for(var iCol = 0; iCol <= lastColToUnselect; iCol++){
             $(".stackElement[data_col="+iCol+"]").removeClass("selected");
          }
          self.selectedStackElements = self.selectedStackElements.filter(element => element > col);
@@ -1610,7 +1614,6 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      // self.styleStackTable();
    };
 
    this.clickRule = function() {
