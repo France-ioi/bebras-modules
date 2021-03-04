@@ -4236,7 +4236,8 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.displayError = function(msg) {
-      $("#error").text(msg);
+      // $("#error").text(msg);
+      $("#explanations").html('<span id="error">'+msg+'</span>');
       // console.log(msg)
    };
 

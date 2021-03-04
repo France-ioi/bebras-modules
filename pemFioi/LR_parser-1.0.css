@@ -1,6 +1,7 @@
 #error {
    text-align: center;
-   height: 1em;
+   /*height: 1em;*/
+   font-size: 16px;
 }
 #explanations {
    min-height: 2em;
