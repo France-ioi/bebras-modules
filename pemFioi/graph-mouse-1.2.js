@@ -4,7 +4,7 @@ function GraphMouse(graphMouseID, graph, visualGraph) {
    this.priority = 2000;
 
    /* ID -> {elementID: ID of vertex or edge,
-   *         eventType: a mouse event type string,
+    *        eventType: a mouse event type string,
     *        callbacks: list of functions to call,
     *        raphaels: list of Raphael objects
     *        }
@@ -914,11 +914,13 @@ function VertexDragAndConnect(settings) {
    };
 
    this.enableVertexDrag = function(vertexId) {
+      // console.log('enableDrag')
       graphMouse.removeEvent(id + "_" + vertexId + "$$$dragAndConnect");
       graphMouse.addEvent(id + "_" + vertexId + "$$$dragAndConnect", "drag", "vertex", vertexId, [self.moveHandler, self.startHandler, self.endHandler]);
    };
 
    this.disableVertexDrag = function(vertexId) {
+      // console.log('disableDrag')
       graphMouse.removeEvent(id + "_" + vertexId + "$$$dragAndConnect");
    };
 
@@ -944,6 +946,7 @@ function VertexDragAndConnect(settings) {
    }
 
    this.startHandler = function(x, y, event) { 
+      // console.log('startDrag')
       if(self.unselectAllEdges){
          self.unselectAllEdges();
       }
@@ -959,6 +962,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.endHandler = function(event) {
+      // console.log('endDrag')
       if(self.isDragging) {
          var isSnappedToGoodPosition = false;
 
@@ -979,9 +983,10 @@ function VertexDragAndConnect(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
-      if(dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
+      if(!self.dragEnabled || dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
          return;
       }
+      // console.log('move')
       if(self.selectionParent !== null && self.allowDeselection) {
          self.onVertexSelect(self.selectionParent, false);
       }
@@ -1023,6 +1028,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id,x,y) {
+      // console.log(id)
       if(self.unselectAllEdges){
          self.unselectAllEdges();
       }
