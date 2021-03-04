@@ -1640,7 +1640,8 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.clickReductionMarker = function(rule,state,vID) {
-      return function() {
+      return function(ev) {
+         // console.log(rule,state,vID)
          if(state == self.currentState){
             var ruleObj = $("#rules [data_rule="+rule+"]");
             self.selectRule(ruleObj);
@@ -1653,7 +1654,8 @@ function LR_Parser(settings,subTask,answer) {
             }else{
                raphObj[0].attr(self.defaultVertexAttr);
             }
-            self.onVertexSelect(vID,info.selected);
+            // self.onVertexSelect(vID,info.selected);
+            self.graphEditor.vertexDragAndConnect.clickHandler(vID,ev.pageX,ev.pageY)
             // console.log("click")
          }
       }
