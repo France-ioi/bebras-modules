@@ -715,7 +715,6 @@ function LR_Parser(settings,subTask,answer) {
    this.initAction = function() {
       if(this.mode < 6){
          this.initPlayer();
-         // this.initExplanations();
       }
       this.initActionInfo();
    };
@@ -737,25 +736,6 @@ function LR_Parser(settings,subTask,answer) {
       $("#action").html(html);
    };
 
-   // this.initExplanations = function() {
-   //    var el = $('#lr-explanation');
-   //    if(el.length) {
-   //       el.html('');
-   //    } else {
-   //       var div = $("<div id=\"lr-explanation\"></div>").css('margin-top', '0.5em');
-   //       $("#action").prepend(div);
-   //    }
-   // };
-
-      /*
-      this.displayExplanation('reduce1', {
-         symbol: this.input.charAt(this.inputIndex),
-         non_terminal: nonTerminal,
-         item: this.grammar.rules[this.selectedRule].toString(),
-         popped_states: prevStates.slice(1).join(', '),
-         RHS: 'TODO'
-      });      
-      */   
    this.displayExplanation = function(key, values, concat) {
       var newExpl = key ? this.formatExplanation(key, values) : '';
       if(concat){
@@ -2963,10 +2943,12 @@ function LR_Parser(settings,subTask,answer) {
          if(self.error){
             self.refuseInput();
          } else {
-            this.displayExplanation('accepted', {
-               state: this.currentState,
-               base_reduction_item: this.stack[this.stack.length - 1][1]
-            });            
+            if(self.mode != 2){
+               self.displayExplanation('accepted', {
+                  state: self.currentState,
+                  base_reduction_item: self.stack[self.stack.length - 1][1]
+               });    
+            }        
          }
       }else{
          $("#acceptButton").css({
@@ -2992,10 +2974,12 @@ function LR_Parser(settings,subTask,answer) {
          if(self.accept){
             self.acceptInput();
          } else {
-            this.displayExplanation('error', {
-               symbol: this.input[this.inputIndex],
-               state: this.currentState
-            });         
+            if(self.mode != 2){
+               self.displayExplanation('error', {
+                  symbol: self.input[self.inputIndex],
+                  state: self.currentState
+               });    
+            }     
          }
       }else{
          $("#errorButton").css({
@@ -3004,7 +2988,9 @@ function LR_Parser(settings,subTask,answer) {
          $("#errorMessage").parent().css({
             "background-color": self.colors.blue
          });
-         this.displayExplanation('not_accepted');                              
+         if(self.mode != 2){
+            self.displayExplanation('not_accepted');     
+         }                         
       }
       self.saveAnswer();
    };
