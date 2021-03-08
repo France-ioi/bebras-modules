@@ -1612,15 +1612,21 @@ function LR_Parser(settings,subTask,answer) {
          return
       }
       if($(".stackElement[data_col="+col+"]").hasClass("selected")){
-         if(col == self.stack.length - 1){
-            var lastColToUnselect = col;
+         var lowest = true;
+         for(var selectedCol of self.selectedStackElements){
+            if(selectedCol < col){
+               lowest = false;
+            }
+         }
+         if(lowest){
+            var lastColToUnselect = self.stack.length - 1;
          }else{
             var lastColToUnselect = col - 1;
          }
          for(var iCol = 0; iCol <= lastColToUnselect; iCol++){
             $(".stackElement[data_col="+iCol+"]").removeClass("selected");
          }
-         self.selectedStackElements = self.selectedStackElements.filter(element => element > col);
+         self.selectedStackElements = self.selectedStackElements.filter(element => element > lastColToUnselect);
       }else{
          for(var iCol = col; iCol < self.stack.length; iCol++){
             $(".stackElement[data_col="+iCol+"]").addClass("selected");
