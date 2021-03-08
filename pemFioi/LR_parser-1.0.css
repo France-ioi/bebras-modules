@@ -312,6 +312,14 @@ code, pre {
    padding: 0.5em 1em;
 }
 
+#logTable td {
+    font-family: monospace; 
+    letter-spacing: 0.3em;
+}
+#logTable td.log_stack {
+   text-align: left;
+}
+
 /* RULES */
 #rules {
    flex-grow: 1;
