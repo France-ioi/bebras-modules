@@ -7,7 +7,18 @@ function LR_Parser(settings,subTask,answer) {
          // +
          shift: 'The lookahead symbol <code>{symbol}</code> is read from the input and state <code>{state}</code> is pushed onto the stack.',
          //         
-         reduce1: 'Lookahead symbol <code>{symbol}</code> is in the Follow set of the LHS non-terminal (<code>{non_terminal}</code>) for the item <code>{item}</code>, thus states <code>{popped_states}</code> are popped from the stack that represent <code>{RHS}</code> in the derivation.',
+         reduce1: function(plural) {
+            if(plural){
+               var plState = 'states';
+               var plIs = 'are';
+            }else{
+               var plState = 'state';
+               var plIs = 'is';
+            }
+            var str = 'Lookahead symbol <code>{symbol}</code> is in the Follow set of the LHS non-terminal (<code>{non_terminal}</code>) for the item <code>{item}</code>,';
+            str += ' thus '+plState+' <code>{popped_states}</code> '+plIs+' popped from the stack that represent <code>{RHS}</code> in the derivation.';
+            return str
+         },
          reduce2: 'The top element after popping <code>{popped_states}</code> is <code>{top_state}</code>, that leads to state <code>{new_state}</code> with the non-terminal <code>{non_terminal}</code>, which is pushed onto the stack.',
          //+
          error: 'No shift or reduce operations possible at state <code>{state}</code> for lookahead symbol <code>{symbol}</code>',
@@ -17,8 +28,12 @@ function LR_Parser(settings,subTask,answer) {
          accepted: 'The input is fully read, and the current state <code>{state}</code> has the item <code>{base_reduction_item}</code>, so the input is accepted.'
       }
    }
-   this.formatExplanation = function(key, values) {
-      var str = this.strings.explanations[key] || null;
+   this.formatExplanation = function(key, values, plural) {
+      if(key != 'reduce1'){
+         var str = this.strings.explanations[key] || null;
+      }else{
+         var str = this.strings.explanations[key](plural) || null;
+      }
       if(str === null) {
          console.error('Explanation ' + key + ' not found.');
          return str;
@@ -736,8 +751,8 @@ function LR_Parser(settings,subTask,answer) {
       $("#action").html(html);
    };
 
-   this.displayExplanation = function(key, values, concat) {
-      var newExpl = key ? this.formatExplanation(key, values) : '';
+   this.displayExplanation = function(key, values, concat, plural) {
+      var newExpl = key ? this.formatExplanation(key, values, plural) : '';
       if(concat){
          var oldExpl = $('#explanations').html();
          var newExpl = '<p>' + oldExpl + '</p><p>' + newExpl + '</p>';
@@ -1876,20 +1891,22 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       // console.log(this.itemToString(item));
+      var poppedStates = prevStates.slice(1).reverse();
       this.gotoInformation = {
-         popped_states: prevStates.slice(1).join(','),
+         popped_states: poppedStates.join(','),
          top_state: prevStates[0],
          non_terminal: nonTerminal,
          new_state: goto
       };
 
+      var plural = (poppedStates.length > 1);
       this.displayExplanation('reduce1', {
          symbol: this.input[this.inputIndex],
          non_terminal: nonTerminal,
          item: this.itemToString(item),
-         popped_states: prevStates.slice(1).join(','),
+         popped_states: poppedStates.join(','),
          RHS: this.grammar.rules[self.selectedRule].development.join(' ')
-      });           
+      }, false, plural);           
       // console.log("reduc1");
 
       var state = prevStates.pop();
@@ -2166,8 +2183,17 @@ function LR_Parser(settings,subTask,answer) {
       for(var stack of this.stack){
          stackStr += '<code>'+stack[1]+'</code>'+stack[0];
       }
-      var newLine = '<tr class="logLine"><td>'+stackStr+'</td><td><code>'+inputStr+'</code></td><td>'+actionStr+'</td>';
-      $('#logTable tbody').append(newLine)
+      var newLine = '<tr class="logLine"><td class="log_stack">'+stackStr+'</td><td class="log_input"><code>'+inputStr+'</code></td><td class="log_action"><span>'+actionStr+'</span></td></tr>';
+      $('#logTable tbody').append(newLine);
+      this.updateLogAction();
+   };
+
+   this.updateLogAction = function() {
+      $('#logTable td.log_action span').show();
+      var lastAction = $('#logTable tr:last-child td.log_action span');
+      if(lastAction.text() != 'accept'){
+         lastAction.hide();
+      }
    };
 
    this.updateCursor = function(anim) {
