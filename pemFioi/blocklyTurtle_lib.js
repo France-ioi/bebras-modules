@@ -252,6 +252,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_nikolaus: "drehe um %1 nach rechts ↻",
             turnleftamountvalue_penta: "drehe um %1 nach links ↺",
             turnrightamountvalue_penta: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_pentasimple: "drehe um %1 nach links ↺",
+            turnrightamountvalue_pentasimple: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
             row: "turtle's row", // TODO :: translate
@@ -657,6 +659,8 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_nikolaus = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_penta = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_penta = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_pentasimple = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_pentasimple = context.turtle.turnrightamount;
 
    context.turtle.colour2 = function(colour, callback) {
       if (typeof callback == "undefined") {
