@@ -292,6 +292,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_nikolaus: "dreheRechtsGrad",
             turnleftamountvalue_penta: "dreheLinksGrad",
             turnrightamountvalue_penta: "dreheRechtsGrad",
+            turnleftamountvalue_pentasimple: "dreheLinksGrad",
+            turnrightamountvalue_pentasimple: "dreheRechtsGrad",
             turneitheramount: "dreheGrade",
             turneitheramountvalue: "dreheGrad",
             row: "turtleRow", // TODO :: translate
