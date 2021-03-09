@@ -97,6 +97,7 @@ function LR_Parser(settings,subTask,answer) {
    this.inputBaseline = []; // mode = 7
    this.selectedSymbolIndices = [];
    this.reductionMarkerR = 10;
+   this.previousState = null;
 
    this.timeOutID;
    this.animationTime = settings.animationTime || 1000;
@@ -1645,7 +1646,6 @@ function LR_Parser(settings,subTask,answer) {
 
    this.clickReductionMarker = function(rule,state,vID) {
       return function(ev) {
-         // console.log(rule,state,vID)
          if(state == self.currentState){
             var ruleObj = $("#rules [data_rule="+rule+"]");
             self.selectRule(ruleObj);
@@ -1653,10 +1653,19 @@ function LR_Parser(settings,subTask,answer) {
             var info = self.graph.getVertexInfo(vID);
             var raphObj = self.visualGraph.getRaphaelsFromID(vID);
             info.selected = !info.selected;
+            // console.log(state,self.currentState,self.previousState,info.selected)
             if(info.selected){
                raphObj[0].attr(self.defaultSelectedVertexAttr);
+               if(self.prevStateHighlight){
+                  if(state == self.previousState){
+                     self.prevStateHighlight.toBack();
+                  }
+               }
             }else{
                raphObj[0].attr(self.defaultVertexAttr);
+               if(self.prevStateHighlight){
+                  self.prevStateHighlight.toFront();
+               }
             }
             // self.onVertexSelect(vID,info.selected);
             self.graphEditor.vertexDragAndConnect.clickHandler(vID,ev.pageX,ev.pageY)
@@ -2246,6 +2255,7 @@ function LR_Parser(settings,subTask,answer) {
    /* HIGHLIGHT */
 
    this.highlightPrevState = function(previousState) {
+      self.previousState = previousState; // bug fix
       var vertex = this.getStateID(previousState);
       var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
       // var x = raphObj[0].attr("x");
@@ -3162,7 +3172,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.selectVertexCallback = function(id,selected) {
-      // console.log(id+" "+selected)
+      // console.log('selectVertexCallback'+id+" "+selected)
       var current = self.getStateID(self.currentState);
       if(!selected && id == current){
          self.styleVertex(id,"current");
@@ -3175,11 +3185,18 @@ function LR_Parser(settings,subTask,answer) {
    this.onVertexSelect = function(ID,selected) {
       // console.log("onVertexSelect"+" "+ID+" "+selected)
       var info = self.graph.getVertexInfo(ID);
+      var state = info.label;
+
       var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
       if(selected){
          self.selectedVertex = ID;
          self.selectedState = info.label;
          stateVertex[4].attr(self.defaultSelectedVertexAttr);
+         if(self.prevStateHighlight && state == self.previousState){
+            self.prevStateHighlight.toBack();
+         }else if(self.prevStateHighlight){
+            self.prevStateHighlight.toFront();
+         }
       }else{
          self.selectedVertex = null;
          self.selectedState = null;
@@ -3198,6 +3215,14 @@ function LR_Parser(settings,subTask,answer) {
       if(self.reductionClickArea[ID]){
          self.reductionClickArea[ID].toFront();
       }
+
+      // if(self.prevStateHighlight){
+      //    if(currState == previousState){
+      //       self.prevStateHighlight.toBack();
+      //    }else{
+      //       self.prevStateHighlight.toFront();
+      //    }
+      // }
    };
 
    this.formatContent = function() {
