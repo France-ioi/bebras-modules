@@ -542,6 +542,10 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
    // element.undrag();
    element.drag(callOnMove,callOnStart,callOnEnd);
    if (element.touchstart) {
+      element.untouchstart();
+      element.untouchend();
+      element.untouchmove();
+      element.untouchcancel();
       element.touchstart(onTouchStart);
       element.touchend(onTouchEnd);
       element.touchcancel(onTouchEnd);
