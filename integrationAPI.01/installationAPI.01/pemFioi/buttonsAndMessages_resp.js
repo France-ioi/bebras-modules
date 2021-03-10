@@ -56,6 +56,7 @@ window.displayHelper = {
    maxTaskW: 800,
    verticalScroll: false,
    horizontalScroll: false,
+   scaleFactor: 1,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -1295,12 +1296,12 @@ window.displayHelper = {
          var availableLength = this.availableW;
          var taskLength = this.taskW;
       }
-      var scaleFactor = availableLength/taskLength;
+      this.scaleFactor = availableLength/taskLength;
 
       if(limitingFactor == "W"){
-         this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*scaleFactor);
+         this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*this.scaleFactor);
       }else{
-         this.newTaskW = this.taskW*scaleFactor;
+         this.newTaskW = this.taskW*this.scaleFactor;
       }
       if(this.newTaskW < this.minTaskW){
          this.newTaskW = this.minTaskW;
@@ -1308,9 +1309,9 @@ window.displayHelper = {
       if(this.newTaskW > this.maxTaskW){
          this.newTaskW = this.maxTaskW;
       }
-      scaleFactor = this.newTaskW/this.taskW;
-      this.newTaskH = this.taskH*scaleFactor;
-      this.updateTaskCSS(scaleFactor,limitingFactor);
+      this.scaleFactor = this.newTaskW/this.taskW;
+      this.newTaskH = this.taskH*this.scaleFactor;
+      this.updateTaskCSS(this.scaleFactor,limitingFactor);
 
       if(Math.floor(this.newTaskH) > Math.ceil(this.availableH)){
          $('#zone_3').addClass('vertical_scroll');
@@ -1318,9 +1319,9 @@ window.displayHelper = {
          // console.log(limitingFactor);
          if(limitingFactor == 'H' && this.newTaskW < this.maxTaskW){
             this.newTaskW = Math.min(this.availableW,this.maxTaskW);
-            scaleFactor = this.newTaskW/this.taskW;
-            this.newTaskH = this.taskH*scaleFactor;
-            this.updateTaskCSS(scaleFactor,limitingFactor);
+            this.scaleFactor = this.newTaskW/this.taskW;
+            this.newTaskH = this.taskH*this.scaleFactor;
+            this.updateTaskCSS(this.scaleFactor,limitingFactor);
          }
       }else{
          $('#zone_3').removeClass('vertical_scroll');
