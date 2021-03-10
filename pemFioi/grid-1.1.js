@@ -140,9 +140,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.getPaperMouse = function(event) {
       var offset = $(self.paper.canvas).offset();
+      var scale = displayHelper.scaleFactor || 1;
       return {
-         left: event.pageX - offset.left,
-         top: event.pageY - offset.top
+         left: (event.pageX - offset.left)/scale,
+         top: (event.pageY - offset.top)/scale
       };
    };
 
