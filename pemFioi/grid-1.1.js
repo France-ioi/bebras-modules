@@ -115,6 +115,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.unclickCell = function() {
       this.element.unbind("click", internalClickHandler);
+      this.element.off('click');
    };
 
    var internalClickHandler = function(event) {
