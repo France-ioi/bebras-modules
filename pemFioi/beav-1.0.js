@@ -521,7 +521,12 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd, displayHelper) {
       var touches = evt.changedTouches;
       var dx = touches[0].pageX - touchingX;
       var dy = touches[0].pageY - touchingY;
-      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+      if(displayHelper){
+         var scale = displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      onMove(dx/scale, dy/scale, touches[0].pageX, touches[0].pageY, evt);
    }
    
    function callOnStart(x,y,event) {
