@@ -391,8 +391,13 @@ function VertexDragger(settings) {
       if(Beav.Array.has(self.stillVertices,self.elementID)){
          return
       }
-      var newX = self.originalPosition.x + dx;
-      var newY = self.originalPosition.y + dy;
+      if(displayHelper){
+         var scale = displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      var newX = self.originalPosition.x + dx/scale;
+      var newY = self.originalPosition.y + dy/scale;
       if(self.gridEnabled) {
          newX -= (newX % self.gridX);
          newY -= (newY % self.gridY);
