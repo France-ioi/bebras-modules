@@ -716,6 +716,10 @@ h1 .stars {
    float: left;
    width: 70%;
 }
+.layout_2 .consigne.no_example #text {
+   float: left;
+   width: 100%;
+}
 .layout_2 .consigne #example {
    float: right;
    width: 30%;
