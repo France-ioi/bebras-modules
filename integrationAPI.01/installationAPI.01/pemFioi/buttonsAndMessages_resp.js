@@ -855,6 +855,10 @@ window.displayHelper = {
             }
             $('html, body, #zone_12').animate( scrollObj, animTime );
          });
+
+         if($('.consigne #example').length == 0){
+            $('.consigne').addClass('no_example');
+         }
       }else{
          $('#zone_0 > *').prependTo($('#task'));
          $('#task #tabsContainer').after($('<div id="taskContent"></div>'));
