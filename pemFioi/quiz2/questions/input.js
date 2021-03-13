@@ -1,5 +1,14 @@
 (function() {
 
+    function formatAnswer(answer, format) {
+        if(format == 'number') {
+           try {
+               answer = parseFloat(answer.replace(',', '.'));
+            } catch(e) {}
+        }
+        return answer;
+    };
+
     function textInput(parent, question_idx, params) {
         var answer = parent.find('answer');
         var input = $('<input type="text"/>');
@@ -9,7 +18,7 @@
         if(format == 'string') {
             validator = '.+';
         } else if(format == 'number') {
-            validator = '^-?[0-9]*\.?[0-9]*$';
+            validator = '^-?[0-9]*[,.]?[0-9]*$';
         } else if(format == 'regexp') {
             validator = answer.attr('validator');
             var code = 'validator = ' + validator;
@@ -41,7 +50,7 @@
         return {
             getAnswer: function() {
                 return [
-                    input.val()
+                    formatAnswer(input.val(), format)
                 ];
             },
 
