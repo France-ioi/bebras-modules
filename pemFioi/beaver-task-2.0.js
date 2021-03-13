@@ -174,6 +174,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          }
          if(window.initialLevel) {
             defaultLevel = window.initialLevel;
+         } else if(defaultLevel) {
+            window.initialLevel = defaultLevel;
          }
 
          if(levels) {
@@ -199,7 +201,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             }
             if(!window.initialLevel) {
                // Should happen only if mainTask.assumeLevels
-               window.initialLevel = defaultLevel || "easy";
+               window.initialLevel = "easy";
             }
             if(defaultLevel === null || defaultLevel === undefined) {
                defaultLevel = window.initialLevel;
