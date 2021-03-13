@@ -47,11 +47,11 @@ Quiz.common = {
 
     toggleAlertMessage: function(parent, msg, type) {
         var el = parent.find('.error-message');
-        msg && !el.length && parent.append(
+        el.remove();
+        msg && parent.append(
             '<div class="alert-message ' + type + '-message">' +
             '<i class="fas fa-bell icon"></i>' + msg +
             '</div>');
-        //!msg && el.remove();
     }
 
 }
