@@ -2429,7 +2429,7 @@ window.displayHelper = {
          }else{
             $("#error").hide();
          }
-         $('#error i:last-of-type').click(function() {
+         $('#error').click(function() {
             $("#error").hide();
          });
       }else{
