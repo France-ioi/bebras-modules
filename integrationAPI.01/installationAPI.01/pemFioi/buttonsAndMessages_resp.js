@@ -992,7 +992,7 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).children().attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
-               displayHelper.updateTaskDimensions();
+               // displayHelper.updateTaskDimensions();
                // displayHelper.centerInstructions();
             });
             /* version arrows in mobile mode */
@@ -1003,7 +1003,7 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
-               displayHelper.updateTaskDimensions();
+               // displayHelper.updateTaskDimensions();
                displayHelper.toggleTask();
                // displayHelper.centerInstructions();
             });
@@ -1012,7 +1012,7 @@ window.displayHelper = {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
                displayHelper.setLevel(newLevel);
-               displayHelper.updateTaskDimensions();
+               // displayHelper.updateTaskDimensions();
                displayHelper.toggleTask();
                // displayHelper.centerInstructions();
             });
@@ -1598,6 +1598,10 @@ window.displayHelper = {
       };
 
       reload(afterReload);
+
+      if(self.responsive){
+         self.updateTaskDimensions();
+      }
    },
 
    getImgPath: function() {
