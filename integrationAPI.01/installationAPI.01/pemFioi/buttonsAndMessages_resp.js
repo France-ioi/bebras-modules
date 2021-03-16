@@ -1360,7 +1360,7 @@ window.displayHelper = {
       $('#taskCont').width(this.taskW);
       // $('#taskCont').height(newTaskH);
       // console.log(limitingFactor,scaleFactor,this.taskW,this.availableW,newTaskW)
-      var fixingOffset = 5;
+      var fixingOffset = 0; // unnecessary?
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
          if(this.availableH > this.taskH){
