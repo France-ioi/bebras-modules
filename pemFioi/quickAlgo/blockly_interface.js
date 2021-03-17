@@ -517,11 +517,13 @@ function getBlocklyInterface(maxBlocks, subTask) {
 
             var additionalXML = xml.getElementsByTagName("additional");
             if (additionalXML.length > 0) {
-               var additional = JSON.parse(additionalXML[0].innerText);
-               // load additional from quickAlgoInterface
-               if (this.quickAlgoInterface.loadAdditional) {
-                  this.quickAlgoInterface.loadAdditional(additional);
-               }
+               try {
+                  var additional = JSON.parse(additionalXML[0].innerHTML);
+                  // load additional from quickAlgoInterface
+                  if (this.quickAlgoInterface.loadAdditional) {
+                     this.quickAlgoInterface.loadAdditional(additional);
+                  }
+               } catch(e) {}
             }
          }
          $("#program").val(this.programs[this.codeId].javascript);
