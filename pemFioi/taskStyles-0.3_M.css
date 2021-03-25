@@ -491,6 +491,7 @@ h1 .stars {
    left: 0;
    padding: 10px 30px 10px 20px;
    max-width: 100%;
+   cursor: pointer;
 }
 #error i:first-of-type {
    margin-right: 10px;
@@ -500,7 +501,6 @@ h1 .stars {
    position: absolute;
    top: 5px;
    right: 7px;
-   cursor: pointer;
 }
 
 /**************************************************************/
