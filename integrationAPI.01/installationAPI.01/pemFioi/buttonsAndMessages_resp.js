@@ -1189,7 +1189,8 @@ window.displayHelper = {
       if (!this.bUseFullWidth) {
          return
       }
-      var layout1Breakpoint = this.taskW / 0.6;
+      // var layout1Breakpoint = this.taskW / 0.6; => why?
+      var layout1Breakpoint = 1200;
       if(!this.responsive){
          $('#valider').appendTo($('#displayHelper_validate'));
          if(window.innerWidth >= 1200) {
@@ -1301,7 +1302,6 @@ window.displayHelper = {
          var taskLength = this.taskW;
       }
       this.scaleFactor = availableLength/taskLength;
-
       if(limitingFactor == "W"){
          this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*this.scaleFactor);
       }else{
@@ -1380,7 +1380,9 @@ window.displayHelper = {
             if(this.verticalScroll){
                $('#taskCont').css('margin-left','auto');
             }else{
-               $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
+               // $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
+               $('#taskCont').css('margin-left','auto'); // cf. alkindi 2017 01
+               // console.log((this.availableW - this.taskW)*scaleFactor/2)
             }
          }
       }else{
