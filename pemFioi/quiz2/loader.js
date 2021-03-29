@@ -27,6 +27,9 @@ function loadQuizModules() {
     if(window.quiz_question_types.input) {
         modules.push('quiz2_questions_input');
     }
+    if(window.quiz_question_types.sort_list){
+        modules.push('quiz2_questions_sort_list');
+    }
 
     // text processing
     if(quiz_settings.mathjax) {
