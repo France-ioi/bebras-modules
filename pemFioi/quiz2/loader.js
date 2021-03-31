@@ -30,6 +30,9 @@ function loadQuizModules() {
     if(window.quiz_question_types.sort_list){
         modules.push('quiz2_questions_sort_list');
     }
+    if(window.quiz_question_types.sort_items){
+        modules.push('quiz2_questions_sort_items');
+    }
 
     // text processing
     if(quiz_settings.mathjax) {

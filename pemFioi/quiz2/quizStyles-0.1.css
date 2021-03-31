@@ -666,22 +666,81 @@ button,
 
 /***** SORT LIST *****/
 
-.list-group {
+question[type="sort_list"] .list-group {
   display: flex;
   flex-direction: column;
 }
-.list-group-item {
+question[type="sort_list"] .list-group-item {
   padding: .75rem 1.25rem;
   margin-bottom: -1px;
   background-color: #fff;
   border: 1px solid rgba(0,0,0,.125);
   cursor: grab;
 }
-.list-group-item:first-child {
+question[type="sort_list"] .list-group-item:first-child {
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
 }
-.list-group-item:last-child {
+question[type="sort_list"] .list-group-item:last-child {
     border-bottom-right-radius: .25rem;
     border-bottom-left-radius: .25rem;
+}
+
+/***** SORT ITEMS *****/
+
+question[type="sort_items"] .src {
+  min-height: 68px;
+}
+question[type="sort_items"] .src .list-group-item {
+  display: inline-block;
+  padding: .75rem 1.25rem;
+  margin: 10px;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.125);
+  cursor: grab;
+  border-radius: .25rem;
+  min-width: 100px;
+  text-align: center;
+}
+
+question[type="sort_items"] .dest {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+}
+question[type="sort_items"] .dest label {
+  font-weight: bold;
+}
+
+question[type="sort_items"] .dest .list-group {
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  min-width: 100px;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+}
+question[type="sort_items"] .dest .list-group-item {
+  padding: .75rem 1.25rem;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.125);
+  cursor: grab;
+}
+question[type="sort_items"] .dest .list-group-item:first-child {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+question[type="sort_items"] .dest .list-group-item:last-child {
+    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+}
+
+.blue-background-class{
+  background-color: lightblue !important;
+}
+.lightgrey-background-class{
+  background-color: lightgrey !important;
 }

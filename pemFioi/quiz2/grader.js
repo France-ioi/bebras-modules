@@ -102,6 +102,31 @@
             return res;
         }
 
+        function gradeAnswerTwoDimArray(given_answer, correct_answer, messages) {
+            var res = {
+                score: true,
+                feedback: {
+                    correct_answer: correct_answer,
+                    mistakes: [],
+                    messages: messages
+                }
+            }
+            for(var i = 0; i < given_answer.length; i++) {
+                for(var j = 0; j < given_answer[i].length; j++){
+                    var correct = correct_answer[i].indexOf(given_answer[i][j]) !== -1;
+                    res.score = res.score && correct;
+                    if(!correct) {
+                        res.feedback.mistakes.push({ cont: i, item: j });
+                    }
+                }
+                if(given_answer[i].length != correct_answer[i].length) {
+                    res.score = false;
+                    res.feedback.mistakes.push({ cont: i, item: null });
+                }
+            }
+            return res;
+        }
+
 
 
         var grader_types = {
@@ -152,6 +177,9 @@
 
 
             'object': function(answer) {
+                if(grader.twoDimArray) {
+                    return gradeAnswerTwoDimArray(answer, grader.value, grader.messages || []);
+                }
                 if(grader.strict) {
                     return gradeAnswerArrayStrict(answer, grader.value, grader.messages || []);
                 }
