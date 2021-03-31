@@ -3,7 +3,7 @@
     function sort_list(parent, question_idx) {
         new Sortable(list_cont, {
             animation: 150,
-            ghostClass: 'blue-background-class'
+            ghostClass: 'lightgrey-background-class'
         });
 
         var initialOrder = [];
