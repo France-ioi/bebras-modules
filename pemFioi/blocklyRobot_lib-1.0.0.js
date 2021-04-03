@@ -1872,21 +1872,6 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
-      flowers: {
-         bagInit: {
-           count: 200,
-           type: "flower"
-         },
-         backgroundColor: "#f9f9c1",
-         itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
-            flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
-            fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 },
-            number: { num: 6, side: 60, zOrder: 1 }
-         },
-         checkEndCondition: robotEndConditions.checkContainersFilled
-      },
       course: {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
@@ -1993,6 +1978,54 @@ var getContext = function(display, infos, curLevel) {
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
          }
+      },
+      fishing: {
+         backgroundColor: "#7fdceb",
+         borderColor: "#21d2e6",
+         bagSize: 1,
+         containerSize: 1,
+         itemTypes: {
+            red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 4, customDisplay: function(obj) {
+            	if(context.bag.length != 0)
+            		obj.img = "red_robot_fishes.png";
+            	else
+            		obj.img = "red_robot.png";
+            } },
+            island: { num: 2, img: "island.png", side: 80, isContainer: true, offsetX: -12, offsetY: -5, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            fishes: { num: 3, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1 },
+            fishes: { num: 4, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
+            	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
+            		obj.offsetY = 10;
+            } },
+            count_fishes: { num: 5, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isWithdrawable === true;
+               }).length;
+            }, side: 60, isWritable: true, fontColor: "#000000", fontBold: true, zOrder: 3, offsetX: -20, offsetY: -12},
+            count_needs: { num: 6, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isContainer === true;
+               })[0].containerSize;
+            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -3, offsetY: -10},
+            obstacle: { num: 7, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
+            net: { num: 8, img: "net.png", side: 60, zOrder: 2 },
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
+      },
+      flowers: {
+         bagInit: {
+           count: 200,
+           type: "flower"
+         },
+         backgroundColor: "#f9f9c1",
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
+            flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
+            fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 },
+            number: { num: 6, side: 60, zOrder: 1 }
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
       },
       gears: {
          backgroundColor: "#f2f1e3",
