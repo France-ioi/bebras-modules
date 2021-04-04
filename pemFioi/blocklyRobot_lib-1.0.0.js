@@ -1097,6 +1097,74 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      fishing: {
+         fr: {
+            label: {
+               withdrawObject: "prendre les poissons",
+               dropObject: "déposer les poissons",
+               withdrawNum_noShadow: "prendre %1 poissons",
+               dropNum_noShadow: "déposer %1 poissons",
+               nbWithdrawables: "nombre de poissons sur la case",
+               containerSize: "nombre de poissons commandés",
+               onObject: "poissons sur la case",
+               onContainer: "sur une île",
+            },
+            code: {
+               withdrawObject: "prendrePoissons",
+               dropObject: "deposerPoissons",
+               onObject: "surPoissons",
+               onContainer: "surIle",
+               nbWithdrawables: "nbPoissonsSur",
+               containerSize: "nbPoissonsCommandes",
+            },
+            description: {
+               withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
+               dropObject: "deposerPoissons() dépose sur la case les poissons transportés",
+               onObject: "surPoissons() indique s'il y a un ou des poissons sur la case",
+               onContainer: "surIle() indique s'il y a une île sur la case",
+               nbWithdrawables: "nbPoissonsSur() indique combien de poissons sont sur la case",
+               containerSize: "nbPoissonsCommandes() indique il faut livrer de poissons sur l'île",
+               dropNum: "deposer(nbPoissons) dépose nbPoissons poissons sur la case",
+               withdrawNum: "prendre(nbPoissons) prend nbPoissons poissons sur la case",
+            },
+            messages: {
+               emptyBag: "Le robot ne porte pas de poisson !",
+
+               tooManyObjects: "Le robot porte déjà un poisson !",
+               successContainersFilled: "Bravo, votre robot a apporté du poisson sur toutes les îles !",
+               failureContainersFilled: "Votre robot a remis du poisson à l'eau !",
+               failureContainersFilledLess: "Il reste encore au moins un poisson à apporter sur une île.",
+               failureContainersFilledBag: "Il faut apporter les poissons sur une île !",
+               failureDropObject: "Cette île a déjà reçu assez de poisson.",
+               nothingToPickUp: "Il n'y a plus de poisson dans ce filet !",
+               failureContainersFilledBag: "Votre robot a pris tro de poisson.",
+               failureDropObject: "Votre robot essaie de déposer trop de poisson sur cette île."
+            }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger la bola",
+               dropObject: "soltar la bola",
+               onObject: "sobre una bola",
+               onContainer: "sobre un agujero",
+            },
+            code: {
+               withdrawObject: "recogerBola",
+               dropObject: "soltarBola",
+               onObject: "sobreBola",
+               onContainer: "sobreAgujero",
+            },   
+            messages: {
+               emptyBag: "¡El robot no carga ninguna bola!",
+               tooManyObjects: "¡El robot ya está cargando una bola!",
+               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
+               failureContainersFilled: "Hay bolas en lugares incorrectos.",
+               failureContainersFilledLess: "Aún falta colocar una bola.",
+               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
+            }
+         }
+      },
       gears: {
          fr: {
             label: {
@@ -1985,7 +2053,7 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          containerSize: 1,
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 4, customDisplay: function(obj) {
+            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 4, customDisplay: function(obj) {
             	if(context.bag.length != 0)
             		obj.img = "red_robot_fishes.png";
             	else
