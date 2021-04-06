@@ -2,6 +2,12 @@
 
     function sort_items(parent, question_idx) {
         var srcCont = parent.find('.src');
+        srcCont.addClass('list-group');
+        srcCont.children().each(function(index){
+            $(this).attr('item_id',index);
+            $(this).addClass('list-group-item');
+        });
+
         new Sortable(srcCont[0], {
             group: {
                 name: 'shared'
@@ -13,6 +19,7 @@
         var dest = parent.find('.dest').children();
         var nbDest = dest.length;
         dest.each(function(index) {
+            $(this).addClass('cont');
             var destCont = $(this).find('.list-group')
             new Sortable(destCont[0], {
                 group: {
@@ -23,16 +30,8 @@
             });
         });
 
-        
-
-        // var initialOrder = [];
-        // var initialList = parent.find('.list-group').children();
-        // initialList.each(function(index){
-        //     initialOrder[index] = $(this).attr('item_id');
-        // });
         var initialDestContent = getDestContent();
         var initialSrcContent = getSrcContent();
-        // console.log(initialSrcContent);
 
         function getDestContent() {
             var content = [];
@@ -41,7 +40,7 @@
                 content[destIndex] = [];
                 var destList = $(this).find('.list-group').children();
                 destList.each(function(itemIndex){
-                    content[destIndex][itemIndex] = $(this).attr('item_id');
+                    content[destIndex][itemIndex] = parseInt($(this).attr('item_id'),10);
                 });    
             });
             return content;
@@ -52,7 +51,7 @@
             var srcCont = parent.find('.src');
             var srcList = srcCont.children();
             srcList.each(function(index) {
-                content[index] = $(this).attr('item_id');
+                content[index] = parseInt($(this).attr('item_id'),10);
             });
             return content
         };

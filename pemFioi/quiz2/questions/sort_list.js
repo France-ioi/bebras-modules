@@ -1,15 +1,18 @@
 (function() {
 
     function sort_list(parent, question_idx) {
-        new Sortable(list_cont, {
-            animation: 150,
-            ghostClass: 'lightgrey-background-class'
+        var listCont = parent.find('.list-group');
+        var initialList = listCont.children();
+        var initialOrder = [];
+        initialList.each(function(index){
+            $(this).attr('item_id',index);
+            $(this).addClass('list-group-item');
+            initialOrder[index] = index;
         });
 
-        var initialOrder = [];
-        var initialList = parent.find('.list-group').children();
-        initialList.each(function(index){
-            initialOrder[index] = $(this).attr('item_id');
+        new Sortable(listCont[0], {
+            animation: 150,
+            ghostClass: 'lightgrey-background-class'
         });
 
         return {
@@ -17,24 +20,10 @@
                 var res = [];
                 var list = parent.find('.list-group').children();
                 list.each(function(index){
-                    res[index] = $(this).attr('item_id');
+                    res[index] = parseInt($(this).attr('item_id'),10);
                 });
                 return res;
             },
-
-            // setAnswer: function(answer) {
-            //     resetWords();
-            //     var placeholders = text.find('.placeholder');
-            //     placeholders.each(function(i) {
-            //         var placeholder = $(this);
-            //         if(answer[i]) {
-            //             var el = getWordFromToolbar(answer[i]);
-            //             if(el) {
-            //                 placeholder.append(el);
-            //             }
-            //         }
-            //     });
-            // },
 
             checkAnswered: function(error_message) {
                 var answered = false;
@@ -85,9 +74,7 @@
 
             resetFeedback: function() {
                 parent.find('.alert-message').remove();
-            },
-
-            // answers_order: [0]
+            }
         }
 
     }
