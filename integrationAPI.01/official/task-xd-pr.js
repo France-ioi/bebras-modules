@@ -310,7 +310,7 @@ Platform.prototype.askHint = function(platformToken, success, error) {error('pla
 Platform.prototype.updateHeight = function(height, success, error) { this.updateDisplay({height: height}); };
 Platform.prototype.updateDisplay = function(data, success, error) {
    if(data.height) {
-      this.task.iframe.height(parseInt(height)+40);success();
+      this.task.iframe.height(parseInt(data.height)+40);success();
    }
 };
 Platform.prototype.openUrl = function(url, success, error) {error('platform.openUrl is not defined!');};
