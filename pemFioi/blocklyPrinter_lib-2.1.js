@@ -186,6 +186,21 @@ var getContext = function(display, infos) {
       context.updateScale();
    };
 
+   context.getCurrentState = function () {
+      return {
+         input_text: context.printer.input_text,
+         output_text: context.printer.output_text,
+         input_reset: context.printer.input_reset,
+      };
+   };
+
+   context.reloadState = function (data) {
+      context.printer.input_text = data.input_text;
+      context.printer.output_text = data.output_text;
+      context.printer.input_reset = data.input_reset;
+      context.updateScale();
+   };
+
    context.resetDisplay = function() {
       this.delayFactory.destroyAll();
 
