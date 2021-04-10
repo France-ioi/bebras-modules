@@ -1116,6 +1116,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "surIle",
                nbWithdrawables: "nbPoissonsSur",
                containerSize: "nbPoissonsCommandes",
+               withdrawNum: "prendre",
             },
             description: {
                withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
