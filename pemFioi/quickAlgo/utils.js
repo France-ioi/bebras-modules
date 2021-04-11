@@ -341,18 +341,45 @@ SrlLogger.logMouse = function(e) {
       }
    }
 
+   var zone = 'task';
+   var target = $(e.target);
+   var targetParent = null;
+   if((targetParent = target.parents('#blocklyLibContent')).length) {
+      zone = 'editor';
+   } else if((targetParent = target.parents('#gridContainer')).length) {
+      zone = 'grid';
+   } else if((targetParent = target.parents('.speedControls')).length) {
+      zone = 'controls';
+   } else {
+      targetParent = null;
+   }
+
+   var tpx = e.pageX;
+   var tpy = e.pageY;
+
    var win = $(window);
+   var winw = win.width();
+   var winh = win.height();
+   var tpw = winw;
+   var tph = winh;
+   if(targetParent) {
+      var tpo = targetParent.offset();
+      tpx -= Math.floor(tpo.left);
+      tpy -= Math.floor(tpo.top);
+      tpw = Math.floor(targetParent.width());
+      tph = Math.floor(targetParent.height());
+   }
    var data = {
-      'zone': '',
+      'zone': zone,
       'etat': state,
       'coordonnees_ecran_x': e.screenX,
       'coordonnees_ecran_y': e.screenY,
       'coordonnees_page_x': e.pageX,
       'coordonnees_page_y': e.pageY,
-      'coordonnees_zone_x': 0,
-      'coordonnees_zone_y': 0,
-      'dimension_zone_longueur': 0,
-      'dimension_zone_hauteur': 0,
+      'coordonnees_zone_x': tpx,
+      'coordonnees_zone_y': tpy,
+      'dimension_zone_longueur': tpw,
+      'dimension_zone_hauteur': tph,
       'dimension_page_longueur': win.width(),
       'dimension_page_hauteur': win.height()
       };
