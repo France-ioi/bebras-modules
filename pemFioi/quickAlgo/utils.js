@@ -298,6 +298,69 @@ function dragElement(elmnt) {
 }
 
 
+window.SrlLogger = {};
+
+SrlLogger.logMouseInit = function() {
+   if(SrlLogger.logMouseInitialized) { return; }
+
+   SrlLogger.mouseButtons = {'left': false, 'right': false};
+
+   window.addEventListener('mousedown', SrlLogger.logMouse);
+   window.addEventListener('mousemove', SrlLogger.logMouse);
+   window.addEventListener('mouseup', SrlLogger.logMouse);
+
+   SrlLogger.logMouseInitialized = true;
+};
+
+SrlLogger.logMouse = function(e) {
+   if(e.type == 'mousemove' && SrlLogger.mouseMoveIgnore) { return; }
+
+   var state = 'aucun';
+
+   if(e.type == 'mousedown' || e.type == 'mouseup') {
+      var newval = e.type == 'mousedown';
+      if(e.button === 0) {
+         var btn = 'left';
+      } else if(e.button === 2) {
+         var btn = 'right';
+      } else {
+         return;
+      }
+      SrlLogger.mouseButtons[btn] = newval;
+
+      state = btn == 'left' ? 'clic gauche' : 'clic droit';
+   }
+
+   if(e.type == 'mousemove') {
+      // Throttle mousemove events
+      SrlLogger.mouseMoveIgnore = true;
+      setTimeout(function() { SrlLogger.mouseMoveIgnore = false; }, 200);
+
+      if(SrlLogger.mouseButtons['left'] || SrlLogger.mouseButtons['right']) {
+         state = 'drag';
+      }
+   }
+
+   var win = $(window);
+   var data = {
+      'zone': '',
+      'etat': state,
+      'coordonnees_ecran_x': e.screenX,
+      'coordonnees_ecran_y': e.screenY,
+      'coordonnees_page_x': e.pageX,
+      'coordonnees_page_y': e.pageY,
+      'coordonnees_zone_x': 0,
+      'coordonnees_zone_y': 0,
+      'dimension_zone_longueur': 0,
+      'dimension_zone_hauteur': 0,
+      'dimension_page_longueur': win.width(),
+      'dimension_page_hauteur': win.height()
+      };
+
+   platform.log(['srl', data]);
+};
+
+
 window.iOSDetected = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
 
 (function() {

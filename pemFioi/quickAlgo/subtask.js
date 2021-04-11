@@ -43,6 +43,7 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.state = {};
       subTask.iTestCase = 0;
       subTask.nbExecutions = 0;
+      subTask.logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
       subTask.clearWbe();
       if(!window.taskResultsCache) {
          window.taskResultsCache = {};
@@ -155,6 +156,11 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.logActivity('loadLevel;' + curLevel);
          window.levelLogActivityTimeout = null;
       }, 1000);
+
+      // Start SRL mouse logging
+      if(subTask.logOption) {
+         SrlLogger.logMouseInit();
+      }
    };
 
    subTask.updateScale = function() {
@@ -217,8 +223,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.logActivity = function(details) {
-      var logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
-      if(!logOption) { return; }
+      if(!subTask.logOption) { return; }
 
       if(!details) {
          // Sends a validate("log") to the platform if the log GET parameter is set
@@ -231,10 +236,7 @@ var initBlocklySubTask = function(subTask, language) {
          return;
       }
 
-      // We can only log extended activity if the platform gave us a
-      // logActivity function
-      if(!window.logActivity) { return; }
-      window.logActivity(details);
+      platform.log(['activity', details]);
    };
 
    subTask.waitBetweenExecutions = function() {
@@ -354,6 +356,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.step = function () {
       if(subTask.validating) { return; }
+      subTask.srlStepByStepLog('step');
       subTask.context.changeDelay(200);
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
          this.initRun();
@@ -371,6 +374,8 @@ var initBlocklySubTask = function(subTask, language) {
 
       // Reset everything through changeTest
       subTask.changeTest(0);
+
+      subTask.srlStepByStepLog('stop');
    };
 
    /**
@@ -430,6 +435,7 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.play = function() {
       if(subTask.validating) { return; }
       this.clearAnalysis();
+      subTask.srlStepByStepLog('play');
 
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
          this.run();
@@ -679,4 +685,21 @@ var initBlocklySubTask = function(subTask, language) {
          }, 1000);
    };
 
+   subTask.srlStepByStepLog = function(type) {
+      if(!subTask.logOption) { return; }
+      var srlType = '';
+      if(type == 'play') {
+         srlType = subTask.context.actionDelay == 0 ? 'Aller à la fin' : 'Exécution automatique';
+      } else if(type == 'step') {
+         srlType = 'Exécution Manuelle';
+      } else if(type == 'stop') {
+         srlType = 'Revenir au début';
+      }
+
+      var data = {
+         action: srlType,
+         vitesse: subTask.context.actionDelay
+         };
+      platform.log(['srl', data]);
+   };
 }
