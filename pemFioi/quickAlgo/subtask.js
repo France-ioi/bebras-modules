@@ -698,7 +698,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       var data = {
          action: srlType,
-         vitesse: subTask.context.actionDelay
+         vitesse: subTask.context.infos.actionDelay
          };
       platform.log(['srl', data]);
    };
