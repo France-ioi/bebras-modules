@@ -2049,8 +2049,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       fishing: {
-         backgroundColor: "#7fdceb",
-         borderColor: "#21d2e6",
+         backgroundColor: "#57b8bf",
+         borderColor: "#489a9c",
          bagSize: 1,
          containerSize: 1,
          itemTypes: {
@@ -2060,22 +2060,22 @@ var getContext = function(display, infos, curLevel) {
             	else
             		obj.img = "red_robot.png";
             } },
-            island: { num: 2, img: "island.png", side: 80, isContainer: true, offsetX: -12, offsetY: -5, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            island: { num: 2, img: "island.png", side: 75, isContainer: true, offsetX: -7, offsetY: 0, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
             fishes: { num: 3, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1 },
-            fishes: { num: 4, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
+            fishes: { num: 4, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 8, offsetX: 2, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
             	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
-            		obj.offsetY = 10;
+            		obj.offsetX = 0;
             } },
             count_fishes: { num: 5, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isWithdrawable === true;
                }).length;
-            }, side: 60, isWritable: true, fontColor: "#000000", fontBold: true, zOrder: 3, offsetX: -20, offsetY: -12},
+            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -14, offsetY: -14},
             count_needs: { num: 6, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isContainer === true;
                })[0].containerSize;
-            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -3, offsetY: -10},
+            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -15, offsetY: -14},
             obstacle: { num: 7, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
             net: { num: 8, img: "net.png", side: 60, zOrder: 2 },
          },
