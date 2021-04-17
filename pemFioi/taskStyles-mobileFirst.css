@@ -300,7 +300,6 @@ img {
   font-size: 12px;
 }
 #popupMessage .qpi .panel-body {
-  margin-left: 44px; /* Align left to .sectionTitle text left */
   font-size: 12px;
 }
 #popupMessage .qpi .panel-body label {
