@@ -1136,10 +1136,10 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Votre robot a remis du poisson à l'eau !",
                failureContainersFilledLess: "Il reste encore au moins un poisson à apporter sur une île.",
                failureContainersFilledBag: "Il faut apporter les poissons sur une île !",
-               failureDropObject: "Cette île a déjà reçu assez de poisson.",
-               nothingToPickUp: "Il n'y a plus de poisson dans ce filet !",
-               failureContainersFilledBag: "Votre robot a pris tro de poisson.",
-               failureDropObject: "Votre robot essaie de déposer trop de poisson sur cette île."
+               failureDropObject: "Cette île a déjà reçu assez de poissons.",
+               nothingToPickUp: "Pas de poisson ici !",
+               failureContainersFilledBag: "Votre robot a pris trop de poissons.",
+               failureDropObject: "Votre robot essaie de déposer trop de poissons sur cette île."
             }
          },
 
