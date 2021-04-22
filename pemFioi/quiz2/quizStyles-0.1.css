@@ -691,27 +691,49 @@ question[type="sort_list"] .list-group-item:last-child {
 question[type="sort_items"] .src {
   min-height: 68px;
 }
+question[type="sort_items"] .src::after {
+  content: '';
+  display: block;
+  width: 90vw;
+  height: 1px;
+  background-color: #e5e5e5;
+  margin-top: 20px;
+}
+
 question[type="sort_items"] .src .list-group-item {
   display: inline-block;
-  padding: .75rem 1.25rem;
+  padding: .5rem 1rem;
   margin: 10px;
-  background-color: #fff;
+  background-color: #f1f2f7;
   border: 1px solid rgba(0,0,0,.125);
   cursor: grab;
-  border-radius: .25rem;
-  min-width: 100px;
+  min-width: 90px;
+  min-height: 30px;
+  border-radius: 30px;
   text-align: center;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+question[type="sort_items"] .src .list-group-item::before {
+  font-family: "Font Awesome 5 Free"; 
+  font-weight: 900; 
+  content: "\f142";
+  color: #d8d9dd;
+  margin-right: 10px;
 }
 
 question[type="sort_items"] .dest {
-  margin-top: 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   text-align: center;
 }
 question[type="sort_items"] .dest label {
+  display: block;
   font-weight: bold;
+  color: #4a90e2;
+  padding: 20px 0;
 }
 
 question[type="sort_items"] .dest .list-group {
@@ -721,6 +743,7 @@ question[type="sort_items"] .dest .list-group {
   min-width: 100px;
   border: 1px solid rgba(0,0,0,.125);
   border-radius: .25rem;
+  background: #f2f2f2;
 }
 question[type="sort_items"] .dest .list-group-item {
   padding: .75rem 1.25rem;
