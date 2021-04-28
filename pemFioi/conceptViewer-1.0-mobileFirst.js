@@ -244,6 +244,8 @@ var conceptViewer = {
     if (this.shownConcept && (initConcept || typeof initConcept == 'undefined')) {
       this.showConcept(this.shownConcept);
     }
+
+    if(window.SrlLogger) { SrlLogger.navigation('help:show'); }
   },
 
   hide: function () {
@@ -251,6 +253,8 @@ var conceptViewer = {
     this.load();
     $('#conceptViewer').fadeOut(500);
     this.loadUrl('');
+
+    if(window.SrlLogger) { SrlLogger.navigation('help:hide'); }
   },
 
   openInNewWidget: function() {

@@ -157,9 +157,11 @@ var initBlocklySubTask = function(subTask, language) {
          window.levelLogActivityTimeout = null;
       }, 1000);
 
-      // Start SRL mouse logging
+      // Start SRL logging
       if(subTask.logOption) {
+         SrlLogger.levelLoaded(curLevel);
          SrlLogger.logMouseInit();
+         SrlLogger.logKeyboardInit();
       }
    };
 
@@ -307,6 +309,8 @@ var initBlocklySubTask = function(subTask, language) {
                    results
                );
             }
+
+            SrlLogger.validation(success ? 100 : 0, success ? 'none' : 'execution');
          }
          // Log the attempt
          subTask.logActivity();
@@ -686,20 +690,6 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.srlStepByStepLog = function(type) {
-      if(!subTask.logOption) { return; }
-      var srlType = '';
-      if(type == 'play') {
-         srlType = subTask.context.actionDelay == 0 ? 'Aller à la fin' : 'Exécution automatique';
-      } else if(type == 'step') {
-         srlType = 'Exécution Manuelle';
-      } else if(type == 'stop') {
-         srlType = 'Revenir au début';
-      }
-
-      var data = {
-         action: srlType,
-         vitesse: subTask.context.infos.actionDelay
-         };
-      platform.log(['srl', data]);
+      SrlLogger.stepByStep(subTask, type);
    };
 }

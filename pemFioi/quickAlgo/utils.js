@@ -300,6 +300,13 @@ function dragElement(elmnt) {
 
 window.SrlLogger = {};
 
+SrlLogger.load = function() {
+   SrlLogger.active = true;
+
+   SrlLogger.logMouseInit();
+   SrlLogger.logKeyboardInit();
+};
+
 SrlLogger.logMouseInit = function() {
    if(SrlLogger.logMouseInitialized) { return; }
 
@@ -370,6 +377,7 @@ SrlLogger.logMouse = function(e) {
       tph = Math.floor(targetParent.height());
    }
    var data = {
+      'reference': 'souris',
       'zone': zone,
       'etat': state,
       'coordonnees_ecran_x': e.screenX,
@@ -384,6 +392,90 @@ SrlLogger.logMouse = function(e) {
       'dimension_page_hauteur': win.height()
       };
 
+   platform.log(['srl', data]);
+};
+
+SrlLogger.logKeyboardInit = function() {
+   if(SrlLogger.logKeyboardInitialized) { return; }
+
+   window.addEventListener('keydown', SrlLogger.logKeyboard);
+
+   SrlLogger.logKeyboardInitialized = true;
+};
+
+SrlLogger.logKeyboard = function(e) {
+   var text = e.key;
+   var data = {
+      'reference': 'clavier',
+      'touche': text
+      };
+   platform.log(['srl', data]);
+};
+
+SrlLogger.stepByStep = function(subtask, type) {
+   if(!SrlLogger.active) { return; }
+
+   var srlType = '';
+   if(type == 'play') {
+      srlType = subTask.context.actionDelay == 0 ? 'Aller à la fin' : 'Exécution automatique';
+   } else if(type == 'step') {
+      srlType = 'Exécution Manuelle';
+   } else if(type == 'stop') {
+      srlType = 'Revenir au début';
+   }
+
+   var data = {
+      reference: 'pas_a_pas',
+      action: srlType,
+      vitesse: subTask.context.infos.actionDelay
+      };
+   platform.log(['srl', data]);
+};
+
+SrlLogger.navigation = function(type) {
+   if(!SrlLogger.active) { return; }
+
+   var data = {
+      reference: 'navigation',
+      module: type
+      };
+   platform.log(['srl', data]);
+};
+
+SrlLogger.levelLoaded = function(level) {
+   if(!SrlLogger.active || SrlLogger.lastLevelLoaded == level) { return; }
+   SrlLogger.lastLevelLoaded = level;
+   SrlLogger.navigation('level:' + level);
+};
+
+SrlLogger.validation = function(score, error) {
+   if(error == 'code') {
+      error = 'Erreur de prérequis';
+   } else if(error == 'execution') {
+      error = 'Erreur de solution';
+   } else {
+      error = 'Aucune';
+   }
+   var data = {
+      reference: 'modification',
+      score: score,
+      'type_erreur': error
+      };
+};
+
+SrlLogger.modification = function(len, error) {
+   if(error == 'code') {
+      error = 'Erreur de prérequis';
+   } else if(error == 'execution') {
+      error = 'Erreur de solution';
+   } else {
+      error = 'Aucune';
+   }
+   var data = {
+      reference: 'modification',
+      'taille_reponse': len,
+      erreur: error
+      };
    platform.log(['srl', data]);
 };
 
