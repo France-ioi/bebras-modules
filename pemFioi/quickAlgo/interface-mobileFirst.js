@@ -712,6 +712,11 @@ var quickAlgoInterface = {
             this.blinkRemaining(0);
             this.displayError(null, true);
         }
+
+        // TODO :: better return of info once SRL allows more
+        try {
+           SrlLogger.modification(this.blocklyHelper.programs[0].blockly.length, info.invalid || info.warning ? 'code' : '');
+        } catch(e) {}
     },
 
 

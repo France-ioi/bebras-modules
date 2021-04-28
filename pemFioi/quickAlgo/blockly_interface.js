@@ -746,6 +746,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             }
             if(!robotStartHasChildren) {
                this.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
+               SrlLogger.validation(0, 'code');
                return;
             }
          }
@@ -755,6 +756,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
          this.highlightPause = false;
          if(this.getRemainingCapacity(that.workspace) < 0) {
             this.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            SrlLogger.validation(0, 'code');
             return;
          }
          var limited = this.findLimited(this.workspace);
@@ -764,6 +766,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             errorMsg += this.getBlockLabel(limited, true);
             errorMsg += '.';
             this.displayError('<span class="testError">'+errorMsg+'</span>');
+            SrlLogger.validation(0, 'code');
             return;
          }
          if(!this.scratchMode) {

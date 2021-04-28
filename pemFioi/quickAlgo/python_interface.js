@@ -237,6 +237,7 @@ function LogicController(maxInstructions, subTask) {
       } else {
         $('#errors').html(err);
       }
+      SrlLogger.validation(0, 'code');
     })) {
        return false;
     }
