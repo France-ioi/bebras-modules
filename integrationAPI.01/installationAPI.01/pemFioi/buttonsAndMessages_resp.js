@@ -57,6 +57,8 @@ window.displayHelper = {
    verticalScroll: false,
    horizontalScroll: false,
    scaleFactor: 1,
+   sideZoneEnabled: false,
+   updateLayoutCallbackStart: null,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -782,9 +784,6 @@ window.displayHelper = {
          $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
          $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
 
-         // $('#task').append('<span id="error"><i class="fas fa-exclamation-triangle"></i><span id="errorMsg"></span><i class="fas fa-times"></i></span>');
-         // console.log('load')
-
          $('#zone_012').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
          $('#zone_012').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));
          $('#zone_012').append($('<div id="scroll_arr_left"><i class="fas fa-chevron-left"></i></div>'));
@@ -1186,10 +1185,12 @@ window.displayHelper = {
    },
 
    updateLayout: function() {
+      if(this.updateLayoutCallbackStart){
+         this.updateLayoutCallbackStart();
+      }
       if (!this.bUseFullWidth) {
          return
       }
-      // var layout1Breakpoint = this.taskW / 0.6; => why?
       var layout1Breakpoint = 1200;
       if(!this.responsive){
          $('#valider').appendTo($('#displayHelper_validate'));
@@ -1215,14 +1216,10 @@ window.displayHelper = {
          $('#task').css("margin-top",this.headerH+'px');
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
-         // $('#zone_0').height(this.versionHeaderH[this.layout])
-         // $('#displayHelperAnswering').appendTo($('#zone_3'));
-         // console.log($('#resp_switch_1').length)
          $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }
-         // $('#zone_1, #zone_2').appendTo($('#zone_12'));
          if(w >= layout1Breakpoint) {
             this.mobileMode = false;
             this.layout = 1;
@@ -1230,6 +1227,9 @@ window.displayHelper = {
             this.availableW = Math.floor(w*0.7);
             $('#zone_1').height(this.availableH);
             $('#zone_12').css("overflow-x","initial");
+            if(this.sideZoneEnabled){
+               $('#side_zone').addClass('show');
+            }
          }else if(w >= 800){
             this.mobileMode = false;
             this.layout = 2;
@@ -1249,6 +1249,9 @@ window.displayHelper = {
             if(!$('#zone_3 #tabsContainer').length){
                $('#tabsContainer').prependTo($('#zone_3'));
             }
+         }
+         if(w < layout1Breakpoint && this.sideZoneEnabled){
+            $('#side_zone').removeClass('show');
          }
          if (this.layout !== 1) {
             $('#zone_12').css("overflow-x","auto");
@@ -1344,6 +1347,16 @@ window.displayHelper = {
 
    centerInstructions: function() {
       if(this.layout != 2){
+         if(this.sideZoneEnabled && this.layout == 1){
+            $('#zone_1').css({
+               display: 'flex',
+               'flex-direction': 'column',
+               'justify-content': 'space-around'
+
+            });
+            return
+         }
+
          var zone1H = $('#zone_1').height();
          var consigneH = $('#zone_1 > .consigne').height();
          if(zone1H > consigneH){
@@ -1359,7 +1372,6 @@ window.displayHelper = {
    updateTaskCSS: function(scaleFactor,limitingFactor) {
       $('#taskCont').width(this.taskW);
       // $('#taskCont').height(newTaskH);
-      // console.log(limitingFactor,scaleFactor,this.taskW,this.availableW,newTaskW)
       var fixingOffset = 0; // unnecessary?
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
@@ -1372,17 +1384,14 @@ window.displayHelper = {
                $('#taskCont').css('margin-top',0);
             }
          }
-         // console.log(limitingFactor)
          if(limitingFactor == 'W'){
             $('#taskCont').css('margin-left','auto');
-            // $('#taskCont').css('margin-left',0);
          }else{
             if(this.verticalScroll){
                $('#taskCont').css('margin-left','auto');
             }else{
                // $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
                $('#taskCont').css('margin-left','auto'); // cf. alkindi 2017 01
-               // console.log((this.availableW - this.taskW)*scaleFactor/2)
             }
          }
       }else{
