@@ -605,6 +605,15 @@ h1 .stars {
 }
 
 /**************************************************************/
+/* SIDE ZONE */
+#side_zone {
+   display: none;
+}
+#side_zone.show {
+   display: block;
+}
+
+/**************************************************************/
 /* LAYOUT 1 (large screen) */
 #main_header[class^=layout_] {
    height: 71px;
