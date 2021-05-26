@@ -696,12 +696,37 @@ window.displayHelper = {
          enemyWarning: "<strong>Opozorilo:</strong> Pri tej nalogi ti bo računalnik preprečil naključno rešitev."
       },
    },
+
+   // themeStrings is like languageStrings, when setTheme is called, it will
+   // overwrite some languageStrings
+   themeStrings: {
+      coursera: {
+         solvedMoveOn: "Votre score a été transmis à Coursera. Vous devez rafraîchir la page dans Coursera pour voir votre note.",
+         moveOn: "Fermer cet exercice",
+         no: "Rester"
+      },
+   },
+
    initLanguage: function() {
       if (window.stringsLanguage == undefined) {
          window.stringsLanguage = 'fr';
       }
       this.strings = this.languageStrings[window.stringsLanguage];
+      if(this.theme) { this.setTheme(this.theme); }
    },
+   setTheme: function(theme) {
+      // Set a "theme", which is just some different strings
+
+      var newStrings = this.themeStrings[theme];
+      if(!newStrings) { return; }
+      this.theme = theme;
+
+      if(!this.strings) { return; }
+      for(var key in newStrings) {
+         this.strings[key] = newStrings[key];
+      }
+   },
+
    /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
