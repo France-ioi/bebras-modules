@@ -159,9 +159,8 @@ var initBlocklySubTask = function(subTask, language) {
 
       // Start SRL logging
       if(subTask.logOption) {
+         SrlLogger.load();
          SrlLogger.levelLoaded(curLevel);
-         SrlLogger.logMouseInit();
-         SrlLogger.logKeyboardInit();
       }
    };
 
