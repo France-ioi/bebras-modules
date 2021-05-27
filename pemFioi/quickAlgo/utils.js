@@ -420,7 +420,7 @@ SrlLogger.stepByStep = function(subtask, type) {
 
    var srlType = '';
    if(type == 'play') {
-      srlType = subTask.context.actionDelay == 0 ? 'Aller à la fin' : 'Exécution automatique';
+      srlType = subtask.context.actionDelay == 0 ? 'Aller à la fin' : 'Exécution automatique';
    } else if(type == 'step') {
       srlType = 'Exécution Manuelle';
    } else if(type == 'stop') {
@@ -430,7 +430,7 @@ SrlLogger.stepByStep = function(subtask, type) {
    var data = {
       reference: 'pas_a_pas',
       action: srlType,
-      vitesse: subTask.context.infos.actionDelay
+      vitesse: subtask.context.infos.actionDelay
       };
    platform.log(['srl', data]);
 };
