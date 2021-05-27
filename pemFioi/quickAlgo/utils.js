@@ -320,6 +320,7 @@ SrlLogger.logMouseInit = function() {
 };
 
 SrlLogger.logMouse = function(e) {
+   if(!SrlLogger.active) { return; }
    if(e.type == 'mousemove' && SrlLogger.mouseMoveIgnore) { return; }
 
    var state = 'aucun';
@@ -404,6 +405,8 @@ SrlLogger.logKeyboardInit = function() {
 };
 
 SrlLogger.logKeyboard = function(e) {
+   if(!SrlLogger.active) { return; }
+
    var text = e.key;
    var data = {
       'reference': 'clavier',
@@ -449,6 +452,8 @@ SrlLogger.levelLoaded = function(level) {
 };
 
 SrlLogger.validation = function(score, error) {
+   if(!SrlLogger.active) { return; }
+
    if(error == 'code') {
       error = 'Erreur de prérequis';
    } else if(error == 'execution') {
@@ -457,13 +462,16 @@ SrlLogger.validation = function(score, error) {
       error = 'Aucune';
    }
    var data = {
-      reference: 'modification',
+      reference: 'validation',
       score: score,
       'type_erreur': error
       };
+   platform.log(['srl', data]);
 };
 
 SrlLogger.modification = function(len, error) {
+   if(!SrlLogger.active) { return; }
+
    if(error == 'code') {
       error = 'Erreur de prérequis';
    } else if(error == 'execution') {
