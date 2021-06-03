@@ -245,7 +245,7 @@ var conceptViewer = {
       this.showConcept(this.shownConcept);
     }
 
-    if(window.SrlLogger) { SrlLogger.navigation('help:show'); }
+    if(window.SrlLogger) { SrlLogger.navigation('Aide'); }
   },
 
   hide: function () {
@@ -253,8 +253,6 @@ var conceptViewer = {
     this.load();
     $('#conceptViewer').fadeOut(500);
     this.loadUrl('');
-
-    if(window.SrlLogger) { SrlLogger.navigation('help:hide'); }
   },
 
   openInNewWidget: function() {
