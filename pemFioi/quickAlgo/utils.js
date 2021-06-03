@@ -302,6 +302,7 @@ window.SrlLogger = {};
 
 SrlLogger.load = function() {
    SrlLogger.active = true;
+   SrlLogger.version = 0;
 
    SrlLogger.logMouseInit();
    SrlLogger.logKeyboardInit();
@@ -379,6 +380,7 @@ SrlLogger.logMouse = function(e) {
    }
    var data = {
       'reference': 'souris',
+      'version': SrlLogger.version,
       'zone': zone,
       'etat': state,
       'coordonnees_ecran_x': e.screenX,
@@ -410,6 +412,7 @@ SrlLogger.logKeyboard = function(e) {
    var text = e.key;
    var data = {
       'reference': 'clavier',
+      'version': SrlLogger.version,
       'touche': text
       };
    platform.log(['srl', data]);
@@ -429,6 +432,7 @@ SrlLogger.stepByStep = function(subtask, type) {
 
    var data = {
       reference: 'pas_a_pas',
+      version: SrlLogger.version,
       action: srlType,
       vitesse: subtask.context.infos.actionDelay
       };
@@ -440,6 +444,7 @@ SrlLogger.navigation = function(type) {
 
    var data = {
       reference: 'navigation',
+      version: SrlLogger.version,
       module: type
       };
    platform.log(['srl', data]);
@@ -447,8 +452,15 @@ SrlLogger.navigation = function(type) {
 
 SrlLogger.levelLoaded = function(level) {
    if(!SrlLogger.active || SrlLogger.lastLevelLoaded == level) { return; }
-   SrlLogger.lastLevelLoaded = level;
-   SrlLogger.navigation('level:' + level);
+
+   var defaultLevelsRanks = { basic: 1, easy: 2, medium: 3, hard: 4 };
+   var version = defaultLevelsRanks[level];
+   if(!version) { version = 5; }
+
+   if(version == SrlLogger.version) { return; }
+
+   SrlLogger.navigation('Exercice');
+   SrlLogger.version = version;
 };
 
 SrlLogger.validation = function(score, error) {
@@ -463,6 +475,7 @@ SrlLogger.validation = function(score, error) {
    }
    var data = {
       reference: 'validation',
+      version: SrlLogger.version,
       score: score,
       'type_erreur': error
       };
@@ -481,6 +494,7 @@ SrlLogger.modification = function(len, error) {
    }
    var data = {
       reference: 'modification',
+      version: SrlLogger.version,
       'taille_reponse': len,
       erreur: error
       };
