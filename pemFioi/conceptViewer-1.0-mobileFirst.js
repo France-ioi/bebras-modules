@@ -253,6 +253,7 @@ var conceptViewer = {
     this.load();
     $('#conceptViewer').fadeOut(500);
     this.loadUrl('');
+    if(window.SrlLogger) { SrlLogger.navigation('Exercice'); }
   },
 
   openInNewWidget: function() {
