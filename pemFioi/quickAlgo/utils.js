@@ -298,11 +298,13 @@ function dragElement(elmnt) {
 }
 
 
-window.SrlLogger = {};
+window.SrlLogger = {
+   active: false,
+   version: 0
+   };
 
 SrlLogger.load = function() {
    SrlLogger.active = true;
-   SrlLogger.version = 0;
 
    SrlLogger.logMouseInit();
    SrlLogger.logKeyboardInit();
@@ -453,14 +455,16 @@ SrlLogger.navigation = function(type) {
 SrlLogger.levelLoaded = function(level) {
    if(!SrlLogger.active || SrlLogger.lastLevelLoaded == level) { return; }
 
+   SrlLogger.lastLevelLoaded = level;
+
    var defaultLevelsRanks = { basic: 1, easy: 2, medium: 3, hard: 4 };
    var version = defaultLevelsRanks[level];
    if(!version) { version = 5; }
 
    if(version == SrlLogger.version) { return; }
 
-   SrlLogger.navigation('Exercice');
    SrlLogger.version = version;
+   SrlLogger.navigation('Exercice');
 };
 
 SrlLogger.validation = function(score, error) {
