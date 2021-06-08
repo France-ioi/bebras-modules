@@ -467,7 +467,7 @@ SrlLogger.levelLoaded = function(level) {
    SrlLogger.navigation('Exercice');
 };
 
-SrlLogger.validation = function(score, error) {
+SrlLogger.validation = function(score, error, experimentation) {
    if(!SrlLogger.active) { return; }
 
    if(error == 'code') {
@@ -481,6 +481,7 @@ SrlLogger.validation = function(score, error) {
       reference: 'validation',
       version: SrlLogger.version,
       score: score,
+      experimentation: experimentation,
       'type_erreur': error
       };
    platform.log(['srl', data]);

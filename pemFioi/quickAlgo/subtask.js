@@ -284,6 +284,8 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.initRun = function(callback) {
+      var allowInfiniteLoop = !!subTask.context.allowInfiniteLoop;
+
       if(window.quickAlgoInterface) {
          quickAlgoInterface.toggleMoreDetails(false);
       }
@@ -309,7 +311,9 @@ var initBlocklySubTask = function(subTask, language) {
                );
             }
 
-            SrlLogger.validation(success ? 100 : 0, success ? 'none' : 'execution');
+            if(!allowInfiniteLoop) {
+               SrlLogger.validation(success ? 100 : 0, success ? 'none' : 'execution', 0);
+            }
          }
          // Log the attempt
          subTask.logActivity();
@@ -327,6 +331,10 @@ var initBlocklySubTask = function(subTask, language) {
          }
       });
       initContextForLevel(initialTestCase);
+
+      if(allowInfiniteLoop) {
+         SrlLogger.validation(0, 'none', 1);
+      }
    };
 
    subTask.run = function(callback) {
