@@ -4256,7 +4256,7 @@ var getContext = function (display, infos, curLevel) {
                 var localvalue = $('input[name=pilocalconnectiontype]:checked').val()
 
                 if (localvalue == "localhost") {
-                    $('#piaddress').val(localhost);
+                    $('#piaddress').val("localhost");
                     $('#piaddress').trigger("input");
                 } else {
                     $('#piaddress').val(window.location.hostname);
