@@ -780,6 +780,7 @@ def initOLEDScreen():
 
         serial = i2c(port=1, address=0x3C)
         oleddisp = ssd1306(serial, width=oledwidth, height=oledheight)
+        oleddisp.cleanup = lambda _: True
 
         oledfont = ImageFont.load_default()
         oledimage = Image.new('1', (oledwidth, oledheight))
@@ -808,6 +809,21 @@ def displayTextOled(line1, line2=""):
 
     oleddraw.text((0, 0), line1, font=oledfont, fill=255)
     oleddraw.text((0, 15), line2, font=oledfont, fill=255)
+
+    updateScreen()
+
+def displayTextOledAtPos(line1, x, y, fill=255):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    # This will allow arguments to be numbers
+    line1 = str(line1)
+
+    oleddraw.text((x, y), line1, font=oledfont, fill=fill)
 
     updateScreen()
 
