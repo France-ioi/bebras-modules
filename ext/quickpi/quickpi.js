@@ -2439,6 +2439,7 @@ def gyroThread():
 # Begin getTemperatureFromCloud
    
 getTemperatureCloudUrl = "https://cloud.quick-pi.org/cache/weather.php"
+getTemperatureSupportedTowns = None
 
 def _getTemperatureSupportedTowns():
     import requests
@@ -2446,13 +2447,15 @@ def _getTemperatureSupportedTowns():
 
     return json.loads(requests.get(getTemperatureCloudUrl + "?q=supportedtowns").text)
 
-getTemperatureSupportedTowns = _getTemperatureSupportedTowns()
-
 getTemperatureCache = {}
 
 def getTemperatureFromCloud(town):
     import requests
-    import time
+    global getTemperatureSupportedTowns
+
+    if getTemperatureSupportedTowns is None:
+        getTemperatureSupportedTowns = _getTemperatureSupportedTowns()
+    
     current_milli_time = lambda: int(round(time.time() * 1000))
 
     if not town in getTemperatureSupportedTowns:
