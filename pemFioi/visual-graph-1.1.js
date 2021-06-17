@@ -359,7 +359,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }else{
          /* table mode */
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content,visualInfo.wCorr);
+         var boxSize = this.getBoxSize(content,visualInfo.wCorr,label);
          var w = boxSize.w;
          var h = boxSize.h;
          var x = pos.x - w/2;
@@ -405,18 +405,27 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       return result;
    };
-   this.getBoxSize = function(content,wCorrection) {
+   this.getBoxSize = function(content,wCorrection,label) {
       var wCorr = wCorrection || 0;
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
       // var textSize = this.getTextSize(content);
       var tempText = this.paper.text(0,0,content).attr(this.vertexContentAttr);
+      if(label){
+         var tempLabel = this.paper.text(0,0,label).attr(this.vertexLabelAttr);
+         var labelBBox = tempLabel.getBBox();
+         tempLabel.remove();
+      }
       var textBBox = tempText.getBBox();
       tempText.remove();
       var minW = this.minBoxW;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
       // var w = Math.max(0.7*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
-      var w = Math.max(textBBox.width + 2*margin,minW);
+      if(label){
+         var w = Math.max(textBBox.width + 2*margin,labelBBox.width + 2*margin,minW)
+      }else{
+         var w = Math.max(textBBox.width + 2*margin,minW);
+      }
       // var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
       var h = Math.max(textBBox.height + labelHeight + 2*margin, minH);
       return { w: w + wCorr, h: h };
