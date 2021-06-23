@@ -812,6 +812,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.getDistanceFromVertex = function(id, xPos, yPos) {
+      // console.log(this.paper,this.visualGraph.paper)
       var vertexPos = this.getVertexPosition(id);
       var tableMode = this.visualGraph.getVertexVisualInfo(id).tableMode;
       // var xDistance = xPos - vertexPos.x;
@@ -829,7 +830,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var info = this.graph.getVertexInfo(id);
          var vInfo = this.visualGraph.getVertexVisualInfo(id);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content,vInfo.wCorr);
+         var label = (info.label) ? info.label : "";
+         var boxSize = this.getBoxSize(content,vInfo.wCorr,label);
          var surfacePoint = this.getSurfacePointFromAngle(vertexPos.x,vertexPos.y,boxSize.w,boxSize.h,angleWithCenter);
          var surfaceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,surfacePoint.x,surfacePoint.y);
          if(distanceFromCenter <= surfaceFromCenter) {
