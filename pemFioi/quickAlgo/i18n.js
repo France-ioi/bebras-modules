@@ -354,20 +354,20 @@ var quickAlgoLanguageStrings = {
       importFromBlockly: "Generiere von Blockly-Blöcken",
       loadExample: "Beispiel einfügen",
       saveOrLoadButton: "Laden / Speichern",
-      saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
-      editButton: "bearbeiten", // TODO: verify
-      editWindowTitle: "Übungsausgabe", // TODO: verify
-      titleEdition: "Titel:", // TODO: verify
-      descriptionEdition: "Beschreibung:", // TODO: verify
-      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
-      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
-      about: "À propos", // TODO: translate
-      license: "Lizenz:", // TODO: verify
+      saveOrLoadProgram: "Speichere oder lade deinen Quelltext:",
+      editButton: "Bearbeiten",
+      editWindowTitle: "Übungsausgabe",
+      titleEdition: "Titel:",
+      descriptionEdition: "Beschreibung:",
+      saveAndQuit: "Speichern & Beenden",
+      quitWithoutSavingConfirmation: "Beenden, ohne deine Änderungen zu speichern?",
+      about: "Über",
+      license: "Lizenz:",
       licenseReserved: "Alle Rechte vorbehalten.",
-      authors: "Autoren :", // TODO: verify
-      other: "Andere", // TODO: verify
-      otherLicense: "Other license", // TODO: translate
-      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
+      authors: "Autoren :",
+      other: "Andere",
+      otherLicense: "Andere Lizenz",
+      pleaseSpecifyLicense: "Bitte wählen Sie eine Lizenz aus",
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -376,17 +376,17 @@ var quickAlgoLanguageStrings = {
       saveProgram: "Speichern",
       copy: "Kopieren",
       paste: "Einfügen",
-      blocklyToPython: "Convert to Python",
-      blocklyToPythonTitle: "Python code",
+      blocklyToPython: "Konvertiere zu Python",
+      blocklyToPythonTitle: "Python-Code",
       blocklyToPythonIntro: "",
-      blocklyToPythonPassComment: '# Insert instructions here',
+      blocklyToPythonPassComment: '# Befehle hier eingeben',
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
-      limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
-      limitElements: "Noch {remainingBlocks} von {maxBlocks} Elementen verfügbar.",
-      limitElementsOver: "{remainingBlocks} Elemente zusätzlich zum Limit von {maxBlocks} verbraucht.",
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
-      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.",
-      waitBetweenExecutions: "Think carefully before starting a different program!",
+      limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
+      limitElements: "Noch {remainingBlocks} von {maxBlocks} Befehle verfügbar.",
+      limitElementsOver: "{remainingBlocks} Befehle zusätzlich zum Limit von {maxBlocks} verbraucht.",
+      capacityWarning: "Warnung: Dein Programm ist ungültig, weil es zu viele Bausteine verwendet. Beachte das Bausteinlimit oben rechts im Editor.",
+      clipboardDisallowedBlocks: "Du kannst dieses Programm nicht einfügen, weil es Bausteine enthält, die in dieser Aufgabe / Version nicht erlaubt sind.",
+      waitBetweenExecutions: "Überlege genau, bevor du ein neues Programm startest!",
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
@@ -427,7 +427,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Die verfügbaren Funktionen zum Steuern des Roboters sind:",
       startingLine: "Dein Programm muss mit folgender Zeile beginnen:",
       startingLines: "Dein Programm muss mit folgenden Zeilen beginnen",
-      keyword: "Schlüsselwort", // TODO :: verify
+      keyword: "Schlüsselwort",
       keywordAllowed: "Erlaubtes Schlüsselwort:",
       keywordForbidden: "Nicht erlaubtes Schlüsselwort:",
       keywordsAllowed: "Erlaubte Schlüsselwörter:",
@@ -435,9 +435,9 @@ var quickAlgoLanguageStrings = {
       variablesAllowed: "Du darfst Variable verwenden.",
       variablesForbidden: "Du darfst keine Variablen verwenden",
       readDocumentation: "Du darfst die Python-Dokumentation lesen.",
-      autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
-      constant: "constant", // TODO :: verify
-      variable: "variable" // TODO: verify
+      autorizedKeyWords: "Erlaubte Schlüsselwörter:",
+      constant: "Konstante",
+      variable: "Variable"
    },
    es: {
       categories: {
