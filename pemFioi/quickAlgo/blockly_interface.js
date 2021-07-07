@@ -605,7 +605,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
                }
                that.loadPrograms();
                that.loadCodeId(that.codeId);
-            }
+            };
 
             reader.readAsText(file);
          } else {

@@ -21,6 +21,7 @@ var quickAlgoInterface = {
     options: {},
     capacityPopupDisplayed: {},
     userTaskData: null, // contain the subject and title, and also the about
+    subtask: null,
     keypadData: {
         value: '',
         callbackModify: null,
@@ -75,6 +76,10 @@ var quickAlgoInterface = {
         }
         this.fullscreen = false;
         this.updateFullscreenElements();
+    },
+
+    setSubtask: function(subtask) {
+        this.subtask = subtask;
     },
 
 
@@ -253,6 +258,7 @@ var quickAlgoInterface = {
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                     "<div rel='about' class='item' onclick='quickAlgoInterface.editorBtn(\"about\");'><span class='fas fa-question-circle'></span>" + this.strings.about + "</div>" +
+                    "<div rel='share' class='item' onclick='quickAlgoInterface.editorBtn(\"share\");'><span class='fas fa-share'></span>share</div>" +
                 "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
@@ -302,7 +308,77 @@ var quickAlgoInterface = {
             this.displayBlocklyPython();
         } else if (btn == 'about') {
             this.openAbout();
+        } else if (btn == 'share') {
+            this.openShare();
         }
+    },
+
+    openShare: function() {
+        displayHelper.showPopupMessage(this.strings.doYouWantToShare, 'blanket', this.strings.yes, this.shareSubject.bind(this), this.strings.no, null, null)
+    },
+
+    shareSubject: function() {
+        var that = this;
+
+        var additional = that.userTaskData;
+
+        // This is done as if it was a task.js
+        var subTaskToPublish = {
+            // the title of the exercise
+            // we will have to move this to userTaskData during loading.
+            title: additional.title,
+
+            // taskIntro is the subject inside of the json editor.
+            // we will have to move this to userTaskData during loading.
+            taskIntro: additional.subject,
+
+            // This are the meta data of the subject, they have this format inside of the Json editor
+            // during load, we will take some information from here and put it in gridinfo (rebuild the about).
+            PEMTaskMetaData: {
+                // inside of the editor, authors is an array, in our case this is slightly different because it is a string,
+                // the owner of the task can write what he want there (website ect...)
+                // we will have to move this to userTaskData during loading.
+                authors: additional.about.authors,
+
+                // Normally this is how we set fr ect...
+                language: window.stringsLanguage,
+
+                // The user should be able to select his version during share, for now one, there is no way to display
+                // the version to the user, but we can set it so later if we need it (example if we want to create a
+                // versioning system), then all the subject already have their own version.
+                version: "1.0.0",
+
+                // the license of the subject, during load we will have to move it to the userTaskData and about.
+                license: additional.about.license
+            },
+
+            // We just need to take the gridInfo from the exercise.
+            gridInfos: that.subtask.gridInfos,
+
+            // We juste take the data from the exercise which mean that we are compatible with everything.
+            data: that.subtask.data,
+
+            // We retrieve the saved answer of the user.
+            // with this method, we can get the updated answer (after save) for all the levels.
+            answer: that.subtask.getAnswerObject()
+        };
+
+        // we remove the userTaskData from subTaskToPublish because the one that is present
+        // is not up to date, we have our additional that is up to date and that we have placed inside of metadatas.
+        if (subTaskToPublish.gridInfos.userTaskData) {
+            delete subTaskToPublish.gridInfos.userTaskData;
+        }
+
+        var answerType = that.blocklyHelper.isBlockly ? "blockly" : "python";
+
+        // TODO: change with "prod" url
+        var url = "file:///home/nicolas/stage/test/v01/QuickPi/dynamicTestbed/testbed/index.html";
+
+        $.post("http://localhost:3000", JSON.stringify(subTaskToPublish), function(data) {
+            var parseUrl = url + "?language=" + answerType + "&id=" + data;
+
+            displayHelper.showPopupMessage(that.strings.shareLink.replace("{url}", parseUrl), "blanket", "OK");
+        });
     },
 
     /**
@@ -625,6 +701,8 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
         $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
+
+        $('#editorMenu div[rel=share]').toggleClass('interfaceToggled', hideControls.share !== false);
 
         var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
         $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
