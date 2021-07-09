@@ -1,3 +1,12 @@
+var channel = null;
+
+$(function() {
+  if (window.opener || window.parent) {
+    var windowChannel = window.opener ? window.opener : window.parent;
+    channel = Channel.build({window: windowChannel, origin: '*', scope: 'test'});
+  }
+});
+
 function conceptDisplay() {
   var hash = window.location.hash.substr(1);
   if(!hash) { return; }
@@ -29,6 +38,38 @@ function conceptDisplay() {
     } else {
       allLangDivs.show();
     }
+  }
+
+  if (channel) {
+    var pythonCodes = $('.pythonCode');
+    pythonCodes.each(function (index, element) {
+      const jQueryElement = $(element);
+      if (!jQueryElement.parent().find('.pythonCode-execute').length) {
+        const previousCode = $(element).html();
+        jQueryElement
+          .removeClass('pythonCode')
+          .addClass('pythonCode-container')
+          .empty()
+          .append($("<div class='pythonCode'></div>").html(previousCode))
+          .append("<button class='pythonCode-execute'>Utiliser cet exemple</button>")
+      }
+    })
+
+    $('.pythonCode-execute').click(function () {
+      const code = $(this).parent().find('.pythonCode').text();
+
+      channel.call({
+        method: 'useCodeExample',
+        params: {
+          code,
+          language: 'python',
+        },
+        success: function () {
+        },
+        error: function () {
+        }
+      });
+    });
   }
 }
 
