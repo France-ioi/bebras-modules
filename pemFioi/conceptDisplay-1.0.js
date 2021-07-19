@@ -55,7 +55,7 @@ function doSetupCodeSnippets() {
   var pythonCodes = $('.pythonCode');
   pythonCodes.each(function (index, element) {
     const jQueryElement = $(element);
-    if (!jQueryElement.parent().find('.pythonCode-execute').length) {
+    if (!jQueryElement.parents('.pythonCode-container').length) {
       const previousCode = $(element).html();
       jQueryElement
         .removeClass('pythonCode')
