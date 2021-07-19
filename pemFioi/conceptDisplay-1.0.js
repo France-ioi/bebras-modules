@@ -1,9 +1,15 @@
 var channel = null;
+var setupCodeSnippets = false;
 
 $(function() {
-  if (window.opener || window.parent) {
+  if (window.Channel && (window.opener || window.parent)) {
     var windowChannel = window.opener ? window.opener : window.parent;
-    channel = Channel.build({window: windowChannel, origin: '*', scope: 'test'});
+    channel = Channel.build({window: windowChannel, origin: '*', scope: 'snippet'});
+
+    channel.bind('setupConceptDisplaySnippets', function () {
+      setupCodeSnippets = true;
+      doSetupCodeSnippets();
+    });
   }
 });
 
@@ -31,7 +37,7 @@ function conceptDisplay() {
     var langDivs = allLangDivs.filter(function(i, e) {
       var langs = e.getAttribute('data-lang').split(' ');
       return langs.indexOf(lang) != -1;
-      });
+    });
     if(langDivs.length) {
       allLangDivs.hide();
       langDivs.show();
@@ -40,37 +46,37 @@ function conceptDisplay() {
     }
   }
 
-  if (channel) {
-    var pythonCodes = $('.pythonCode');
-    pythonCodes.each(function (index, element) {
-      const jQueryElement = $(element);
-      if (!jQueryElement.parent().find('.pythonCode-execute').length) {
-        const previousCode = $(element).html();
-        jQueryElement
-          .removeClass('pythonCode')
-          .addClass('pythonCode-container')
-          .empty()
-          .append($("<div class='pythonCode'></div>").html(previousCode))
-          .append("<button class='pythonCode-execute'>Utiliser cet exemple</button>")
-      }
-    })
-
-    $('.pythonCode-execute').click(function () {
-      const code = $(this).parent().find('.pythonCode').text();
-
-      channel.call({
-        method: 'useCodeExample',
-        params: {
-          code,
-          language: 'python',
-        },
-        success: function () {
-        },
-        error: function () {
-        }
-      });
-    });
+  if (setupCodeSnippets) {
+    doSetupCodeSnippets();
   }
+}
+
+function doSetupCodeSnippets() {
+  var pythonCodes = $('.pythonCode');
+  pythonCodes.each(function (index, element) {
+    const jQueryElement = $(element);
+    if (!jQueryElement.parent().find('.pythonCode-execute').length) {
+      const previousCode = $(element).html();
+      jQueryElement
+        .removeClass('pythonCode')
+        .addClass('pythonCode-container')
+        .empty()
+        .append($("<div class='pythonCode'></div>").html(previousCode))
+        .append("<button class='pythonCode-execute'>Utiliser cet exemple</button>")
+    }
+  })
+
+  $('.pythonCode-execute').click(function () {
+    const code = $(this).parent().find('.pythonCode').text();
+
+    channel.notify({
+      method: 'useCodeExample',
+      params: {
+        code: code,
+        language: 'python',
+      },
+    });
+  });
 }
 
 $(window).on('hashchange', conceptDisplay);
