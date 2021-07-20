@@ -31,7 +31,7 @@ function Gauge(paper) {
       }
 
       var needleR = settings.needleR || r/10;
-      var needleCircle = paper.circle(cy,cy,needleR).attr(attr.needle);
+      var needleCircle = paper.circle(cx,cy,needleR).attr(attr.needle);
       var xTr1 = cx - r;
       var xTr2 = cx;
       var yTr1 = cy;
