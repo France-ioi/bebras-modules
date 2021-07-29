@@ -141,6 +141,7 @@
          'quiz2_questions_input': {src: modulesPath+"/pemFioi/quiz2/questions/input.js", id: "quiz_questions_input"},
          'quiz2_questions_sort_list': {src: modulesPath+"/pemFioi/quiz2/questions/sort_list.js", id: "quiz_questions_sort_list"},
          'quiz2_questions_sort_items': {src: modulesPath+"/pemFioi/quiz2/questions/sort_items.js", id: "quiz_questions_sort_items"},
+         'sortable': {src: modulesPath+"/ext/Sortable-master/Sortable.js", id: "sortable"},
 
          // Video task
          'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
