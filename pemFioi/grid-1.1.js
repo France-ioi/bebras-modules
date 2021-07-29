@@ -380,9 +380,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
       var id = this._cellToHighlightID(row, col);
       if(this.cellHighlights[id]) {
-         attr.x = cellPos.x + xPad;
-         attr.y = cellPos.y + yPad;
-         this.cellHighlights[id].attr(attr);
+         var xHighlight = cellPos.x + xPad;
+         var yHighlight = cellPos.y + yPad;
+         this.cellHighlights[id].attr({ x: xHighlight, y: yHighlight });
          this.cellHighlights[id].show();
       } else {
          this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
