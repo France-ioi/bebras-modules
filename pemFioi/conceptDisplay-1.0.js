@@ -2,7 +2,8 @@ var channel = null;
 var setupCodeSnippets = false;
 
 $(function() {
-  if (window.Channel && (window.opener || window.parent)) {
+  var targetWindow = window.opener || window.parent;
+  if (window.Channel && targetWindow && targetWindow !== window) {
     var windowChannel = window.opener ? window.opener : window.parent;
     channel = Channel.build({window: windowChannel, origin: '*', scope: 'snippet'});
 
