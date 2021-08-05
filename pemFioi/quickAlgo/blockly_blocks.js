@@ -1226,7 +1226,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_charAt_noShado",
+                  name: "text_charAt_noShadow",
                   blocklyXml: "<block type='text_charAt'></block>",
                   excludedByDefault: true
 
