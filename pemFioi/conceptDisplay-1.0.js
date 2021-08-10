@@ -27,7 +27,7 @@ function conceptDisplay() {
     var target = hash;
   }
 
-  var targetDiv = $('div[data-id='+target+']');
+  var targetDiv = $('[data-id='+target+']');
 
   if(!targetDiv.length) { return; }
 
@@ -69,12 +69,14 @@ function doSetupCodeSnippets() {
 
   $('.pythonCode-execute').click(function () {
     const code = $(this).parent().find('.pythonCode').text();
+    const language = $(this).closest('[data-lang]').length && $(this).closest('[data-lang]').attr('data-lang') ?
+      $(this).closest('[data-lang]').attr('data-lang') : 'python';
 
     channel.notify({
       method: 'useCodeExample',
       params: {
         code: code,
-        language: 'python',
+        language: language,
       },
     });
   });
