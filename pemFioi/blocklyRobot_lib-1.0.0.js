@@ -3301,7 +3301,20 @@ var getContext = function(display, infos, curLevel) {
          resetItems();
       }
    };
-   
+
+   context.resetDisplay = function() {
+      if(context.display) {
+         this.raphaelFactory.destroyAll();
+         if(paper !== undefined)
+            paper.remove();
+         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+         resetBoard();
+         redisplayAllItems();
+         context.updateScale();
+         $("#nbMoves").html(context.nbMoves);
+      }
+   }
+
    context.unload = function() {
       if(context.display && paper != null) {
          paper.remove();
