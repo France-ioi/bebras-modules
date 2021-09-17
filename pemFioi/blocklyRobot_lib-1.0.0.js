@@ -3315,6 +3315,28 @@ var getContext = function(display, infos, curLevel) {
       }
    }
 
+   context.getCurrentState = function() {
+      return {
+         items: context.items,
+         multicell_items: context.multicell_items,
+         last_connect: context.last_connext,
+         wires: context.wires,
+         nbMoves: context.nbMoves,
+         time: context.time,
+         bag: context.bag,
+      };
+   };
+
+   context.reloadState = function(data) {
+      context.items = data.items;
+      context.multicell_items = data.multicell_items;
+      context.last_connect = data.last_connect;
+      context.wires = data.wires;
+      context.nbMoves = data.nbMoves;
+      context.time = data.time;
+      context.bag = data.bag;
+   };
+
    context.unload = function() {
       if(context.display && paper != null) {
          paper.remove();
