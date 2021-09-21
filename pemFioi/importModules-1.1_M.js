@@ -38,6 +38,7 @@ var importableModules = function () {
       'shape-paths': {src: modulesPath+"/pemFioi/shape-paths.js", id: "shape-paths"},
       'shape-paths-1.1': {src: modulesPath+"/pemFioi/shape-paths-1.1.js", id: "shape-paths-1.1"},
       'gauge-1.0': {src: modulesPath+"/pemFioi/gauge-1.0.js", id: "gauge-1.0"},
+      'button-1.0': {src: modulesPath+"/pemFioi/button-1.0.js", id: "button-1.0"},
 
       'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
       'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},

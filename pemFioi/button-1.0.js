@@ -1,0 +1,47 @@
+function drawButton(paper,xc,yc,w,h,params) {
+   var defaultAttr = {
+      rect: {
+         stroke: "none",
+         fill: "#4a90e2",
+         r: h/2
+      },
+      text: {
+         "font-size": 14,
+         "font-weight": "bold",
+         fill: "white"
+      },
+      icon: {
+         stroke: "none",
+         fill: "white"
+      }
+   };
+   var attr = params.attr || defaultAttr;
+
+   paper.setStart();
+   var xRect = xc - w/2;
+   var yRect = yc - h/2;
+   paper.rect(xRect,yRect,w,h).attr(attr.rect);
+   
+   if(params.text){
+      var xText = params.xText;
+      var yText = params.yText;
+      paper.text(xText,yText,params.text).attr(attr.text);
+   }
+
+   if(params.shape) {
+      var iconR = params.iconR;
+      var xIcon = params.xIcon;
+      var yIcon = params.yIcon;
+      var shape = params.shape;
+      var icon = getShape({
+         paper, shape,
+         radius: iconR, x: xIcon, y: yIcon
+      });
+      icon.attr(attr.icon);
+      if(params.iconAngle){
+         icon.attr("transform",["R",params.iconAngle]);
+      }
+   }
+
+   return paper.setFinish()
+};
