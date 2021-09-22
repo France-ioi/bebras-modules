@@ -1,7 +1,7 @@
-function getShapePath(params) {
-    var shape = params.shape;
-    var x = params.x;
-    var y = params.y;
+function getShapePath(shape,x,y,params) {
+    // var shape = params.shape;
+    // var x = params.x;
+    // var y = params.y;
     var radius = params.radius;
     var roundedRectangleRadius = params.roundedRectangleRadius;
     if(!radius) radius = 15;
@@ -93,8 +93,7 @@ function getShapePath(params) {
     
 }
 
-function getShape(params) {
-    var path = getShapePath(params);
-    var paper = params.paper;
+function getShape(paper,shape,x,y,params) {
+    var path = getShapePath(shape,x,y,params);
     return paper.path(path);
 };
