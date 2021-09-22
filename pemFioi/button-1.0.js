@@ -33,10 +33,7 @@ function drawButton(paper,xc,yc,w,h,params) {
       var xIcon = params.xIcon;
       var yIcon = params.yIcon;
       var shape = params.shape;
-      var icon = getShape({
-         paper, shape,
-         radius: iconR, x: xIcon, y: yIcon
-      });
+      var icon = getShape(paper, shape,xIcon,yIcon,{ radius: iconR });
       icon.attr(attr.icon);
       if(params.iconAngle){
          icon.attr("transform",["R",params.iconAngle]);
