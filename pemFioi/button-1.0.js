@@ -40,5 +40,14 @@ function drawButton(paper,xc,yc,w,h,params) {
       }
    }
 
+   if(params.imgSrc) {
+      var src = params.imgSrc;
+      var xIcon = params.xIcon;
+      var yIcon = params.yIcon;
+      var iconW = params.iconW;
+      var iconH = params.iconH;
+      var icon = paper.image(src,xIcon,yIcon,iconW,iconW);
+   }
+
    return paper.setFinish()
 };
