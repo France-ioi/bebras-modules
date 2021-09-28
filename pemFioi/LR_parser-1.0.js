@@ -4069,6 +4069,9 @@ function LR_Parser(settings,subTask,answer) {
             break;
          case 3:
             answer.visualGraphJSON.push(self.visualGraph.toJSON());
+            if(settings.visualGraphLog){
+               console.log(self.visualGraph.toJSON())
+            }
             break;
          case 6:
          case 7:
