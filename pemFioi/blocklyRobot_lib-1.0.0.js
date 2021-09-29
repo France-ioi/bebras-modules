@@ -3302,7 +3302,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.resetDisplay = function() {
+   context.redrawDisplay = function() {
       if(context.display) {
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
@@ -3315,7 +3315,7 @@ var getContext = function(display, infos, curLevel) {
       }
    }
 
-   context.getCurrentState = function() {
+   context.getInnerState = function() {
       return {
          items: context.items,
          multicell_items: context.multicell_items,
@@ -3327,7 +3327,7 @@ var getContext = function(display, infos, curLevel) {
       };
    };
 
-   context.reloadState = function(data) {
+   context.reloadInnerState = function(data) {
       context.items = data.items;
       context.multicell_items = data.multicell_items;
       context.last_connect = data.last_connect;
