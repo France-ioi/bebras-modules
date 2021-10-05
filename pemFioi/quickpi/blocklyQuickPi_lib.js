@@ -837,11 +837,11 @@ var quickPiLocalLanguageStrings = {
             state: "Estado",
 
             cloudTypes: {
-                object: "Dictionnaire", // TODO: translate (dictionary)
-                array: "Tableau", // TODO: translate
-                boolean: "Booléen", // TODO: translate
-                number: "Nombre", // TODO: translate
-                string: "Chaîne de caractère" // TODO: translate
+                object: "Dictionario",
+                array: "Arreglo",
+                boolean: "Booleano",
+                number: "Nombre",
+                string: "Cadena de caracteres"
             },
             cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.", // TODO: translate
             cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud", // TODO: translate
@@ -9475,7 +9475,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = context.findSensor("magnetometer", "i2c");
 
             context.quickPiConnection.sendCommand("readMagnetometerLSM303C()", function(returnVal) {
-                sensor.state = returnVal;
+                sensor.state = JSON.parse(returnVal);
                 drawSensor(sensor);
 
                 returnVal = Math.atan2(sensor.state[0],sensor.state[1])*(180/Math.PI) + 180;
