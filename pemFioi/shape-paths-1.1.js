@@ -11,9 +11,11 @@ function getShapePath(shape,x,y,params) {
         var h = params.arrowH || 20;
         var x0 = x - w/2;
         var y0 = y - h/2;
-        var trW = params.trW || w*0.5;
+        var ratioW = params.ratioW || 0.5;
+        var trW = params.trW || w*ratioW;
         var rectW = w - trW;
-        var rectH = h*0.6;
+        var ratioH = params.ratioH || 0.6;
+        var rectH = h*ratioH;
 
         var yRect = y0 + (h - rectH)/2;
         var yTr1 = y0;
