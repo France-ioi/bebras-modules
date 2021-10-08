@@ -387,6 +387,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       } else {
          this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
       }
+      this.cellHighlights[id].toFront();
    };
 
    this.unhighlightCell = function(row, col) {
