@@ -1,4 +1,4 @@
-function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr) {
+function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells = false) {
    var self = this;
    this.raphaelID = raphaelID;
    this.paper = paper;
@@ -492,12 +492,33 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
          if(self.dragSelection){ // bug fix
-            self.dragSelection.attr({
-               x: Math.min(anchorPaperPos.left, currentPaperPos.left),
-               y: Math.min(anchorPaperPos.top, currentPaperPos.top),
-               width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
-               height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
-            });
+            if(!dragSelectionAroundCells){
+               self.dragSelection.attr({
+                  x: Math.min(anchorPaperPos.left, currentPaperPos.left),
+                  y: Math.min(anchorPaperPos.top, currentPaperPos.top),
+                  width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
+                  height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
+               });
+            }else{
+               var row1 = Math.min(anchorGridPos.row,newGridPos.row);
+               var row2 = Math.max(anchorGridPos.row,newGridPos.row);
+               var col1 = Math.min(anchorGridPos.col,newGridPos.col);
+               var col2 = Math.max(anchorGridPos.col,newGridPos.col);
+               var pos1 = self.getCellPos(row1, col1);
+               var pos2 = self.getCellPos(row2, col2);
+               var x1 = pos1.x;
+               var y1 = pos1.y;
+               var x2 = pos2.x + self.cellWidth;
+               var y2 = pos2.y + self.cellHeight;
+               var w = Math.min(x2 - x1, self.gridLeft + self.cols*self.cellWidth - x1);
+               var h = Math.min(y2 - y1, self.gridTop + self.rows*self.cellHeight - y1);
+               self.dragSelection.attr({
+                  x: x1,
+                  y: y1,
+                  width: w,
+                  height: h
+               });
+            }
          }
 
          // Below threshold.
@@ -657,10 +678,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this.init();
 }
 
-Grid.fromArray = function(raphaelID, paper, array, cellFiller, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr) {
+Grid.fromArray = function(raphaelID, paper, array, cellFiller, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells = false) {
    var rows = array.length;
    var cols = array[0].length;
-   var grid = new Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr);
+   var grid = new Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells);
 
    for (var iRow = 0; iRow < rows; iRow++) {
       for (var iCol = 0; iCol < cols; iCol++) {
