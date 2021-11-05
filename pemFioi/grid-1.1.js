@@ -1,5 +1,6 @@
-function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells = false) {
+function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelAroundCells) {
    var self = this;
+   var dragSelectionAroundCells = dragSelAroundCells || false;
    this.raphaelID = raphaelID;
    this.paper = paper;
    this.rows = rows;
@@ -678,7 +679,8 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this.init();
 }
 
-Grid.fromArray = function(raphaelID, paper, array, cellFiller, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells = false) {
+Grid.fromArray = function(raphaelID, paper, array, cellFiller, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelAroundCells) {
+   var dragSelectionAroundCells = dragSelAroundCells || false;
    var rows = array.length;
    var cols = array[0].length;
    var grid = new Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr,dragSelectionAroundCells);
