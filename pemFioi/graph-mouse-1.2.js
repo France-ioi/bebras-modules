@@ -991,7 +991,6 @@ function VertexDragAndConnect(settings) {
       if(!self.dragEnabled || dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
          return;
       }
-      // console.log('move')
       if(self.selectionParent !== null && self.allowDeselection) {
          self.onVertexSelect(self.selectionParent, false);
       }
@@ -2002,7 +2001,8 @@ function GraphEditor(settings) {
                var neighbors1 = graph.getNeighbors(id1);
                var neighbors2 = graph.getNeighbors(id2);
                var neighbors = neighbors1.concat(neighbors2);
-               for(var neighbor of neighbors){
+               for(var iNeighbor = 0; iNeighbor < neighbors.length; iNeighbor++){
+                  var neighbor = neighbors[iNeighbor];
                   if(neighbor != id1 && neighbor != id2 && areAligned(id1,id2,neighbor)){
                      var edges1 = graph.getEdgesBetween(id1,neighbor);
                      var edges2 = graph.getEdgesBetween(id2,neighbor);
@@ -2022,7 +2022,8 @@ function GraphEditor(settings) {
          // console.log(parameterSet[nTry])
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
       }
-      for(var edge of edges){
+      for(var iEdge = 0; iEdge < edges.length; iEdge++){
+         var edge = edges[iEdge];
          var vInfo = visualGraph.getEdgeVisualInfo(edge);
          if(!vInfo["radius-ratio"]){
             vInfo = {};
