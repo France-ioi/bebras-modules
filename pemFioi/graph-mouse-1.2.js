@@ -2344,7 +2344,8 @@ function GraphEditor(settings) {
 
       if(!self.allowMutlipleInitial){
          var vertices = graph.getAllVertices();
-         for(var vertex of vertices){
+         for(var iVert = 0; iVert < vertices.length; iVert++){
+            var vertex = vertices[iVert];
             if(vertex != vID){
                var currInfo = graph.getVertexInfo(vertex);
                if(currInfo.initial){
