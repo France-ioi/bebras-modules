@@ -933,6 +933,7 @@ function VertexDragAndConnect(settings) {
       // console.log("onFuzzyClick",elementType,id)
       if(elementType === "edge") {
          if(self.selectionParent !== null) {
+            // console.log("fuzzyEdge")
             self.onVertexSelect(self.selectionParent, false);
          }
          self.selectionParent = null;
@@ -967,7 +968,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.endHandler = function(event) {
-      // console.log('endDrag')
+      // console.log('endDrag',self.isDragging)
       if(self.isDragging) {
          var isSnappedToGoodPosition = false;
 
@@ -984,7 +985,9 @@ function VertexDragAndConnect(settings) {
          // self.isDragging = false;
          return;
       }
-      self.clickHandler(self.elementID,event.pageX,event.pageY);  // because drag event interferes with click event on chrome
+      // console.log("click",self.elementID,event)
+      // add object with event to fix bug with touchPad
+      self.clickHandler(self.elementID,event.pageX,event.pageY,{ event: event});  // because drag event interferes with click event on chrome
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
@@ -1031,8 +1034,8 @@ function VertexDragAndConnect(settings) {
       }
    };
 
-   this.clickHandler = function(id,x,y) {
-      // console.log(id)
+   this.clickHandler = function(id,x,y,params) {
+      // console.log(id,x,y)
       if(self.unselectAllEdges){
          self.unselectAllEdges();
       }
@@ -1044,7 +1047,7 @@ function VertexDragAndConnect(settings) {
          // Click on background or on the selected vertex -  deselect it.
          if(id === null || id === self.selectionParent){
             if(self.selectionParent !== null && self.onVertexSelect) {
-               self.onVertexSelect(self.selectionParent, false,x,y);
+               self.onVertexSelect(self.selectionParent, false,x,y,params);
             }
             self.selectionParent = null;
             return;
@@ -1053,7 +1056,7 @@ function VertexDragAndConnect(settings) {
          // Start a new pair.
          if(self.selectionParent === null && self.onVertexSelect) {
             self.selectionParent = id;
-            self.onVertexSelect(id, true,x,y);
+            self.onVertexSelect(id, true,x,y,params);
             return;
          }
          
@@ -1062,7 +1065,7 @@ function VertexDragAndConnect(settings) {
             self.onPairSelect(self.selectionParent, id, x, y);
          }
          if(self.onVertexSelect){
-            self.onVertexSelect(self.selectionParent, false, x,y);
+            self.onVertexSelect(self.selectionParent, false, x,y,params);
          }
          self.selectionParent = null;
          if(self.clickHandlerCallback){
