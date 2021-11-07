@@ -529,6 +529,15 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
 
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
+
+      // We get an error here if the distance is too small!
+      var dx = info1.x - info2.x;
+      var dy = info1.y - info2.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 30) {
+         return;
+      }
+      
       var newPath;
 
       for(var iEdge in edges) {
