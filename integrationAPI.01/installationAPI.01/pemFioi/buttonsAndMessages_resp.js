@@ -1367,6 +1367,13 @@ window.displayHelper = {
       }else{
          $('#zone_1 > .consigne').css('margin-top','20px');
       }
+      if(this.layout == 1){   // so that instructions and task are displayed with 3 equal margins
+         var taskMarginR = $("#taskCont").css("marginRight");
+         taskMarginR = taskMarginR.replace("px","");
+         taskMarginR = Math.round(taskMarginR) + $("#taskCont").position().left;
+         $('#zone_1 > .consigne').css('margin-right','0px');
+         $('#zone_1 > .consigne').css('margin-left',Math.max(20,taskMarginR)+'px');
+      }
    },
 
    updateTaskCSS: function(scaleFactor,limitingFactor) {
