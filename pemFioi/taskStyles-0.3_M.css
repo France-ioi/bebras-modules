@@ -287,18 +287,13 @@ h1 .stars {
    display: block;
    background: white;
    font-size: 14px;
-   /*color: white;*/
    color: #88BB88;
-   /*border-radius: 5px 5px 0 0;*/
    border-bottom: 1px solid #88BB88;
    text-align: center;
    margin: 0;
    padding: 13px;
 }
 [alkindi] .consigne h3 i {
-   /*display: block;*/
-   /*float: left;*/
-   /*width: 20px;*/
    margin-right: 20px;
 }
 [alkindi] .consigne #text {
@@ -705,6 +700,10 @@ h1 .stars {
 .layout_1 #zone_3 [id^=show] i,
 .layout_2 #zone_3 [id^=show] i {
    margin-right: 10px;
+}
+
+.layout_1 .consigne {
+   min-height: 40%;
 }
 
 .layout_1 .consigne #example,
