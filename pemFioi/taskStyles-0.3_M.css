@@ -203,6 +203,9 @@ textarea {
    border-radius: 6px 6px 0 0;
    text-align: center;
 }
+#tabsMenu.moreTabs .li {
+   margin: 0 10px;
+}
 #tabsMenu .li.first {
    border-radius: 0 6px 0 0;
 }
