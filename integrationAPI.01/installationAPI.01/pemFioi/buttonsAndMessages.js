@@ -935,6 +935,7 @@ window.displayHelper = {
       if(nbLevels < 2) { tabsInnerHTML = ''; }
       var tabsHTML = '<div id="tabsMenu">' + tabsInnerHTML + '</div>';
       $('#tabsContainer').append(tabsHTML);
+      if(nbLevels >= 4) { $('#tabsMenu').addClass('moreTabs'); }
 
       var self = this;
       setTimeout(function() {
