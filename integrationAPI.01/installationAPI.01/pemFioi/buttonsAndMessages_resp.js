@@ -1347,7 +1347,8 @@ window.displayHelper = {
 
    centerInstructions: function() {
       if(this.layout != 2){
-         if(this.sideZoneEnabled && this.layout == 1){
+         $('#zone_1 > .consigne #text').css('max-width','');
+            if(this.sideZoneEnabled && this.layout == 1){
             $('#zone_1').css({
                display: 'flex',
                'flex-direction': 'column',
@@ -1366,6 +1367,11 @@ window.displayHelper = {
          }
       }else{
          $('#zone_1 > .consigne').css('margin-top','20px');
+         if($("#zone_1 .consigne #example").length > 0){ // fix example bug ni layout 2
+            var exW = $("#zone_1 .consigne #example").outerWidth();
+            var w = window.innerWidth;
+            $('#zone_1 .consigne #text').css('max-width',(w - 80 - exW)+'px');
+         }
       }
       if(this.layout == 1){   // so that instructions and task are displayed with 3 equal margins
          var taskMarginR = $("#taskCont").css("marginRight");
@@ -1373,6 +1379,9 @@ window.displayHelper = {
          taskMarginR = Math.round(taskMarginR) + $("#taskCont").position().left;
          $('#zone_1 > .consigne').css('margin-right','0px');
          $('#zone_1 > .consigne').css('margin-left',Math.max(20,taskMarginR)+'px');
+      }else{
+         $('#zone_1 > .consigne').css('margin-right','');
+         $('#zone_1 > .consigne').css('margin-left','');
       }
    },
 

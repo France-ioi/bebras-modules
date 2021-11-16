@@ -306,11 +306,11 @@ h1 .stars {
    display: none;
 }
 [alkindi] .consigne #text {
-   background: #F5F5F5;
+   /*background: #F5F5F5;*/
    padding: 20px;
    padding-bottom: 10px;
    padding-top: 0px;
-   border-radius: 0 0 5px 5px;
+   /*border-radius: 0 0 5px 5px;*/
 }
 
 /**************************************************************/
