@@ -19,6 +19,7 @@ $(document).ready(function() {
       controls: {},
       audioWorkerUrl: modulesPath + "ext/codecast/7.0/index.worker.worker.js",
       baseUrl: "https://codecast.france-ioi.org/v7",
+      authProviders: ["algorea", "guest"],
       task: window.taskData,
       taskInstructions: taskInstructionsHtml,
     }, additionalOptions);
