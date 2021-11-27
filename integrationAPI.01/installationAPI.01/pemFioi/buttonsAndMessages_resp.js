@@ -1211,9 +1211,11 @@ window.displayHelper = {
          var w = Math.floor(window.innerWidth - this.getScrollbarWidth());
          var h = Math.floor(window.innerHeight);
 
+         var headerH = $('#main_header').length ? this.headerH : 0;
+
          $('#task, #main_header').removeClass();
-         $('#task').css("height",(h - this.headerH)+'px');
-         $('#task').css("margin-top",this.headerH+'px');
+         $('#task').css("height",(h - headerH)+'px');
+         $('#task').css("margin-top",headerH+'px');
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
          $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
@@ -1223,7 +1225,7 @@ window.displayHelper = {
          if(w >= layout1Breakpoint) {
             this.mobileMode = false;
             this.layout = 1;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
             this.availableW = Math.floor(w*0.7);
             $('#zone_1').height(this.availableH);
             $('#zone_12').css("overflow-x","initial");
@@ -1238,13 +1240,13 @@ window.displayHelper = {
          }else if(w/h < 1){
             this.mobileMode = true;
             this.layout = 3;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
             this.availableW = w;
             $('#zone_1').height('auto');
          }else{
             this.mobileMode = true;
             this.layout = 4;
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1];
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1];
             this.availableW = w - 50;
             if(!$('#zone_3 #tabsContainer').length){
                $('#tabsContainer').prependTo($('#zone_3'));
@@ -1259,7 +1261,7 @@ window.displayHelper = {
          $('#task, #main_header').addClass('layout_'+this.layout);
          if(this.layout == 2){   // bug fix
             var zone1H = $('#zone_1').height();
-            this.availableH = h - this.headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
          }
 
          this.updateTaskDimensions();
@@ -1304,7 +1306,9 @@ window.displayHelper = {
          var availableLength = this.availableW;
          var taskLength = this.taskW;
       }
+
       this.scaleFactor = availableLength/taskLength;
+
       if(limitingFactor == "W"){
          this.newTaskW = Math.max(Math.min(this.taskW,this.availableW),this.taskW*this.scaleFactor);
       }else{
