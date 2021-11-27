@@ -1324,7 +1324,7 @@ window.displayHelper = {
          $('#zone_3').addClass('vertical_scroll');
          this.verticalScroll = true;
          // console.log(limitingFactor);
-         if(limitingFactor == 'H' && this.newTaskW < this.maxTaskW){
+         if(this.layout != 1 && limitingFactor == 'H' && this.newTaskW < this.maxTaskW){
             this.newTaskW = Math.min(this.availableW,this.maxTaskW);
             this.scaleFactor = this.newTaskW/this.taskW;
             this.newTaskH = this.taskH*this.scaleFactor;
@@ -1367,7 +1367,7 @@ window.displayHelper = {
          }
       }else{
          $('#zone_1 > .consigne').css('margin-top','20px');
-         if($("#zone_1 .consigne #example").length > 0){ // fix example bug ni layout 2
+         if($("#zone_1 .consigne #example").length > 0){ // fix example bug in layout 2
             var exW = $("#zone_1 .consigne #example").outerWidth();
             var w = window.innerWidth;
             $('#zone_1 .consigne #text').css('max-width',(w - 80 - exW)+'px');
