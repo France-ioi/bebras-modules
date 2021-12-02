@@ -1520,8 +1520,12 @@ window.displayHelper = {
       $('body').css('width', '100%');
       // This try is probably not needed but avoid breaking just in case
       try {
-         $(document).ready(function () {displayHelper.updateLayout();});
-         $(window).resize(function () {displayHelper.updateLayout();});
+         $(document).ready(function () {
+            displayHelper.updateLayout();
+         });
+         $(window).resize(function () {
+            displayHelper.updateLayout();
+         });
          this.bUseFullWidth = true;
       } catch(e) {
       }
@@ -1563,6 +1567,7 @@ window.displayHelper = {
       $('#tabsMenu .li.current').prev().addClass('prev');
       $('#tabsMenu .li.current').next().addClass('next');
       this.showSolution(false);
+      this.updateLayout();
    },
 
    setLevel: function(newLevel, force) {
