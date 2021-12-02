@@ -1218,7 +1218,7 @@ window.displayHelper = {
          $('#task').css("margin-top",headerH+'px');
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
-         $('#zone_0').height(this.versionHeaderH[this.layout - 1]);
+         $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }

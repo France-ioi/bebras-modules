@@ -152,6 +152,7 @@ textarea {
  }
 #task h1,
 .question h1 {
+   display: none;
    margin-bottom: 10px;
    margin-top: 10px;
 }
