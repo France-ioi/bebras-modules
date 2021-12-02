@@ -550,10 +550,20 @@ def normalizePin(pin):
         returnpin = pin
     elif len(pin) >= 2 and pin[0].isalpha() and pin[1:].isdigit():
         returnpin = pin[1:]
+    elif pin.upper().startswith("I2C"):
+        returnpin = pin[3:]
     else:
         returnpin = normalizePin(nameToPin(pin))
 
     return int(returnpin)
+
+def getSensorChannel(name):
+    for sensor in sensorTable:
+        if sensor["name"] == name:
+            return sensor["channel"]
+
+    return 0
+
 
 
 def cleanupPin(pin):
@@ -959,7 +969,44 @@ def isPointSet(x, y):
 
     return pixels[x,y] > 0
 
-def displayText16x2(line1, line2=""):
+def i2c_write_data(port, address, register, data):
+    issofti2c = False
+    print("------------------------->", "i2c_write_data")
+    if ('softi2c' in globals()) and (str(port) in softi2c):
+
+        print("------------------------->", "Soft i2c")
+
+        issofti2c = True
+        softsda = softi2c[str(port)][1]
+        softscl = softi2c[str(port)][0]
+
+    if port == 0:
+        bus = smbus.SMBus(1)
+        bus.write_byte_data(address, register, data)
+    else:
+        print("------------------------->", "SOFT I2C", "SDA: ", softsda, "SCL: ", softscl)
+        try:
+            pi.bb_i2c_close(softsda)
+        except:
+            pass
+
+        pi.bb_i2c_open(softsda, softscl, 10000)
+
+        commandlist = [4,               # Set the address to next byte
+                       address,         # I2c address
+                       2,               # Stop condition
+                       7,               # Write the next byte of data
+                       1 + len(data),   # Write 1 byte of data
+                       register         # Payload (register address)
+                       ]
+        commandlist.extend(data)
+        commandlist.extend([3, 0])
+
+        pi.bb_i2c_zip(softsda, commandlist)
+        pi.bb_i2c_close(softsda)
+
+
+def displayText16x2(line1, line2="", port=0):
     global screenLine1
     global screenLine2
 
@@ -970,12 +1017,13 @@ def displayText16x2(line1, line2=""):
     screenLine2 = line2
 
     address = 0x3e
-    bus = smbus.SMBus(1)
+    port = 3
+    #bus = smbus.SMBus(1)
 
-    bus.write_byte_data(address, 0x80, 0x01) #clear
+    i2c_write_data(port, address, 0x80, 0x01) #clear
     time.sleep(0.05)
-    bus.write_byte_data(address, 0x80, 0x08 | 0x04) # display on, no cursor
-    bus.write_byte_data(address, 0x80, 0x28) # two lines
+    i2c_write_data(port, address, 0x80, 0x08 | 0x04) # display on, no cursor
+    i2c_write_data(port, address, 0x80, 0x28) # two lines
     time.sleep(0.05)
 
     # This will allow arguments to be numbers
@@ -984,18 +1032,77 @@ def displayText16x2(line1, line2=""):
 
     count = 0
     for c in line1:
-        bus.write_byte_data(address, 0x40, ord(c))
+        i2c_write_data(port, address, 0x40, ord(c))
         count += 1
         if count == 16:
             break
 
-    bus.write_byte_data(address, 0x80, 0xc0) # Next line
+    i2c_write_data(port, address, 0x80, 0xc0) # Next line
     count = 0
     for c in line2:
-        bus.write_byte_data(address, 0x40, ord(c))
+        i2c_write_data(port, address, 0x40, ord(c))
         count += 1
         if count == 16:
             break
+
+def motorRun(name, speed):
+    GROVE_MOTOR_DRIVER_DEFAULT_I2C_ADDR         = 0x14
+    GROVE_MOTOR_DRIVER_I2C_CMD_BRAKE            = 0x00
+    GROVE_MOTOR_DRIVER_I2C_CMD_STOP             = 0x01
+    GROVE_MOTOR_DRIVER_I2C_CMD_CW               = 0x02
+    GROVE_MOTOR_DRIVER_I2C_CMD_CCW              = 0x03
+    GROVE_MOTOR_DRIVER_I2C_CMD_STANDBY          = 0x04
+    GROVE_MOTOR_DRIVER_I2C_CMD_NOT_STANDBY      = 0x05
+    GROVE_MOTOR_DRIVER_I2C_CMD_STEPPER_RUN = 0x06
+    GROVE_MOTOR_DRIVER_I2C_CMD_STEPPER_STOP     = 0x07
+    GROVE_MOTOR_DRIVER_I2C_CMD_STEPPER_KEEP_RUN = 0x08
+    GROVE_MOTOR_DRIVER_I2C_CMD_SET_ADDR         = 0x11
+
+    MOTOR_CHA = 0
+    MOTOR_CHB = 1
+
+    FULL_STEP = 0
+    WAVE_DRIVE = 1
+    HALF_STEP = 2
+    MICRO_STEPPING = 3
+
+    if speed > 255:
+        speed = 255
+    elif speed < -255:
+        speed = -255
+
+
+    port = normalizePin(name)
+    channel = int(getSensorChannel(name))
+
+    cmd = GROVE_MOTOR_DRIVER_I2C_CMD_CW
+    if speed < 0:
+        cmd = GROVE_MOTOR_DRIVER_I2C_CMD_CCW
+        speed = -1 * speed
+
+    i2c_write_data(port, GROVE_MOTOR_DRIVER_DEFAULT_I2C_ADDR, cmd, [channel, speed])
+
+GroveMultiChannelRelayState = 0x00
+
+def setRelayState(name, state):
+    global GroveMultiChannelRelayState
+
+    port = normalizePin(name)
+    channel = int(getSensorChannel(name))
+
+    if state:
+        GroveMultiChannelRelayState = GroveMultiChannelRelayState | (0x01 << channel)
+    else:
+        GroveMultiChannelRelayState = GroveMultiChannelRelayState & (~(0x01 << channel))
+
+    print("--------------->name", name, "port", port, "GroveMultiChannelRelayState", GroveMultiChannelRelayState)
+
+    CMD_CHANNEL_CTRL = 0x10
+
+    i2c_write_data(port, 0x11, CMD_CHANNEL_CTRL, [GroveMultiChannelRelayState])
+
+def readBarometricPressure(name):
+    pass
 
 def setServoAngle(pin, angle):
     pin = normalizePin(pin)
@@ -2318,8 +2425,8 @@ def calibrateCompassGame():
         else:
             accelvalues =  reaAccelerometerLSM303C()
         
-        x_accel = accelvalues[0]
-        y_accel = accelvalues[1]
+        x_accel = accelvalues[0] / 9.8
+        y_accel = accelvalues[1] / 9.8
 
         data.append(magvalues)
 
