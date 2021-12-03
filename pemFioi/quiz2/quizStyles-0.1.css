@@ -120,7 +120,7 @@ statement p:first-child {
   /* because we get <p> wraps here by taskeditor tinymce */
   display: inline;
 }
-statement::before {
+.questions-numeration-enabled statement::before {
   counter-increment: questions-counter;
   content: counter(questions-counter);
   color: #fff;
@@ -716,8 +716,8 @@ question[type="sort_items"] .src .list-group-item {
 }
 
 question[type="sort_items"] .src .list-group-item::before {
-  font-family: "Font Awesome 5 Free"; 
-  font-weight: 900; 
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
   content: "\f142";
   color: #d8d9dd;
   margin-right: 10px;
