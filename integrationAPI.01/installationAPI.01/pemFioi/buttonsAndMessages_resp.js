@@ -57,6 +57,7 @@ window.displayHelper = {
    verticalScroll: false,
    horizontalScroll: false,
    scaleFactor: 1,
+   prevScaleFactor: 1,
    sideZoneEnabled: false,
    updateLayoutCallbackStart: null,
 
@@ -1267,6 +1268,12 @@ window.displayHelper = {
          this.updateTaskDimensions();
          this.toggleTask();
       }
+      if(this.scaleFactor != this.prevScaleFactor){
+         this.prevScaleFactor = this.scaleFactor;
+         // this.updateTaskDimensions();
+         // task.displayedSubTask.resetDisplay();
+         // console.log(task)
+      }
    },
 
    getScrollbarWidth: function () {
@@ -1525,6 +1532,8 @@ window.displayHelper = {
          });
          $(window).resize(function () {
             displayHelper.updateLayout();
+            // console.log(task)
+            // task.displayedSubTask.resetDisplay();
          });
          this.bUseFullWidth = true;
       } catch(e) {
