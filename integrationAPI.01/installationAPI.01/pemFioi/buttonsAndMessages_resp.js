@@ -1270,6 +1270,7 @@ window.displayHelper = {
       }
       if(this.scaleFactor != this.prevScaleFactor){
          this.prevScaleFactor = this.scaleFactor;
+         $('#task').hide().show(0);
          // this.updateTaskDimensions();
          // task.displayedSubTask.resetDisplay();
          // console.log(task)
