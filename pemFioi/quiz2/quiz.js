@@ -152,10 +152,8 @@ Quiz.UI = function(params) {
     questions_order = Quiz.common.shuffleElements(els, params.shuffle_questions);
 
 
-
-
-
-
+    // toggle questions numeration
+    $('.taskContent').toggleClass('questions-numeration-enabled', questions.length > 1);
 
 
     // replace refs in solution with real answer and qustion numbers/labels
