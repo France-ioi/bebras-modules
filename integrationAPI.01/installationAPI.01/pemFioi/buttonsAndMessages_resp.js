@@ -1268,10 +1268,13 @@ window.displayHelper = {
          this.updateTaskDimensions();
          this.toggleTask();
       }
+      $('html').hide().show(0);
+      $("html").css("overflow-y","auto");
       if(this.scaleFactor != this.prevScaleFactor){
          this.prevScaleFactor = this.scaleFactor;
-         $('html').hide().show(0);
-         $("html").css("overflow-y","auto");
+         // this.updateTaskDimensions();
+         // task.displayedSubTask.resetDisplay();
+         // console.log(task)
       }
    },
 
