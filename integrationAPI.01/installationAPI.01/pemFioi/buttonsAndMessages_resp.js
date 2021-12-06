@@ -1268,7 +1268,15 @@ window.displayHelper = {
          this.updateTaskDimensions();
          this.toggleTask();
       }
-      $('html').hide().show(0);
+      setTimeout(function() {
+         $('html').hide(0).show(0);
+      }, 100);
+      setTimeout(function() {
+         $('html').hide(0).show(0);
+      }, 200);
+      setTimeout(function() {
+         $('html').hide(0).show(0);
+      }, 500);
       $("html").css("overflow-y","auto");
       if(this.scaleFactor != this.prevScaleFactor){
          this.prevScaleFactor = this.scaleFactor;
