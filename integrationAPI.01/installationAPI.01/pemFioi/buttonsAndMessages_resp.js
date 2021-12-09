@@ -1620,7 +1620,8 @@ window.displayHelper = {
             }
          } else if (!self.hasSolution) {
             if ($('#tab_' + newLevel).hasClass('uselessLevel') && self.levelsScores[newLevel] < self.levelsMaxScores[newLevel]) {
-               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, reload, null, "warning");
+               var popupType = (self.responsive) ? "blanket" : "tab";
+               self.showPopupMessage(self.strings.harderLevelSolved, popupType, self.strings.showLevelAnyway, reload, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
                var easyVersionKey = "levelVersionName_easy";
