@@ -1003,18 +1003,17 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
-               // displayHelper.updateTaskDimensions();
+               displayHelper.toggle_task = false;
                displayHelper.toggleTask();
-               // displayHelper.centerInstructions();
+               // console.log("change level")
             });
             /* click version in resp layout4 */
             $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
                displayHelper.setLevel(newLevel);
-               // displayHelper.updateTaskDimensions();
+               displayHelper.toggle_task = false;
                displayHelper.toggleTask();
-               // displayHelper.centerInstructions();
             });
          }
       }
@@ -1244,6 +1243,11 @@ window.displayHelper = {
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
             this.availableW = w;
             $('#zone_1').height('auto');
+            if(w <= 650){
+               $("#zone_3").addClass("compact");
+            }else{
+               $("#zone_3").removeClass("compact");
+            }
          }else{
             this.mobileMode = true;
             this.layout = 4;

@@ -854,20 +854,43 @@ h1 .stars {
    background: white;
    color: #88bb88;
 }
-.layout_3 [id^=resp_sw] i,
-.layout_3 #showSolution i,
+
+.layout_3 .compact [id^=resp_sw] i,
+.layout_3 .compact #showSolution i,
 .layout_4 [id^=resp_sw] i,
 .layout_4 #showSolution i {
    margin-top: 50%;
    margin-left: 50%;
    transform: translate(-50%,-50%);
 }
-.layout_3 [id^=resp_sw] span,
-.layout_3 #showSolution span,
+.layout_3 .compact [id^=resp_sw] span,
+.layout_3 .compact #showSolution span,
 .layout_4 [id^=resp_sw] span,
 .layout_4 #showSolution span {
    display: none;
 }
+
+.layout_3 [id^=resp_sw],
+.layout_3 #showSolution {
+   width: auto;
+   font-size: 14px;
+   padding: 15px;
+   font-weight: bold;
+}
+.layout_3 [id^=resp_sw] i,
+.layout_3 #showSolution i {
+   margin: 0 10px 0 0;
+   transform: none;
+}
+.layout_3 [id^=resp_sw] span,
+.layout_3 #showSolution span {
+   display: inline;
+   position: relative;
+}
+.layout_3 #resp_switch_2 {
+   border-right: 1px solid #d5d5d5;
+}
+
 .layout_3 .hideButtons [id^=resp_sw],
 .layout_3 .hideButtons #showSolution {
    width: auto;
@@ -902,17 +925,17 @@ h1 .stars {
    display: none;
 }
 
-.layout_3 #displayHelper_cancel > div {
+.layout_3 .compact #displayHelper_cancel > div {
    padding: 6px 8px;
 }
-.layout_3 #displayHelper_cancel > div span {
+.layout_3 .compact #displayHelper_cancel > div span {
    display: none
 }
-.layout_3 #displayHelper_cancel > div i {
+.layout_3 .compact #displayHelper_cancel > div i {
    margin-right: 0;
 }
 .layout_3 #displayHelper_validate > div span {
-   font-size: 12px;
+   font-size: 14px;
 }
 .layout_3 #displayHelper_validate > div i {
    margin-right: 5px;
@@ -920,19 +943,19 @@ h1 .stars {
 [alkindi].layout_3 #displayHelper_validate > div {
    width: 100px;
 }
-[alkindi].layout_3 #displayHelper_cancel > div,
+[alkindi].layout_3 .compact #displayHelper_cancel > div,
 [alkindi].layout_4 #displayHelper_cancel > div,
 [alkindi].layout_4 #displayHelper_validate > div {
    width: auto;
    border-radius: 50px;
 }
-[alkindi].layout_3 #displayHelper_cancel > div {
+[alkindi].layout_3 .compact #displayHelper_cancel > div {
    padding: 6px 8px;
 }
-[alkindi].layout_3 #displayHelper_cancel > div span {
+[alkindi].layout_3 .compact #displayHelper_cancel > div span {
    display: none
 }
-[alkindi].layout_3 #displayHelper_cancel > div i,
+[alkindi].layout_3 .compact #displayHelper_cancel > div i,
 /*[alkindi].layout_3 #displayHelper_validate > div i,*/
 [alkindi].layout_4 #displayHelper_cancel > div i,
 [alkindi].layout_4 #displayHelper_validate > div i {
@@ -941,8 +964,9 @@ h1 .stars {
 [alkindi].layout_3 #displayHelper_cancel > div i {
    margin-right: 0;
 }
-[alkindi].layout_3 #displayHelper_validate > div span {
-   font-size: 12px;
+[alkindi].layout_3 #displayHelper_validate > div span,
+[alkindi].layout_3 #displayHelper_cancel > div span {
+   font-size: 14px;
 }
 [alkindi].layout_3 #displayHelper_validate > div i {
    margin-right: 5px;
