@@ -26,6 +26,8 @@ function loadQuizModules() {
     }
     if(window.quiz_question_types.input) {
         modules.push('quiz2_questions_input');
+        modules.push('numeric_keypad');
+        modules.push('numeric_keypad_css');
     }
     if(window.quiz_question_types.sort_list){
         modules.push('quiz2_questions_sort_list');

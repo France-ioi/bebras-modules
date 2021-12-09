@@ -19,6 +19,9 @@
             validator = '.+';
         } else if(format == 'number') {
             validator = '^-?[0-9]*[,.]?[0-9]*$';
+            if('NumericKeypad' in window) {
+                NumericKeypad.attach(input);
+            }
         } else if(format == 'regexp') {
             validator = answer.attr('validator');
             var code = 'validator = ' + validator;
