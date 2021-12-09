@@ -258,6 +258,17 @@ Quiz.UI = function(params) {
                     questions[i].resetAnswer();
                 }
             }
+        },
+
+
+        getQuestionsInfo: function() {
+            var res = [];
+            for(var i=0; i<questions.length; i++) {
+                res[i] = {
+                    answers_amount: 'answers_order' in questions[i] ? questions[i].answers_order.length : 0
+                }
+            }  
+            return res;
         }
 
     }
