@@ -9,6 +9,7 @@
 
 
 #numeric-keypad .keypad {
+    font-family: 'Titillium Web', Arial, Helvetica, sans-serif;    
     position: absolute;
     display: -ms-flexbox;
     display: flex;

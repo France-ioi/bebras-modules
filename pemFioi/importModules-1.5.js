@@ -191,7 +191,9 @@
             'quickAlgo_blockly_runner',
             'quickAlgo_subtask',
             'quickAlgo_context',
-            'quickAlgo_css'
+            'quickAlgo_css',
+            'numeric_keypad',
+            'numeric_keypad_css'
          ],
          scratch: [
             'acorn',
