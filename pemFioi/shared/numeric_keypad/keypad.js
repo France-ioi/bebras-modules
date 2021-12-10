@@ -152,7 +152,7 @@ var NumericKeypad = {
     },
 
 
-    display: function(initialValue, position, callbackModify, callbackFinished) {
+    displayKeypad: function(initialValue, position, callbackModify, callbackFinished) {
         this.renderKeypad();
         $('#numeric-keypad').show();
         $('.keypad').css('top', position.top).css('left', position.left);
