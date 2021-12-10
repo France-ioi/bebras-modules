@@ -644,14 +644,13 @@ h1 .stars {
 }
 .layout_1 #tabsContainer #tabsMenu .resp_tabs, 
 .layout_2 #tabsContainer #tabsMenu .resp_tabs,
+.layout_3 #tabsContainer #tabsMenu:not(.compact) .resp_tabs,
 .layout_1 #tabsContainer #tabsMenu .resp_version_arr, 
-.layout_2 #tabsContainer #tabsMenu .resp_version_arr {
+.layout_2 #tabsContainer #tabsMenu .resp_version_arr,
+.layout_3 #tabsContainer #tabsMenu:not(.compact) .resp_version_arr {
    display: none;
 }
-.layout_1 #zone_0,
-.layout_2 #zone_0 {
-   /*height: 110px;*/
-}
+
 #task.layout_1,
 #task.layout_2,
 #task.layout_3,
@@ -760,41 +759,44 @@ h1 .stars {
 .layout_4 h1 {
    font-size: 25px;
 }
-.layout_3 #tabsContainer #tabsMenu .resp_tabs {
+.layout_3 #tabsMenu .li {
+   width: 160px;
+}
+.layout_3 #tabsContainer #tabsMenu.compact .resp_tabs {
    font-size: 14px;
    padding: 8px;
    color: #4a90e2;
 }
-.layout_3 #tabsContainer #tabsMenu .resp_tabs i {
+.layout_3 #tabsContainer #tabsMenu.compact .resp_tabs i {
    color: black;
 }
-.layout_3 #tabsContainer #tabsMenu a:not(.resp_version_arr),
-.layout_4 #tabsContainer #tabsMenu a {
+.layout_3 #tabsContainer #tabsMenu.compact a:not(.resp_version_arr),
+.layout_4 #tabsContainer #tabsMenu.compact a {
    display: none;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_version_arr {
+.layout_3 #tabsContainer #tabsMenu.compact a.resp_version_arr {
    width: 2em;
    padding: 0;
    opacity: 0.5;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_right_arr {
+.layout_3 #tabsContainer #tabsMenu.compact a.resp_right_arr {
    float: right;
 }
-.layout_3 #tabsContainer #tabsMenu a.resp_left_arr {
+.layout_3 #tabsContainer #tabsMenu.compact a.resp_left_arr {
    float: left;
 }
 .layout_3 .li > a.resp_version_arr {
    display: none !important;
 }
-.layout_3 #tabsMenu {
+.layout_3 #tabsMenu.compact {
    width: 90%;
    margin: 0 5%;
 }
-.layout_3 #tabsMenu .li:not(.current),
-.layout_4 #tabsMenu .li:not(.current)  {
+.layout_3 #tabsMenu.compact .li:not(.current),
+.layout_4 #tabsMenu.compact .li:not(.current)  {
    display: none;
 }
-.layout_3 #tabsMenu .li.current {
+.layout_3 #tabsMenu.compact .li.current {
    width: 100%;
    border-radius: 6px 6px 0 0;
 }

@@ -60,6 +60,7 @@ window.displayHelper = {
    prevScaleFactor: 1,
    sideZoneEnabled: false,
    updateLayoutCallbackStart: null,
+   compactMode: false,  // for tabs & footer in responsive layout 3
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -981,7 +982,8 @@ window.displayHelper = {
             });
          }else{
             $('#zone_0 #tabsMenu .li').on('click', function(event) {
-               if(displayHelper.layout == 3){
+               // console.log("click compact",displayHelper.compactMode)
+               if(displayHelper.layout == 3 && displayHelper.compactMode){
                   return
                }
                if(displayHelper.responsive && displayHelper.layout == 4){
@@ -992,8 +994,10 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).children().attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
-               // displayHelper.updateTaskDimensions();
-               // displayHelper.centerInstructions();
+               if(displayHelper.layout == 3 && !displayHelper.compactMode){
+                  displayHelper.toggle_task = false;  // change level => display new instructions
+                  displayHelper.toggleTask();
+               }
             });
             /* version arrows in mobile mode */
             $('#tabsMenu .resp_version_arr').on('click', function(event) {
@@ -1003,16 +1007,15 @@ window.displayHelper = {
                event.preventDefault();
                var newLevel = $(this).attr('href').split('#')[1];
                displayHelper.setLevel(newLevel);
-               displayHelper.toggle_task = false;
+               displayHelper.toggle_task = false; // change level => display new instructions
                displayHelper.toggleTask();
-               // console.log("change level")
             });
             /* click version in resp layout4 */
             $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
                displayHelper.setLevel(newLevel);
-               displayHelper.toggle_task = false;
+               displayHelper.toggle_task = false; // change level => display new instructions
                displayHelper.toggleTask();
             });
          }
@@ -1245,8 +1248,12 @@ window.displayHelper = {
             $('#zone_1').height('auto');
             if(w <= 650){
                $("#zone_3").addClass("compact");
+               $("#tabsMenu").addClass("compact");
+               this.compactMode = true;
             }else{
                $("#zone_3").removeClass("compact");
+               $("#tabsMenu").removeClass("compact");
+               this.compactMode = false;
             }
          }else{
             this.mobileMode = true;
