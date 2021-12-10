@@ -58,7 +58,25 @@
 
     function getAnswerGrader(grader, score_settings, idx) {
 
-        var question_info = score_settings.questions_info[idx];        
+        var question_info = score_settings.questions_info[idx];
+
+
+        function getScoreCalculationMethod() {
+            var res = {
+                formula: 'default',
+                wrong_answer_penalty: 1
+            }
+            if('score_calculation' in score_settings) {
+                if('formula' in score_settings.score_calculation) {
+                    res.formula = score_settings.score_calculation.formula;
+                } else if('wrong_answer_penalty' in score_settings.score_calculation) {
+                    res.formula = 'wrong_answer_penalty';
+                    res.wrong_answer_penalty = parseFloat(score_settings.score_calculation.wrong_answer_penalty) || 1;
+                }            
+            }
+            return res;
+        }
+
 
         function gradeAnswerArray(given_answer, correct_answer, messages) {
             var res = {
@@ -85,7 +103,14 @@
             var correct_answers_amount = correct_answer.length;
             var incorrect_answers_amount = question_info.answers_amount - correct_answers_amount;
 
-            switch(score_settings['score_calculation_formula']) {
+            var method = getScoreCalculationMethod();
+
+            switch(method.formula) {
+                case "wrong_answer_penalty":
+                    if(correct_answers_amount > 0) {
+                        res.score = (user_correct_answers_amount - method.wrong_answer_penalty * user_incorrect_answers_amount) / correct_answers_amount;
+                    }
+                    break;
                 case "percentage_of_correct":
                     if(correct_answers_amount > 0 && user_incorrect_answers_amount == 0) {
                         res.score = user_correct_answers_amount / correct_answers_amount;
@@ -110,6 +135,7 @@
                     break;
             }
             res.score = Math.max(0, res.score);
+            res.score = Math.min(1, res.score);
             return res;
         }
 
