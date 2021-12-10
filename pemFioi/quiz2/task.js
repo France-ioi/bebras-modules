@@ -420,7 +420,7 @@
                     maxScore: taskParams.maxScore,
                     minScore: taskParams.minScore,
                     noScore: taskParams.noScore,
-                    score_calculation_formula: quiz_settings['score_calculation_formula'],
+                    score_calculation: 'score_calculation' in quiz_settings ? quiz_settings.score_calculation : {},
                     questions_info: q.getQuestionsInfo()
                 };
                 var token = task_token.get()
