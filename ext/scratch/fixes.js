@@ -238,6 +238,90 @@ Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
   this.updateColour();
 };
 
+Blockly.BlockSvg.prototype.handleDragFree_ = function(oldXY, newXY, e) {
+  // Fix : move the drag surface to the right workspace position when moving a block from a sub-workspace
+  if(!Blockly.dragMutatorStyle) {
+     Blockly.dragMutatorStyle = document.createElement('style');
+     document.head.appendChild(Blockly.dragMutatorStyle);
+  }
+  if(this.workspace !== Blockly.mainWorkspace) {
+     // This is done through CSS because Scratch computations get wrong if you
+     // translate the SVG differently
+     var transformData = (
+        $(this.workspace.getParentSvg())
+        .closest('.blocklyBubbleCanvas').children()
+        .attr('transform').match(/translate\(([.0-9-]+),([.0-9-]+)\)/));
+     var transformStr = 'translate3d(' + transformData[1] + 'px, ' + transformData[2] + 'px, 0px)';
+     Blockly.dragMutatorStyle.innerText = (
+        '.blocklyDraggable.blocklyDragging.blocklySelected { transform: '+transformStr+'; }');
+  } else {
+     Blockly.dragMutatorStyle.innerText = '';
+  }
+
+  var dxy = goog.math.Coordinate.difference(oldXY, this.dragStartXY_);
+  this.workspace.dragSurface.translateSurface(newXY.x, newXY.y);
+  // Drag all the nested bubbles.
+  for (var i = 0; i < this.draggedBubbles_.length; i++) {
+    var commentData = this.draggedBubbles_[i];
+    commentData.bubble.setIconLocation(
+        goog.math.Coordinate.sum(commentData, dxy));
+  }
+
+  // Check to see if any of this block's connections are within range of
+  // another block's connection.
+  var myConnections = this.getConnections_(false);
+  // Also check the last connection on this stack
+  var lastOnStack = this.lastConnectionInStack();
+  if (lastOnStack && lastOnStack != this.nextConnection) {
+    myConnections.push(lastOnStack);
+  }
+  var closestConnection = null;
+  var localConnection = null;
+  var radiusConnection = Blockly.SNAP_RADIUS;
+  // If there is already a connection highlighted,
+  // increase the radius we check for making new connections.
+  // Why? When a connection is highlighted, blocks move around when the insertion
+  // marker is created, which could cause the connection became out of range.
+  // By increasing radiusConnection when a connection already exists,
+  // we never "lose" the connection from the offset.
+  if (Blockly.localConnection_ && Blockly.highlightedConnection_) {
+    radiusConnection = Blockly.CONNECTING_SNAP_RADIUS;
+  }
+  for (i = 0; i < myConnections.length; i++) {
+    var myConnection = myConnections[i];
+    var neighbour = myConnection.closest(radiusConnection, dxy);
+    if (neighbour.connection) {
+      closestConnection = neighbour.connection;
+      localConnection = myConnection;
+      radiusConnection = neighbour.radius;
+    }
+  }
+
+  var updatePreviews = true;
+  if (localConnection && localConnection.type == Blockly.OUTPUT_VALUE) {
+    updatePreviews = true; // Always update previews for output connections.
+  } else if (Blockly.localConnection_ && Blockly.highlightedConnection_) {
+    var xDiff = Blockly.localConnection_.x_ + dxy.x -
+        Blockly.highlightedConnection_.x_;
+    var yDiff = Blockly.localConnection_.y_ + dxy.y -
+        Blockly.highlightedConnection_.y_;
+    var curDistance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    // Slightly prefer the existing preview over a new preview.
+    if (closestConnection && radiusConnection > curDistance -
+        Blockly.CURRENT_CONNECTION_PREFERENCE) {
+      updatePreviews = false;
+    }
+  }
+
+  if (updatePreviews) {
+    var candidateIsLast = (localConnection == lastOnStack);
+    this.updatePreviews(closestConnection, localConnection, radiusConnection,
+        e, newXY.x - this.dragStartXY_.x, newXY.y - this.dragStartXY_.y,
+        candidateIsLast);
+  }
+};
+
 // Change behavior when we attach a data_variable along a data_variablemenu
 Blockly.Connection.prototype.connect_ = function(childConnection) {
   var parentConnection = this;
