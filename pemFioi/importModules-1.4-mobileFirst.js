@@ -221,6 +221,8 @@
             'blockly_' + strLang,
             'blockly_fioi',
             'fonts-loader-1.0',
+            'numeric_keypad',
+            'numeric_keypad_css',
             'quickAlgo_utils',
             'quickAlgo_i18n',
             'quickAlgo_interface',
@@ -229,9 +231,7 @@
             'quickAlgo_blockly_runner',
             'quickAlgo_subtask',
             'quickAlgo_context',
-            'quickAlgo_css',
-            'numeric_keypad',
-            'numeric_keypad_css'
+            'quickAlgo_css'
          ],
          scratch: [
             'acorn',
@@ -247,6 +247,8 @@
             'scratch_fixes',
             'scratch_procedures',
             'fonts-loader-1.0',
+            'numeric_keypad',
+            'numeric_keypad_css',
             'quickAlgo_utils',
             'quickAlgo_i18n',
             'quickAlgo_interface',
