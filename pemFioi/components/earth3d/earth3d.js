@@ -1167,6 +1167,7 @@ function Earth3D(params) {
         setDistance: function(d) {
             var r = config.distance.min + d * (config.distance.max - config.distance.min);
             orbit_controller.setRadius(r);
+            orbit_controller.rotateSpeed = 0.25*r/config.distance.max;
         },
 
         addPath: addPath,
