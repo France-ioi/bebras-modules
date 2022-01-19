@@ -1,10 +1,12 @@
 var NumericKeypad = {
 
+    bodyStyle: document.createElement('style'),
+
     data: {
         value: '',
         initialValue: '',
         callbackModify: function() {},
-        callbackFinished: function() {}
+        callbackFinished: function() {},
     },
 
     renderKeypad: function() {
@@ -46,6 +48,7 @@ var NumericKeypad = {
             '</div></div>';
         $('body').append(html);
         $('#numeric-keypad').on('click keydown', this.handleKeypadKey.bind(this));
+        document.head.appendChild(this.bodyStyle);
     },
 
     handleKeypadKey: function(e) {
@@ -140,6 +143,7 @@ var NumericKeypad = {
 
         if(finished) {
             $('#numeric-keypad').hide();
+            this.bodyStyle.innerText = '';
             // Second argument could be !!btn if we want to be able to click on
             // the block's input
             var finalValue = data.value == '' ? data.initialValue : data.value;
@@ -152,10 +156,17 @@ var NumericKeypad = {
     },
 
 
+    positionKeypad: function(position) {
+        $('#numeric-keypad .keypad').css('top', position.top).css('left', position.left);
+        // Make sure the body has enough height for the keypad
+        this.bodyStyle.innerText = 'body { min-height: ' + (position.top + 272) + 'px; }';
+    },
+
+
     displayKeypad: function(initialValue, position, callbackModify, callbackFinished) {
         this.renderKeypad();
+        this.positionKeypad(position);
         $('#numeric-keypad').show();
-        $('.keypad').css('top', position.top).css('left', position.left);
         this.data = {
             value: '',
             initialValue: initialValue,
@@ -172,12 +183,12 @@ var NumericKeypad = {
         input.on('focus', function() {
             self.renderKeypad();
             $('#numeric-keypad').show();
-            var position = input.position();
-            $('#numeric-keypad .keypad').css('top', position.top).css('left', position.left);
+            var position = input.offset();
+            this.positionKeypad(position);
             var v = input.val();
             self.data = {
                 value: v,
-                initialValue: v,
+                initialValue: v || '0',
                 callbackModify: function(v) { 
                     input.val(v); 
                 },
