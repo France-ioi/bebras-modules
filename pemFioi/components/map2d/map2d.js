@@ -1163,23 +1163,25 @@ function Map2D(params) {
                     return false;
                 }
 
-                // check missed pixels
-                var l;
-                var fl = false;
-                bias_loops:
-                for(var k=0; k<ofs_table.length; k++) {
-                    l = j + ofs_table[k];
-                    if(l < 0 || l >= editor_drawing.length) {
-                        continue;
+                if(editor_drawing[j] == 0 && target_mask[j] != 0){
+                    // check missed pixels
+                    var l;
+                    var fl = false;
+                    bias_loops:
+                    for(var k=0; k<ofs_table.length; k++) {
+                        l = j + ofs_table[k];
+                        if(l < 0 || l >= editor_drawing.length) {
+                            continue;
+                        }
+                        if(editor_drawing[l] == target_drawing[j]) {
+                            fl = true;
+                            break bias_loops;
+                        }
                     }
-                    if(editor_drawing[l] == target_drawing[j]) {
-                        fl = true;
-                        break bias_loops;
+                    if(!fl) {
+                        setPixelMistake(j, 'miss', layer);
+                        return false;
                     }
-                }
-                if(!fl) {
-                    setPixelMistake(j, 'miss', layer);
-                    return false;
                 }
             }
             return true;
