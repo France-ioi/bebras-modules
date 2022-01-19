@@ -184,7 +184,7 @@ var NumericKeypad = {
             self.renderKeypad();
             $('#numeric-keypad').show();
             var position = input.offset();
-            this.positionKeypad(position);
+            self.positionKeypad(position);
             var v = input.val();
             self.data = {
                 value: v,
