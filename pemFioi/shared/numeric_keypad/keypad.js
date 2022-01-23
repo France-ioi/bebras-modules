@@ -181,6 +181,7 @@ var NumericKeypad = {
         // Make sure the body has enough height for the keypad
         this.bodyMinHeight = Math.max(this.bodyMinHeight, (input.offset().top || 0) + 272);
         this.bodyStyle.innerText = 'body, #container { min-height: ' + this.bodyMinHeight + 'px; }';
+        $('#container').css('padding-bottom', '110px');
 
         input.on('focus', function() {
             self.renderKeypad();
