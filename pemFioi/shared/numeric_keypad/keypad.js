@@ -1,6 +1,7 @@
 var NumericKeypad = {
 
     bodyStyle: document.createElement('style'),
+    bodyMinHeight: 0,
 
     data: {
         value: '',
@@ -143,7 +144,6 @@ var NumericKeypad = {
 
         if(finished) {
             $('#numeric-keypad').hide();
-            this.bodyStyle.innerText = '';
             // Second argument could be !!btn if we want to be able to click on
             // the block's input
             var finalValue = data.value == '' ? data.initialValue : data.value;
@@ -158,8 +158,6 @@ var NumericKeypad = {
 
     positionKeypad: function(position) {
         $('#numeric-keypad .keypad').css('top', position.top).css('left', position.left);
-        // Make sure the body has enough height for the keypad
-        this.bodyStyle.innerText = 'body { min-height: ' + (position.top + 272) + 'px; }';
     },
 
 
@@ -179,7 +177,11 @@ var NumericKeypad = {
 
     attach: function(input) {
         var self = this;
-        
+
+        // Make sure the body has enough height for the keypad
+        this.bodyMinHeight = Math.max(this.bodyMinHeight, (input.offset().top || 0) + 272);
+        this.bodyStyle.innerText = 'body, #container { min-height: ' + this.bodyMinHeight + 'px; }';
+
         input.on('focus', function() {
             self.renderKeypad();
             $('#numeric-keypad').show();
