@@ -1,5 +1,5 @@
 function createAlgoreaInstructions(type,params) {
-   // var languages = ["blockly","scratch","python"];
+   var languages = ["blockly","scratch","python"];
 
    var imgPath = "../../../_common/modules/img/algorea/";
    var vidPath = "../../../_common/modules/vid/";
