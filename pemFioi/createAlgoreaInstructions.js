@@ -5,8 +5,11 @@ function createAlgoreaInstructions(type,level,params) {
    var vidPath = "../../../_common/modules/vid/";
    var totalHTML = "<div class='"+level+"'>";
    totalHTML += (params.moreDetails) ? "<div class='short'>" : "";
+
    // 0 : course
    // 1 : dominoes
+   // 2 : flowers
+   // 3 : gems
    switch(type){
       case 0:
          totalHTML += createCourseInstructions(params);
@@ -14,13 +17,32 @@ function createAlgoreaInstructions(type,level,params) {
       case 1:
          totalHTML += createDominoesInstructions(params);
          break
+      case 2:
+         totalHTML += createFlowersInstructions(params);
+         break
+      case 3:
+         totalHTML += createGemsInstructions(params);
+         break
       default:
          totalHTML += params.custom;
    }
 
+   if(params.help){
+      totalHTML += addHelp(params.help);
+   }
+
+   if(params.stepByStep){
+      totalHTML += addStepByStep(params.stepByStep);
+   }
+
+   if(params.helpConcept){
+      totalHTML += addHelpConcept(params.helpConcept);
+   }
+
+   // test lang
    for(var iLang = 0; iLang < languages.length; iLang++){
       var lang = languages[iLang];
-      totalHTML += "<p data-lang="+lang+">Contenu "+lang+"</p>";  // test
+      totalHTML += "<p data-lang="+lang+">Contenu "+lang+"</p>";  
    }
    
    totalHTML += (params.moreDetails) ? "</div>" : "";
@@ -145,15 +167,133 @@ function createAlgoreaInstructions(type,level,params) {
       return html
    };
 
-   function addDetails(dat) {
-      var html = "<div class='long";
-      // if(dat.level){
-      //    for(var iLev = 0; iLev < dat.level.length; iLev++){
-      //       html += " "+dat.level[iLev];
-      //    }
-      // }
-      // html += "'";
+   function createFlowersInstructions(params) {
+      // Programmez le robot pour qu'il sème une graine de fleur dans la zone de terre. 14
+      // Programmez le robot pour qu'il sème une graine de fleur dans chaque zone de terre. 92
+      // Programmez le robot pour qu'il dépose une graine sur le tas de terre. 3
+      // Programmez le robot pour qu'il dépose une graine sur chaque tas de terre. 18
+      // Programmez le robot pour qu'il sème une graine de fleur dans la zone de terre en bas à droite. 1
 
+      // Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus. (Il ne va quand même pas écraser les fleurs !) 84
+
+      var strArr1 = [
+         "une graine de fleur dans la zone de terre.",
+         "une graine de fleur dans chaque zone de terre."
+      ];
+      var strArr2 = [
+         "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus. Il ne va quand même pas écraser les fleurs !",
+         "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus."
+      ];
+      var strID1 = params.strID1;
+      var strID2 = params.strID2;
+      var html = "<p>"; 
+      html += "Programmez le robot pour qu'il sème ";
+      html += strArr1[strID1];
+      html += "</p>";
+      if(strID2 != undefined){
+         html += "<p>";
+         html += strArr2[strID2];
+         html += "</p>";
+      }
+      return html
+   };
+
+   function createGemsInstructions(params) {
+      // Programmez le robot pour qu'il passe ramasser la pierre précieuse. 7
+      // Programmez le robot pour qu'il passe ramasser toutes les pierres précieuses. 53
+      // Programmez le robot pour qu'il ramasse le diamant. 3
+      // Programmez le robot pour qu'il passe ramasser tous les diamants. 9
+
+      // Pour ramasser une pierre, le robot doit simplement passer sur la case qui la contient. 4
+      // Pour ramasser une pierre, le robot doit passer sur la case qui la contient. 16
+      // Notez que lorsqu'il arrive sur une case, le robot ramasse automatiquement le diamant s'il y en a un sur la case. 4
+      // Lorsqu'il arrive sur une case, le robot ramasse automatiquement le diamant s'il y en a un sur la case. 4
+   };
+
+   /*** COMMON ***/
+
+   function addHelp(dat) {
+      // indication :
+      // aide :
+      // Aide : on peut placer une boucle à l'intérieur d'une boucle ! 
+      var html = "<p";
+      if(dat.lang){
+         html += " data-lang='";
+         for(var iLang = 0; iLang < dat.lang.length; iLang++){
+            html += " "+dat.lang[iLang];
+         }
+         html += "'";
+      }
+      html += ">";
+      var strArr1 = [
+         "",
+         "Aide : ",
+         "Indication : "
+      ];
+      var strID1 = dat.strID1;
+      html += strArr1[strID1];
+      html += dat.text;
+      html += "</p>";
+
+      return html
+   };
+
+   function addStepByStep(dat) {
+      var html = "<p";
+      if(dat.lang){
+         html += " data-lang='";
+         for(var iLang = 0; iLang < dat.lang.length; iLang++){
+            html += " "+dat.lang[iLang];
+         }
+         html += "'";
+      }
+      html += ">";
+      html += "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\" ";
+      html += "<img src=\""+imgPath+"step_by_step_button.png\" style=\"width: 40px; vertical-align: middle\" />";
+      html += "</p>";
+      
+      return html
+   };
+
+   function addHelpConcept(dat) {
+      // Vous aurez besoin du bloc
+      // Vous pouvez avoir besoin du bloc
+      // utilisez des fonctions
+
+      var html = "<p";
+      if(dat.lang){
+         html += " data-lang='";
+         for(var iLang = 0; iLang < dat.lang.length; iLang++){
+            html += " "+dat.lang[iLang];
+         }
+         html += "'";
+      }
+      html += ">";
+
+      if(dat.custom){
+         html += dat.custom;
+      }else{
+         var strArr1 = [
+            "Vous pourrez avoir besoin du bloc ",
+            "Vous aurez besoin du bloc ",
+            "Vous pourrez avoir besoin de ",
+            "Vous aurez besoin de ",
+            "Aide : ",
+            "Utilisez des "
+         ];
+         var strID1 = dat.strID1;
+         html += strArr1[strID1];
+         html += "<a onclick=\"conceptViewer.showConcept('"+dat.concept+"')\">";
+         html += dat.mainStr;
+         html += "</a>";
+      }
+      html += ".</p>";
+
+      return html
+   };
+
+   function addDetails(dat) { // tuto
+      var html = "<div class='long";
       if(dat.lang){
          html += " data-lang='";
          for(var iLang = 0; iLang < dat.lang.length; iLang++){
@@ -180,13 +320,11 @@ function createAlgoreaInstructions(type,level,params) {
    };
    
 
-   // indication :
-   // aide :
+   
    // attention ! Le même programme doit fonctionner sur les X tests/parcours ci-dessous/proposés/suivants. 
    // attention, vous ne disposez que de X blocs
-   // Vous aurez besoin du bloc
-   // Vous pouvez avoir besoin du bloc
-   // utilisez des fonctions
+   
+   
 
    // Si vous avez besoin d'aide, cliquez sur le bouton "Plus de détails" ci-dessous. 
    // Une aide est disponible en cliquant sur le bouton "Plus de détails". 
