@@ -1,26 +1,24 @@
 function createAlgoreaInstructions(type,level,params) {
    var languages = ["blockly","scratch","python"];
+   
+   var strLang = window.stringsLanguage;
 
    var imgPath = "../../../_common/modules/img/algorea/";
    var vidPath = "../../../_common/modules/vid/";
    var totalHTML = "<div class='"+level+"'>";
    totalHTML += (params.moreDetails) ? "<div class='short'>" : "";
 
-   // 0 : course
-   // 1 : dominoes
-   // 2 : flowers
-   // 3 : gems
    switch(type){
-      case 0:
-         totalHTML += createCourseInstructions(params);
+      case "course":
+         totalHTML += createCourseInstructions(params.data);
          break;
-      case 1:
+      case "dominoes":
          totalHTML += createDominoesInstructions(params);
          break
-      case 2:
+      case "flowers":
          totalHTML += createFlowersInstructions(params);
          break
-      case 3:
+      case "gems":
          totalHTML += createGemsInstructions(params);
          break
       default:
@@ -48,73 +46,52 @@ function createAlgoreaInstructions(type,level,params) {
    totalHTML += (params.moreDetails) ? "</div>" : "";
 
    if(params.moreDetails){
-      totalHTML += addDetails(params.moreDetails);
+      // totalHTML += addDetails(params.moreDetails);
    }
    
    totalHTML += "</div>";
 
    return totalHTML
 
-   function createCourseInstructions(params) {
-      // Programmez votre robot pour qu'il atteigne le drapeau. 
-      // Programmer le robot pour qu'il atteigne le drapeau, sans foncer dans un buisson. 
-      // Programmez votre robot pour qu'il sorte du labyrinthe. La sortie est sur la case verte. 
-      // Programmez votre robot pour qu'il sorte du labyrinthe en atteignant une des deux cases vertes. 
-      // Programmez votre robot pour qu'il atteigne la zone verte tout au bout du parcours. 
-      // Programmer le robot pour qu'il atteigne une case verte, sans foncer dans un obstacle. Un obstacle est soit un mur, soit une porte fermée. 
-      // Programmez le robot pour qu'il atteigne un drapeau, sans foncer dans un obstacle. Un obstacle est soit un buisson, soit une étendue d'eau. 
-      // Programmer le robot pour qu'il atteigne la zone verte tout au bout du parcours, sans rentrer dans un obstacle. 
-      // Programmez le robot pour qu'il atteigne une des zones vertes dans un coin du labyrinthe. 
-      // Programmez le robot pour qu'il atteigne la zone verte. 
-      // Programmer le robot pour qu'il atteigne un drapeau, sans foncer dans un buisson, ni tomber dans l'eau. 
-      // Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer. 
-      var exit = params.exit;
-      // 0: drapeau
-      // 1: case verte
-      var nbExits = params.nbExits;
-      var obstacles = params.obstacles;   // []
-      // 0: buisson
-      // 1: étendue d'eau
-      // 2: mur
-      // 3: porte fermée  
-      var obsStr = [ "un buisson", "une étendue d'eau", "un mur", "une porte fermée"];
-      var board = params.board;
-
-      var html = "<p>"; 
-      html += "Programmez le robot pour qu'il atteigne ";
-      if(exit == 0){
-         if(nbExits == 1){
-            html += "le drapeau";
-         }else{
-            html += "un des "+nbExits+" drapeaux";
-         }
-      }else if(exit == 1){
-         if(nbExits == 1){
-            html += "la case verte";
-         }else{
-            html += "une des "+nbExits+" cases vertes";
-         }
+   function createCourseInstructions(data) {
+      if(!data){
+         return
       }
-      html += " sans rentrer dans ";
-
-      if(obstacles.length == 1){
-         html += obsStr[obstacles[0]]+".";
-      }else{
-         html += "un obstacle. Un obstacle est ";
-         for(var iObs = 0; iObs < obstacles.length; iObs++){
-            var obsID = obstacles[iObs];
-            html += "soit "+obsStr[obsID];
-            if(iObs < obstacles.length - 1){
-               html += ", ";
-            }else{
-               html += ".";
+      var tiles = data[0].tiles;
+      var nbRows = tiles.length;
+      var nbCol = tiles[0].length;
+      var obstacles = [];
+      var nbExits = 0;
+      var board = false;
+      for(var row = 0; row < nbRows; row++){
+         for(var col = 0; col < nbCol; col++){
+            var itemID = tiles[row][col];
+            switch(itemID){
+               case 2:
+               case 4:
+               case 7:
+               case 8:
+               case 13:
+                  if(!Beav.Array.has(obstacles,itemID)){
+                     obstacles.push(itemID)
+                  }
+                  break;
+               case 3:
+                  nbExits++;
+                  break;
+               case 14:
+                  board = true;
+                  break;
             }
          }
       }
-      html += "</p>";
+
+      var text = algoreaInstructionsStrings[strLang].course(nbExits,obstacles);
+
+      html = "<p>"+text+"</p>";
 
       if(board){
-         html += "<p>Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer.</p>"; 
+         html += "<p>"+algoreaInstructionsStrings[strLang].board+"</p>"; 
       }
       return html
    };
@@ -251,7 +228,7 @@ function createAlgoreaInstructions(type,level,params) {
       html += "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\" ";
       html += "<img src=\""+imgPath+"step_by_step_button.png\" style=\"width: 40px; vertical-align: middle\" />";
       html += "</p>";
-      
+
       return html
    };
 
@@ -292,32 +269,32 @@ function createAlgoreaInstructions(type,level,params) {
       return html
    };
 
-   function addDetails(dat) { // tuto
-      var html = "<div class='long";
-      if(dat.lang){
-         html += " data-lang='";
-         for(var iLang = 0; iLang < dat.lang.length; iLang++){
-            html += " "+dat.lang[iLang];
-         }
-         html += "'";
-      }
-      html += ">";
+   // function addDetails(dat) { // tuto
+   //    var html = "<div class='long";
+   //    if(dat.lang){
+   //       html += " data-lang='";
+   //       for(var iLang = 0; iLang < dat.lang.length; iLang++){
+   //          html += " "+dat.lang[iLang];
+   //       }
+   //       html += "'";
+   //    }
+   //    html += ">";
 
-      html += "<p>Glissez les blocs avec la souris :</p>";
-      html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
-      html += "<p>Démonstration :</p>";
-      html += "<a class='videoBtn' data-lang='blockly' data-video='"+vidPath+"demo_b.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_b.jpg'></a>";
-      html += "<a class='videoBtn' data-lang='scratch' data-video='"+vidPath+"demo_s.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_s.jpg'></a>";
-      html += "</div>";
-      html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
-      html += "<p>Cliquez ensuite sur le bouton</p>";
-      html += "<img src='"+imgPath+"play_button.png' />";
-      html += "<p>qui se trouve <span style='color: red;'>sous le dessin</span></p>";
-      html += "<p>et observez le résultat !</p>";
-      html += "</div>";
-      html += "</div>";
-      return html
-   };
+   //    html += "<p>Glissez les blocs avec la souris :</p>";
+   //    html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
+   //    html += "<p>Démonstration :</p>";
+   //    html += "<a class='videoBtn' data-lang='blockly' data-video='"+vidPath+"demo_b.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_b.jpg'></a>";
+   //    html += "<a class='videoBtn' data-lang='scratch' data-video='"+vidPath+"demo_s.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_s.jpg'></a>";
+   //    html += "</div>";
+   //    html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
+   //    html += "<p>Cliquez ensuite sur le bouton</p>";
+   //    html += "<img src='"+imgPath+"play_button.png' />";
+   //    html += "<p>qui se trouve <span style='color: red;'>sous le dessin</span></p>";
+   //    html += "<p>et observez le résultat !</p>";
+   //    html += "</div>";
+   //    html += "</div>";
+   //    return html
+   // };
    
 
    
