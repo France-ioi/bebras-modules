@@ -1944,6 +1944,7 @@ var getContext = function(display, infos, curLevel) {
       course: {
          itemTypes: {
             red_robot: { img: modulesPath+"/img/algorea/red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
+            red_robot_alt: { img: modulesPath+"/img/algorea/red_robot_alt.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
             bush: { num: 2, img: modulesPath+"/img/algorea/bush.png", side: 60, isObstacle: true, zOrder: 0 },
             flag: { num: 3, img: modulesPath+"/img/algorea/flag.png", side: 60, isExit: true, zOrder: 0},
             wall: { num: 4, img: modulesPath+"/img/algorea/wall.png", side: 60, isObstacle: true, zOrder: 0 },
