@@ -35,6 +35,17 @@ var algoreaInstructionsStrings = {
 
          return text
       },
-      board: "Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer."
+      board: "Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer.",
+      helpConcept: function(id) {
+         var strArr = [
+            "Vous pourrez avoir besoin du bloc ",
+            "Vous aurez besoin du bloc ",
+            "Vous pourrez avoir besoin de ",
+            "Vous aurez besoin de ",
+            "Aide : ",
+            "Utilisez des "
+         ];
+         return strArr[id]
+      }
    }
 };

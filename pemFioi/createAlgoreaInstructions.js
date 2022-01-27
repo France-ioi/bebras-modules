@@ -1,12 +1,26 @@
-function createAlgoreaInstructions(type,level,params) {
-   var languages = ["blockly","scratch","python"];
-   
+function createAlgoreaInstructions(type,params) {
+   // var languages = ["blockly","scratch","python"];
+   var level = displayHelper.taskLevel;
+   var lang = conceptViewer.selectedLanguage;
+   if(!level || !lang){
+      return ""
+   }
+   // console.log(lang,level)
    var strLang = window.stringsLanguage;
 
    var imgPath = "../../../_common/modules/img/algorea/";
    var vidPath = "../../../_common/modules/vid/";
    var totalHTML = "<div class='"+level+"'>";
-   totalHTML += (params.moreDetails) ? "<div class='short'>" : "";
+
+   if(params.moreDetails){
+      var detailsEnabled = false;
+      var dat = params.moreDetails;
+      if((!dat.lang || Beav.Array.has(dat.lang,lang)) && 
+         (!dat.level || Beav.Array.has(dat.level,level))){
+         totalHTML += (params.moreDetails) ? "<div class='short'>" : "";
+         detailsEnabled = true;
+      }
+   }
 
    switch(type){
       case "course":
@@ -36,17 +50,11 @@ function createAlgoreaInstructions(type,level,params) {
    if(params.helpConcept){
       totalHTML += addHelpConcept(params.helpConcept);
    }
-
-   // test lang
-   for(var iLang = 0; iLang < languages.length; iLang++){
-      var lang = languages[iLang];
-      totalHTML += "<p data-lang="+lang+">Contenu "+lang+"</p>";  
-   }
    
    totalHTML += (params.moreDetails) ? "</div>" : "";
 
-   if(params.moreDetails){
-      // totalHTML += addDetails(params.moreDetails);
+   if(params.moreDetails && detailsEnabled){
+      totalHTML += params.moreDetails.html;
    }
    
    totalHTML += "</div>";
@@ -57,7 +65,7 @@ function createAlgoreaInstructions(type,level,params) {
       if(!data){
          return
       }
-      var tiles = data[0].tiles;
+      var tiles = data[level][0].tiles;
       var nbRows = tiles.length;
       var nbCol = tiles[0].length;
       var obstacles = [];
@@ -190,25 +198,11 @@ function createAlgoreaInstructions(type,level,params) {
    /*** COMMON ***/
 
    function addHelp(dat) {
-      // indication :
-      // aide :
-      // Aide : on peut placer une boucle à l'intérieur d'une boucle ! 
-      var html = "<p";
-      if(dat.lang){
-         html += " data-lang='";
-         for(var iLang = 0; iLang < dat.lang.length; iLang++){
-            html += " "+dat.lang[iLang];
-         }
-         html += "'";
+      if((dat.lang && !Beav.Array.has(dat.lang,lang)) || 
+         (dat.level && !Beav.Array.has(dat.level,level))){
+         return ""
       }
-      html += ">";
-      var strArr1 = [
-         "",
-         "Aide : ",
-         "Indication : "
-      ];
-      var strID1 = dat.strID1;
-      html += strArr1[strID1];
+      var html = "<p>";
       html += dat.text;
       html += "</p>";
 
@@ -233,33 +227,18 @@ function createAlgoreaInstructions(type,level,params) {
    };
 
    function addHelpConcept(dat) {
-      // Vous aurez besoin du bloc
-      // Vous pouvez avoir besoin du bloc
-      // utilisez des fonctions
-
-      var html = "<p";
-      if(dat.lang){
-         html += " data-lang='";
-         for(var iLang = 0; iLang < dat.lang.length; iLang++){
-            html += " "+dat.lang[iLang];
-         }
-         html += "'";
+      if((dat.lang && !Beav.Array.has(dat.lang,lang)) || 
+         (dat.level && !Beav.Array.has(dat.level,level))){
+         return ""
       }
-      html += ">";
+
+      var html = "<p>";
 
       if(dat.custom){
          html += dat.custom;
       }else{
-         var strArr1 = [
-            "Vous pourrez avoir besoin du bloc ",
-            "Vous aurez besoin du bloc ",
-            "Vous pourrez avoir besoin de ",
-            "Vous aurez besoin de ",
-            "Aide : ",
-            "Utilisez des "
-         ];
-         var strID1 = dat.strID1;
-         html += strArr1[strID1];
+         var strID = dat.strID;
+         html += algoreaInstructionsStrings[strLang].helpConcept(strID);
          html += "<a onclick=\"conceptViewer.showConcept('"+dat.concept+"')\">";
          html += dat.mainStr;
          html += "</a>";
@@ -268,33 +247,6 @@ function createAlgoreaInstructions(type,level,params) {
 
       return html
    };
-
-   // function addDetails(dat) { // tuto
-   //    var html = "<div class='long";
-   //    if(dat.lang){
-   //       html += " data-lang='";
-   //       for(var iLang = 0; iLang < dat.lang.length; iLang++){
-   //          html += " "+dat.lang[iLang];
-   //       }
-   //       html += "'";
-   //    }
-   //    html += ">";
-
-   //    html += "<p>Glissez les blocs avec la souris :</p>";
-   //    html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
-   //    html += "<p>Démonstration :</p>";
-   //    html += "<a class='videoBtn' data-lang='blockly' data-video='"+vidPath+"demo_b.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_b.jpg'></a>";
-   //    html += "<a class='videoBtn' data-lang='scratch' data-video='"+vidPath+"demo_s.mp4' style='width: 100%'' ><img src='"+imgPath+"vignette_s.jpg'></a>";
-   //    html += "</div>";
-   //    html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
-   //    html += "<p>Cliquez ensuite sur le bouton</p>";
-   //    html += "<img src='"+imgPath+"play_button.png' />";
-   //    html += "<p>qui se trouve <span style='color: red;'>sous le dessin</span></p>";
-   //    html += "<p>et observez le résultat !</p>";
-   //    html += "</div>";
-   //    html += "</div>";
-   //    return html
-   // };
    
 
    
