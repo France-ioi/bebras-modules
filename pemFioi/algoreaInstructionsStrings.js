@@ -36,6 +36,22 @@ var algoreaInstructionsStrings = {
          return text
       },
       board: "Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer.",
+      dominoes: function(nbTarget,rollOver) {
+         var text = "Programmez le robot pour qu'il ramasse ";
+         if(nbTarget == 1){
+            text += "le domino avec deux carrés bleus.";
+         }else{
+            text += "tous les dominos avec deux carrés bleus.";
+         }
+         if(rollOver){
+            text += " Le robot peut passer sur les dominos qu'il ne ramasse pas.";
+         }
+         return text
+      },
+      maxMove: function(max) {
+         return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
+      },
+      repeatHelp: "Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”.",
       helpConcept: function(id) {
          var strArr = [
             "Vous pourrez avoir besoin du bloc ",
