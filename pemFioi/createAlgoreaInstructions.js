@@ -5,11 +5,11 @@ function createAlgoreaInstructions(type,params) {
    if(!level || !lang){
       return ""
    }
-   // console.log(lang,level)
    var strLang = window.stringsLanguage;
+   var strings = algoreaInstructionsStrings[strLang];
 
    var imgPath = "../../../_common/modules/img/algorea/";
-   var vidPath = "../../../_common/modules/vid/";
+   // var vidPath = "../../../_common/modules/vid/";
    var totalHTML = "<div class='"+level+"'>";
 
    if(params.moreDetails){
@@ -94,61 +94,43 @@ function createAlgoreaInstructions(type,params) {
          }
       }
 
-      var text = algoreaInstructionsStrings[strLang].course(nbExits,obstacles);
+      var text = strings.course(nbExits,obstacles);
 
-      html = "<p>"+text+"</p>";
+      var html = "<p>"+text+"</p>";
 
       if(board){
-         html += "<p>"+algoreaInstructionsStrings[strLang].board+"</p>"; 
+         html += "<p>"+strings.board+"</p>"; 
       }
       return html
    };
 
    function createDominoesInstructions(params) {
-      // Programmez le robot pour qu'il ramasse le domino avec deux carrés bleus. 6
-      // Programmez le robot pour qu'il ramasse tous les dominos avec deux carrés bleus. 16
-      // Programmez le robot pour qu'il ramasse tous les dominos. 2
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent au moins un carré bleu. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui ne contiennent pas de carré bleu. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui ne contiennent pas de croix verte mais au moins un carré bleu. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos sauf ceux qui contiennent deux carrés bleus. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos avec deux carrés bleus, et seulement ceux-là. 7
-      // Programmez le robot pour qu'il ramasse le domino avec deux carrés bleus s'il y en a un, et seulement celui-là. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent un carré ou une croix, et uniquement ceux là. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent un carré ou une croix du côté gauche, et uniquement ceux là. 3
-      // Programmez le robot pour qu'il ramasse tous les dominos qui ont à la fois un carré bleu et une étoile orange. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent au moins une croix verte et tous les dominos qui contiennent au moins une étoile orange. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent deux étoiles orange. 1
-      // Programmez le robot pour qu'il ramasse tous les dominos qui contiennent deux motifs différents. 1
-
-      // Le robot peut passer sur les dominos qu'il ne ramasse pas. 8
-      // Le robot ne doit pas se déplacer plus de X fois. 4 
-      // Votre programme ne doit utiliser qu'une seule fois l'instruction ramasserDomino. 4
-      var strArr1 = [
-         "le domino avec deux carrés bleus.",
-         "le domino avec deux carrés bleus s'il y en a un, et seulement celui-là.",
-         "tous les dominos avec deux carrés bleus.",
-         "tous les dominos avec deux carrés bleus, et seulement ceux-là.",
-         "tous les dominos."
-      ];
-      var strID2 = [
-         "Le robot peut passer sur les dominos qu'il ne ramasse pas.",
-         "Votre programme ne doit utiliser qu'une seule fois l'instruction ramasserDomino.",
-         function(max) {
-            return "Le robot ne doit pas se déplacer plus de "+max+" fois."
-         }
-      ];
-      var strID1 = params.strID1;
-      var strID2 = params.strID2;
-      var html = "<p>"; 
-      html += "Programmez le robot pour qu'il ramasse ";
-      html += strArr1[strID1];
-      html += "</p>";
-      if(strID2 != undefined){
-         html += "<p>";
-         html += strArr2[strID2];
-         html += "</p>";
+      if(params.custom){
+         return "<p>"+params.custom+"</p>"
       }
+
+      var tiles = params.data[level][0].tiles;
+      var nbRows = tiles.length;
+      var nbCol = tiles[0].length;
+      var nbTarget = 0;
+      for(var row = 0; row < nbRows; row++){
+         for(var col = 0; col < nbCol; col++){
+            var itemID = tiles[row][col];
+            if(itemID == 11){
+               nbTarget++;
+            }
+         }
+      }
+
+      var text = strings.dominoes(nbTarget,params.rollOver);
+
+      var html = "<p>"+text+"</p>";
+
+      if(params.maxMove){
+         var text2 = strings.maxMove(params.maxMove);
+         html += "<p>"+text2+"</p>";
+      }
+
       return html
    };
 
@@ -198,12 +180,17 @@ function createAlgoreaInstructions(type,params) {
    /*** COMMON ***/
 
    function addHelp(dat) {
+      // Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”. 
       if((dat.lang && !Beav.Array.has(dat.lang,lang)) || 
          (dat.level && !Beav.Array.has(dat.level,level))){
          return ""
       }
       var html = "<p>";
-      html += dat.text;
+      if(dat.repeat){
+         html += strings.repeatHelp;
+      }else{
+         html += dat.text;
+      }
       html += "</p>";
 
       return html
@@ -238,7 +225,7 @@ function createAlgoreaInstructions(type,params) {
          html += dat.custom;
       }else{
          var strID = dat.strID;
-         html += algoreaInstructionsStrings[strLang].helpConcept(strID);
+         html += strings.helpConcept(strID);
          html += "<a onclick=\"conceptViewer.showConcept('"+dat.concept+"')\">";
          html += dat.mainStr;
          html += "</a>";
@@ -261,7 +248,6 @@ function createAlgoreaInstructions(type,params) {
    // Pour vous aider à comprendre vos erreurs, pensez au mode "Pas à Pas" : 
    // Vous ne pouvez utiliser que X instructions Y. 
 
-   // Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”. 
    // Si vous êtes bloqué, en particulier si vous n'avez plus assez de blocs pour finir votre programme, cliquez sur le bouton "Plus de détails" pour obtenir plus d'aide. 
    // Dans cette version, les blocs sont regroupés par catégorie dans des menus. Cliquez sur un menu pour accéder aux blocs de la catégorie correspondante. 
    

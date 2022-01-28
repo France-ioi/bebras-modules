@@ -3,6 +3,7 @@
 /*TODO : un changement de taille de la fenetre à la fin d'une execution duplique les items*/
 /*TODO : traduire le context wiring*/
 var robotCommands = [];
+var imgPath = modulesPath+"img/algorea/";
 
 var initArray = function(n, elem) {
    var res = [];
@@ -1943,18 +1944,18 @@ var getContext = function(display, infos, curLevel) {
       },
       course: {
          itemTypes: {
-            red_robot: { img: modulesPath+"/img/algorea/red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
-            red_robot_alt: { img: modulesPath+"/img/algorea/red_robot_alt.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
-            bush: { num: 2, img: modulesPath+"/img/algorea/bush.png", side: 60, isObstacle: true, zOrder: 0 },
-            flag: { num: 3, img: modulesPath+"/img/algorea/flag.png", side: 60, isExit: true, zOrder: 0},
-            wall: { num: 4, img: modulesPath+"/img/algorea/wall.png", side: 60, isObstacle: true, zOrder: 0 },
+            red_robot: { img: imgPath+"red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
+            red_robot_alt: { img: imgPath+"red_robot_alt.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
+            bush: { num: 2, img: imgPath+"bush.png", side: 60, isObstacle: true, zOrder: 0 },
+            flag: { num: 3, img: imgPath+"flag.png", side: 60, isExit: true, zOrder: 0},
+            wall: { num: 4, img: imgPath+"wall.png", side: 60, isObstacle: true, zOrder: 0 },
             number: { num: 5, side: 60, zOrder: 1 },
-            horizontal_closed_door: { num: 7, img:  modulesPath+"/img/algorea/horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            vertical_closed_door: { num: 8, img:  modulesPath+"/img/algorea/vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            horizontal_open_door: { num: 11, img:  modulesPath+"/img/algorea/horizontal_open_door.png", side: 60, zOrder: 1},
-            vertical_open_door: { num: 12, img:  modulesPath+"/img/algorea/vertical_open_door.png", side: 60, zOrder: 1},
-            water: { num: 13, img: modulesPath+"/img/algorea/water.png", side: 60, isObstacle: true, zOrder: 1 },
-            board: { num: 14, img: modulesPath+"/img/algorea/water+board.png", side: 60, zOrder: 1 }
+            horizontal_closed_door: { num: 7, img:  imgPath+"horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            vertical_closed_door: { num: 8, img:  imgPath+"vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            horizontal_open_door: { num: 11, img:  imgPath+"horizontal_open_door.png", side: 60, zOrder: 1},
+            vertical_open_door: { num: 12, img:  imgPath+"vertical_open_door.png", side: 60, zOrder: 1},
+            water: { num: 13, img: imgPath+"water.png", side: 60, isObstacle: true, zOrder: 1 },
+            board: { num: 14, img: imgPath+"water+board.png", side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -2036,17 +2037,18 @@ var getContext = function(display, infos, curLevel) {
          noBorders: true,
          backgroundColor: "#a40e0e",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            contour: { num: 2, img: "contour.png", side: 60, zOrder: 0 },
-            GG: { num: 3, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
-            GO: { num: 4, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
-            GB: { num: 5, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
-            OG: { num: 6, img: "OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
-            OO: { num: 7, img: "OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
-            OB: { num: 8, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
-            BG: { num: 9, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
-            BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
-            BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
+            green_robot: { img: imgPath+"green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            green_robot_alt: { img: imgPath+"green_robot_alt.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            contour: { num: 2, img: imgPath+"contour.png", side: 60, zOrder: 0 },
+            GG: { num: 3, img: imgPath+"GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
+            GO: { num: 4, img: imgPath+"GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
+            GB: { num: 5, img: imgPath+"GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
+            OG: { num: 6, img: imgPath+"OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
+            OO: { num: 7, img: imgPath+"OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
+            OB: { num: 8, img: imgPath+"OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
+            BG: { num: 9, img: imgPath+"BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
+            BO: { num: 10, img: imgPath+"BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
+            BB: { num: 11, img: imgPath+"BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
             board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
