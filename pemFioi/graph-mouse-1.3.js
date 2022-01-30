@@ -1823,12 +1823,18 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnEdgeSelect = function(edgeID,selected) {
-      // console.log(edgeID,selected)
       var edge = visualGraph.getRaphaelsFromID(edgeID);
+      var info = graph.getEdgeInfo(edgeID);
+      if(info.edgeType != undefined){
+         var edgeAttr = visualGraph.graphDrawer.edgeTypeAttr[info.edgeType] || visualGraph.graphDrawer.lineAttr;
+      }else{
+         var edgeAttr = visualGraph.graphDrawer.lineAttr;
+      }
+
       if(!self.removeEdgeEnabled){
          if(!selected){
             $(document).off("keydown");
-            edge[0].attr(visualGraph.graphDrawer.lineAttr);
+            edge[0].attr(edgeAttr);
             if(self.edgeCross)
                self.edgeCross.remove();
          }
@@ -1840,7 +1846,6 @@ function GraphEditor(settings) {
          edge[0].attr(selectedEdgeAttr);
 
          self.addEdgeCross(edgeID);
-         var info = graph.getEdgeInfo(edgeID);
          if(!info.label || info.label.length == 0){
             self.editLabel(edgeID,"edge");
          }
@@ -1859,7 +1864,7 @@ function GraphEditor(settings) {
       }else{
          self.selectedEdges = [];
          $(document).off("keydown");
-         edge[0].attr(visualGraph.graphDrawer.lineAttr);
+         edge[0].attr(edgeAttr);
          if(self.edgeCross)
             self.edgeCross.remove();
       }
