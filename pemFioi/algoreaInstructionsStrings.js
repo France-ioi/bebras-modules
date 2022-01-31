@@ -48,6 +48,17 @@ var algoreaInstructionsStrings = {
          }
          return text
       },
+      flowers: function(nbTarget) {
+         var text = "Programmez le robot pour qu'il sème une graine de fleur ";
+         if(nbTarget == 1){
+            text += "dans la zone de terre.";
+         }else{
+            text += "dans chaque zone de terre.";
+         }
+         return text
+      },
+      dontStepOnFlowers: "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus.",
+
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
