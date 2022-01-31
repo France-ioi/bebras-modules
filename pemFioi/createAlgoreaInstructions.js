@@ -135,31 +135,26 @@ function createAlgoreaInstructions(type,params) {
    };
 
    function createFlowersInstructions(params) {
-      // Programmez le robot pour qu'il sème une graine de fleur dans la zone de terre. 14
-      // Programmez le robot pour qu'il sème une graine de fleur dans chaque zone de terre. 92
-      // Programmez le robot pour qu'il dépose une graine sur le tas de terre. 3
-      // Programmez le robot pour qu'il dépose une graine sur chaque tas de terre. 18
-      // Programmez le robot pour qu'il sème une graine de fleur dans la zone de terre en bas à droite. 1
+      var tiles = params.data[level][0].tiles;
+      var nbRows = tiles.length;
+      var nbCol = tiles[0].length;
+      var nbTarget = 0;
+      for(var row = 0; row < nbRows; row++){
+         for(var col = 0; col < nbCol; col++){
+            var itemID = tiles[row][col];
+            if(itemID == 2){
+               nbTarget++;
+            }
+         }
+      }
 
-      // Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus. (Il ne va quand même pas écraser les fleurs !) 84
-
-      var strArr1 = [
-         "une graine de fleur dans la zone de terre.",
-         "une graine de fleur dans chaque zone de terre."
-      ];
-      var strArr2 = [
-         "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus. Il ne va quand même pas écraser les fleurs !",
-         "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus."
-      ];
-      var strID1 = params.strID1;
-      var strID2 = params.strID2;
       var html = "<p>"; 
-      html += "Programmez le robot pour qu'il sème ";
-      html += strArr1[strID1];
+      html += strings.flowers(nbTarget);
       html += "</p>";
-      if(strID2 != undefined){
+      
+      if(params.dontStepOnFlowers){
          html += "<p>";
-         html += strArr2[strID2];
+         html += strings.dontStepOnFlowers;
          html += "</p>";
       }
       return html
