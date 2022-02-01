@@ -63,16 +63,39 @@ var algoreaInstructionsStrings = {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
       repeatHelp: "Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”.",
-      helpConcept: function(id) {
-         var strArr = [
-            "Vous pourrez avoir besoin du bloc ",
-            "Vous aurez besoin du bloc ",
-            "Vous pourrez avoir besoin de ",
-            "Vous aurez besoin de ",
-            "Aide : ",
-            "Utilisez des "
-         ];
-         return strArr[id]
-      }
+      helpConcept: function(lang,concepts) {
+         var text = "Vous pourrez avoir besoin ";
+         if(lang != "python"){
+            text += (concepts.length > 1) ? "des blocs " : "du bloc ";
+         }else{
+            text += "de ";
+         }
+         for(var iConcept = 0; iConcept < concepts.length; iConcept++){
+            var concept = concepts[iConcept];
+            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\"><b>";
+            text += conceptName(concept,lang);
+            text += "</b></a>";
+            if(iConcept == concepts.length - 2){
+               text += " et ";
+               if(lang == "python"){
+                  text += "de ";
+               }
+            }else if(iConcept < concepts.length - 2){
+               text += ", "
+            }
+         }
+         return text
+
+         function conceptName(concept,lang) {
+            switch(concept) {
+               case 'blockly_controls_repeat':
+                  if(lang != "python"){
+                     return "répéter"
+                  }
+                  return "la boucle for"
+            }
+         }
+      },
+      
    }
 };
