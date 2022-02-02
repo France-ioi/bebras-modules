@@ -62,7 +62,12 @@ var algoreaInstructionsStrings = {
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
-      repeatHelp: "Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”.",
+      repeatHelp: function(lang) {
+         if(lang != "python"){
+            return "Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”."
+         }
+         return "Si besoin, vous pouvez placer plusieurs instructions à l’intérieur de la boucle for."
+      },
       helpConcept: function(lang,concepts) {
          var text = "Vous pourrez avoir besoin ";
          if(lang != "python"){
