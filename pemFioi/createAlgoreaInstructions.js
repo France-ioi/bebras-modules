@@ -70,8 +70,7 @@ function createAlgoreaInstructions(subTask) {
                var src = $(this).attr("src");
                src = src.replace("$img_path$",imgPath);
                $(this).attr("src",src);
-               console.log($(this).attr("src"))
-            })
+            });
             totalHTML += $("#tuto").html();
          }
 
@@ -184,15 +183,15 @@ function createAlgoreaInstructions(subTask) {
       /*** COMMON ***/
 
       function addHelp(dat) {
-         if((dat.lang && !Beav.Array.has(dat.lang,lang)) || 
-            (dat.level && !Beav.Array.has(dat.level,level))){
+         var msg = dat.shared || dat[level];
+         if(!msg){
             return ""
          }
          var html = "<p>";
-         if(dat.repeat){
+         if(msg.repeat){
             html += strings.repeatHelp;
          }else{
-            html += dat.text;
+            html += msg.text;
          }
          html += "</p>";
 
@@ -217,7 +216,24 @@ function createAlgoreaInstructions(subTask) {
       // };
 
       function addHelpConcept(dat) {
-         if(dat.level && !Beav.Array.has(dat.level,level)){
+         var levelConcepts = [];
+         if(dat.shared && dat.shared.length > 0){
+            for(var iConcept = 0; iConcept < dat.shared.length; iConcept++){
+               var concept = dat.shared[iConcept];
+               if(!Beav.Array.has(levelConcepts,concept)){
+                  levelConcepts.push(concept);
+               }
+            }
+         }
+         if(dat[level] && dat[level].length > 0){
+            for(var iConcept = 0; iConcept < dat[level].length; iConcept++){
+               var concept = dat[level][iConcept];
+               if(!Beav.Array.has(levelConcepts,concept)){
+                  levelConcepts.push(concept);
+               }
+            }
+         }
+         if(levelConcepts.length == 0){
             return ""
          }
 
@@ -226,7 +242,7 @@ function createAlgoreaInstructions(subTask) {
          if(dat.custom){
             html += dat.custom;
          }else{
-            html += strings.helpConcept(lang,dat.concept);
+            html += strings.helpConcept(lang,levelConcepts);
          }
          html += ".</p>";
 
