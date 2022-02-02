@@ -134,17 +134,17 @@ function createAlgoreaInstructions(subTask) {
 
          var html = "<p>"+text+"</p>";
 
-         if(gridInfos.intro && gridInfos.intro.maxMove){
-            var text2 = strings.maxMove(gridInfos.intro.maxMove);
-            html += "<p>"+text2+"</p>";
-         }
+         // if(gridInfos.intro && gridInfos.intro.maxMove){
+         //    var text2 = strings.maxMove(gridInfos.intro.maxMove);
+         //    html += "<p>"+text2+"</p>";
+         // }
 
          return html
       };
 
       function createFlowersInstructions() {
          var nbTarget = countItem(2);
-         var nbFixed = countItem(5);
+         // var nbFixed = countItem(5);
 
          var html = "<p>"; 
          html += strings.flowers(nbTarget);
@@ -183,7 +183,7 @@ function createAlgoreaInstructions(subTask) {
          }
          var html = "<p>";
          if(msg.repeat){
-            html += strings.repeatHelp;
+            html += strings.repeatHelp(lang);
          }else{
             html += msg.text;
          }
