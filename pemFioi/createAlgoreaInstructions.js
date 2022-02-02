@@ -36,9 +36,9 @@ function createAlgoreaInstructions(subTask) {
             // case "course":
             //    totalHTML += createCourseInstructions(params.data);
             //    break;
-            // case "dominoes":
-            //    totalHTML += createDominoesInstructions(params);
-            //    break
+            case "dominoes":
+               totalHTML += createDominoesInstructions();
+               break
             case "flowers":
                totalHTML += createFlowersInstructions();
                break
@@ -122,35 +122,25 @@ function createAlgoreaInstructions(subTask) {
       //    return html
       // };
 
-      // function createDominoesInstructions(params) {
-      //    if(params.custom){
-      //       return "<p>"+params.custom+"</p>"
-      //    }
+      function createDominoesInstructions() {
+         if(gridInfos.intro && gridInfos.intro.text){
+            return "<p>"+gridInfos.intro.text+"</p>"
+         }
 
-      //    var tiles = params.data[level][0].tiles;
-      //    var nbRows = tiles.length;
-      //    var nbCol = tiles[0].length;
-      //    var nbTarget = 0;
-      //    for(var row = 0; row < nbRows; row++){
-      //       for(var col = 0; col < nbCol; col++){
-      //          var itemID = tiles[row][col];
-      //          if(itemID == 11){
-      //             nbTarget++;
-      //          }
-      //       }
-      //    }
+         var nbTarget = countItem(11);
+         var rollOver = (gridInfos.intro && gridInfos.intro.rollOver)
 
-      //    var text = strings.dominoes(nbTarget,params.rollOver);
+         var text = strings.dominoes(nbTarget,rollOver);
 
-      //    var html = "<p>"+text+"</p>";
+         var html = "<p>"+text+"</p>";
 
-      //    if(params.maxMove){
-      //       var text2 = strings.maxMove(params.maxMove);
-      //       html += "<p>"+text2+"</p>";
-      //    }
+         if(gridInfos.intro && gridInfos.intro.maxMove){
+            var text2 = strings.maxMove(gridInfos.intro.maxMove);
+            html += "<p>"+text2+"</p>";
+         }
 
-      //    return html
-      // };
+         return html
+      };
 
       function createFlowersInstructions() {
          var nbTarget = countItem(2);
@@ -160,10 +150,14 @@ function createAlgoreaInstructions(subTask) {
          html += strings.flowers(nbTarget);
          html += "</p>";
          
-         if(nbTarget > 1 || nbFixed > 0){
-            html += "<p>";
-            html += strings.dontStepOnFlowers;
-            html += "</p>";
+         // if(nbTarget > 1 || nbFixed > 0){
+         if(gridInfos.intro && gridInfos.intro.dontStepOnFlowers){
+            var dontDoIt = gridInfos.intro.dontStepOnFlowers;
+            if(dontDoIt.shared || dontDoIt[level]){
+               html += "<p>";
+               html += strings.dontStepOnFlowers;
+               html += "</p>";
+            }
          }
          return html
       };
