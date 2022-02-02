@@ -33,9 +33,9 @@ function createAlgoreaInstructions(subTask) {
          }
 
          switch(type){
-            // case "course":
-            //    totalHTML += createCourseInstructions(params.data);
-            //    break;
+            case "course":
+               totalHTML += createCourseInstructions();
+               break;
             case "dominoes":
                totalHTML += createDominoesInstructions();
                break
@@ -79,48 +79,45 @@ function createAlgoreaInstructions(subTask) {
          return totalHTML
       };
 
-      // function createCourseInstructions(data) {
-      //    if(!data){
-      //       return
-      //    }
-      //    var tiles = data[level][0].tiles;
-      //    var nbRows = tiles.length;
-      //    var nbCol = tiles[0].length;
-      //    var obstacles = [];
-      //    var nbExits = 0;
-      //    var board = false;
-      //    for(var row = 0; row < nbRows; row++){
-      //       for(var col = 0; col < nbCol; col++){
-      //          var itemID = tiles[row][col];
-      //          switch(itemID){
-      //             case 2:
-      //             case 4:
-      //             case 7:
-      //             case 8:
-      //             case 13:
-      //                if(!Beav.Array.has(obstacles,itemID)){
-      //                   obstacles.push(itemID)
-      //                }
-      //                break;
-      //             case 3:
-      //                nbExits++;
-      //                break;
-      //             case 14:
-      //                board = true;
-      //                break;
-      //          }
-      //       }
-      //    }
+      function createCourseInstructions() {
+         var tiles = data[level][0].tiles;
+         var nbRows = tiles.length;
+         var nbCol = tiles[0].length;
+         var obstacles = [];
+         var nbExits = 0;
+         var board = false;
+         for(var row = 0; row < nbRows; row++){
+            for(var col = 0; col < nbCol; col++){
+               var itemID = tiles[row][col];
+               switch(itemID){
+                  case 2:
+                  case 4:
+                  case 7:
+                  case 8:
+                  case 13:
+                     if(!Beav.Array.has(obstacles,itemID)){
+                        obstacles.push(itemID)
+                     }
+                     break;
+                  case 3:
+                     nbExits++;
+                     break;
+                  case 14:
+                     board = true;
+                     break;
+               }
+            }
+         }
 
-      //    var text = strings.course(nbExits,obstacles);
+         var text = strings.course(nbExits,obstacles);
 
-      //    var html = "<p>"+text+"</p>";
+         var html = "<p>"+text+"</p>";
 
-      //    if(board){
-      //       html += "<p>"+strings.board+"</p>"; 
-      //    }
-      //    return html
-      // };
+         if(board){
+            html += "<p>"+strings.board+"</p>"; 
+         }
+         return html
+      };
 
       function createDominoesInstructions() {
          if(gridInfos.intro && gridInfos.intro.text){
