@@ -2038,7 +2038,7 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#a40e0e",
          itemTypes: {
             green_robot: { img: imgPath+"green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            green_robot_alt: { img: imgPath+"green_robot_alt.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            pink_robot: { img: imgPath+"pink_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             contour: { num: 2, img: imgPath+"contour.png", side: 60, zOrder: 0 },
             GG: { num: 3, img: imgPath+"GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
             GO: { num: 4, img: imgPath+"GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
@@ -2196,12 +2196,13 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          backgroundColor: "#dadada",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
-            hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
-            marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
+            red_robot: { img: imgPath+"red_robot_alt.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
+            blue_robot: { img: imgPath+"blue_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
+            hole: { num: 3, img: imgPath+"hole.png", side: 60, isContainer: true, zOrder: 0 },
+            marble: { num: 4, img: imgPath+"marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "shadow.png", side: 60, zOrder: 0 }
+            white: { num: 7, color: imgPath+"shadow.png", side: 60, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
