@@ -68,6 +68,23 @@ var algoreaInstructionsStrings = {
          return text
       },
       toPickAGem: "Pour ramasser une pierre, le robot doit juste passer sur la case qui la contient.",
+      marbles: function(nbMarbles,nbHoles) {
+         var text = "Programmer le robot pour qu'il ramasse ";
+         if(nbMarbles == 1){
+            text += "la bille ";
+         }else{
+            text += "chaque bille ";
+         }
+         text += "et la dépose ";
+         if(nbHoles == 1){
+            text += "dans le trou.";
+         }else{
+            text += "dans un trou.";
+         }
+         return text
+      },
+      oneMarble: "Le robot ne peut transporter qu'une bille à la fois.",
+      onePerHole: "Chaque trou ne peut contenir qu'une seule bille.",
 
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";

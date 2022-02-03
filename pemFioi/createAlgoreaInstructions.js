@@ -45,6 +45,9 @@ function createAlgoreaInstructions(subTask) {
             case "gems":
                totalHTML += createGemsInstructions();
                break
+            case "marbles":
+               totalHTML += createMarblesInstructions();
+               break
             default:
                // totalHTML += params.custom;
          }
@@ -168,6 +171,28 @@ function createAlgoreaInstructions(subTask) {
          html += "<p>"; 
          html += strings.toPickAGem;
          html += "</p>";
+         return html
+      };
+
+      function createMarblesInstructions() {
+         var nbHoles = countItem(3);
+         var nbMarbles = countItem(4);
+
+         var html = "<p>"; 
+         html += strings.marbles(nbMarbles,nbHoles);
+         html += "</p>";
+
+         if(nbMarbles > 1){
+            html += "<p>"; 
+            html += strings.oneMarble;
+            html += "</p>";
+            if(nbHoles > 1){
+               html += "<p>"; 
+               html += strings.onePerHole;
+               html += "</p>";
+            }
+         }
+
          return html
       };
 
