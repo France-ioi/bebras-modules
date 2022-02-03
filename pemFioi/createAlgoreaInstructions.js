@@ -42,9 +42,9 @@ function createAlgoreaInstructions(subTask) {
             case "flowers":
                totalHTML += createFlowersInstructions();
                break
-            // case "gems":
-            //    totalHTML += createGemsInstructions(params);
-            //    break
+            case "gems":
+               totalHTML += createGemsInstructions();
+               break
             default:
                // totalHTML += params.custom;
          }
@@ -159,16 +159,16 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
-      function createGemsInstructions(params) {
-         // Programmez le robot pour qu'il passe ramasser la pierre précieuse. 7
-         // Programmez le robot pour qu'il passe ramasser toutes les pierres précieuses. 53
-         // Programmez le robot pour qu'il ramasse le diamant. 3
-         // Programmez le robot pour qu'il passe ramasser tous les diamants. 9
+      function createGemsInstructions() {
+         var nbTarget = countItem(3);
 
-         // Pour ramasser une pierre, le robot doit simplement passer sur la case qui la contient. 4
-         // Pour ramasser une pierre, le robot doit passer sur la case qui la contient. 16
-         // Notez que lorsqu'il arrive sur une case, le robot ramasse automatiquement le diamant s'il y en a un sur la case. 4
-         // Lorsqu'il arrive sur une case, le robot ramasse automatiquement le diamant s'il y en a un sur la case. 4
+         var html = "<p>"; 
+         html += strings.gems(nbTarget);
+         html += "</p>";
+         html += "<p>"; 
+         html += strings.toPickAGem;
+         html += "</p>";
+         return html
       };
 
       /*** COMMON ***/

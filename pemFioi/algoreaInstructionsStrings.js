@@ -58,6 +58,16 @@ var algoreaInstructionsStrings = {
          return text
       },
       dontStepOnFlowers: "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus.",
+      gems: function(nbTarget) {
+         var text = "Programmez le robot pour qu'il ramasse ";
+         if(nbTarget == 1){
+            text += "la pierre précieuse.";
+         }else{
+            text += "toutes les pierres précieuses.";
+         }
+         return text
+      },
+      toPickAGem: "Pour ramasser une pierre, le robot doit juste passer sur la case qui la contient.",
 
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
