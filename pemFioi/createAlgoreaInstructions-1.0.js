@@ -7,8 +7,9 @@ function createAlgoreaInstructions(subTask) {
       }
       var strLang = window.stringsLanguage;
       var strings = algoreaInstructionsStrings[strLang];
-      var gridInfos = subTask.gridInfos;
+      var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
       var data = subTask.data;
+            // console.log(gridInfos.intro)
 
       var instHTML = getAlgoreaIntro();
 
@@ -59,7 +60,7 @@ function createAlgoreaInstructions(subTask) {
                var elem = more[iElem];
                switch(elem.type){
                   case "helpConcept":
-                     totalHTML += addHelpConcept(elem);
+                     totalHTML += addHelpConcept(elem.concepts);
                      break;
                   case "help":
                      totalHTML += addHelp(elem);
@@ -215,15 +216,15 @@ function createAlgoreaInstructions(subTask) {
       /*** COMMON ***/
 
       function addHelp(dat) {
-         var msg = dat.shared || dat[level];
-         if(!msg){
-            return ""
-         }
+         // var msg = dat.shared || dat[level];
+         // if(!msg){
+         //    return ""
+         // }
          var html = "<p>";
-         if(msg.repeat){
+         if(dat.repeat){
             html += strings.repeatHelp(lang);
          }else{
-            html += msg.text;
+            html += dat.text;
          }
          html += "</p>";
 
@@ -248,34 +249,34 @@ function createAlgoreaInstructions(subTask) {
       // };
 
       function addHelpConcept(dat) {
-         var levelConcepts = [];
-         if(dat.shared && dat.shared.length > 0){
-            for(var iConcept = 0; iConcept < dat.shared.length; iConcept++){
-               var concept = dat.shared[iConcept];
-               if(!Beav.Array.has(levelConcepts,concept)){
-                  levelConcepts.push(concept);
-               }
-            }
-         }
-         if(dat[level] && dat[level].length > 0){
-            for(var iConcept = 0; iConcept < dat[level].length; iConcept++){
-               var concept = dat[level][iConcept];
-               if(!Beav.Array.has(levelConcepts,concept)){
-                  levelConcepts.push(concept);
-               }
-            }
-         }
-         if(levelConcepts.length == 0){
+         // var levelConcepts = [];
+         // if(dat.shared && dat.shared.length > 0){
+         //    for(var iConcept = 0; iConcept < dat.shared.length; iConcept++){
+         //       var concept = dat.shared[iConcept];
+         //       if(!Beav.Array.has(levelConcepts,concept)){
+         //          levelConcepts.push(concept);
+         //       }
+         //    }
+         // }
+         // if(dat[level] && dat[level].length > 0){
+         //    for(var iConcept = 0; iConcept < dat[level].length; iConcept++){
+         //       var concept = dat[level][iConcept];
+         //       if(!Beav.Array.has(levelConcepts,concept)){
+         //          levelConcepts.push(concept);
+         //       }
+         //    }
+         // }
+         if(!dat){
             return ""
          }
 
          var html = "<p>";
 
-         if(dat.custom){
-            html += dat.custom;
-         }else{
-            html += strings.helpConcept(lang,levelConcepts);
-         }
+         // if(dat.custom){
+         //    html += dat.custom;
+         // }else{
+            html += strings.helpConcept(lang,dat);
+         // }
          html += ".</p>";
 
          return html
