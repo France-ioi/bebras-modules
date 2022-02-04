@@ -106,6 +106,7 @@
          'quickAlgo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/quickAlgo/quickAlgo-mobileFirst.css", id: "quickAlgo_css"},
 
          'createAlgoreaInstructions': {src: modulesPath+"/pemFioi/createAlgoreaInstructions.js", id: "createAlgoreaInstructions"},
+         'createAlgoreaInstructions-1.0': {src: modulesPath+"/pemFioi/createAlgoreaInstructions-1.0.js", id: "createAlgoreaInstructions"},
          'algoreaInstructionsStrings': {src: modulesPath+"/pemFioi/algoreaInstructionsStrings.js", id: "algoreaInstructionsStrings"},
 
          'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
