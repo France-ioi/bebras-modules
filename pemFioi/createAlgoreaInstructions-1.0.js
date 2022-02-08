@@ -9,7 +9,7 @@ function createAlgoreaInstructions(subTask) {
       var strings = algoreaInstructionsStrings[strLang];
       var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
       var data = subTask.data;
-            // console.log(gridInfos.intro)
+      // console.log(gridInfos.intro);
 
       var instHTML = getAlgoreaIntro();
 
@@ -20,14 +20,20 @@ function createAlgoreaInstructions(subTask) {
          var type = gridInfos.contextType;
 
          var totalHTML = "<div class='"+level+"'>";
-
-         var tuto = ($("#task #tuto").length > 0);
+         if($("#task #tuto").length > 0 || (gridInfos.intro.tuto && typeof gridInfos.intro.tuto != "object")){
+            var tuto = (lang != "python") ? true : false;
+         }
          if(tuto){
             var tutoEnabled = false;
-            var dataLevel = $("#task #tuto").attr("data-level");
-            var dataLang = $("#task #tuto").attr("data-lang");
-            if((!dataLevel || dataLevel.indexOf(level) !== -1) &&
-               (!dataLang || dataLang.indexOf(lang) !== -1)){
+            if($("#task #tuto").length > 0){
+               var dataLevel = $("#task #tuto").attr("data-level");
+               var dataLang = $("#task #tuto").attr("data-lang");
+               if((!dataLevel || dataLevel.indexOf(level) !== -1) &&
+                  (!dataLang || dataLang.indexOf(lang) !== -1)){
+                  totalHTML += "<div class='short'>";
+                  tutoEnabled = true;
+               }
+            }else{
                totalHTML += "<div class='short'>";
                tutoEnabled = true;
             }
@@ -68,30 +74,20 @@ function createAlgoreaInstructions(subTask) {
                }
             }
          }
-
-
-
-         // if(gridInfos.intro && gridInfos.intro.helpConcept){
-         //    totalHTML += addHelpConcept(gridInfos.intro.helpConcept);
-         // }
-
-         // if(gridInfos.intro && gridInfos.intro.help){
-         //    totalHTML += addHelp(gridInfos.intro.help);
-         // }
-
-         // if(params.stepByStep){
-         //    totalHTML += addStepByStep(params.stepByStep);
-         // }
          
          totalHTML += (tutoEnabled) ? "</div>" : "";
 
          if(tutoEnabled){
-            $("#tuto img").each(function() {
-               var src = $(this).attr("src");
-               src = src.replace("$img_path$",imgPath);
-               $(this).attr("src",src);
-            });
-            totalHTML += $("#tuto").html();
+            if($("#task #tuto").length > 0){
+               $("#tuto img").each(function() {
+                  var src = $(this).attr("src");
+                  src = src.replace("$img_path$",imgPath);
+                  $(this).attr("src",src);
+               });
+               totalHTML += $("#tuto").html();
+            }else{
+               totalHTML += addTuto(type,gridInfos.intro.tuto);
+            }
          }
 
          totalHTML += "</div>";
@@ -168,14 +164,14 @@ function createAlgoreaInstructions(subTask) {
          html += "</p>";
          
          // if(nbTarget > 1 || nbFixed > 0){
-         if(gridInfos.intro && gridInfos.intro.dontStepOnFlowers){
-            var dontDoIt = gridInfos.intro.dontStepOnFlowers;
-            if(dontDoIt.shared || dontDoIt[level]){
-               html += "<p>";
-               html += strings.dontStepOnFlowers;
-               html += "</p>";
-            }
-         }
+         // if(gridInfos.intro && gridInfos.intro.dontStepOnFlowers){
+         //    // var dontDoIt = gridInfos.intro.dontStepOnFlowers;
+         //    // if(dontDoIt.shared || dontDoIt[level]){
+         //       html += "<p>";
+         //       html += strings.dontStepOnFlowers;
+         //       html += "</p>";
+         //    // }
+         // }
          return html
       };
 
@@ -216,17 +212,29 @@ function createAlgoreaInstructions(subTask) {
       /*** COMMON ***/
 
       function addHelp(dat) {
-         // var msg = dat.shared || dat[level];
-         // if(!msg){
-         //    return ""
-         // }
-         var html = "<p>";
-         if(dat.repeat){
-            html += strings.repeatHelp(lang);
-         }else{
-            html += dat.text;
+         for(var key in dat){
+            var html = "<p>";
+            switch(key){
+               case "repeat":
+                  html += strings.repeatHelp(lang);
+                  break;
+               case "text":
+                  html += dat.text;
+                  break;
+               case "dontStepOnFlowers":
+                  html += strings.dontStepOnFlowers;
+                  break;
+
+            }
+            html += "</p>";
          }
-         html += "</p>";
+         // var html = "<p>";
+         // if(dat.repeat){
+         //    html += strings.repeatHelp(lang);
+         // }else{
+         //    html += dat.text;
+         // }
+         // html += "</p>";
 
          return html
       };
@@ -281,6 +289,33 @@ function createAlgoreaInstructions(subTask) {
 
          return html
       };
+
+      function addTuto(type,id) {
+         var html = "";
+         var suffix = (lang == "blockly") ? "_b" : "_s";
+         var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
+         switch(id){
+            case "drag_blocks":
+               html += "<div data-lang='blockly scratch' class='long'>";
+               html += "<p>"+strings.dragBlocks+" :</p>";
+               html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
+               html += "<p>"+strings.demonstration+" :</p>";
+               // html += "<a class='videoBtn' data-video='demo"+suffix+".mp4' style='width: 100%' ><img src='vignette"+suffix+".jpg'></a>";
+               html += "<video controls ><source src='"+vidSrc+".mp4' type=video/mp4></video>";
+               html += "</div>";
+               html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
+               html += "<p>"+strings.thenClickButton+" :</p>";
+               html += "<img src='"+imgPath+"play_button.png' />";
+               html += "<p>"+strings.demonstration+" :</p>";
+               html += "<p>"+strings.bottomOfScreen+"</p>";
+               html += "<p>"+strings.watchResult+"</p>";
+               html += "</div>";
+               html += "</div>";
+               break;
+         // console.log(id)
+      }
+      return html
+   };
 
       function countItem(id) {
          var tiles = data[level][0].tiles;
