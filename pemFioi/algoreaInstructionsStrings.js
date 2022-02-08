@@ -86,6 +86,14 @@ var algoreaInstructionsStrings = {
       oneMarble: "Le robot ne peut transporter qu'une bille à la fois.",
       onePerHole: "Chaque trou ne peut contenir qu'une seule bille.",
 
+      /** tutos **/
+      dragBlocks: "Glissez les blocs avec la souris",
+      demonstration: "Démonstration",
+      thenClickButton: "Cliquez ensuite sur le bouton",
+      bottomOfScreen: "qui se trouve <b>en bas de l'écran</b>",
+      watchResult: "et observez le résultat !",
+
+      /** help **/
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
