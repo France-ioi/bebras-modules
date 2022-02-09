@@ -56,6 +56,9 @@ function createAlgoreaInstructions(subTask) {
                case "marbles":
                   totalHTML += createMarblesInstructions();
                   break
+               case "paint":
+                  totalHTML += createPaintInstructions();
+                  break
                default:
                   // totalHTML += params.custom;
             }
@@ -209,6 +212,17 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
+      function createPaintInstructions() {
+         var nbBlack = countItem(3);
+         var nbWhite = countItem(4);
+
+         var html = "<p>"; 
+         html += strings.paint(nbBlack,nbWhite);
+         html += "</p>";
+
+         return html
+      };
+
       /*** COMMON ***/
 
       function addHelp(dat) {
@@ -257,34 +271,12 @@ function createAlgoreaInstructions(subTask) {
       // };
 
       function addHelpConcept(dat) {
-         // var levelConcepts = [];
-         // if(dat.shared && dat.shared.length > 0){
-         //    for(var iConcept = 0; iConcept < dat.shared.length; iConcept++){
-         //       var concept = dat.shared[iConcept];
-         //       if(!Beav.Array.has(levelConcepts,concept)){
-         //          levelConcepts.push(concept);
-         //       }
-         //    }
-         // }
-         // if(dat[level] && dat[level].length > 0){
-         //    for(var iConcept = 0; iConcept < dat[level].length; iConcept++){
-         //       var concept = dat[level][iConcept];
-         //       if(!Beav.Array.has(levelConcepts,concept)){
-         //          levelConcepts.push(concept);
-         //       }
-         //    }
-         // }
          if(!dat){
             return ""
          }
 
-         var html = "<p>";
-
-         // if(dat.custom){
-         //    html += dat.custom;
-         // }else{
-            html += strings.helpConcept(lang,dat);
-         // }
+         var html = "<p>"; 
+         html += strings.helpConcept(lang,dat);
          html += ".</p>";
 
          return html
@@ -294,6 +286,7 @@ function createAlgoreaInstructions(subTask) {
          var html = "";
          var suffix = (lang == "blockly") ? "_b" : "_s";
          var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
+         // console.log()
          switch(id){
             case "drag_blocks":
                html += "<div data-lang='blockly scratch' class='long'>";
@@ -306,12 +299,30 @@ function createAlgoreaInstructions(subTask) {
                html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
                html += "<p>"+strings.thenClickButton+" :</p>";
                html += "<img src='"+imgPath+"play_button.png' />";
-               html += "<p>"+strings.demonstration+" :</p>";
                html += "<p>"+strings.bottomOfScreen+"</p>";
                html += "<p>"+strings.watchResult+"</p>";
                html += "</div>";
                html += "</div>";
                break;
+            case "blockly_controls_repeat":
+               if(Beav.Array.has(gridInfos.includeBlocks.generatedBlocks.robot,"east")){
+                  var dir = "east";
+               }else{
+                  var dir = "forward";
+               }
+               var repeatSrc = modulesPath+"img/algorea/tutos/repeat_"+dir+suffix;
+               var keypadSrc = modulesPath+"img/algorea/tutos/keypad"+suffix;
+               console.log(repeatSrc)
+               html += "<div data-lang='blockly scratch' class='long'>";
+               html += "<p>"+strings.controlsRepeat+" :</p>";
+               html += "<div style='display: inline-block;vertical-align: top;'>";
+               html += "<img src='"+repeatSrc+".png'/>";
+               html += "</div>";
+               html += "<div style='max-width: 480px; margin: 10px;'>";
+               html += "<img src='"+keypadSrc+".png' width='100%' />";
+               html += "</div>";
+               html += "<p>"+strings.loopsAreUseful+"</p>";
+               html += "</div>";
          // console.log(id)
       }
       return html
