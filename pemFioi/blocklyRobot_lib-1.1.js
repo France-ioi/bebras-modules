@@ -2380,12 +2380,13 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkReachExit
       },
       sokoban: {
-         backgroundColor: "#ffeead",
+         backgroundColor: "#c2c6f2",
+         borderColor: "a4aacd",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
-            marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
-            box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
+            robot: { img: imgPath+"orange_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            wall: { num: 2, img: imgPath+"grey_brick_wall.png", side: 60, isObstacle: true, zOrder: 0 },
+            marker: { num: 3, img: imgPath+"marker.png", side: 60, isContainer: true, zOrder: 0 },
+            box: { num: 4, img: imgPath+"box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
