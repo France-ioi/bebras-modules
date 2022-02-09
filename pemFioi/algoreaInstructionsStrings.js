@@ -85,6 +85,25 @@ var algoreaInstructionsStrings = {
       },
       oneMarble: "Le robot ne peut transporter qu'une bille à la fois.",
       onePerHole: "Chaque trou ne peut contenir qu'une seule bille.",
+      paint: function(nbBlack,nbWhite) {
+         var text = "Programmez le robot pour qu'il peigne ";
+         if(nbBlack == 1){
+            text += "la case ";
+         }else{
+            text += "toutes les cases ";
+         }
+         text += "avec un point noir";
+         if(nbWhite > 0){
+            text += " et uniquement ";
+            if(nbBlack > 1){
+               text += "celles-là";
+            }else{
+               text += "celle-là";
+            }
+         }
+         text += ".";
+         return text
+      },
 
       /** tutos **/
       dragBlocks: "Glissez les blocs avec la souris",
@@ -92,6 +111,8 @@ var algoreaInstructionsStrings = {
       thenClickButton: "Cliquez ensuite sur le bouton",
       bottomOfScreen: "qui se trouve <b>en bas de l'écran</b>",
       watchResult: "et observez le résultat !",
+      controlsRepeat: "Le bloc <b>répéter</b> vous permet d'utiliser moins de blocs",
+      loopsAreUseful: "Les boucles, c'est pratique ! C'est moins long à programmer !</br>Et cela permet d'avoir assez de blocs pour finir le programme.",
 
       /** help **/
       maxMove: function(max) {
