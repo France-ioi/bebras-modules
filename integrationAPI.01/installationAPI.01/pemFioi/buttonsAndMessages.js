@@ -1354,6 +1354,10 @@ window.displayHelper = {
          task.reloadAnswer('', function() {
             self.checkAnswerChanged();
          });
+      } else if (mode == 'stay') {
+         // A few tasks erroneously call this validate directly instead of the
+         // platform's validate
+         this.callValidate();
       } else {
          task.getAnswer(function(strAnswer) {
             if (!self.hasSolution) {
