@@ -104,6 +104,16 @@ var algoreaInstructionsStrings = {
          text += ".";
          return text
       },
+      sokoban: function(nbBoxes) {
+         var text = "Programmez le robot pour qu'il pousse ";
+         if(nbBoxes == 1){
+            text += "la caisse sur la case marquée.";
+         }else{
+            text += "les caisses sur les cases marquées.";
+         }
+         return text
+      },
+      pushBox: "Le robot peut pousser une caisse s'il se met juste devant et que l'espace derrière cette caisse est libre.",
 
       /** tutos **/
       dragBlocks: "Glissez les blocs avec la souris",

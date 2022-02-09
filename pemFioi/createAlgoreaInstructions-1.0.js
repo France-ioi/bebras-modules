@@ -59,6 +59,9 @@ function createAlgoreaInstructions(subTask) {
                case "paint":
                   totalHTML += createPaintInstructions();
                   break
+               case "sokoban":
+                  totalHTML += createSokobanInstructions();
+                  break
                default:
                   // totalHTML += params.custom;
             }
@@ -223,6 +226,20 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
+      function createSokobanInstructions() {
+         var nbBoxes = countItem(4);
+         
+         var html = "<p>"; 
+         html += strings.sokoban(nbBoxes);
+         html += "</p>";
+
+         html += "<p>"; 
+         html += strings.pushBox;
+         html += "</p>";
+
+         return html
+      };
+
       /*** COMMON ***/
 
       function addHelp(dat) {
@@ -312,7 +329,6 @@ function createAlgoreaInstructions(subTask) {
                }
                var repeatSrc = modulesPath+"img/algorea/tutos/repeat_"+dir+suffix;
                var keypadSrc = modulesPath+"img/algorea/tutos/keypad"+suffix;
-               console.log(repeatSrc)
                html += "<div data-lang='blockly scratch' class='long'>";
                html += "<p>"+strings.controlsRepeat+" :</p>";
                html += "<div style='display: inline-block;vertical-align: top;'>";
