@@ -148,6 +148,28 @@ var algoreaInstructionsStrings = {
          }
          return text
       },
+      veterinary: function(nbBeav,numbers) {
+         var text = "Programmez le robot pour qu'il ";
+         if(numbers){
+            text += "apporte ";
+            if(nbBeav > 1){
+               text += "à chaque castor ";
+            }else{
+               text += "au castor ";
+            }
+            text += "le nombre de bûches qu'il demande."
+         }else{
+            text += "ramasse le bois et le donne ";
+            if(nbBeav > 1){
+               text += "aux castors.";
+            }else{
+               text += "au castor.";
+            }
+         }
+         return text
+      },
+      oneWood: "Le robot ne peut porter qu'un tas de bois à la fois, et chaque castor ne reçoit qu'un seul tas de bois.",
+      overBeaver: "Le robot doit se trouver sur la case du castor pour lui donner des bûches.",
 
       /** tutos **/
       dragBlocks: "Glissez les blocs avec la souris",

@@ -65,6 +65,9 @@ function createAlgoreaInstructions(subTask) {
                case "rocket":
                   totalHTML += createSpaceInstructions();
                   break
+               case "veterinary":
+                  totalHTML += createVetInstructions();
+                  break
                default:
                   // totalHTML += params.custom;
             }
@@ -257,6 +260,30 @@ function createAlgoreaInstructions(subTask) {
          if(nbAsteroids > 0){
             html += "<p>"; 
             html += strings.bewareOfAsteroids(nbAsteroids);
+            html += "</p>";
+         }
+
+         return html
+      };
+
+      function createVetInstructions() {
+         var nbBeav = countItem(2);
+         var numbers = gridInfos.intro.numbers;
+         var overBeaver = gridInfos.intro.overBeaver;
+
+         var html = "<p>"; 
+         html += strings.veterinary(nbBeav,numbers);
+         html += "</p>";
+
+         if(!numbers && nbBeav > 1){
+            html += "<p>"; 
+            html += strings.oneWood;
+            html += "</p>";
+         }
+
+         if(overBeaver){
+            html += "<p>"; 
+            html += strings.overBeaver;
             html += "</p>";
          }
 
