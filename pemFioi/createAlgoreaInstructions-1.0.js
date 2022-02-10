@@ -62,6 +62,9 @@ function createAlgoreaInstructions(subTask) {
                case "sokoban":
                   totalHTML += createSokobanInstructions();
                   break
+               case "rocket":
+                  totalHTML += createSpaceInstructions();
+                  break
                default:
                   // totalHTML += params.custom;
             }
@@ -236,6 +239,26 @@ function createAlgoreaInstructions(subTask) {
          html += "<p>"; 
          html += strings.pushBox;
          html += "</p>";
+
+         return html
+      };
+
+      function createSpaceInstructions() {
+         var nbAsteroids = countItem(4);
+         var nbRockets = countItem(5);
+         var nbItem1 = countItem(7);
+         var nbItem2 = countItem(8);
+         var nbItems = nbItem1 + nbItem2;
+         
+         var html = "<p>"; 
+         html += strings.space(nbRockets,nbItems);
+         html += "</p>";
+
+         if(nbAsteroids > 0){
+            html += "<p>"; 
+            html += strings.bewareOfAsteroids(nbAsteroids);
+            html += "</p>";
+         }
 
          return html
       };

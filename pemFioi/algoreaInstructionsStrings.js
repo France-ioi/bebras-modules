@@ -114,6 +114,40 @@ var algoreaInstructionsStrings = {
          return text
       },
       pushBox: "Le robot peut pousser une caisse s'il se met juste devant et que l'espace derrière cette caisse est libre.",
+      space: function(nbRockets,nbItems) {
+         var text = "Programmez le robot pour qu'il ";
+         if(nbItems > 0){
+            text += "ramasse ";
+            if(nbItems > 1){
+               text += "tous les objets";
+            }else{
+               text += "l'objet"
+            }
+            if(nbRockets > 0){
+               text += " puis ";
+            }else{
+               text += ".";
+            }
+         }
+         if(nbRockets > 0){
+            text += "rejoigne ";
+            if(nbRockets > 1){
+               text += "une des "+nbRockets+" fusées.";
+            }else{
+               text += "la fusée.";
+            }
+         }
+         return text
+      },
+      bewareOfAsteroids: function(nbAst) {
+         var text = "Attention ";
+         if(nbAst > 1){
+            text += "aux astéroïdes !";
+         }else{
+            text += "à l'astéroïde !";
+         }
+         return text
+      },
 
       /** tutos **/
       dragBlocks: "Glissez les blocs avec la souris",
