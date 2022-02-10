@@ -2365,16 +2365,16 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       rocket: {
-         backgroundColor: "#666699",
+         backgroundColor: "#2c293e",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            robot: { img: imgPath+"white_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             board_background: { num: 2, color: "#8d8dbe", side: 60, zOrder: 0},
-            stars: { num: 3, img: "stars.png", side: 60, zOrder: 1},
-            asteroide: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
-            rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
-            obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
-            objet1: { num: 7, img: "objet1.png", side: 60, isWithdrawable: true, zOrder: 1 },
-            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
+            // stars: { num: 3, img: "stars.png", side: 60, zOrder: 1},
+            asteroide: { num: 4, img: imgPath+"asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
+            rocket: { num: 5, img: imgPath+"rocket.png", side: 60, isExit: true, zOrder: 1 },
+            // obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
+            objet1: { num: 7, img: imgPath+"solar_panel.png", side: 60, isWithdrawable: true, zOrder: 1 },
+            // objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
             number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
