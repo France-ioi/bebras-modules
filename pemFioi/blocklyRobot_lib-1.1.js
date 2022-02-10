@@ -2397,11 +2397,11 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#e8c999",
          borderColor: "#a67d40",
          itemTypes: {
-            green_robot: { img: "veterinary_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 2 },
-            bebras: { num: 2, img: "bebras.png", side: 70, isContainer: true, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
-            wood: { num: 3, img: "wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
-            wood_outside: { num: 5, img: "wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1, canBeOutside: true },
-            tree: { num: 4, img: "tree.png", side: 70, isObstacle: true, offsetY: 5, zOrder: 0 }, 
+            robot: { img: imgPath+"veterinary_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 2 },
+            beaver: { num: 2, img: imgPath+"beaver.png", side: 70, isContainer: true, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            wood: { num: 3, img: imgPath+"wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
+            wood_outside: { num: 5, img: imgPath+"wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1, canBeOutside: true },
+            tree: { num: 4, img: imgPath+"tree.png", side: 70, isObstacle: true, offsetY: 5, zOrder: 0 }, 
             count_wood: { num: 6, value: function(obj) {
                return context.getItemsOn(obj.row, obj.col, function(item) {
                   return item.isWithdrawable === true;
