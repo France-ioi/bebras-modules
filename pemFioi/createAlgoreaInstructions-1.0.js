@@ -299,6 +299,10 @@ function createAlgoreaInstructions(subTask) {
                case "repeat":
                   html += strings.repeatHelp(lang);
                   break;
+               case "stepByStep":
+                  html += strings.stepByStep;
+                  html += " : <img src='"+imgPath+"step_by_step.png' style='width: 40px; vertical-align: middle' />";
+                  break;
                case "text":
                   html += dat.text;
                   break;
@@ -309,33 +313,9 @@ function createAlgoreaInstructions(subTask) {
             }
             html += "</p>";
          }
-         // var html = "<p>";
-         // if(dat.repeat){
-         //    html += strings.repeatHelp(lang);
-         // }else{
-         //    html += dat.text;
-         // }
-         // html += "</p>";
 
          return html
       };
-
-      // function addStepByStep(dat) {
-      //    var html = "<p";
-      //    if(dat.lang){
-      //       html += " data-lang='";
-      //       for(var iLang = 0; iLang < dat.lang.length; iLang++){
-      //          html += " "+dat.lang[iLang];
-      //       }
-      //       html += "'";
-      //    }
-      //    html += ">";
-      //    html += "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\" ";
-      //    html += "<img src=\""+imgPath+"step_by_step_button.png\" style=\"width: 40px; vertical-align: middle\" />";
-      //    html += "</p>";
-
-      //    return html
-      // };
 
       function addHelpConcept(dat) {
          if(!dat){
@@ -420,7 +400,6 @@ function createAlgoreaInstructions(subTask) {
       // Si vous avez besoin d'aide, cliquez sur le bouton "Plus de détails" ci-dessous. 
       // Une aide est disponible en cliquant sur le bouton "Plus de détails". 
       // Si vous ne connaissez pas ce bloc, cliquez sur "Plus de détails" pour une introduction. 
-      // Pour vous aider à comprendre vos erreurs, pensez au mode "Pas à Pas" : 
       // Vous ne pouvez utiliser que X instructions Y. 
 
       // Si vous êtes bloqué, en particulier si vous n'avez plus assez de blocs pour finir votre programme, cliquez sur le bouton "Plus de détails" pour obtenir plus d'aide. 
