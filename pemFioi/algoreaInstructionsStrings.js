@@ -223,6 +223,7 @@ var algoreaInstructionsStrings = {
             }
          }
       },
+      stepByStep: "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\""
       
    }
 };
