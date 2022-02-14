@@ -9,6 +9,7 @@ function createAlgoreaInstructions(subTask) {
       var strings = algoreaInstructionsStrings[strLang];
       var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
       var data = subTask.data;
+      var nbTests = data[level].length;
       // console.log(gridInfos.intro);
 
       var instHTML = getAlgoreaIntro();
@@ -20,7 +21,7 @@ function createAlgoreaInstructions(subTask) {
          var type = gridInfos.contextType;
 
          var totalHTML = "<div class='"+level+"'>";
-         if($("#task #tuto").length > 0 || (gridInfos.intro.tuto && typeof gridInfos.intro.tuto != "object")){
+         if($("#task #tuto").length > 0 || (gridInfos.intro.tuto && (Array.isArray(gridInfos.intro.tuto) || typeof gridInfos.intro.tuto == "string"))){
             var tuto = (lang != "python") ? true : false;
          }
          if(tuto){
@@ -72,6 +73,11 @@ function createAlgoreaInstructions(subTask) {
                   // totalHTML += params.custom;
             }
          }
+
+         if(nbTests > 1){
+            totalHTML += "<p>"+strings.multipleTests(nbTests)+"</p>";
+         }
+
          if(gridInfos.intro.more){
             var more = gridInfos.intro.more;
             for(var iElem = 0; iElem < more.length; iElem++){
@@ -329,50 +335,75 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
-      function addTuto(type,id) {
+      function addTuto(type,ids) {
          var html = "";
          var suffix = (lang == "blockly") ? "_b" : "_s";
-         var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
-         // console.log()
-         switch(id){
-            case "drag_blocks":
-               html += "<div data-lang='blockly scratch' class='long'>";
-               html += "<p>"+strings.dragBlocks+" :</p>";
-               html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
-               html += "<p>"+strings.demonstration+" :</p>";
-               // html += "<a class='videoBtn' data-video='demo"+suffix+".mp4' style='width: 100%' ><img src='vignette"+suffix+".jpg'></a>";
-               html += "<video controls ><source src='"+vidSrc+".mp4' type=video/mp4></video>";
-               html += "</div>";
-               html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
-               html += "<p>"+strings.thenClickButton+" :</p>";
-               html += "<img src='"+imgPath+"play_button.png' />";
-               html += "<p>"+strings.bottomOfScreen+"</p>";
-               html += "<p>"+strings.watchResult+"</p>";
-               html += "</div>";
-               html += "</div>";
-               break;
-            case "blockly_controls_repeat":
-               if(Beav.Array.has(gridInfos.includeBlocks.generatedBlocks.robot,"east")){
-                  var dir = "east";
-               }else{
-                  var dir = "forward";
-               }
-               var repeatSrc = modulesPath+"img/algorea/tutos/repeat_"+dir+suffix;
-               var keypadSrc = modulesPath+"img/algorea/tutos/keypad"+suffix;
-               html += "<div data-lang='blockly scratch' class='long'>";
-               html += "<p>"+strings.controlsRepeat+" :</p>";
-               html += "<div style='display: inline-block;vertical-align: top;'>";
-               html += "<img src='"+repeatSrc+".png'/>";
-               html += "</div>";
-               html += "<div style='max-width: 480px; margin: 10px;'>";
-               html += "<img src='"+keypadSrc+".png' width='100%' />";
-               html += "</div>";
-               html += "<p>"+strings.loopsAreUseful+"</p>";
-               html += "</div>";
-         // console.log(id)
-      }
-      return html
-   };
+            console.log(ids)
+         if(!Array.isArray(ids)){
+            ids = [ids];
+         }
+         html += "<div data-lang='blockly scratch' class='long'>";
+         for(var iTuto = 0; iTuto < ids.length; iTuto++){
+            var id = ids[iTuto];
+            var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
+            var marginTop = (iTuto > 0) ? "20px" : "0";
+            html += "<div style='margin-top:"+marginTop+"'>";
+            switch(id){
+               case "drag_blocks":
+                  html += "<p>"+strings.dragBlocks+" :</p>";
+                  html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
+                  html += "<p>"+strings.demonstration+" :</p>";
+                  // html += "<a class='videoBtn' data-video='demo"+suffix+".mp4' style='width: 100%' ><img src='vignette"+suffix+".jpg'></a>";
+                  html += "<video controls ><source src='"+vidSrc+".mp4' type=video/mp4></video>";
+                  html += "</div>";
+                  html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
+                  html += "<p>"+strings.thenClickButton+" :</p>";
+                  html += "<img src='"+imgPath+"play_button.png' />";
+                  html += "<p>"+strings.bottomOfScreen+"</p>";
+                  html += "<p>"+strings.watchResult+"</p>";
+                  html += "</div>";
+                  html += "</div>";
+                  break;
+               case "blockly_controls_repeat":
+                  if(Beav.Array.has(gridInfos.includeBlocks.generatedBlocks.robot,"east")){
+                     var dir = "east";
+                  }else{
+                     var dir = "forward";
+                  }
+                  var repeatSrc = modulesPath+"img/algorea/tutos/repeat_"+dir+suffix;
+                  var keypadSrc = modulesPath+"img/algorea/tutos/keypad"+suffix;
+                  html += "<p>"+strings.controlsRepeat+" :</p>";
+                  html += "<div style='display: inline-block;vertical-align: top;'>";
+                  html += "<img src='"+repeatSrc+".png'/>";
+                  html += "</div>";
+                  html += "<div style='max-width: 480px; margin: 10px;'>";
+                  html += "<img src='"+keypadSrc+".png' width='100%' />";
+                  html += "</div>";
+                  html += "<p>"+strings.loopsAreUseful+"</p>";
+                  html += "</div>";
+                  break;
+               case "multiple_tests":
+                  var maxWidth = Math.floor(100/nbTests);
+                  html += "<p>"+strings.lookAtTests(nbTests)+"</p>";
+                  html += "<div style='display: flex; text-align: center;'>"
+                  for(var iTest = 0; iTest < nbTests; iTest++){
+                     var testID = iTest + 1;
+                     var src = $("#test_"+level+"_"+testID).attr("src");
+                     html += "<div>";
+                     html += "<p style='margin: 0;color: #4a90e2'>TEST "+testID+"</p>";
+                     html += "<div style='width: 90%; max-width: 400px;'>";
+                     html += "<img src='"+src+"' />";
+                     html += "</div>";
+                     html += "</div>";
+                  }
+                  html += "</div>";
+
+            }
+            html += "</div>";
+         }
+         html += "</div>";
+         return html
+      };
 
       function countItem(id) {
          var tiles = data[level][0].tiles;
@@ -392,10 +423,7 @@ function createAlgoreaInstructions(subTask) {
       
 
       
-      // attention ! Le même programme doit fonctionner sur les X tests/parcours ci-dessous/proposés/suivants. 
       // attention, vous ne disposez que de X blocs
-      
-      
 
       // Si vous avez besoin d'aide, cliquez sur le bouton "Plus de détails" ci-dessous. 
       // Une aide est disponible en cliquant sur le bouton "Plus de détails". 
