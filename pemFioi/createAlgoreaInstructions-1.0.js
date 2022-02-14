@@ -21,23 +21,13 @@ function createAlgoreaInstructions(subTask) {
          var type = gridInfos.contextType;
 
          var totalHTML = "<div class='"+level+"'>";
-         if($("#task #tuto").length > 0 || (gridInfos.intro.tuto && (Array.isArray(gridInfos.intro.tuto) || typeof gridInfos.intro.tuto == "string"))){
-            var tuto = (lang != "python") ? true : false;
+         var tuto = false;
+         
+         if(gridInfos.intro.tuto && (Array.isArray(gridInfos.intro.tuto) || typeof gridInfos.intro.tuto == "string")){
+            tuto = (lang != "python") ? true : false;
          }
          if(tuto){
-            var tutoEnabled = false;
-            if($("#task #tuto").length > 0){
-               var dataLevel = $("#task #tuto").attr("data-level");
-               var dataLang = $("#task #tuto").attr("data-lang");
-               if((!dataLevel || dataLevel.indexOf(level) !== -1) &&
-                  (!dataLang || dataLang.indexOf(lang) !== -1)){
-                  totalHTML += "<div class='short'>";
-                  tutoEnabled = true;
-               }
-            }else{
-               totalHTML += "<div class='short'>";
-               tutoEnabled = true;
-            }
+            totalHTML += "<div class='short'>";
          }
 
          if(gridInfos.intro.default){
@@ -93,19 +83,10 @@ function createAlgoreaInstructions(subTask) {
             }
          }
          
-         totalHTML += (tutoEnabled) ? "</div>" : "";
+         totalHTML += (tuto) ? "</div>" : "";
 
-         if(tutoEnabled){
-            if($("#task #tuto").length > 0){
-               $("#tuto img").each(function() {
-                  var src = $(this).attr("src");
-                  src = src.replace("$img_path$",imgPath);
-                  $(this).attr("src",src);
-               });
-               totalHTML += $("#tuto").html();
-            }else{
-               totalHTML += addTuto(type,gridInfos.intro.tuto);
-            }
+         if(tuto){
+            totalHTML += addTuto(type,gridInfos.intro.tuto);
          }
 
          totalHTML += "</div>";
@@ -338,18 +319,19 @@ function createAlgoreaInstructions(subTask) {
       function addTuto(type,ids) {
          var html = "";
          var suffix = (lang == "blockly") ? "_b" : "_s";
-            console.log(ids)
+            // console.log(ids)
          if(!Array.isArray(ids)){
             ids = [ids];
          }
          html += "<div data-lang='blockly scratch' class='long'>";
          for(var iTuto = 0; iTuto < ids.length; iTuto++){
             var id = ids[iTuto];
-            var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
             var marginTop = (iTuto > 0) ? "20px" : "0";
             html += "<div style='margin-top:"+marginTop+"'>";
+
             switch(id){
                case "drag_blocks":
+                  var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
                   html += "<p>"+strings.dragBlocks+" :</p>";
                   html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
                   html += "<p>"+strings.demonstration+" :</p>";
@@ -382,8 +364,18 @@ function createAlgoreaInstructions(subTask) {
                   html += "<p>"+strings.loopsAreUseful+"</p>";
                   html += "</div>";
                   break;
+               case "blockly_controls_if_else":
+                  html += "<div>";
+                  html += "<div style='display: inline-block; vertical-align: middle; margin-top: 20px;'>";
+                  html += "<img src='"+imgPath+"/tutos/if_else"+suffix+".png' />";
+                  html += "</div>";
+                  html += "<div style='display: inline-block; max-width: 400px; vertical-align: middle; margin-left: 20px;'>";
+                  html += "<p>"+strings.ifElse+"</p>";
+                  html += "</div>";
+                  html += "</div>";
+                  break;
                case "multiple_tests":
-                  var maxWidth = Math.floor(100/nbTests);
+                  // var maxWidth = Math.floor(100/nbTests);
                   html += "<p>"+strings.lookAtTests(nbTests)+"</p>";
                   html += "<div style='display: flex; text-align: center;'>"
                   for(var iTest = 0; iTest < nbTests; iTest++){
@@ -397,6 +389,9 @@ function createAlgoreaInstructions(subTask) {
                      html += "</div>";
                   }
                   html += "</div>";
+                  break;
+               default: // custom
+                  html += $("#"+id).html();
 
             }
             html += "</div>";
