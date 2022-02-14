@@ -182,6 +182,7 @@ var algoreaInstructionsStrings = {
       lookAtTests: function(nbTests) {
          return "Un seul chemin est commun aux "+nbTests+" tests. Trouvez-le !"
       },
+      ifElse: "Ce bloc permet de commander différemment le robot suivant qu'une condition est remplie ou non.",
 
       /** help **/
       multipleTests: function(nbTests) {
@@ -226,6 +227,11 @@ var algoreaInstructionsStrings = {
                      return "répéter"
                   }
                   return "la boucle for"
+               case 'blockly_controls_if_else':
+                  if(lang != "python"){
+                     return "si / sinon"
+                  }
+                  return "l'alternative'"
             }
          }
       },
