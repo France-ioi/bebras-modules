@@ -179,8 +179,14 @@ var algoreaInstructionsStrings = {
       watchResult: "et observez le résultat !",
       controlsRepeat: "Le bloc <b>répéter</b> vous permet d'utiliser moins de blocs",
       loopsAreUseful: "Les boucles, c'est pratique ! C'est moins long à programmer !</br>Et cela permet d'avoir assez de blocs pour finir le programme.",
+      lookAtTests: function(nbTests) {
+         return "Un seul chemin est commun aux "+nbTests+" tests. Trouvez-le !"
+      },
 
       /** help **/
+      multipleTests: function(nbTests) {
+         return "Le même programme doit fonctionner sur les "+nbTests+" tests ci-dessous."
+      },
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
