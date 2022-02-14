@@ -1943,6 +1943,8 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       course: {
+         backgroundColor: "#fff1c4",
+         borderColor: "#d4eda5",
          itemTypes: {
             red_robot: { img: imgPath+"red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
             red_robot_alt: { img: imgPath+"red_robot_alt.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
