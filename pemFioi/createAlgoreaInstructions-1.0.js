@@ -32,6 +32,9 @@ function createAlgoreaInstructions(subTask) {
 
          if(gridInfos.intro.default){
             switch(type){
+               case "castle":
+                  totalHTML += createCastleInstructions();
+                  break;
                case "course":
                   totalHTML += createCourseInstructions();
                   break;
@@ -95,6 +98,60 @@ function createAlgoreaInstructions(subTask) {
          totalHTML += "</div>";
 
          return totalHTML
+      };
+
+      function createCastleInstructions() {
+         var nbHearth = countItem(4);
+
+         var html = "<p>"+strings.castle(nbHearth)+"</p>";
+
+         if(nbHearth > 1){
+            html += "<p>"+strings.oneFirewood+"</p>";
+         }
+
+         var canFall = false;
+         var maxH = 3;
+         var tiles = data[level][0].tiles;
+         // var initItems = data[level][0].initItems;
+         var nbRows = tiles.length;
+         var nbCol = tiles[0].length;
+         for(var row = 0; row < nbRows; row++){
+            for(var col = 0; col < nbCol; col++){
+               if(col < nbCol - 1 && tiles[row][col] == 2 && tiles[row][col + 1] == 1){
+                  var fallH = getFallH(row,col + 1);
+                  if(fallH >= maxH || fallH + row >= nbRows){
+                     // console.log(fallH,row)
+                     canFall = true;
+                     break;
+                  }
+               }
+               if(col > 0 && tiles[row][col] == 2 && tiles[row][col - 1] == 1){
+                  var fallH = getFallH(row,col - 1);
+                  if(fallH >= maxH || fallH + row >= nbRows){
+                     // console.log(fallH,row)
+                     canFall = true;
+                     break;
+                  }
+               }
+            }
+            if(canFall){
+               break;
+            }
+         }
+         if(canFall){
+            html += "<p>"+strings.fall(maxH)+"</p>";
+         }
+
+         return html
+
+         function getFallH(r,c) {
+            for(var row = r + 1; row < nbRows; row++){
+               if(tiles[row][c] != 1){
+                  return row - r
+               }
+            }
+            return nbRows - r
+         }
       };
 
       function createCourseInstructions() {

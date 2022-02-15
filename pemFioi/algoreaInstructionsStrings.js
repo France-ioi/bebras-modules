@@ -1,5 +1,18 @@
 var algoreaInstructionsStrings = {
    fr: {
+      castle: function(nbHearth) {
+         var text = "Programmez le robot pour qu'il mette du bois dans ";
+         if(nbHearth == 1){
+            text += "la cheminée.";
+         }else{
+            text += "chaque cheminée."
+         }
+         return text
+      },
+      oneFirewood: "Le robot ne peut transporter qu'un seul tas de bois à la fois.</br>Chaque cheminée ne peut contenir qu'un seul tas de bois.",
+      fall: function(maxH) {
+         return "Le robot tombe s'il n'est pas sur une plateforme, et s'il tombe de plus de "+maxH+" cases, il se casse."
+      },
       course: function(nbExits,obstacles) {
          var text = "Programmez le robot pour qu'il atteigne ";
          if(nbExits == 1){
