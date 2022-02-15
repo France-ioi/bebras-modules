@@ -231,7 +231,7 @@ var algoreaInstructionsStrings = {
                   if(lang != "python"){
                      return "si / sinon"
                   }
-                  return "l'alternative'"
+                  return "l'instruction if/else"
             }
          }
       },

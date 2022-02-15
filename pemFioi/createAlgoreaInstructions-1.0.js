@@ -79,6 +79,9 @@ function createAlgoreaInstructions(subTask) {
                   case "help":
                      totalHTML += addHelp(elem);
                      break;
+                  case "custom":
+                     totalHTML += addCustom(elem);
+                     break;
                }
             }
          }
@@ -398,6 +401,15 @@ function createAlgoreaInstructions(subTask) {
          }
          html += "</div>";
          return html
+      };
+
+      function addCustom(dat) {
+         if(dat.id){
+            return $("#"+dat.id).html()
+         }
+         if(dat.text){
+            return "<p>"+dat.text+"</p>"
+         }
       };
 
       function countItem(id) {
