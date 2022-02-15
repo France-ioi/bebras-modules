@@ -196,6 +196,11 @@ var algoreaInstructionsStrings = {
          return "Un seul chemin est commun aux "+nbTests+" tests. Trouvez-le !"
       },
       ifElse: "Ce bloc permet de commander différemment le robot suivant qu'une condition est remplie ou non.",
+      changeDirection: "Les commandes de pivotement",
+      toChangeDirection: "Pour faire pivoter le robot, utilisez les blocs",
+      or: "ou",
+      whenChangingDirection: "Attention : lorsque le robot tourne à gauche ou à droite, il reste sur la même case. Il est nécessaire d'utiliser ensuite le bloc",
+      toChangeCell: "pour que le robot change ensuite de case.",
 
       /** help **/
       multipleTests: function(nbTests) {

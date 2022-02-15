@@ -112,7 +112,6 @@ function createAlgoreaInstructions(subTask) {
          var canFall = false;
          var maxH = 3;
          var tiles = data[level][0].tiles;
-         // var initItems = data[level][0].initItems;
          var nbRows = tiles.length;
          var nbCol = tiles[0].length;
          for(var row = 0; row < nbRows; row++){
@@ -120,7 +119,6 @@ function createAlgoreaInstructions(subTask) {
                if(col < nbCol - 1 && tiles[row][col] == 2 && tiles[row][col + 1] == 1){
                   var fallH = getFallH(row,col + 1);
                   if(fallH >= maxH || fallH + row >= nbRows){
-                     // console.log(fallH,row)
                      canFall = true;
                      break;
                   }
@@ -128,7 +126,6 @@ function createAlgoreaInstructions(subTask) {
                if(col > 0 && tiles[row][col] == 2 && tiles[row][col - 1] == 1){
                   var fallH = getFallH(row,col - 1);
                   if(fallH >= maxH || fallH + row >= nbRows){
-                     // console.log(fallH,row)
                      canFall = true;
                      break;
                   }
@@ -379,7 +376,6 @@ function createAlgoreaInstructions(subTask) {
       function addTuto(type,ids) {
          var html = "";
          var suffix = (lang == "blockly") ? "_b" : "_s";
-            // console.log(ids)
          if(!Array.isArray(ids)){
             ids = [ids];
          }
@@ -449,6 +445,16 @@ function createAlgoreaInstructions(subTask) {
                      html += "</div>";
                   }
                   html += "</div>";
+                  break;
+               case "change_direction":
+                  html += "<h3>"+strings.changeDirection+"</h3>";
+                  html += "<p>"+strings.toChangeDirection;
+                  html += "<img src='"+imgPath+"/tutos/left"+suffix+".png' style='vertical-align: middle' />";
+                  html += strings.or+"<img src='"+imgPath+"/tutos/right"+suffix+".png' style='vertical-align: middle' />";
+                  html += "</p>";
+                  html += "<p>"+strings.whenChangingDirection;
+                  html += "<img src='"+imgPath+"/tutos/forward"+suffix+".png' style='vertical-align: middle' />";
+                  html += strings.toChangeCell+"</p>";
                   break;
                default: // custom
                   html += $("#"+id).html();
