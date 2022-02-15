@@ -860,6 +860,79 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      castle: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le bois",
+               dropObject: "déposer le bois",
+               onObject: "sur du bois",
+               onContainer: "sur une cheminée"
+            },
+            code: {
+               withdrawObject: "ramasserBois",
+               dropObject: "deposerBois",
+               onObject: "surBois",
+               onContainer: "surCheminee"
+            },
+            messages: {
+               successContainersFilled: "Bravo, le château est bien chauffé !",
+               failureContainersFilled: "Votre robot n'a pas mis du bois dans toutes les cheminées.",
+               failureContainersFilledLess: "Votre robot n'a pas mis du bois dans toutes les cheminées..",
+               failureContainersFilledBag: "Votre robot doit déposer le bois dans la cheminée.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà du bois dans cette cheminée.",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie de déposer du bois alors qu'il n'en transporte pas !"
+            }
+         },
+
+         en: {
+            label: {
+               withdrawObject: "pick up the gear",
+               dropObject: "accrocher la roue dentée",
+               onObject: "sur une roue dentée",
+               onContainer: "sur une machine"
+            },
+            code: {
+               withdrawObject: "pickGear",
+               dropObject: "attachGear",
+               onObject: "onGear",
+               onContainer: "onMachine"
+            },
+            messages: {
+               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
+               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà une plateforme ici !",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
+            }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger el engranaje",
+               dropObject: "soltar el engranaje",
+               onObject: "sobre engranaje",
+               onContainer: "sobre una máquina"
+            },
+            code: {
+               withdrawObject: "recogerEngranaje",
+               dropObject: "soltarEngranaje",
+               onObject: "sobreEngranaje",
+               onContainer: "sobreMaquina"
+            },
+            messages: {
+               successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
+               failureContainersFilled: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
+               failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
+            } 
+         }
+      },
       chticode_abs: {
          fr: {
             label: {
@@ -1167,79 +1240,7 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
-      gears: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser la roue dentée",
-               dropObject: "accrocher la roue dentée",
-               onObject: "sur une roue dentée",
-               onContainer: "sur une machine"
-            },
-            code: {
-               withdrawObject: "ramasserRoue",
-               dropObject: "deposerRoue",
-               onObject: "surRoueDentee",
-               onContainer: "surMachine"
-            },
-            messages: {
-               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
-               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
-               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
-               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
-               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
-               failureDropObject: "Il y a déjà une roue ici !",
-               failureDropPlatform: "Il y a déjà une plateforme ici !",
-               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
-            }
-         },
-
-         en: {
-            label: {
-               withdrawObject: "pick up the gear",
-               dropObject: "accrocher la roue dentée",
-               onObject: "sur une roue dentée",
-               onContainer: "sur une machine"
-            },
-            code: {
-               withdrawObject: "pickGear",
-               dropObject: "attachGear",
-               onObject: "onGear",
-               onContainer: "onMachine"
-            },
-            messages: {
-               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
-               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
-               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
-               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
-               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
-               failureDropObject: "Il y a déjà une plateforme ici !",
-               failureDropPlatform: "Il y a déjà une plateforme ici !",
-               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger el engranaje",
-               dropObject: "soltar el engranaje",
-               onObject: "sobre engranaje",
-               onContainer: "sobre una máquina"
-            },
-            code: {
-               withdrawObject: "recogerEngranaje",
-               dropObject: "soltarEngranaje",
-               onObject: "sobreEngranaje",
-               onContainer: "sobreMaquina"
-            },
-            messages: {
-               successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
-               failureContainersFilled: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
-               failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
-               failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
-               failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
-            } 
-         }
-      },
+      
       marbles: {
          fr: {
             label: {
@@ -1904,6 +1905,32 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
+      castle: {
+         backgroundColor: "#1f003c",
+         borderColor: "#2d0073",
+         hasGravity: true,
+         bagSize: 1,
+         containerSize: 1,
+         itemTypes: {
+            robot: { img: imgPath+"castle_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, offsetY: 3, zOrder: 3 },
+            platform: { num: 2, img: imgPath+"platform.png", side: 60, isObstacle: true, zOrder: 0 },
+            hearth: { num: 4, img: imgPath+"hearth.png", side: 60, isContainer: true, zOrder: 1},
+            wood: { num:5, img: imgPath+"firewood.png", side: 60, isWithdrawable: true, zOrder: 2},
+            // projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
+            // door: { num: 8, img: "door.png", side: 60, isExit: true, zOrder: 1},
+            // dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+            // dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+            projectile_generator: {num: 7, side: 60, action: function(item, time) {
+               if(item.period == undefined)
+                  item.period = 1;
+               if(item.start == undefined)
+                  item.start = 1;
+               if(time % item.period == item.start) 
+                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
+            }}
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
+      },
       chticode_abs: {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
@@ -2105,31 +2132,7 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
-      gears: {
-         backgroundColor: "#f2f1e3",
-         hasGravity: true,
-         bagSize: 1,
-         containerSize: 1,
-         itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, offsetY: 3, zOrder: 3 },
-            platform: { num: 2, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
-            gears: { num: 4, img: "gears.png", side: 60, isContainer: true, zOrder: 1},
-            wheel: { num:5, img: "wheel.png", side: 60, isWithdrawable: true, zOrder: 2},
-            projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
-            door: { num: 8, img: "door.png", side: 60, isExit: true, zOrder: 1},
-            dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
-            dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
-            projectile_generator: {num: 7, side: 60, action: function(item, time) {
-               if(item.period == undefined)
-                  item.period = 1;
-               if(item.start == undefined)
-                  item.start = 1;
-               if(time % item.period == item.start) 
-                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
-            }}
-         },
-         checkEndCondition: robotEndConditions.checkContainersFilled
-      },
+      
       gems: {
          backgroundColor: "#BF5E47",
          borderColor: "#96413B",
