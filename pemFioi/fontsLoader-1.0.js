@@ -13,6 +13,11 @@ var importableFonts = function () {
              src: mp+"/fonts/titilliumweb.css",
              embed: mp+"/fonts/embed-titilliumweb.css",
              cdn: "https://static4.castor-informatique.fr/modules/fonts/titilliumweb.css"
+        },
+        'source-sans-pro': {
+             check: '12px "Source Sans Pro"',
+             src: "https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+             // TODO : local source
         }
     };
 }
