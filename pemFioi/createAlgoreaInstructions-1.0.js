@@ -337,6 +337,7 @@ function createAlgoreaInstructions(subTask) {
       /*** COMMON ***/
 
       function addHelp(dat) {
+         var suffix = (lang == "blockly") ? "_b" : "_s";
          for(var key in dat){
             var html = "<p>";
             switch(key){
@@ -352,6 +353,16 @@ function createAlgoreaInstructions(subTask) {
                   break;
                case "dontStepOnFlowers":
                   html += strings.dontStepOnFlowers;
+                  break;
+               case "moreDetails":
+                  html += strings.moreDetails;
+                  break;
+               case "ifElse":
+                  if(lang == "python"){
+                     return addHelpConcept(["blockly_controls_if_else"])
+                  }
+                  html += "<b>"+strings.youWillNeed+" :</b>";
+                  html += "<img src='"+imgPath+"/tutos/if_else"+suffix+".png' width='70px' style='vertical-align: middle' />";
                   break;
 
             }
@@ -431,17 +442,16 @@ function createAlgoreaInstructions(subTask) {
                   html += "</div>";
                   break;
                case "multiple_tests":
-                  // var maxWidth = Math.floor(100/nbTests);
+                  var tiles = data[level][0].tiles;
+                  var nbCol = tiles[0].length;
                   html += "<p>"+strings.lookAtTests(nbTests)+"</p>";
-                  html += "<div style='display: flex; text-align: center;'>"
+                  html += "<div style='display: flex; text-align: center; flex-direction: "+((nbCol > 10) ? "column" : "row")+"; justify-content: center;'>"
                   for(var iTest = 0; iTest < nbTests; iTest++){
                      var testID = iTest + 1;
                      var src = $("#test_"+level+"_"+testID).attr("src");
                      html += "<div>";
-                     html += "<p style='margin: 0;color: #4a90e2'>TEST "+testID+"</p>";
-                     html += "<div style='width: 90%; max-width: 400px;'>";
-                     html += "<img src='"+src+"' />";
-                     html += "</div>";
+                     html += "<p style='margin: 0; "+((nbCol > 10) ? "margin-top: 10px;" :"")+"color: #4a90e2'>TEST "+testID+"</p>";
+                     html += "<img src='"+src+"' style='width: 90%; max-width: 400px;'/>";
                      html += "</div>";
                   }
                   html += "</div>";
