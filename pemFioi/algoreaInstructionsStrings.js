@@ -253,7 +253,9 @@ var algoreaInstructionsStrings = {
             }
          }
       },
-      stepByStep: "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\""
+      stepByStep: "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\"",
+      moreDetails: "Si vous avez besoin d'aide, cliquez sur le bouton <b>\"Plus de détails\"</b> ci-dessous.",
+      youWillNeed: "Vous aurez besoin de"
       
    }
 };
