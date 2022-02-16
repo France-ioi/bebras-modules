@@ -209,6 +209,10 @@ var algoreaInstructionsStrings = {
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
+      maxBlocks: function(max,lang) {
+         var str = (lang == "python") ? "instructions" : "blocs";
+         return "<b>Attention</b>, vous ne disposez que de <b>"+max+" "+str+"</b>.";
+      },
       repeatHelp: function(lang) {
          if(lang != "python"){
             return "Si besoin, vous pouvez placer plusieurs blocs à l’intérieur du bloc “répéter”."
