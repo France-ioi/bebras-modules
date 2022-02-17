@@ -311,9 +311,13 @@ function createAlgoreaInstructions(subTask) {
       };
 
       function createVetInstructions() {
-         var nbBeav = countItem(2);
-         var numbers = gridInfos.intro.numbers;
+         var nbCountBeav = countItem(7);
+         // var nbCountWood = countItem(6);
+         var numbers = nbCountBeav > 0;
+         var nbBeav = (numbers) ? nbCountBeav : countItem(2);
+
          var overBeaver = gridInfos.intro.overBeaver;
+         // console.log(overBeaver)
 
          var html = "<p>"; 
          html += strings.veterinary(nbBeav,numbers);
@@ -325,7 +329,7 @@ function createAlgoreaInstructions(subTask) {
             html += "</p>";
          }
 
-         if(overBeaver){
+         if(overBeaver === true){
             html += "<p>"; 
             html += strings.overBeaver;
             html += "</p>";

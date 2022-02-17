@@ -222,13 +222,17 @@ var algoreaInstructionsStrings = {
       helpConcept: function(lang,concepts) {
          var text = "Vous pourrez avoir besoin ";
          if(lang != "python"){
-            text += (concepts.length > 1) ? "des blocs " : "du bloc ";
+            if(concepts[0] != "extra_variable"){
+               text += (concepts.length > 1) ? "des blocs " : "du bloc ";
+            }else{
+               text += "de ";
+            }
          }else{
             text += "de ";
          }
          for(var iConcept = 0; iConcept < concepts.length; iConcept++){
             var concept = concepts[iConcept];
-            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\"><b>";
+            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\" class=\"aide\"><b>";
             text += conceptName(concept,lang);
             text += "</b></a>";
             if(iConcept == concepts.length - 2){
@@ -254,6 +258,8 @@ var algoreaInstructionsStrings = {
                      return "si / sinon"
                   }
                   return "l'instruction if/else"
+               case 'extra_variable':
+                  return "variables"
             }
          }
       },
