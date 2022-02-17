@@ -631,3 +631,42 @@ button,
   color: #ff001f;
   border-color: #ff001f;
 }
+
+
+
+
+body.coursera, body.coursera #task {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+}
+
+body.coursera #task .intro p.dropcap::first-letter,
+body.coursera #task .title,
+body.coursera statement,
+body.coursera .displayFeedback answer.correct:not(.selected) .answer-code::before,
+body.coursera #score,
+body.coursera .fill-gaps-text .placeholder,
+body.coursera question[type="sort_items"] .dest label {
+  color: #0056D2;
+}
+
+body.coursera question::after,
+body.coursera .questions-numeration-enabled statement::before,
+body.coursera answer.selected .answer-code,
+body.coursera answer.selected .answer-switch .cursor,
+body.coursera #displayHelper_validate input[type=button],
+body.coursera #popupMessage button,
+body.coursera .btn {
+  background-color: #0056D2;
+}
+
+body.coursera answer.selected .answer-block,
+body.coursera answer .answer-code {
+  color: #0056D2;
+  border-color: #0056D2;
+}
+
+body.coursera .fill-gaps-toolbar .word,
+body.coursera .fill-gaps-text .word,
+body.coursera .fill-gaps-text .placeholder-hover {
+  border-color: #0056D2;
+}
