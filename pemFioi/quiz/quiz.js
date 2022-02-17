@@ -209,6 +209,17 @@ Quiz.UI = function(params) {
     useFullWidth();
     params.parent.show();
 
+    function getParameterByName(name) {
+       name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+       var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+           results = regex.exec(window.location.toString());
+       return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+    if(getParameterByName('theme') == 'coursera') {
+       $('body').addClass('coursera');
+       FontsLoader.loadFonts(['source-sans-pro']);
+    }
+
 
 
     // interface
