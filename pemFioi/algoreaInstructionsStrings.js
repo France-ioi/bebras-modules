@@ -49,18 +49,16 @@ var algoreaInstructionsStrings = {
          return text
       },
       board: "Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer.",
-      dominoes: function(nbTarget,rollOver) {
+      dominoes: function(nbTarget) {
          var text = "Programmez le robot pour qu'il ramasse ";
          if(nbTarget == 1){
             text += "le domino avec deux carrés bleus.";
          }else{
             text += "tous les dominos avec deux carrés bleus.";
          }
-         if(rollOver){
-            text += " Le robot peut passer sur les dominos qu'il ne ramasse pas.";
-         }
          return text
       },
+      rollOver: "Le robot peut passer sur les dominos qu'il ne ramasse pas.",
       flowers: function(nbTarget) {
          var text = "Programmez le robot pour qu'il sème une graine de fleur ";
          if(nbTarget == 1){

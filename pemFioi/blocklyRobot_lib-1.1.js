@@ -2064,7 +2064,8 @@ var getContext = function(display, infos, curLevel) {
            }
          ],
          noBorders: true,
-         backgroundColor: "#a40e0e",
+         backgroundColor: "#90569D",
+         borderColor: "#BDA6C9",
          itemTypes: {
             green_robot: { img: imgPath+"green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             pink_robot: { img: imgPath+"pink_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },

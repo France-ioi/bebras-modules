@@ -197,11 +197,13 @@ function createAlgoreaInstructions(subTask) {
          }
 
          var nbTarget = countItem(11);
-         var rollOver = (gridInfos.intro && gridInfos.intro.rollOver)
+         var rollOver = (gridInfos.intro.rollOver === true || countItem([3,4,5,6,7,8,9,10]) > 0);
 
-         var text = strings.dominoes(nbTarget,rollOver);
+         var html = "<p>"+strings.dominoes(nbTarget);+"</p>";
 
-         var html = "<p>"+text+"</p>";
+         if(rollOver){
+            html += "<p>"+strings.rollOver+"</p>";
+         }
 
          // if(gridInfos.intro && gridInfos.intro.maxMove){
          //    var text2 = strings.maxMove(gridInfos.intro.maxMove);
@@ -501,7 +503,7 @@ function createAlgoreaInstructions(subTask) {
          for(var row = 0; row < nbRows; row++){
             for(var col = 0; col < nbCol; col++){
                var itemID = tiles[row][col];
-               if(itemID == id){
+               if((Array.isArray(id) && Beav.Array.has(id,itemID)) || itemID == id){
                   nbTarget++;
                }
             }
