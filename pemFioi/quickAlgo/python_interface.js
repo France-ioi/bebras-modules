@@ -138,7 +138,7 @@ function LogicController(maxInstructions, subTask) {
     }
 
     // Check for functions used as values
-    var re = /def\W+([^(]+)\(/g;
+    var re = /def\s+([^(]+)\(/g;
     var foundFuncs = this._mainContext && this._mainContext.runner ? this._mainContext.runner.getDefinedFunctions() : [];
     var match;
     while(match = re.exec(code)) {
