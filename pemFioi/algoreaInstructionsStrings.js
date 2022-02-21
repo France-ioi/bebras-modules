@@ -244,7 +244,10 @@ var algoreaInstructionsStrings = {
                   text += "de ";
                }
             }else if(iConcept < concepts.length - 2){
-               text += ", "
+               text += ", ";
+               if(lang == "python"){
+                  text += "de ";
+               }
             }
          }
          return text
@@ -261,6 +264,11 @@ var algoreaInstructionsStrings = {
                      return "si / sinon"
                   }
                   return "l'instruction if/else"
+               case 'blockly_controls_if':
+                  if(lang != "python"){
+                     return "si"
+                  }
+                  return "l'instruction if"
                case 'extra_variable':
                   return "variables"
             }
@@ -303,7 +311,17 @@ var algoreaInstructionsStrings = {
                            return "peindre la case"
                         }
                         return "peindreCase()"
+                     case "flowers":
+                        if(lang != "python"){
+                           return "semer une graine"
+                        }
+                        return "semerGraine()"
                   }
+               case "north":
+                  if(lang != "python"){
+                     return "Avancer vers le nord"
+                  }
+                  return "nord()"
             }
          }
 
