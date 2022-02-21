@@ -68,7 +68,7 @@ function createAlgoreaInstructions(subTask) {
          }
 
          var limitedUses = gridInfos.limitedUses;
-         if(limitedUses){
+         if(limitedUses && Array.isArray(limitedUses)){
             totalHTML += "<p>"+strings.limitedUses(limitedUses,lang,type)+"</p>";
          }
 
