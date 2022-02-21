@@ -67,6 +67,11 @@ function createAlgoreaInstructions(subTask) {
             }
          }
 
+         var limitedUses = gridInfos.limitedUses;
+         if(limitedUses){
+            totalHTML += "<p>"+strings.limitedUses(limitedUses,lang,type)+"</p>";
+         }
+
          if(nbTests > 1){
             totalHTML += "<p>"+strings.multipleTests(nbTests)+"</p>";
          }
@@ -374,6 +379,9 @@ function createAlgoreaInstructions(subTask) {
                   var max = gridInfos.maxInstructions;
                   html += strings.maxBlocks(max,lang);
                   break;
+               case "nestedRepeat":
+                  html += strings.helpNestedRepeat;
+                  break;
 
             }
             html += "</p>";
@@ -475,6 +483,22 @@ function createAlgoreaInstructions(subTask) {
                   html += "<p>"+strings.whenChangingDirection;
                   html += "<img src='"+imgPath+"/tutos/forward"+suffix+".png' style='vertical-align: middle' />";
                   html += strings.toChangeCell+"</p>";
+                  break;
+               case "extra_nested_repeat":
+                  var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id+suffix;
+                  html += "<div style='display: inline-block;vertical-align: top;'>";
+                  html += "<img src='"+imgPath+"/tutos/"+type+"_"+id+"_sequence"+suffix+".png'/>";
+                  html += "</div>";
+                  html += "<div style='display: inline-block;vertical-align: top;'>";
+                  html += "<p>"+strings.sameAs+" :</p>";
+                  html += "</div>";
+                  html += "<div style='display: inline-block;vertical-align: top;'>";
+                  html += "<img src='"+imgPath+"/tutos/"+type+"_"+id+"_repeat"+suffix+".png'/>";
+                  html += "</div>";
+                  html += "<div style='display: block; width: 100%; max-width: 400px; border: 1px solid black; padding: 10px; margin-left: 20px; margin: 10px;'>";
+                  html += "<p>"+strings.demonstration+" :</p>";
+                  html += "<video controls style='max-width: 380px;'><source src='"+vidSrc+".mp4' type=video/mp4></video>";
+                  html += "</div>";
                   break;
                default: // custom
                   html += $("#"+id).html();

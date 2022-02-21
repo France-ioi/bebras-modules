@@ -182,7 +182,9 @@ var algoreaInstructionsStrings = {
       oneWood: "Le robot ne peut porter qu'un tas de bois à la fois, et chaque castor ne reçoit qu'un seul tas de bois.",
       overBeaver: "Le robot doit se trouver sur la case du castor pour lui donner des bûches.",
 
-      /** tutos **/
+
+      /*** TUTOS ***/
+      /*************/
       dragBlocks: "Glissez les blocs avec la souris",
       demonstration: "Démonstration",
       thenClickButton: "Cliquez ensuite sur le bouton",
@@ -199,8 +201,11 @@ var algoreaInstructionsStrings = {
       or: "ou",
       whenChangingDirection: "Attention : lorsque le robot tourne à gauche ou à droite, il reste sur la même case. Il est nécessaire d'utiliser ensuite le bloc",
       toChangeCell: "pour que le robot change ensuite de case.",
+      sameAs: "Cela fait pareil que",
 
-      /** help **/
+
+      /*** HELP ***/
+      /************/
       multipleTests: function(nbTests) {
          return "Le même programme doit fonctionner sur les "+nbTests+" tests ci-dessous."
       },
@@ -263,7 +268,46 @@ var algoreaInstructionsStrings = {
       },
       stepByStep: "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\"",
       moreDetails: "Si vous avez besoin d'aide, cliquez sur le bouton <b>\"Plus de détails\"</b> ci-dessous.",
-      youWillNeed: "Vous aurez besoin de"
+      youWillNeed: "Vous aurez besoin de",
+      helpNestedRepeat: "Aide : on peut placer une boucle à l'intérieur d'une boucle !",
+      limitedUses: function(limitedUses,lang,type) {
+         var text = "Votre programme ne peut contenir que ";
+         for(var iElem = 0; iElem < limitedUses.length; iElem++){
+            var elemData = limitedUses[iElem];
+            var nbUses = elemData.nbUses;
+            var blocks = elemData.blocks;
+            text += "<b>"+nbUses+" fois</b> ";
+            text += (blocks.length > 1) ? "les instructions " : "l'instruction ";
+            for(var iBlock = 0; iBlock < blocks.length; iBlock++){
+               text += "\""+instructionName(blocks[iBlock],lang,type)+"\"";
+               if(iBlock < blocks.length - 2){
+                  text += ", ";
+               }else if(iBlock == blocks.length - 2){
+                  text += "et ";
+               }
+            }
+            if(iElem < limitedUses.length - 2){
+               text += ", que ";
+            }else if(iElem == limitedUses.length - 2){
+               text += "et que ";
+            }
+         }
+         return text+"."
+
+         function instructionName(instr,lang,type) {
+            switch(instr) {
+               case "dropObject":
+                  switch(type) {
+                     case "paint":
+                        if(lang != "python"){
+                           return "peindre la case"
+                        }
+                        return "peindreCase()"
+                  }
+            }
+         }
+
+      }
       
    }
 };
