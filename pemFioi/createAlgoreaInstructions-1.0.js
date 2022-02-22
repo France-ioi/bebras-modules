@@ -41,6 +41,9 @@ function createAlgoreaInstructions(subTask) {
                case "dominoes":
                   totalHTML += createDominoesInstructions();
                   break
+               case "fishing":
+                  totalHTML += createFishingInstructions();
+                  break
                case "flowers":
                   totalHTML += createFlowersInstructions();
                   break
@@ -220,6 +223,27 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
+      function createFishingInstructions() {
+         var nbIslands = countItem(6);
+
+         var html = "<p>"; 
+         html += strings.fishing(nbIslands);
+         html += "</p>";
+
+         if(gridInfos.intro.howTo == true){
+            html += "<p>"; 
+            html += strings.fishingHowTo;
+            html += "</p>";
+         }
+         
+         if(gridInfos.intro.exactNumber == true){
+            html += "<p>"; 
+            html += strings.fishingExactNumber;
+            html += "</p>";
+         }
+         return html
+      };
+
       function createFlowersInstructions() {
          var nbTarget = countItem(2);
          // var nbFixed = countItem(5);
@@ -383,6 +407,9 @@ function createAlgoreaInstructions(subTask) {
                   break;
                case "nestedRepeat":
                   html += strings.helpNestedRepeat;
+                  break;
+               case "warningEasy":
+                  html += strings.warningEasy;
                   break;
 
             }

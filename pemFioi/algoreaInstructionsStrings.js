@@ -59,6 +59,18 @@ var algoreaInstructionsStrings = {
          return text
       },
       rollOver: "Le robot peut passer sur les dominos qu'il ne ramasse pas.",
+      fishing: function(nbIslands) {
+         var text = "Programmez le robot-bouée pour qu'il apporte ";
+         if(nbIslands > 1){
+            text += "sur chaque île ";
+         }else{
+            text += "sur l'île ";
+         }
+         text += "le nombre de poissons demandé."
+         return text
+      },
+      fishingHowTo: "Le robot doit se trouver sur la case du filet pour pouvoir prendre des poissons. Il doit se trouver sur la case de l'île pour y déposer des poissons.",
+      fishingExactNumber: "Le robot ne doit pas ramasser plus de poisson que nécessaire.",
       flowers: function(nbTarget) {
          var text = "Programmez le robot pour qu'il sème une graine de fleur ";
          if(nbTarget == 1){
@@ -283,6 +295,7 @@ var algoreaInstructionsStrings = {
       moreDetails: "Si vous avez besoin d'aide, cliquez sur le bouton <b>\"Plus de détails\"</b> ci-dessous.",
       youWillNeed: "Vous aurez besoin de",
       helpNestedRepeat: "Aide : on peut placer une boucle à l'intérieur d'une boucle !",
+      warningEasy: "Si cette version est trop difficile, résolvez d'abord la <b>version 1 étoile</b>. Pour y accéder, cliquez sur l'<b>onglet en haut à gauche</b>.",
       limitedUses: function(limitedUses,lang,type) {
          var text = "Votre programme ne peut contenir que ";
          for(var iElem = 0; iElem < limitedUses.length; iElem++){
