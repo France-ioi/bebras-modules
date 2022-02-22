@@ -2090,15 +2090,15 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          containerSize: 1,
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 4, customDisplay: function(obj) {
+            robot: { img: imgPath+"buoy_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 4, customDisplay: function(obj) {
             	if(context.bag.length != 0)
-            		obj.img = "red_robot_fishes.png";
+            		obj.img = imgPath+"buoy_robot_fishes.png";
             	else
-            		obj.img = "red_robot.png";
+            		obj.img = imgPath+"buoy_robot.png";
             } },
-            island: { num: 2, img: "island.png", side: 75, isContainer: true, offsetX: -7, offsetY: 0, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
-            fishes: { num: 3, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1 },
-            fishes: { num: 4, img: "fishes.png", side: 60, isWithdrawable: true, offsetY: 8, offsetX: 2, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
+            island: { num: 2, img: imgPath+"island.png", side: 75, isContainer: true, offsetX: -7, offsetY: 0, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            fishes: { num: 3, img: imgPath+"fishes.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 1 },
+            fishes: { num: 4, img: imgPath+"fishes.png", side: 60, isWithdrawable: true, offsetY: 8, offsetX: 2, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
             	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
             		obj.offsetX = 0;
             } },
@@ -2112,8 +2112,8 @@ var getContext = function(display, infos, curLevel) {
                   return item.isContainer === true;
                })[0].containerSize;
             }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -15, offsetY: -14},
-            obstacle: { num: 7, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
-            net: { num: 8, img: "net.png", side: 60, zOrder: 2 },
+            obstacle: { num: 7, img: imgPath+"reef.png", side: 60, isObstacle: true, zOrder: 0 },
+            net: { num: 8, img: imgPath+"net.png", side: 60, zOrder: 2 },
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
