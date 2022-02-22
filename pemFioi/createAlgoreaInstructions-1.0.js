@@ -401,6 +401,13 @@ function createAlgoreaInstructions(subTask) {
                   html += "<b>"+strings.youWillNeed+" :</b>";
                   html += "<img src='"+imgPath+"/tutos/if_else"+suffix+".png' width='70px' style='vertical-align: middle' />";
                   break;
+               case "variable":
+                  if(lang == "python"){
+                     return addHelpConcept(["extra_variable"])
+                  }
+                  html += "<b>"+strings.youWillNeed+" :</b>";
+                  html += "<img src='"+imgPath+"/tutos/variable"+suffix+".png' style='vertical-align: middle' />";
+                  break;
                case "maxBlocks":
                   var max = gridInfos.maxInstructions;
                   html += strings.maxBlocks(max,lang);
