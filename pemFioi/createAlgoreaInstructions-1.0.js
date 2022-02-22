@@ -67,15 +67,6 @@ function createAlgoreaInstructions(subTask) {
             }
          }
 
-         var limitedUses = gridInfos.limitedUses;
-         if(limitedUses && Array.isArray(limitedUses)){
-            totalHTML += "<p>"+strings.limitedUses(limitedUses,lang,type)+"</p>";
-         }
-
-         if(nbTests > 1){
-            totalHTML += "<p>"+strings.multipleTests(nbTests)+"</p>";
-         }
-
          if(gridInfos.intro.more){
             var more = gridInfos.intro.more;
             for(var iElem = 0; iElem < more.length; iElem++){
@@ -93,6 +84,17 @@ function createAlgoreaInstructions(subTask) {
                }
             }
          }
+
+         var limitedUses = gridInfos.limitedUses;
+         if(limitedUses && Array.isArray(limitedUses)){
+            totalHTML += "<p>"+strings.limitedUses(limitedUses,lang,type)+"</p>";
+         }
+
+         if(nbTests > 1){
+            totalHTML += "<p>"+strings.multipleTests(nbTests)+"</p>";
+         }
+
+         
          
          totalHTML += (tuto) ? "</div>" : "";
 

@@ -269,6 +269,11 @@ var algoreaInstructionsStrings = {
                      return "si"
                   }
                   return "l'instruction if"
+               case 'blockly_logic_negate':
+                  if(lang != "python"){
+                     return "pas"
+                  }
+                  return "la négation"
                case 'extra_variable':
                   return "variables"
             }
@@ -312,6 +317,7 @@ var algoreaInstructionsStrings = {
                         }
                         return "peindreCase()"
                      case "flowers":
+                     default:
                         if(lang != "python"){
                            return "semer une graine"
                         }
@@ -322,6 +328,15 @@ var algoreaInstructionsStrings = {
                      return "Avancer vers le nord"
                   }
                   return "nord()"
+               case "withdrawObject":
+                  switch(type){
+                     case "marbles":
+                     default:
+                        if(lang != "python"){
+                           return "ramasser la bille"
+                        }
+                        return "ramasserBille()"
+                  }
             }
          }
 
