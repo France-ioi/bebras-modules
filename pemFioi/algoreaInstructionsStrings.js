@@ -237,6 +237,42 @@ var algoreaInstructionsStrings = {
          var text = "Vous pouvez choisir  "+str+". Utilisez pour cela les blocs $1 et $2, en remplaçant le zéro par le nombre voulu.";
          return text
       },
+      variable_1: function(type,nbTests) {
+         switch(type){
+            case "fishing":
+            default:
+               var str1 = "d'apporter sur l'île le nombre <b>exact</b> de poissons qui est indiqué sur le panneau";
+               var str2 = "poissons";
+               break;
+         }
+         var text = "La mission de votre robot est "+str1+". ";
+         text += "Pour chaque test, le nombre de "+str2+" est différent, mais le même programme doit fonctionner pour les "+nbTests+" tests.";
+         return text
+      },
+      variable_2: function(type) {
+         switch(type){
+            case "fishing":
+            default:
+               var str = "de l'île";
+               break;
+         }
+         var text = "Pour réussir sa mission, votre robot doit d'abord se rendre sur la case "+str+".";
+         return text
+      },
+      variable_3: "Une fois sur cette case, il doit capter le nombre écrit sur la case, et stocker cette information dans sa mémoire pour la réutiliser plus tard.",
+      variable_4: "<b>memoireRobot</b> est une variable, c'est-à-dire un espace de stockage auquel on a donné un nom.",
+      variable_5: "Dans la suite du programme, l'information est gardée en mémoire dans $0 et peut être utilisée à tout moment",
+      variable_6: function(type) {
+         switch(type){
+            case "fishing":
+            default:
+               var str = "le nombre de poissons du filet";
+               break;
+         }
+         var text = "Sur l'animation, remarquez que "+str+" est mis à jour lorsque le robot en prend.";
+         return text
+      },
+      animation: "Animation",
 
 
       /*** HELP ***/
