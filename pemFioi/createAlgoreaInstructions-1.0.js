@@ -79,7 +79,7 @@ function createAlgoreaInstructions(subTask) {
                      totalHTML += addHelpConcept(elem.concepts);
                      break;
                   case "help":
-                     totalHTML += addHelp(elem);
+                     totalHTML += addHelp(elem,type);
                      break;
                   case "custom":
                      totalHTML += addCustom(elem);
@@ -373,7 +373,7 @@ function createAlgoreaInstructions(subTask) {
 
       /*** COMMON ***/
 
-      function addHelp(dat) {
+      function addHelp(dat,type) {
          var suffix = (lang == "blockly") ? "_b" : "_s";
          for(var key in dat){
             var html = "<p>";
@@ -407,6 +407,15 @@ function createAlgoreaInstructions(subTask) {
                   }
                   html += "<b>"+strings.youWillNeed+" :</b>";
                   html += "<img src='"+imgPath+"/tutos/variable"+suffix+".png' style='vertical-align: middle' />";
+                  break;
+               case "extraVariable":
+                  if(lang == "python"){
+                     return addHelpConcept(["extra_variable"])
+                  }
+                  var str = strings.extraVariableHelp;
+                  str = str.replace("$0","<img src='"+imgPath+"/tutos/create_variable.png' style='vertical-align: middle' />");
+                  str = str.replace("$1","<img src='"+imgPath+"/tutos/"+type+"_extra_variable_incr"+suffix+".png' style='vertical-align: middle' />");
+                  html += "<b>"+str+"</b>";
                   break;
                case "maxBlocks":
                   var max = gridInfos.maxInstructions;
@@ -596,6 +605,55 @@ function createAlgoreaInstructions(subTask) {
                   html += "<img src='"+dropSrc+".png' style='display: block; vertical-align: middle'/>";
                   html += "</div>";
                   html += "</div>";
+                  break;
+               case "extra_variable":
+                  var createSrc = imgPath+"/tutos/create_variable";
+                  var setSrc = imgPath+"/tutos/"+type+"_"+id+"_set"+suffix;
+                  var set2Src = imgPath+"/tutos/"+type+"_"+id+"_set_2"+suffix;
+                  var set4Src = imgPath+"/tutos/"+type+"_"+id+"_set_4"+suffix;
+                  var incrSrc = imgPath+"/tutos/"+type+"_"+id+"_incr"+suffix;
+                  var incr3Src = imgPath+"/tutos/"+type+"_"+id+"_incr_3"+suffix;
+                  var variableSrc = imgPath+"/tutos/"+type+"_"+id+"_variable"+suffix;
+                  html += "<h3>"+strings.extraVariable_1+"</h3>";
+                  html += "<p>"+strings.extraVariable_2+"</p>";
+
+                  var nextLine = strings.extraVariable_3(type);
+                  nextLine = nextLine.replace("$0","<img src='"+createSrc+".png' style='display: inline; vertical-align: middle' />");
+                  html += "<p>"+nextLine+" :</p>";
+
+                  html += "<h3>"+strings.extraVariable_4+"</h3>";
+
+                  var nextLine = strings.extraVariable_5;
+                  nextLine = nextLine.replace("$0","<img src='"+setSrc+".png' style='display: inline; vertical-align: middle' />");
+                  html += "<p>"+nextLine+"</p>";
+              
+                  html += "<p>"+strings.extraVariable_6;
+                  html += "<img src='"+incrSrc+".png' style='vertical-align: middle'/>";
+                  html += "</p>";
+                  html += "<p><b>"+strings.example+" :</b></p>";
+                  html += "<table id='exemple'>";
+
+                  html += "<tr>";
+                  html += "<td><img src='"+set2Src+".png' style='vertical-align: middle'/></td>";
+                  html += "<td><img src='"+variableSrc+".png' style='vertical-align: middle'/>";
+                  html += strings.extraVariable_7+"</td>";
+                  html += "</tr>";
+
+                  html += "<tr>";
+                  html += "<td><img src='"+set4Src+".png' style='vertical-align: middle'/></td>";
+                  html += "<td>";
+                  var nextLine = strings.extraVariable_8;
+                  nextLine = nextLine.replace("$0","<img src='"+variableSrc+".png' style='vertical-align: middle'/>");
+                  html += nextLine+"</td>";
+                  html += "</tr>";
+
+                  html += "<tr>";
+                  html += "<td><img src='"+incr3Src+".png' style='vertical-align: middle'/></td>";
+                  html += "<td>";
+                  var nextLine = strings.extraVariable_9;
+                  nextLine = nextLine.replace("$0","<img src='"+variableSrc+".png' style='vertical-align: middle'/>");
+                  html += nextLine+"</td>";
+                  html += "</tr></table>";
                   break;
                default: // custom
                   html += $("#"+id).html();
