@@ -211,6 +211,7 @@ var algoreaInstructionsStrings = {
       changeDirection: "Les commandes de pivotement",
       toChangeDirection: "Pour faire pivoter le robot, utilisez les blocs",
       or: "ou",
+      and: "et",
       whenChangingDirection: "Attention : lorsque le robot tourne à gauche ou à droite, il reste sur la même case. Il est nécessaire d'utiliser ensuite le bloc",
       toChangeCell: "pour que le robot change ensuite de case.",
       sameAs: "Cela fait pareil que",
@@ -273,6 +274,28 @@ var algoreaInstructionsStrings = {
          return text
       },
       animation: "Animation",
+      extraVariable_1: "Création de variable",
+      extraVariable_2: "Dans cette version, vous devez créer les variables dont vous avez besoin.",
+      extraVariable_3: function(type) {
+         switch(type){
+            case "fishing":
+            default:
+               var str = "nbPoissons";
+               break;
+         }
+         var text = "Pour créer une variable, cliquez sur $0 et choisissez un nom en le tapant au clavier. ";
+         text += "Dans l'exemple qui suit, la variable a été nommée <b>"+str+"</b>. ";
+         text += "Attention, le nom de votre variable ne peut pas contenir d'espace.";
+         return text
+      },
+      extraVariable_4: "Incrémentation",
+      extraVariable_5: "Lorsque vous placez une valeur dans une variable avec le bloc $0, ce qui était auparavant stocké dans la variable est effacé.",
+      extraVariable_6: "Pour ajouter une valeur à celle qui est déjà stockée dans la variable, il faut utiliser le bloc ",
+      extraVariable_7: " contient la valeur 2.",
+      extraVariable_8: "Dans $0, la valeur 2 est remplacée par la valeur 4.",
+      extraVariable_9: "La valeur 3 est ajoutée à la valeur 4. Désormais $0 contient la valeur 7.",
+      example: "Exemple",
+
 
 
       /*** HELP ***/
@@ -353,6 +376,7 @@ var algoreaInstructionsStrings = {
       stepByStep: "Pour vous aider à comprendre vos erreurs, pensez au mode \"Pas à Pas\"",
       moreDetails: "Si vous avez besoin d'aide, cliquez sur le bouton <b>\"Plus de détails\"</b> ci-dessous.",
       youWillNeed: "Vous aurez besoin de",
+      extraVariableHelp: "Vous aurez besoin des blocs $0 et $1",
       helpNestedRepeat: "Aide : on peut placer une boucle à l'intérieur d'une boucle !",
       warningEasy: "Si cette version est trop difficile, résolvez d'abord la <b>version 1 étoile</b>. Pour y accéder, cliquez sur l'<b>onglet en haut à gauche</b>.",
       limitedUses: function(limitedUses,lang,type) {
