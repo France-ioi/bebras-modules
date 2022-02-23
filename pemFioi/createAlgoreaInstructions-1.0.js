@@ -456,7 +456,6 @@ function createAlgoreaInstructions(subTask) {
                   html += "<p>"+strings.dragBlocks+" :</p>";
                   html += "<div style='display: inline-block; border: 1px solid black; padding: 2px; margin-bottom: 10px;'>";
                   html += "<p>"+strings.demonstration+" :</p>";
-                  // html += "<a class='videoBtn' data-video='demo"+suffix+".mp4' style='width: 100%' ><img src='vignette"+suffix+".jpg'></a>";
                   html += "<video controls ><source src='"+vidSrc+".mp4' type=video/mp4></video>";
                   html += "</div>";
                   html += "<div style='display: inline-block; vertical-align: top; margin-left: 10px;'>";
@@ -540,16 +539,63 @@ function createAlgoreaInstructions(subTask) {
                   var explainSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_explain";
                   var withdrawSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_withdraw"+suffix;
                   var dropSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_drop"+suffix;
-                  html += "<div style='max-width: 90%;'>";
                   html += "<div style='width: 90%; max-width: 480px;'>"
                   html += "<img src='"+explainSrc+".png' />";
-                  html += "</div>";
                   html += "</div>";
                   html += "<p>"+strings.quantity_1(type)+"</p>";
                   var nextParagraph = strings.quantity_2(type);
                   nextParagraph = nextParagraph.replace("$1","<img src='"+withdrawSrc+".png' style='vertical-align: middle;' />");
                   nextParagraph = nextParagraph.replace("$2","<img src='"+dropSrc+".png' style='vertical-align: middle;' />");
                   html += "<p>"+nextParagraph+"</p>";
+                  break;
+               case "variable":
+                  var explainSrc = imgPath+"/tutos/"+type+"_"+id+"_explain";
+                  var sensorSrc = imgPath+"/tutos/"+type+"_"+id+"_sensor";
+                  var setSrc = imgPath+"/tutos/"+type+"_"+id+"_set"+suffix;
+                  var withdrawSrc = imgPath+"/tutos/"+type+"_"+id+"_withdraw"+suffix;
+                  var dropSrc = imgPath+"/tutos/"+type+"_"+id+"_drop"+suffix;
+                  var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id;
+                  html += "<div style='width: 90%; max-width: 480px;'>";
+                  html += "<img src='"+explainSrc+".png' />";
+                  html += "</div>";
+                  html += "<p>"+strings.variable_1(type,nbTests)+"</p>";
+                  html += "<div style='display: flex; text-align: center; justify-content: center;'>"
+                  for(var iTest = 0; iTest < nbTests; iTest++){
+                     var testID = iTest + 1;
+                     var src = $("#test_"+level+"_"+testID).attr("src");
+                     html += "<div>";
+                     html += "<p style='margin: 0; color: #4a90e2'>TEST "+testID+"</p>";
+                     html += "<img src='"+src+"' style='width: 90%; max-width: 400px;'/>";
+                     html += "</div>";
+                  }
+                  html += "</div>";
+                  html += "<p>"+strings.variable_2(type)+"</p>";
+                  html += "<div>";
+                  html += "<div style='display: inline-block; vertical-align: top; max-width: 38%;'>";
+                  html += "<div style='width: 90%; max-width: 480px;'>"
+                  html += "<img src='"+sensorSrc+".png' />";
+                  html += "</div>";
+                  html += "</div>";
+                  html += "<div style='display: inline-block; vertical-align: top; max-width: 55%;'>";
+                  html += "<p>"+strings.variable_3+"</p>";
+                  html += "<img src='"+setSrc+".png' />";
+                  html += "<p>"+strings.variable_4+"</p>";
+                  html += "</div>";
+                  html += "</div>";
+                  html += "<div>";
+                  html += "<div style='display: inline-block; vertical-align: top; max-width: 35%; border: 1px solid black; padding: 10px; margin-left: 20px; margin: 10px;''>";
+                  html += "<p>"+strings.animation+" :</p>";
+                  html += "<video controls style='width: 100%;'><source src='"+vidSrc+".mp4' type=video/mp4></video>";
+                  html += "</div>";
+                  html += "<div style='display: inline-block; vertical-align: top; max-width: 60%;'>";
+                  var nextLine = strings.variable_5;
+                  nextLine = nextLine.replace("$0","<img src='"+imgPath+"/tutos/variable_b.png' style='display: inline; vertical-align: middle' />");
+                  html += "<p>"+nextLine+" :</p>";
+                  html += "<img src='"+withdrawSrc+".png' style='display: block; vertical-align: middle'/>";
+                  html += "<p>"+strings.variable_6(type)+"</p>";
+                  html += "<img src='"+dropSrc+".png' style='display: block; vertical-align: middle'/>";
+                  html += "</div>";
+                  html += "</div>";
                   break;
                default: // custom
                   html += $("#"+id).html();
