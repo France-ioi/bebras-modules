@@ -214,6 +214,29 @@ var algoreaInstructionsStrings = {
       whenChangingDirection: "Attention : lorsque le robot tourne à gauche ou à droite, il reste sur la même case. Il est nécessaire d'utiliser ensuite le bloc",
       toChangeCell: "pour que le robot change ensuite de case.",
       sameAs: "Cela fait pareil que",
+      quantity_1: function(type) {
+         switch(type){
+            case "fishing":
+            default:
+               var str1 = "le nombre de poissons que votre robot doit apporter l'île";
+               var str2 = "de poissons";
+               var str3 = "le nombre de poissons que le robot prend dans un filet ou dépose";
+               break;
+         }
+         var text = "Le nombre sur le panneau indique "+str1+".<br/>";
+         text += "Il faut que votre robot dépose le nombre <b>exact</b> "+str2+" indiqué.";
+         return text
+      },
+      quantity_2: function(type) {
+         switch(type){
+            case "fishing":
+            default:
+               var str = "le nombre de poissons que le robot prend dans un filet ou dépose";
+               break;
+         }
+         var text = "Vous pouvez choisir  "+str+". Utilisez pour cela les blocs $1 et $2, en remplaçant le zéro par le nombre voulu.";
+         return text
+      },
 
 
       /*** HELP ***/

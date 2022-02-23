@@ -536,6 +536,21 @@ function createAlgoreaInstructions(subTask) {
                   html += "<video controls style='max-width: 380px;'><source src='"+vidSrc+".mp4' type=video/mp4></video>";
                   html += "</div>";
                   break;
+               case "quantity":
+                  var explainSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_explain";
+                  var withdrawSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_withdraw"+suffix;
+                  var dropSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+"_drop"+suffix;
+                  html += "<div style='max-width: 90%;'>";
+                  html += "<div style='width: 90%; max-width: 480px;'>"
+                  html += "<img src='"+explainSrc+".png' />";
+                  html += "</div>";
+                  html += "</div>";
+                  html += "<p>"+strings.quantity_1(type)+"</p>";
+                  var nextParagraph = strings.quantity_2(type);
+                  nextParagraph = nextParagraph.replace("$1","<img src='"+withdrawSrc+".png' style='vertical-align: middle;' />");
+                  nextParagraph = nextParagraph.replace("$2","<img src='"+dropSrc+".png' style='vertical-align: middle;' />");
+                  html += "<p>"+nextParagraph+"</p>";
+                  break;
                default: // custom
                   html += $("#"+id).html();
 
