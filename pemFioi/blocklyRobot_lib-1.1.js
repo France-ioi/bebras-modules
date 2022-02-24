@@ -1355,8 +1355,9 @@ var getContext = function(display, infos, curLevel) {
                successContainersFilled: "Bravo, tous les cartons sont pleins. Les colis vont pouvoir être livrés !",
                failureContainersFilled: "Tous les livres n'ont pas été mis en carton.",
                failureContainersFilledLess: "Il reste au moins un livre à ranger dans un carton.",
-               failureContainersFilledBag: "Il faut ranger les livres dans un carton !",
-               failureDropObject: "Ce carton est déjà plein.",
+               failureContainersFilledBag: "Votre robot a ramassé trop de livres.",
+               failureDropObject: "Ce colis est déjà plein. Votre robot essaie de déposer trop de livres.",
+               nothingToPickUp: "Il n'y a plus de livre ici !"
             }
          },
 
@@ -2231,15 +2232,15 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#a0cc97",
          borderColor: "#81a279",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4, customDisplay: function(obj) {
+            robot: { img: imgPath+"package_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 4, customDisplay: function(obj) {
             	if(context.bag.length != 0)
-            		obj.img = "green_robot_book.png";
+            		obj.img = imgPath+"package_robot_book.png";
             	else
-            		obj.img = "green_robot.png";
+            		obj.img = imgPath+"package_robot.png";
             } },
-            box: { num: 2, img: "box.png", side: 60, isContainer: true, zOrder: 2, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
-            books: { num: 3, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1 },
-            books_outside: { num: 4, img: "books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
+            box: { num: 2, img: imgPath+"cardboard_box.png", side: 60, isContainer: true, zOrder: 2, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            books: { num: 3, img: imgPath+"books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1 },
+            books_outside: { num: 4, img: imgPath+"books.png", side: 60, isWithdrawable: true, offsetY: 12, zOrder: 1, canBeOutside: true, customDisplay: function(obj) {
             	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
             		obj.offsetY = -5;
             } },         
@@ -2253,8 +2254,8 @@ var getContext = function(display, infos, curLevel) {
                   return item.isContainer === true;
                })[0].containerSize;
             }, side: 60, isWritable: true, fontColor: "#666666", fontBold: true, zOrder: 3, offsetX: 0, offsetY: 13},
-            platform: { num: 7, img: "shelf.png", side: 60, isObstacle: true, zOrder: 0 },
-            square_platform: { num: 8, img: "square_shelf.png", side: 60, isObstacle: true, zOrder: 0 }
+            platform: { num: 7, img: imgPath+"shelf.png", side: 60, isObstacle: true, zOrder: 0 },
+            square_platform: { num: 8, img: imgPath+"square_shelf.png", side: 60, isObstacle: true, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },

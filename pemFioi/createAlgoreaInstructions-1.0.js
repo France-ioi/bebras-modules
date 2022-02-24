@@ -53,6 +53,9 @@ function createAlgoreaInstructions(subTask) {
                case "marbles":
                   totalHTML += createMarblesInstructions();
                   break
+               case "packages":
+                  totalHTML += createPackagesInstructions();
+                  break
                case "paint":
                   totalHTML += createPaintInstructions();
                   break
@@ -294,6 +297,16 @@ function createAlgoreaInstructions(subTask) {
                html += "</p>";
             }
          }
+
+         return html
+      };
+
+      function createPackagesInstructions() {
+         var nbBoxes = countItem(6);
+
+         var html = "<p>"; 
+         html += strings.packages(nbBoxes);
+         html += "</p>";
 
          return html
       };
