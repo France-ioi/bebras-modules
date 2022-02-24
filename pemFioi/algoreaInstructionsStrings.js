@@ -224,18 +224,22 @@ var algoreaInstructionsStrings = {
       quantity_1: function(type) {
          switch(type){
             case "fishing":
-               var str0 = "le panneau"
+               var str0 = "sur le panneau"
                var str1 = "de poissons que votre robot doit apporter sur l'île";
                var str2 = "de poissons";
                break;
             case "packages":
-            default:
-               var str0 = "le carton";
+               var str0 = "sur le carton";
                var str1 = "de livres que votre robot doit apporter dedans";
                var str2 = "de livres";
                break;
+            case "veterinary":
+               var str0 = "au dessus du castor";
+               var str1 = "de bûches que votre robot doit lui apporter";
+               var str2 = "de bûches";
+               break;
          }
-         var text = "Le nombre sur "+str0+" indique le nombre "+str1+".<br/>";
+         var text = "Le nombre "+str0+" indique le nombre "+str1+".<br/>";
          text += "Il faut que votre robot dépose le nombre <b>exact</b> "+str2+" indiqué.";
          return text
       },
@@ -245,8 +249,10 @@ var algoreaInstructionsStrings = {
                var str = "le nombre de poissons que le robot prend dans un filet ou dépose";
                break;
             case "packages":
-            default:
                var str = "le nombre de livres que le robot ramasse ou dépose";
+               break;
+            case "veterinary":
+               var str = "le nombre de bûches que le robot ramasse ou dépose";
                break;
          }
          var text = "Vous pouvez choisir  "+str+". Utilisez pour cela les blocs $1 et $2, en remplaçant le zéro par le nombre voulu.";
@@ -259,9 +265,12 @@ var algoreaInstructionsStrings = {
                var str2 = "poissons";
                break;
             case "packages":
-            default:
                var str1 = "de mettre dans le carton le nombre <b>exact</b> de livres qui est indiqué sur ce carton";
                var str2 = "livres";
+               break;
+            case "veterinary":
+               var str1 = "d'apporter au castor le nombre <b>exact</b> de bûches de bois dont il a besoin";
+               var str2 = "bûches";
                break;
          }
          var text = "La mission de votre robot est "+str1+". ";
@@ -274,15 +283,20 @@ var algoreaInstructionsStrings = {
                var str = "de l'île";
                break;
             case "packages":
-            default:
                var str = "du carton";
+               break;
+            case "veterinary":
+               var str = "du castor";
                break;
          }
          var text = "Pour réussir sa mission, votre robot doit d'abord se rendre sur la case "+str+".";
          return text
       },
       variable_3: "Une fois sur cette case, il doit capter le nombre écrit dessus, et stocker cette information dans sa mémoire pour la réutiliser plus tard.",
-      variable_4: "<b>memoireRobot</b> est une variable, c'est-à-dire un espace de stockage auquel on a donné un nom.",
+      variable_4: function(type) {
+         var name = (type != "veterinary") ? "memoireRobot" : "besoinCastor";
+         return "<b>"+name+"</b> est une variable, c'est-à-dire un espace de stockage auquel on a donné un nom."
+      },
       variable_5: "Dans la suite du programme, l'information est gardée en mémoire dans $0 et peut être utilisée à tout moment",
       variable_6: function(type) {
          switch(type){
@@ -290,8 +304,10 @@ var algoreaInstructionsStrings = {
                var str = "le nombre de poissons du filet";
                break;
             case "packages":
-            default:
                var str = "le nombre de livres sur la case";
+               break;
+            case "veterinary":
+               var str = "le nombre de bûches sur la case";
                break;
          }
          var text = "Sur l'animation, remarquez que "+str+" est mis à jour lorsque le robot en prend.";
@@ -307,6 +323,9 @@ var algoreaInstructionsStrings = {
                break;
             case "packages":
                var str = "nbLivres";
+               break;
+            case "veterinary":
+               var str = "besoinCastor";
                break;
          }
          var text = "Pour créer une variable, cliquez sur $0 et choisissez un nom en le tapant au clavier. ";

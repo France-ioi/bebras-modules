@@ -418,8 +418,9 @@ function createAlgoreaInstructions(subTask) {
                   if(lang == "python"){
                      return addHelpConcept(["extra_variable"])
                   }
+                  var imgSrc = (type != "veterinary") ? imgPath+"/tutos/variable"+suffix : imgPath+"/tutos/"+type+"_variable"+suffix;
                   html += "<b>"+strings.youWillNeed+" :</b>";
-                  html += "<img src='"+imgPath+"/tutos/variable"+suffix+".png' style='vertical-align: middle' />";
+                  html += "<img src='"+imgSrc+".png' style='vertical-align: middle' />";
                   break;
                case "extraVariable":
                   if(lang == "python"){
@@ -577,6 +578,7 @@ function createAlgoreaInstructions(subTask) {
                   var withdrawSrc = imgPath+"/tutos/"+type+"_"+id+"_withdraw"+suffix;
                   var dropSrc = imgPath+"/tutos/"+type+"_"+id+"_drop"+suffix;
                   var vidSrc = modulesPath+"vid/algorea/"+type+"_"+id;
+                  var variableSrc = (type != "veterinary") ? imgPath+"/tutos/variable"+suffix : imgPath+"/tutos/"+type+"_variable"+suffix;
                   html += "<div style='width: 90%; max-width: 480px;'>";
                   html += "<img src='"+explainSrc+".png' />";
                   html += "</div>";
@@ -601,7 +603,7 @@ function createAlgoreaInstructions(subTask) {
                   html += "<div style='display: inline-block; vertical-align: top; max-width: 55%;'>";
                   html += "<p>"+strings.variable_3+"</p>";
                   html += "<img src='"+setSrc+".png' />";
-                  html += "<p>"+strings.variable_4+"</p>";
+                  html += "<p>"+strings.variable_4(type)+"</p>";
                   html += "</div>";
                   html += "</div>";
                   html += "<div>";
@@ -611,7 +613,7 @@ function createAlgoreaInstructions(subTask) {
                   html += "</div>";
                   html += "<div style='display: inline-block; vertical-align: top; max-width: 60%;'>";
                   var nextLine = strings.variable_5;
-                  nextLine = nextLine.replace("$0","<img src='"+imgPath+"/tutos/variable_b.png' style='display: inline; vertical-align: middle' />");
+                  nextLine = nextLine.replace("$0","<img src='"+variableSrc+".png' style='display: inline; vertical-align: middle' />");
                   html += "<p>"+nextLine+" :</p>";
                   html += "<img src='"+withdrawSrc+".png' style='display: block; vertical-align: middle'/>";
                   html += "<p>"+strings.variable_6(type)+"</p>";
@@ -632,7 +634,7 @@ function createAlgoreaInstructions(subTask) {
 
                   var nextLine = strings.extraVariable_3(type);
                   nextLine = nextLine.replace("$0","<img src='"+createSrc+".png' style='display: inline; vertical-align: middle' />");
-                  html += "<p>"+nextLine+" :</p>";
+                  html += "<p>"+nextLine+"</p>";
 
                   html += "<h3>"+strings.extraVariable_4+"</h3>";
 

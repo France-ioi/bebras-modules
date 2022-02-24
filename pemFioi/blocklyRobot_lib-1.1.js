@@ -1354,7 +1354,7 @@ var getContext = function(display, infos, curLevel) {
                tooManyObjects: "Le robot porte déjà un livre !",
                successContainersFilled: "Bravo, tous les cartons sont pleins. Les colis vont pouvoir être livrés !",
                failureContainersFilled: "Tous les livres n'ont pas été mis en carton.",
-               failureContainersFilledLess: "Il reste au moins un livre à ranger dans un carton.",
+               failureContainersFilledLess: "Il y a au moins un carton qui n'est pas plein.",
                failureContainersFilledBag: "Votre robot a ramassé trop de livres.",
                failureDropObject: "Ce colis est déjà plein. Votre robot essaie de déposer trop de livres.",
                nothingToPickUp: "Il n'y a plus de livre ici !"
