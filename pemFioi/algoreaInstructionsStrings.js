@@ -108,6 +108,12 @@ var algoreaInstructionsStrings = {
       },
       oneMarble: "Le robot ne peut transporter qu'une bille à la fois.",
       onePerHole: "Chaque trou ne peut contenir qu'une seule bille.",
+      packages: function(nbBoxes) {
+         var text = "Programmez le robot pour qu'il remplisse ";
+         text += (nbBoxes > 1) ? "chaque" : "le";
+         text += " carton avec le nombre de livres indiqué."
+         return text
+      },
       paint: function(nbBlack,nbWhite) {
          var text = "Programmez le robot pour qu'il peigne ";
          if(nbBlack == 1){
@@ -218,21 +224,29 @@ var algoreaInstructionsStrings = {
       quantity_1: function(type) {
          switch(type){
             case "fishing":
-            default:
-               var str1 = "le nombre de poissons que votre robot doit apporter l'île";
+               var str0 = "le panneau"
+               var str1 = "de poissons que votre robot doit apporter sur l'île";
                var str2 = "de poissons";
-               var str3 = "le nombre de poissons que le robot prend dans un filet ou dépose";
+               break;
+            case "packages":
+            default:
+               var str0 = "le carton";
+               var str1 = "de livres que votre robot doit apporter dedans";
+               var str2 = "de livres";
                break;
          }
-         var text = "Le nombre sur le panneau indique "+str1+".<br/>";
+         var text = "Le nombre sur "+str0+" indique le nombre "+str1+".<br/>";
          text += "Il faut que votre robot dépose le nombre <b>exact</b> "+str2+" indiqué.";
          return text
       },
       quantity_2: function(type) {
          switch(type){
             case "fishing":
-            default:
                var str = "le nombre de poissons que le robot prend dans un filet ou dépose";
+               break;
+            case "packages":
+            default:
+               var str = "le nombre de livres que le robot ramasse ou dépose";
                break;
          }
          var text = "Vous pouvez choisir  "+str+". Utilisez pour cela les blocs $1 et $2, en remplaçant le zéro par le nombre voulu.";
@@ -241,9 +255,13 @@ var algoreaInstructionsStrings = {
       variable_1: function(type,nbTests) {
          switch(type){
             case "fishing":
-            default:
                var str1 = "d'apporter sur l'île le nombre <b>exact</b> de poissons qui est indiqué sur le panneau";
                var str2 = "poissons";
+               break;
+            case "packages":
+            default:
+               var str1 = "de mettre dans le carton le nombre <b>exact</b> de livres qui est indiqué sur ce carton";
+               var str2 = "livres";
                break;
          }
          var text = "La mission de votre robot est "+str1+". ";
@@ -253,21 +271,27 @@ var algoreaInstructionsStrings = {
       variable_2: function(type) {
          switch(type){
             case "fishing":
-            default:
                var str = "de l'île";
+               break;
+            case "packages":
+            default:
+               var str = "du carton";
                break;
          }
          var text = "Pour réussir sa mission, votre robot doit d'abord se rendre sur la case "+str+".";
          return text
       },
-      variable_3: "Une fois sur cette case, il doit capter le nombre écrit sur la case, et stocker cette information dans sa mémoire pour la réutiliser plus tard.",
+      variable_3: "Une fois sur cette case, il doit capter le nombre écrit dessus, et stocker cette information dans sa mémoire pour la réutiliser plus tard.",
       variable_4: "<b>memoireRobot</b> est une variable, c'est-à-dire un espace de stockage auquel on a donné un nom.",
       variable_5: "Dans la suite du programme, l'information est gardée en mémoire dans $0 et peut être utilisée à tout moment",
       variable_6: function(type) {
          switch(type){
             case "fishing":
-            default:
                var str = "le nombre de poissons du filet";
+               break;
+            case "packages":
+            default:
+               var str = "le nombre de livres sur la case";
                break;
          }
          var text = "Sur l'animation, remarquez que "+str+" est mis à jour lorsque le robot en prend.";
@@ -279,8 +303,10 @@ var algoreaInstructionsStrings = {
       extraVariable_3: function(type) {
          switch(type){
             case "fishing":
-            default:
                var str = "nbPoissons";
+               break;
+            case "packages":
+               var str = "nbLivres";
                break;
          }
          var text = "Pour créer une variable, cliquez sur $0 et choisissez un nom en le tapant au clavier. ";
@@ -392,13 +418,13 @@ var algoreaInstructionsStrings = {
                if(iBlock < blocks.length - 2){
                   text += ", ";
                }else if(iBlock == blocks.length - 2){
-                  text += "et ";
+                  text += " et ";
                }
             }
             if(iElem < limitedUses.length - 2){
                text += ", que ";
             }else if(iElem == limitedUses.length - 2){
-               text += "et que ";
+               text += " et que ";
             }
          }
          return text+"."
@@ -432,6 +458,24 @@ var algoreaInstructionsStrings = {
                            return "ramasser la bille"
                         }
                         return "ramasserBille()"
+                  }
+               case "withdrawNum":
+                  switch(type){
+                     case "packages":
+                     default:
+                        if(lang != "python"){
+                           return "ramasser livres"
+                        }
+                        return "ramasser(nbLivres)"
+                  }
+               case "dropNum":
+                  switch(type){
+                     case "packages":
+                     default:
+                        if(lang != "python"){
+                           return "déposer livres"
+                        }
+                        return "déposer(nbLivres)"
                   }
             }
          }
