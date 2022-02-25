@@ -464,6 +464,11 @@ var algoreaInstructionsStrings = {
                         }
                         return "semerGraine()"
                   }
+               case "forward":
+                  if(lang != "python"){
+                     return "avancer"
+                  }
+                  return "avancer()"
                case "north":
                   if(lang != "python"){
                      return "Avancer vers le nord"
