@@ -370,16 +370,16 @@ function getBlocklyInterface(maxBlocks, subTask) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
-            var capacityInfo = this.getCapacityInfo();
-            if(window.quickAlgoInterface) {
-               if(eventType === Blockly.Events.Move) {
-                  // Only display popup when we drop the block, not on creation
-                  capacityInfo.popup = true;
+            if(eventType !== Blockly.Events.Move) {
+               // Capacity info won't change during a move
+               // Also avoids issues due to blocks being duplicated during move
+               var capacityInfo = this.getCapacityInfo();
+               if(window.quickAlgoInterface) {
+                  window.quickAlgoInterface.displayCapacity(capacityInfo);
+                  window.quickAlgoInterface.onEditorChange();
+               } else {
+                  $('#capacity').html(capacityInfo.text);
                }
-               window.quickAlgoInterface.displayCapacity(capacityInfo);
-               window.quickAlgoInterface.onEditorChange();
-            } else {
-               $('#capacity').html(capacityInfo.text);
             }
             this.onChangeResetDisplay();
             this.subTask.onChange();
