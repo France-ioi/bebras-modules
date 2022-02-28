@@ -221,6 +221,51 @@ var algoreaInstructionsStrings = {
       whenChangingDirection: "Attention : lorsque le robot tourne à gauche ou à droite, il reste sur la même case. Il est nécessaire d'utiliser ensuite le bloc",
       toChangeCell: "pour que le robot change ensuite de case.",
       sameAs: "Cela fait pareil que",
+      if_1: function(type) {
+         var text = "On veut programmer le robot pour qu'il ";
+         switch(type){
+            case "castle":
+               text += "ramasse le bois et le mette dans la cheminée.</br>";
+               text += "Le problème, c'est que le bois n'est pas toujours au même endroit !";
+               break;
+            case "dominoes":
+               text += "ramasse le domino avec deux carrés bleus.</br>";
+               text += "Le problème, c'est que dans le test 2, il n'y a pas de domino avec deux carrés bleus, le robot ne doit donc rien ramasser !";
+               break;
+            case "flowers":
+               text += "sème des graines, mais seulement sur les zones de terre.</br>";
+               text += "Le problème, c'est que les zones de terre ne sont pas toujours au même endroit !";
+               break;
+            case "rocket":
+               text += "ramasse l'objet lorsqu'il y en a un.</br>";
+               text += "Le problème, c'est que le robot ne doit pas essayer de ramasser d'objet quand il n'y en a pas !";
+         }
+         return text
+      },
+      if_2: "C'est possible, il faut utiliser :",
+      if_3: function(type) {
+         switch(type){
+            case "castle":
+               var str0 = "un tas de bois";
+               var str1 = "le ramasse";
+               break;
+            case "dominoes":
+               var str0 = "un domino avec des carrés";
+               var str1 = "le ramasse";
+               break;
+            case "flowers":
+               var str0 = "une zone de terre";
+               var str1 = "sème une graine";
+               break;
+            case "rocket":
+               var str0 = "un objet";
+               var str1 = "le ramasse";
+         }
+         var text = "Le robot teste s'il se trouve sur "+str0+".</br>";
+         text += "Si oui, il "+str1+".</br>";
+         text += "Si non, il ne fait pas ce qui est à l'intérieur du bloc.";
+         return text
+      },
       quantity_1: function(type) {
          switch(type){
             case "fishing":
@@ -347,6 +392,9 @@ var algoreaInstructionsStrings = {
       /************/
       multipleTests: function(nbTests) {
          return "Le même programme doit fonctionner sur les "+nbTests+" tests ci-dessous."
+      },
+      multipleTestsAlt: function(nbTests) {
+         return "Le même programme doit fonctionner sur les "+nbTests+" tests suivants :"
       },
       maxMove: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
