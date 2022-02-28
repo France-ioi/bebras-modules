@@ -517,6 +517,28 @@ function createAlgoreaInstructions(subTask) {
                   html += "</div>";
                   html += "</div>";
                   break;
+               case "blockly_controls_if":
+                  var imgSrc = modulesPath+"img/algorea/tutos/"+type+"_"+id+suffix;
+                  html += "<p>"+strings.if_1(type)+"</p>";
+                  html += "<p>"+strings.multipleTestsAlt(nbTests)+"</p>";
+                  html += "<div style='display: flex; text-align: center; justify-content: center; margin-bottom: 20px;'>"
+                  for(var iTest = 0; iTest < nbTests; iTest++){
+                     var testID = iTest + 1;
+                     var src = $("#test_"+level+"_"+testID).attr("src");
+                     html += "<div>";
+                     html += "<p style='margin: 0; "+((nbCol > 10) ? "margin-top: 10px;" :"")+"color: #4a90e2'>TEST "+testID+"</p>";
+                     html += "<img src='"+src+"' style='width: 90%; max-width: 400px;'/>";
+                     html += "</div>";
+                  }
+                  html += "</div>";
+                  html += "<p>"+strings.if_2+"</p>";
+                  html += "<div style='display: inline-block; margin: 20px;'>";
+                  html += "<img src='"+imgSrc+".png' />";
+                  html += "</div>";
+                  html += "<div style='display: inline-block; margin-left: 5px; margin-right: 5px; vertical-align: top;'>"
+                  html += "<p>"+strings.if_3(type)+"</p>";
+                  html += "</div>";
+                  break;
                case "multiple_tests":
                   var tiles = data[level][0].tiles;
                   var nbCol = tiles[0].length;
