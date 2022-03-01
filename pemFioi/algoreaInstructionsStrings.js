@@ -403,7 +403,7 @@ var algoreaInstructionsStrings = {
       multipleTestsAlt: function(nbTests) {
          return "Le même programme doit fonctionner sur les "+nbTests+" tests suivants :"
       },
-      maxMove: function(max) {
+      maxMoves: function(max) {
          return "Le robot ne doit pas se déplacer plus de "+max+" fois.";
       },
       maxBlocks: function(max,lang) {
@@ -475,6 +475,11 @@ var algoreaInstructionsStrings = {
                      return "fonction"
                   }
                   return "fonctions"
+               case 'extra_list':
+                  if(lang != "python"){
+                     return "liste"
+                  }
+                  return "listes"
             }
          }
       },
@@ -490,10 +495,18 @@ var algoreaInstructionsStrings = {
             var elemData = limitedUses[iElem];
             var nbUses = elemData.nbUses;
             var blocks = elemData.blocks;
-            text += "<b>"+nbUses+" fois</b> ";
-            text += (blocks.length > 1) ? "les instructions " : "l'instruction ";
+            if(blocks[0] == "math_number"){
+               text += "<b>"+nbUses+"</b> ";
+            }else{
+               text += "<b>"+nbUses+" fois</b> ";
+               text += (blocks.length > 1) ? "les instructions " : "l'instruction ";
+            }
             for(var iBlock = 0; iBlock < blocks.length; iBlock++){
-               text += "\""+instructionName(blocks[iBlock],lang,type)+"\"";
+               if(blocks[iBlock] != "math_number"){
+                  text += "\""+instructionName(blocks[iBlock],lang,type)+"\"";
+               }else{
+                  text += instructionName(blocks[iBlock],lang,type);
+               }
                if(iBlock < blocks.length - 2){
                   text += ", ";
                }else if(iBlock == blocks.length - 2){
@@ -529,6 +542,11 @@ var algoreaInstructionsStrings = {
                      return "avancer"
                   }
                   return "avancer()"
+               case "left":
+                  if(lang != "python"){
+                     return "tourner à gauche"
+                  }
+                  return "tournerGauche()"
                case "north":
                   if(lang != "python"){
                      return "Avancer vers le nord"
@@ -550,6 +568,11 @@ var algoreaInstructionsStrings = {
                   }
                case "withdrawNum":
                   switch(type){
+                     case "fishing":
+                        if(lang != "python"){
+                           return "prendre ... poissons"
+                        }
+                        return "prendre(nbPoissons)"
                      case "packages":
                      default:
                         if(lang != "python"){
@@ -559,13 +582,29 @@ var algoreaInstructionsStrings = {
                   }
                case "dropNum":
                   switch(type){
+                     case "fishing":
+                        if(lang != "python"){
+                           return "déposer ... poissons"
+                        }
+                        return "déposer(nbPoissons)"
                      case "packages":
-                     default:
                         if(lang != "python"){
                            return "déposer livres"
                         }
                         return "déposer(nbLivres)"
+                     case "veterinary":
+                        if(lang != "python"){
+                           return "donner ... bûches"
+                        }
+                        return "donner(nbBûches)"
                   }
+               case "dropPlatformInFront":
+                  if(lang != "python"){
+                     return "construire une plateforme devant"
+                  }
+                  return "construirePlateformeDevant()"
+               case "math_number":
+                  return "nombres"
             }
          }
 
