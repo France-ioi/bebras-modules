@@ -385,8 +385,15 @@ var algoreaInstructionsStrings = {
       extraVariable_8: "Dans $0, la valeur 2 est remplacée par la valeur 4.",
       extraVariable_9: "La valeur 3 est ajoutée à la valeur 4. Désormais $0 contient la valeur 7.",
       example: "Exemple",
-
-
+      extraFunction_1: "Définir une <strong>procédure</strong> revient à créer votre propre bloc. "+
+      "Une procédure permet d'isoler un morceau de code qu'on a besoin d'utiliser plusieurs fois. "+
+      "Comme ça, on ne l'écrit qu'une fois et on économise des blocs !",
+      extraFunction_2: "Déplacez le bloc $0 dans l'éditeur. Ce bloc ne s'accroche pas au bloc \"Programme du robot\". On le place à côté.",
+      extraFunction_3: "Donnez un nom à votre bloc.",
+      extraFunction_4: "Placez à l’intérieur de ce bloc le morceau de code dont vous aurez besoin plusieurs fois.",
+      extraFunction_5: "Vous pouvez maintenant utiliser ce nouveau bloc $0 dans votre programme, autant de fois que nécessaire !",
+      extraFunction_6: "Voici un début de programme valide :",
+      extraFunction_7: "À vous de le compléter !",
 
       /*** HELP ***/
       /************/
@@ -463,6 +470,11 @@ var algoreaInstructionsStrings = {
                   return "la négation"
                case 'extra_variable':
                   return "variables"
+               case 'extra_function':
+                  if(lang != "python"){
+                     return "fonction"
+                  }
+                  return "fonctions"
             }
          }
       },
@@ -522,6 +534,11 @@ var algoreaInstructionsStrings = {
                      return "Avancer vers le nord"
                   }
                   return "nord()"
+               case "south":
+                  if(lang != "python"){
+                     return "Avancer vers le sud"
+                  }
+                  return "sud()"
                case "withdrawObject":
                   switch(type){
                      case "marbles":

@@ -431,6 +431,13 @@ function createAlgoreaInstructions(subTask) {
                   str = str.replace("$1","<img src='"+imgPath+"/tutos/"+type+"_extra_variable_incr"+suffix+".png' style='vertical-align: middle' />");
                   html += "<b>"+str+"</b>";
                   break;
+               case "function":
+                  if(lang == "python"){
+                     return addHelpConcept(["extra_function"])
+                  }
+                  html += "<b>"+strings.youWillNeed+" :</b>";
+                  html += "<img src='"+imgPath+"/tutos/function"+suffix+".png' width='200px' style='vertical-align: middle' />";
+                  break;
                case "maxBlocks":
                   var max = gridInfos.maxInstructions;
                   html += strings.maxBlocks(max,lang);
@@ -691,6 +698,39 @@ function createAlgoreaInstructions(subTask) {
                   nextLine = nextLine.replace("$0","<img src='"+variableSrc+".png' style='vertical-align: middle'/>");
                   html += nextLine+"</td>";
                   html += "</tr></table>";
+                  break;
+               case "extra_function":
+                  var functionSrc = imgPath+"/tutos/function"+suffix;
+                  var editorSrc = imgPath+"/tutos/"+id+"_editor"+suffix;
+                  var nameSrc = imgPath+"/tutos/"+type+"_"+id+"_name"+suffix;
+                  var defSrc = imgPath+"/tutos/"+type+"_"+id+"_def"+suffix;
+                  var newSrc = imgPath+"/tutos/"+type+"_"+id+"_new"+suffix;
+                  var progSrc = imgPath+"/tutos/"+type+"_"+id+"_prog"+suffix;
+                  html += "<p>"+strings.extraFunction_1+"</p>";
+                  html += "<ol type='1'>";
+                  html += "<li class='space_dessous'>";
+                  var nextLine = strings.extraFunction_2;
+                  nextLine = nextLine.replace("$0","<img src='"+functionSrc+".png' width='180px' style='vertical-align: middle'/>");
+                  html += "<p>"+nextLine+"</p>";
+                  html += "<img src='"+editorSrc+".png' style='border: 1px solid black; max-width: 500px'/>";
+                  html += "</li>";
+                  html += "<li class='space_dessous'>";
+                  html += "<p>"+strings.extraFunction_3+"</p>";
+                  html += "<img src='"+nameSrc+".png' style='border: 1px solid black; max-width: 500px'/>";
+                  html += "</li>";
+                  html += "<li class='space_dessous'>";
+                  html += "<p>"+strings.extraFunction_4+"</p>";
+                  html += "<img src='"+defSrc+".png' style='border: 1px solid black; max-width: 500px'/>";
+                  html += "</li>";
+                  html += "<li class='space_dessous'>";
+                  var nextLine = strings.extraFunction_5;
+                  nextLine = nextLine.replace("$0","<img src='"+newSrc+".png' style='vertical-align: middle'/>");
+                  html += "<p>"+nextLine+"</p>";
+                  html += "<p>"+strings.extraFunction_6+"</p>";
+                  html += "<img src='"+progSrc+".png' style='border: 1px solid black; max-width: 500px'/>";
+                  html += "<p>"+strings.extraFunction_7+"</p>";
+                  html += "</li>";
+                  html += "</ol>";
                   break;
                default: // custom
                   html += $("#"+id).html();
