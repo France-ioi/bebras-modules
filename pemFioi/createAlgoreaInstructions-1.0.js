@@ -96,6 +96,11 @@ function createAlgoreaInstructions(subTask) {
             totalHTML += "<p>"+strings.limitedUses(limitedUses,lang,type)+"</p>";
          }
 
+         var maxMoves = gridInfos.maxMoves;
+         if(maxMoves && !isNaN(maxMoves)){
+            totalHTML += "<p>"+strings.maxMoves(maxMoves)+"</p>";
+         }
+
          if(nbTests > 1){
             totalHTML += "<p>"+strings.multipleTests(nbTests)+"</p>";
          }
@@ -217,11 +222,6 @@ function createAlgoreaInstructions(subTask) {
          if(rollOver){
             html += "<p>"+strings.rollOver+"</p>";
          }
-
-         // if(gridInfos.intro && gridInfos.intro.maxMove){
-         //    var text2 = strings.maxMove(gridInfos.intro.maxMove);
-         //    html += "<p>"+text2+"</p>";
-         // }
 
          return html
       };
