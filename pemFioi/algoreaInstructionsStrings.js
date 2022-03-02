@@ -419,7 +419,7 @@ var algoreaInstructionsStrings = {
       helpConcept: function(lang,concepts) {
          var text = "Vous pourrez avoir besoin ";
          if(lang != "python"){
-            if(concepts[0] != "extra_variable"){
+            if(concepts[0] != "extra_variable" && concepts[0] != "extra_function"){
                text += (concepts.length > 1) ? "des blocs " : "du bloc ";
             }else{
                text += "de ";
@@ -434,12 +434,12 @@ var algoreaInstructionsStrings = {
             text += "</b></a>";
             if(iConcept == concepts.length - 2){
                text += " et ";
-               if(lang == "python"){
+               if(lang == "python" || concept == "extra_function" || concept == "extra_variable"){
                   text += "de ";
                }
             }else if(iConcept < concepts.length - 2){
                text += ", ";
-               if(lang == "python"){
+               if(lang == "python" || concept == "extra_function" || concept == "extra_variable"){
                   text += "de ";
                }
             }
@@ -471,9 +471,6 @@ var algoreaInstructionsStrings = {
                case 'extra_variable':
                   return "variables"
                case 'extra_function':
-                  if(lang != "python"){
-                     return "fonction"
-                  }
                   return "fonctions"
                case 'extra_list':
                   if(lang != "python"){
@@ -525,13 +522,17 @@ var algoreaInstructionsStrings = {
             switch(instr) {
                case "dropObject":
                   switch(type) {
+                     case "fishing":
+                        if(lang != "python"){
+                           return "déposer ... poissons"
+                        }
+                        return "deposer(nbPoissons)"
                      case "paint":
                         if(lang != "python"){
                            return "peindre la case"
                         }
                         return "peindreCase()"
                      case "flowers":
-                     default:
                         if(lang != "python"){
                            return "semer une graine"
                         }
@@ -605,6 +606,16 @@ var algoreaInstructionsStrings = {
                   return "construirePlateformeDevant()"
                case "math_number":
                   return "nombres"
+               case "controls_repeat_ext":
+                  if(lang != "python"){
+                     return "répéter"
+                  }
+                  return "for"
+               case "pushObject":
+                  if(lang != "python"){
+                     return "pousser la caisse"
+                  }
+                  return "pousserCaisse()"
             }
          }
 
