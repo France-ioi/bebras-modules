@@ -255,15 +255,11 @@ function createAlgoreaInstructions(subTask) {
          html += strings.flowers(nbTarget);
          html += "</p>";
          
-         // if(nbTarget > 1 || nbFixed > 0){
-         // if(gridInfos.intro && gridInfos.intro.dontStepOnFlowers){
-         //    // var dontDoIt = gridInfos.intro.dontStepOnFlowers;
-         //    // if(dontDoIt.shared || dontDoIt[level]){
-         //       html += "<p>";
-         //       html += strings.dontStepOnFlowers;
-         //       html += "</p>";
-         //    // }
-         // }
+         if(gridInfos.intro.dontStepOnFlowers){
+            html += "<p>";
+            html += strings.dontStepOnFlowers;
+            html += "</p>";
+         }
          return html
       };
 
@@ -363,7 +359,6 @@ function createAlgoreaInstructions(subTask) {
          var nbBeav = (numbers) ? nbCountBeav : countItem(2);
 
          var overBeaver = gridInfos.intro.overBeaver;
-         // console.log(overBeaver)
 
          var html = "<p>"; 
          html += strings.veterinary(nbBeav,numbers);
@@ -384,7 +379,9 @@ function createAlgoreaInstructions(subTask) {
          return html
       };
 
+
       /*** COMMON ***/
+      /**************/
 
       function addHelp(dat,type) {
          var suffix = (lang == "blockly") ? "_b" : "_s";
