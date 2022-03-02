@@ -434,7 +434,7 @@ var algoreaInstructionsStrings = {
             text += "</b></a>";
             if(iConcept == concepts.length - 2){
                text += " et ";
-               if(lang == "python" || concept == "extra_function" || concept == "extra_variable"){
+               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable"){
                   text += "de ";
                }
             }else if(iConcept < concepts.length - 2){
@@ -477,6 +477,11 @@ var algoreaInstructionsStrings = {
                      return "liste"
                   }
                   return "listes"
+               case 'blockly_controls_whileUntil':
+                  if(lang != "python"){
+                     return "répéter tant que ou jusqu'à"
+                  }
+                  return "l'instruction while"
             }
          }
       },
@@ -616,6 +621,11 @@ var algoreaInstructionsStrings = {
                      return "pousser la caisse"
                   }
                   return "pousserCaisse()"
+               case "platformAbove":
+                  if(lang != "python"){
+                     return "plateforme au-dessus"
+                  }
+                  return "plateformeDessus()"
             }
          }
 
