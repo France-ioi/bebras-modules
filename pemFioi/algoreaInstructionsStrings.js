@@ -419,13 +419,13 @@ var algoreaInstructionsStrings = {
       helpConcept: function(lang,concepts) {
          var text = "Vous pourrez avoir besoin ";
          if(lang != "python"){
-            if(concepts[0] != "extra_variable" && concepts[0] != "extra_function"){
+            if(concepts[0] != "extra_variable" && concepts[0] != "extra_function" && concepts[0] != 'blockly_logic_operation'){
                text += (concepts.length > 1) ? "des blocs " : "du bloc ";
             }else{
-               text += "de ";
+               text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
             }
          }else{
-            text += "de ";
+            text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
          }
          for(var iConcept = 0; iConcept < concepts.length; iConcept++){
             var concept = concepts[iConcept];
@@ -434,13 +434,13 @@ var algoreaInstructionsStrings = {
             text += "</b></a>";
             if(iConcept == concepts.length - 2){
                text += " et ";
-               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable"){
-                  text += "de ";
+               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable" || concepts[iConcept + 1] == "blockly_logic_operation"){
+                  text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
                }
             }else if(iConcept < concepts.length - 2){
                text += ", ";
-               if(lang == "python" || concept == "extra_function" || concept == "extra_variable"){
-                  text += "de ";
+               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable" || concepts[iConcept + 1] == "blockly_logic_operation"){
+                  text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
                }
             }
          }
@@ -482,6 +482,8 @@ var algoreaInstructionsStrings = {
                      return "répéter tant que ou jusqu'à"
                   }
                   return "l'instruction while"
+               case 'blockly_logic_operation':
+                  return "opérateurs logiques"
             }
          }
       },
@@ -512,7 +514,7 @@ var algoreaInstructionsStrings = {
                if(iBlock < blocks.length - 2){
                   text += ", ";
                }else if(iBlock == blocks.length - 2){
-                  text += " et ";
+                  text += " ou ";
                }
             }
             if(iElem < limitedUses.length - 2){
@@ -548,11 +550,21 @@ var algoreaInstructionsStrings = {
                      return "avancer"
                   }
                   return "avancer()"
+               case "backwards":
+                  if(lang != "python"){
+                     return "reculer"
+                  }
+                  return "reculer()"
                case "left":
                   if(lang != "python"){
                      return "tourner à gauche"
                   }
                   return "tournerGauche()"
+               case "right":
+                  if(lang != "python"){
+                     return "tourner à droite"
+                  }
+                  return "tournerDroite()"
                case "north":
                   if(lang != "python"){
                      return "Avancer vers le nord"
@@ -563,14 +575,33 @@ var algoreaInstructionsStrings = {
                      return "Avancer vers le sud"
                   }
                   return "sud()"
+               case "east":
+                  if(lang != "python"){
+                     return "Avancer vers l'est"
+                  }
+                  return "est()"
                case "withdrawObject":
                   switch(type){
+                     case "castle":
+                        if(lang != "python"){
+                           return "ramasser le bois"
+                        }
+                        return "ramasserBois()"
+                     case "dominoes":
+                        if(lang != "python"){
+                           return "ramasser le domino"
+                        }
+                        return "ramasserDomino()"
                      case "marbles":
-                     default:
                         if(lang != "python"){
                            return "ramasser la bille"
                         }
                         return "ramasserBille()"
+                     case "rocket":
+                        if(lang != "python"){
+                           return "ramasser l'objet"
+                        }
+                        return "ramasserObjet()"
                   }
                case "withdrawNum":
                   switch(type){
@@ -580,7 +611,6 @@ var algoreaInstructionsStrings = {
                         }
                         return "prendre(nbPoissons)"
                      case "packages":
-                     default:
                         if(lang != "python"){
                            return "ramasser livres"
                         }
@@ -616,6 +646,16 @@ var algoreaInstructionsStrings = {
                      return "répéter"
                   }
                   return "for"
+               case "controls_if":
+                  if(lang != "python"){
+                     return "si"
+                  }
+                  return "if"
+               case "controls_if_else":
+                  if(lang != "python"){
+                     return "si / sinon"
+                  }
+                  return "if / else"
                case "pushObject":
                   if(lang != "python"){
                      return "pousser la caisse"
@@ -626,6 +666,13 @@ var algoreaInstructionsStrings = {
                      return "plateforme au-dessus"
                   }
                   return "plateformeDessus()"
+               case "col":
+                  if(lang != "python"){
+                     return "colonne du robot"
+                  }
+                  return "colonneRobot()"
+               default: 
+                  return "undefined"
             }
          }
 
