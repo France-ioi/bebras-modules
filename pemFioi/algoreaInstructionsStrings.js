@@ -494,7 +494,7 @@ var algoreaInstructionsStrings = {
       helpNestedRepeat: "Aide : on peut placer une boucle à l'intérieur d'une boucle !",
       warningEasy: "Si cette version est trop difficile, résolvez d'abord la <b>version 1 étoile</b>. Pour y accéder, cliquez sur l'<b>onglet en haut à gauche</b>.",
       limitedUses: function(limitedUses,lang,type) {
-         var text = "Votre programme ne peut contenir que ";
+         var text = "Votre programme ne peut pas contenir plus de ";
          for(var iElem = 0; iElem < limitedUses.length; iElem++){
             var elemData = limitedUses[iElem];
             var nbUses = elemData.nbUses;
@@ -518,9 +518,9 @@ var algoreaInstructionsStrings = {
                }
             }
             if(iElem < limitedUses.length - 2){
-               text += ", que ";
+               text += ", pas plus de ";
             }else if(iElem == limitedUses.length - 2){
-               text += " et que ";
+               text += " et pas plus de ";
             }
          }
          return text+"."
