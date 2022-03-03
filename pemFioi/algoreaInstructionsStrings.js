@@ -91,6 +91,12 @@ var algoreaInstructionsStrings = {
          return text
       },
       toPickAGem: "Pour ramasser une pierre, le robot doit juste passer sur la case qui la contient.",
+      laser1: "Programmez votre robot pour qu'il allume tous les spots à l'aide de rayons laser.",
+      laser2: "Un rayon laser allume tous les spots qui se trouvent sur sa trajectoire.",
+      overLaser: "Pour utiliser un lanceur laser, le robot doit se placer sur sa case.",
+      laserDirection: "Les directions possibles, de 0 à 7, sont indiquées sur le lanceur.",
+      mirrors: "Aidez-vous des miroirs ! Ils réfléchissent les rayons laser. ",
+      launcher: "Lanceur",
       marbles: function(nbMarbles,nbHoles) {
          var text = "Programmer le robot pour qu'il ramasse ";
          if(nbMarbles == 1){
