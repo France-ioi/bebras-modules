@@ -1,7 +1,8 @@
 function createAlgoreaInstructions(subTask) {
    var level = displayHelper.taskLevel;
    if(level){
-      var lang = conceptViewer.selectedLanguage;
+      // var lang = conceptViewer.selectedLanguage;
+      var lang = window.modulesLanguage;
       if(!level || !lang){
          return ""
       }
@@ -10,7 +11,6 @@ function createAlgoreaInstructions(subTask) {
       var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
       var data = subTask.data;
       var nbTests = data[level].length;
-      // console.log(gridInfos.intro);
 
       var instHTML = getAlgoreaIntro();
 
@@ -50,6 +50,9 @@ function createAlgoreaInstructions(subTask) {
                case "gems":
                   totalHTML += createGemsInstructions();
                   break
+               case "laser":
+                  totalHTML += createLaserInstructions();
+                  break
                case "marbles":
                   totalHTML += createMarblesInstructions();
                   break
@@ -69,7 +72,7 @@ function createAlgoreaInstructions(subTask) {
                   totalHTML += createVetInstructions();
                   break
                default:
-                  // totalHTML += params.custom;
+                  totalHTML += "undefined";
             }
          }
 
@@ -272,6 +275,36 @@ function createAlgoreaInstructions(subTask) {
          html += "<p>"; 
          html += strings.toPickAGem;
          html += "</p>";
+         return html
+      };
+
+      function createLaserInstructions() {
+         var nbMirrors = countItem([6,7,8,9]);
+         var imgSrc = imgPath+"launcher_instructions";
+
+         var html = "";
+
+         html += "<p>"+strings.laser1+"</br>"+strings.laser2+"</p>";
+         html +=  "<div style='float: left; vertical-align: top; padding: 5px; margin-right: 5px; border: 1px solid black; max-width: 33%;'>";
+         html += "<div style='width: 90%; max-width: 150px; margin: auto;'>";
+         html += "<img src='"+imgSrc+".png'/>";
+         html += "</div>";
+         html += "<p style='text-align: center; margin: 0;'><strong>"+strings.launcher+"</strong></p>";
+         html += "</div>";
+         if(gridInfos.intro.overLaser || gridInfos.intro.laserDirection){
+            html += "<p>";
+            if(gridInfos.intro.overLaser){
+               html += strings.overLaser+" ";
+            }
+            if(gridInfos.intro.laserDirection){
+               html += strings.laserDirection;
+            }
+            html += "</p>";
+         }
+         if(nbMirrors > 0){
+            html += "<p>"+strings.mirrors+"</p>";
+         }
+
          return html
       };
 
