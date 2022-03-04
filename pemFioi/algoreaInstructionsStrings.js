@@ -400,6 +400,9 @@ var algoreaInstructionsStrings = {
       extraFunction_5: "Vous pouvez maintenant utiliser ce nouveau bloc $0 dans votre programme, autant de fois que nécessaire !",
       extraFunction_6: "Voici un début de programme valide :",
       extraFunction_7: "À vous de le compléter !",
+      laser_1: "Votre robot doit d'abord avancer sur la case du lanceur laser :",
+      laser_2: "Lorsque le robot est placé sur la case du lanceur , il peut tirer un rayon laser. Utilisez le bloc :",
+      laser_3: "Pour que le robot tire dans la bonne direction, entrez le nombre 3. Les directions sont indiquées sur le lanceur.",
 
       /*** HELP ***/
       /************/
