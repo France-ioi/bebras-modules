@@ -258,7 +258,7 @@ function createAlgoreaInstructions(subTask) {
          html += strings.flowers(nbTarget);
          html += "</p>";
          
-         if(gridInfos.intro.dontStepOnFlowers){
+         if(gridInfos.intro.dontStepOnFlowers === true){
             html += "<p>";
             html += strings.dontStepOnFlowers;
             html += "</p>";
@@ -291,12 +291,12 @@ function createAlgoreaInstructions(subTask) {
          html += "</div>";
          html += "<p style='text-align: center; margin: 0;'><strong>"+strings.launcher+"</strong></p>";
          html += "</div>";
-         if(gridInfos.intro.overLaser || gridInfos.intro.laserDirection){
+         if(gridInfos.intro.overLaser === true || gridInfos.intro.laserDirection === true){
             html += "<p>";
-            if(gridInfos.intro.overLaser){
+            if(gridInfos.intro.overLaser === true){
                html += strings.overLaser+" ";
             }
-            if(gridInfos.intro.laserDirection){
+            if(gridInfos.intro.laserDirection === true){
                html += strings.laserDirection;
             }
             html += "</p>";
@@ -761,6 +761,15 @@ function createAlgoreaInstructions(subTask) {
                   html += "<p>"+strings.extraFunction_7+"</p>";
                   html += "</li>";
                   html += "</ol>";
+                  break;
+               case "laser":
+                  var launcherSrc = imgPath+"/tutos/laser_robot_on_launcher";
+                  var shootSrc = imgPath+"/tutos/laser_shoot"+suffix;
+                  html += "<p>"+strings.laser_1+"</p>";
+                  html += "<img src="+launcherSrc+".png />";
+                  html += "<p>"+strings.laser_2+"</p>";
+                  html += "<img src="+shootSrc+".png />";
+                  html += "<p>"+strings.laser_3+"</p>";
                   break;
                default: // custom
                   html += $("#"+id).html();
