@@ -13,6 +13,7 @@ var algoreaInstructionsStrings = {
       fall: function(maxH) {
          return "Le robot tombe s'il n'est pas sur une plateforme, et s'il tombe de plus de "+maxH+" cases, il se casse."
       },
+      chticodeRel: "Programmez le robot pour qu'il passe ramasser toutes les pierres précieuses puis rejoigne la case verte. ",
       course: function(nbExits,obstacles) {
          var text = "Programmez le robot pour qu'il atteigne ";
          if(nbExits == 1){
@@ -426,9 +427,11 @@ var algoreaInstructionsStrings = {
          return "Si besoin, vous pouvez placer plusieurs instructions à l’intérieur de la boucle for."
       },
       helpConcept: function(lang,concepts) {
+         var specialCase = ["extra_variable","extra_function","blockly_logic_operation","extra_nested_repeat"];
          var text = "Vous pourrez avoir besoin ";
          if(lang != "python"){
-            if(concepts[0] != "extra_variable" && concepts[0] != "extra_function" && concepts[0] != 'blockly_logic_operation'){
+            // if(concepts[0] != "extra_variable" && concepts[0] != "extra_function" && concepts[0] != 'blockly_logic_operation'){
+            if(!Beav.Array.has(specialCase,concepts[0])){
                text += (concepts.length > 1) ? "des blocs " : "du bloc ";
             }else{
                text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
@@ -443,12 +446,12 @@ var algoreaInstructionsStrings = {
             text += "</b></a>";
             if(iConcept == concepts.length - 2){
                text += " et ";
-               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable" || concepts[iConcept + 1] == "blockly_logic_operation"){
+               if(lang == "python" || Beav.Array.has(specialCase,concepts[iConcept + 1])){
                   text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
                }
             }else if(iConcept < concepts.length - 2){
                text += ", ";
-               if(lang == "python" || concepts[iConcept + 1] == "extra_function" || concepts[iConcept + 1] == "extra_variable" || concepts[iConcept + 1] == "blockly_logic_operation"){
+               if(lang == "python" || Beav.Array.has(specialCase,concepts[iConcept + 1])){
                   text += (concepts[0] != 'blockly_logic_operation') ? "de " : "des ";
                }
             }
@@ -477,6 +480,8 @@ var algoreaInstructionsStrings = {
                      return "pas"
                   }
                   return "la négation"
+               case 'extra_nested_repeat':
+                  return "boucles imbriquées"
                case 'extra_variable':
                   return "variables"
                case 'extra_function':

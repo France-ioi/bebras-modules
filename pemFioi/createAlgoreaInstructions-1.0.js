@@ -35,6 +35,9 @@ function createAlgoreaInstructions(subTask) {
                case "castle":
                   totalHTML += createCastleInstructions();
                   break;
+               case "chticode_rel":
+                  totalHTML += createChticodeRelInstructions();
+                  break;   
                case "course":
                   totalHTML += createCourseInstructions();
                   break;
@@ -170,6 +173,11 @@ function createAlgoreaInstructions(subTask) {
             }
             return nbRows - r
          }
+      };
+
+      function createChticodeRelInstructions() {
+         var html = "<p>"+strings.chticodeRel+"</p>";
+         return html
       };
 
       function createCourseInstructions() {

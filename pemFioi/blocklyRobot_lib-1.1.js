@@ -1946,11 +1946,13 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkBothReachAndCollect
       },
       chticode_rel: {
+         backgroundColor: "#BF5E47",
+         borderColor: "#96413B",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, zOrder: 2 },
-            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
+            robot: { img: imgPath+"yellow_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, zOrder: 2 },
+            obstacle: { num: 2, img: imgPath+"brick_wall.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
-            gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
+            gem: { num: 4, img: imgPath+"gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
