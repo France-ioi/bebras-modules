@@ -685,6 +685,11 @@ var algoreaInstructionsStrings = {
                      return "colonne du robot"
                   }
                   return "colonneRobot()"
+               case "shoot_noShadow":
+                  if(lang != "python"){
+                     return "tirer au laser dans la direction ..."
+                  }
+                  return "tirerLaser()"
                default: 
                   return "undefined"
             }
