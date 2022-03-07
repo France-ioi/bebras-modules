@@ -2379,7 +2379,7 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             robot: { img: imgPath+"white_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             board_background: { num: 2, color: "#8d8dbe", side: 60, zOrder: 0},
-            // stars: { num: 3, img: "stars.png", side: 60, zOrder: 1},
+            stars: { num: 3, img: imgPath+"stars.png", side: 60, zOrder: 1},
             asteroide: { num: 4, img: imgPath+"asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
             rocket: { num: 5, img: imgPath+"rocket.png", side: 60, isExit: true, zOrder: 1 },
             // obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
