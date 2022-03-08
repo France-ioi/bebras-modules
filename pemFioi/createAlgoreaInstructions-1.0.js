@@ -53,6 +53,9 @@ function createAlgoreaInstructions(subTask) {
                case "gems":
                   totalHTML += createGemsInstructions();
                   break
+               case "help":
+                  totalHTML += createHelpInstructions();
+                  break;
                case "laser":
                   totalHTML += createLaserInstructions();
                   break
@@ -283,6 +286,14 @@ function createAlgoreaInstructions(subTask) {
          html += "<p>"; 
          html += strings.toPickAGem;
          html += "</p>";
+         return html
+      };
+
+      function createHelpInstructions() {
+         var html = "<p>"; 
+         html += strings.helpIntro;
+         html += "</p>";
+
          return html
       };
 
