@@ -98,6 +98,7 @@ var algoreaInstructionsStrings = {
       laserDirection: "Les directions possibles, de 0 à 7, sont indiquées sur le lanceur.",
       mirrors: "Aidez-vous des miroirs ! Ils réfléchissent les rayons laser. ",
       launcher: "Lanceur",
+      helpIntro: "On veut programmer le robot pour qu'il atteigne la case verte. ",
       marbles: function(nbMarbles,nbHoles) {
          var text = "Programmer le robot pour qu'il ramasse ";
          if(nbMarbles == 1){

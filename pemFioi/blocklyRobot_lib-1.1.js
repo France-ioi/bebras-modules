@@ -2177,7 +2177,7 @@ var getContext = function(display, infos, curLevel) {
             },
          ],
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            green_robot: { img: imgPath+"green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true},
             number: { num: 4, side: 60, zOrder: 1 },
