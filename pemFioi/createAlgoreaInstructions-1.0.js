@@ -32,6 +32,9 @@ function createAlgoreaInstructions(subTask) {
 
          if(gridInfos.intro.default){
             switch(type){
+               case "arrows":
+                  totalHTML += createArrowsInstructions();
+                  break;
                case "castle":
                   totalHTML += createCastleInstructions();
                   break;
@@ -125,6 +128,11 @@ function createAlgoreaInstructions(subTask) {
          totalHTML += "</div>";
 
          return totalHTML
+      };
+
+      function createArrowsInstructions() {
+         var html = "<p>"+strings.arrowsIntro+"</p>";
+         return html
       };
 
       function createCastleInstructions() {
@@ -290,8 +298,10 @@ function createAlgoreaInstructions(subTask) {
       };
 
       function createHelpInstructions() {
+         var nbCubes = countItem(6);
+
          var html = "<p>"; 
-         html += strings.helpIntro;
+         html += strings.helpIntro(nbCubes);
          html += "</p>";
 
          return html
@@ -455,6 +465,13 @@ function createAlgoreaInstructions(subTask) {
                   break;
                case "moreDetails":
                   html += strings.moreDetails;
+                  break;
+               case "repeatBlock":
+                  if(lang == "python"){
+                     return addHelpConcept(["blockly_controls_repeat"])
+                  }
+                  html += "<b>"+strings.youWillNeed+" :</b>";
+                  html += "<img src='"+imgPath+"/tutos/repeat"+suffix+".png' width='120px' style='vertical-align: middle' />";
                   break;
                case "ifElse":
                   if(lang == "python"){

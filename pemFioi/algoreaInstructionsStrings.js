@@ -1,5 +1,6 @@
 var algoreaInstructionsStrings = {
    fr: {
+      arrowsIntro: "Programmez le robot pour qu'il atteigne le coffre en suivant les flèches.",
       castle: function(nbHearth) {
          var text = "Programmez le robot pour qu'il mette du bois dans ";
          if(nbHearth == 1){
@@ -98,7 +99,16 @@ var algoreaInstructionsStrings = {
       laserDirection: "Les directions possibles, de 0 à 7, sont indiquées sur le lanceur.",
       mirrors: "Aidez-vous des miroirs ! Ils réfléchissent les rayons laser. ",
       launcher: "Lanceur",
-      helpIntro: "On veut programmer le robot pour qu'il atteigne la case verte. ",
+      helpIntro: function(nbCubes) {
+         var text = "On veut programmer le robot pour qu'il ";
+         if(nbCubes == 1){
+            text += "ramasse le cube puis "
+         }else if(nbCubes > 1){
+            text += "ramasse les cubes puis "
+         }
+         text += "rejoigne la case verte."
+         return text
+      },
       marbles: function(nbMarbles,nbHoles) {
          var text = "Programmer le robot pour qu'il ramasse ";
          if(nbMarbles == 1){
@@ -442,9 +452,9 @@ var algoreaInstructionsStrings = {
          }
          for(var iConcept = 0; iConcept < concepts.length; iConcept++){
             var concept = concepts[iConcept];
-            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\" class=\"aide\"><b>";
+            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\" class=\"help_concept\">";
             text += conceptName(concept,lang);
-            text += "</b></a>";
+            text += "</a>";
             if(iConcept == concepts.length - 2){
                text += " et ";
                if(lang == "python" || Beav.Array.has(specialCase,concepts[iConcept + 1])){

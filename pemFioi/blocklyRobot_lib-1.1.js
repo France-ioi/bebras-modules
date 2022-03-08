@@ -1714,13 +1714,13 @@ var getContext = function(display, infos, curLevel) {
          ],
          backgroundColor: "#d3e7b6",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
+            red_robot: { img: imgPath+"red_robot_alt.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
             cell: {num: 1, color: "#d3e7b6", side: 60, isObstacle: true, zOrder: 0 },
-            box: { num: 3, img: "box.png", side: 60, isExit: true },
-            leftArrow: { num: 4, img: "leftArrow.png", side: 60, forwardsLeft: true, zOrder: 0},
-            rightArrow: { num: 5, img: "rightArrow.png", side: 60, forwardsRight: true, zOrder: 0},
-            topArrow: { num: 6, img: "topArrow.png", side: 60, forwardsTop: true, zOrder: 0},
-            bottomArrow: { num: 7, img: "bottomArrow.png", side: 60, forwardsBottom: true, zOrder: 0}
+            box: { num: 3, img: imgPath+"chest.png", side: 60, isExit: true },
+            leftArrow: { num: 4, img: imgPath+"leftArrow.png", side: 60, forwardsLeft: true, zOrder: 0},
+            rightArrow: { num: 5, img: imgPath+"rightArrow.png", side: 60, forwardsRight: true, zOrder: 0},
+            topArrow: { num: 6, img: imgPath+"topArrow.png", side: 60, forwardsTop: true, zOrder: 0},
+            bottomArrow: { num: 7, img: imgPath+"bottomArrow.png", side: 60, forwardsBottom: true, zOrder: 0}
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -2182,7 +2182,7 @@ var getContext = function(display, infos, curLevel) {
             green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true},
             number: { num: 4, side: 60, zOrder: 1 },
             board: {num: 5, side: 60, isWritable: true, zOrder: 1 },
-            object: {num: 6, img: "object.png", side : 40, isWithdrawable: true, autoWithdraw: true, offsetX: 10, offsetY: -10, zOrder: 1}
+            object: {num: 6, img: imgPath+"red_cube.png", side : 40, isWithdrawable: true, autoWithdraw: true, offsetX: 10, offsetY: -10, zOrder: 1}
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
