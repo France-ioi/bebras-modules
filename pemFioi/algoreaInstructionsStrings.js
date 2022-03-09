@@ -1,6 +1,7 @@
 var algoreaInstructionsStrings = {
    fr: {
       arrowsIntro: "Programmez le robot pour qu'il atteigne le coffre en suivant les flèches.",
+      cards: "Programmez le robot pour qu'il ramasse chaque carte et la dépose sur la case correspondant à son motif.",
       castle: function(nbHearth) {
          var text = "Programmez le robot pour qu'il mette du bois dans ";
          if(nbHearth == 1){
@@ -254,9 +255,16 @@ var algoreaInstructionsStrings = {
                text += "sème des graines, mais seulement sur les zones de terre.</br>";
                text += "Le problème, c'est que les zones de terre ne sont pas toujours au même endroit !";
                break;
+            case "help":
+               text += " atteigne la case verte.</br>";
+               text += "Le problème, c'est que la case verte n'est pas toujours au même endroit !";
+               break;
             case "rocket":
                text += "ramasse l'objet lorsqu'il y en a un.</br>";
                text += "Le problème, c'est que le robot ne doit pas essayer de ramasser d'objet quand il n'y en a pas !";
+               break;
+            default:
+               text += "undefined"
          }
          return text
       },
@@ -264,22 +272,26 @@ var algoreaInstructionsStrings = {
       if_3: function(type) {
          switch(type){
             case "castle":
-               var str0 = "un tas de bois";
+               var str0 = "se trouve sur un tas de bois";
                var str1 = "le ramasse";
                break;
             case "dominoes":
-               var str0 = "un domino avec des carrés";
+               var str0 = "se trouve sur un domino avec des carrés";
                var str1 = "le ramasse";
                break;
             case "flowers":
-               var str0 = "une zone de terre";
+               var str0 = "se trouve sur une zone de terre";
                var str1 = "sème une graine";
                break;
+            case "help":
+               var str0 = "y a un obstacle devant lui";
+               var str1 = "tourne à gauche";
+               break;
             case "rocket":
-               var str0 = "un objet";
+               var str0 = "se trouve sur un objet";
                var str1 = "le ramasse";
          }
-         var text = "Le robot teste s'il se trouve sur "+str0+".</br>";
+         var text = "Le robot teste s'il "+str0+".</br>";
          text += "Si oui, il "+str1+".</br>";
          text += "Si non, il ne fait pas ce qui est à l'intérieur du bloc.";
          return text
