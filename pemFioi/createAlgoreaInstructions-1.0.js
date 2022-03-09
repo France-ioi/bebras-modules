@@ -6,6 +6,7 @@ function createAlgoreaInstructions(subTask) {
       if(!level || !lang){
          return ""
       }
+      // console.log(window.getContext(null,{}).getInfo["itemTypes"])
       var strLang = window.stringsLanguage;
       var strings = algoreaInstructionsStrings[strLang];
       var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
@@ -34,6 +35,9 @@ function createAlgoreaInstructions(subTask) {
             switch(type){
                case "arrows":
                   totalHTML += createArrowsInstructions();
+                  break;
+               case "cards":
+                  totalHTML += createCardsInstructions();
                   break;
                case "castle":
                   totalHTML += createCastleInstructions();
@@ -132,6 +136,11 @@ function createAlgoreaInstructions(subTask) {
 
       function createArrowsInstructions() {
          var html = "<p>"+strings.arrowsIntro+"</p>";
+         return html
+      };
+
+      function createCardsInstructions() {
+         var html = "<p>"+strings.cards+"</p>";
          return html
       };
 
