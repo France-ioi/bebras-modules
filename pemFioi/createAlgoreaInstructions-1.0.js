@@ -141,6 +141,9 @@ function createAlgoreaInstructions(subTask) {
 
       function createCardsInstructions() {
          var html = "<p>"+strings.cards+"</p>";
+         if(gridInfos.intro.oneCard === true){
+            html += "<p>"+strings.oneCard+"</p>";
+         }
          return html
       };
 
