@@ -2,6 +2,7 @@ var algoreaInstructionsStrings = {
    fr: {
       arrowsIntro: "Programmez le robot pour qu'il atteigne le coffre en suivant les flèches.",
       cards: "Programmez le robot pour qu'il ramasse chaque carte et la dépose sur la case correspondant à son motif.",
+      oneCard: "Le robot ne peut transporter qu'une seule carte à la fois.",
       castle: function(nbHearth) {
          var text = "Programmez le robot pour qu'il mette du bois dans ";
          if(nbHearth == 1){
