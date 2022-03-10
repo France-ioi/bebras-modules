@@ -810,6 +810,27 @@ function createAlgoreaInstructions(subTask) {
                   html += "</li>";
                   html += "</ol>";
                   break;
+               case "operations":
+                  var addSrc = imgPath+"/tutos/"+id+"_addition";
+                  var subSrc = imgPath+"/tutos/"+id+"_subtraction";
+                  var mulSrc = imgPath+"/tutos/"+id+"_multiplication";
+                  var divSrc = imgPath+"/tutos/"+id+"_division";
+                  var opSrc = [addSrc,subSrc,mulSrc,divSrc];
+                  var calSrc = imgPath+"/tutos/"+type+"_"+id+"_calculation";
+                  var varSrc = imgPath+"/tutos/"+type+"_"+id+"_variable";
+                  
+                  html += "<p>"+strings.operations_1+"</p>";
+                  for(var imgSrc of opSrc){
+                     html += "<div style='display: inline-block; vertical-align: top; width: 90%; max-width: 100px; margin: auto;'>";
+                     html += "<img src='"+imgSrc+".png' />";
+                     html += "</div>";
+                  }
+                  html += "<p>"+strings.operations_2+"</p>";
+                  html += "<img src='"+calSrc+".png' />";
+                  html += "<p>"+strings.operations_3+"</p>";
+                  html += "<img src='"+varSrc+".png' />";
+                  html += "<p>"+strings.operations_4+"</p>";
+                  break;
                case "laser":
                   var launcherSrc = imgPath+"/tutos/laser_robot_on_launcher";
                   var shootSrc = imgPath+"/tutos/laser_shoot"+suffix;
