@@ -153,6 +153,7 @@ var algoreaInstructionsStrings = {
          text += ".";
          return text
       },
+      marked: "Une case est considérée comme marquée si elle contient un point noir ou un point blanc.",
       sokoban: function(nbBoxes) {
          var text = "Programmez le robot pour qu'il pousse ";
          if(nbBoxes == 1){
@@ -718,6 +719,11 @@ var algoreaInstructionsStrings = {
                      return "tirer au laser dans la direction ..."
                   }
                   return "tirerLaser()"
+               case "writeNumber":
+                  if(lang != "python"){
+                     return "écrire le nombre"
+                  }
+                  return "ecrireNombre()"
                default: 
                   return "undefined"
             }
