@@ -388,6 +388,9 @@ function createAlgoreaInstructions(subTask) {
          var html = "<p>"; 
          html += strings.paint(nbBlack,nbWhite);
          html += "</p>";
+         if(gridInfos.intro.marked == true){
+            html += "<p>"+strings.marked+"</p>";
+         }
 
          return html
       };
