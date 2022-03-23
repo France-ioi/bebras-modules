@@ -180,12 +180,4 @@
             window.map2d = Map2D(params);
         });
     };
-
-
-    $(function() {
-        if(window.platform) {
-            platform.initWithTask(task);
-        }
-    })
-
 })();
