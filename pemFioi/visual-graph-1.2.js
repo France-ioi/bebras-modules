@@ -290,6 +290,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       "opacity": 0
    };
    this.edgeTypeAttr = {};
+   this.vertexTypeAttr = {};
 
    this.init = function(paper, graph, visualGraph) {
       this.paper = paper;
@@ -337,26 +338,37 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    this.setAllEdgeTypeAttr = function(obj) {
       this.edgeTypeAttr = obj;
    };
+   this.setVertexTypeAttr = function(type,attr) {
+      this.vertexTypeAttr[type] = attr;
+   };
+   this.setAllVertexTypeAttr = function(obj) {
+      this.vertexTypeAttr = obj;
+   };
    this.drawVertex = function(id, info, visualInfo) {
       var pos = this._getVertexPosition(visualInfo);
       this.originalPositions[id] = pos;
       var label = (info.label) ? info.label : "";
+      if(info.vertexType != undefined){
+         var vertexAttr = this.vertexTypeAttr[info.vertexType];
+      }
+      var circleAttr = (vertexAttr) ? vertexAttr.circle : this.circleAttr;
+      var vertexLabelAttr = (vertexAttr) ? vertexAttr.label : this.vertexLabelAttr;
 
       if(!visualInfo.tableMode){
-         var node = this.paper.circle(pos.x, pos.y).attr(this.circleAttr);
-         var labelRaph = this.paper.text(pos.x,pos.y,label).attr(this.vertexLabelAttr);
+         var node = this.paper.circle(pos.x, pos.y).attr(circleAttr);
+         var labelRaph = this.paper.text(pos.x,pos.y,label).attr(vertexLabelAttr);
          if(info.terminal && !info.initial){
-            var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r + 5);
+            var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",circleAttr.r + 5);
             var result = [node,labelRaph,terminalCircle];
             this._addCustomElements(id, [labelRaph,terminalCircle]);
          }else if(info.initial && !info.terminal){
-            var initialArrow = this.paper.path("M" + (pos.x - 3*this.circleAttr.r) + "," + pos.y + "H" + (pos.x - this.circleAttr.r)).attr(this.lineAttr);
+            var initialArrow = this.paper.path("M" + (pos.x - 3*circleAttr.r) + "," + pos.y + "H" + (pos.x - circleAttr.r)).attr(this.lineAttr);
             initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
             var result = [node,labelRaph,initialArrow];
             this._addCustomElements(id, [labelRaph,initialArrow]);
          }else if(info.initial && info.terminal){
-            var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r + 5);
-            var initialArrow = this.paper.path("M" + (pos.x - 3*this.circleAttr.r) + "," + pos.y + "H" + (pos.x - this.circleAttr.r)).attr(this.lineAttr);
+            var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",circleAttr.r + 5);
+            var initialArrow = this.paper.path("M" + (pos.x - 3*circleAttr.r) + "," + pos.y + "H" + (pos.x - circleAttr.r)).attr(this.lineAttr);
             initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
             var result = [node,labelRaph,initialArrow,terminalCircle];
             this._addCustomElements(id, [labelRaph,initialArrow,terminalCircle]);
@@ -372,9 +384,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var h = boxSize.h;
          var x = pos.x - w/2;
          var y = pos.y - h/2;
-         var labelHeight = 2*this.vertexLabelAttr["font-size"];
+         var labelHeight = 2*vertexLabelAttr["font-size"];
          var node = this.paper.rect(x,y,w,h).attr(this.rectAttr);
-         var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(this.vertexLabelAttr);
+         var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(vertexLabelAttr);
          var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.boxLineAttr);
          var textAlign = this.vertexContentAttr["text-anchor"] || "middle";
          switch(textAlign){
@@ -390,15 +402,15 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          }
          var content = this.paper.text(contentX, y + labelHeight + (h - labelHeight)/2,content).attr(this.vertexContentAttr);
          if(info.initial && !info.terminal){
-            var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
+            var initialArrow = this.paper.path("M" + (x - 2*circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
             initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
             var result = [node,labelRaph,line,content,initialArrow];
          }else if(!info.initial && info.terminal){
-            var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
+            var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, circleAttr.r + 5);
             var result = [node,labelRaph,line,content,terminalFrame];
          }else if(info.initial && info.terminal){
-            var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
-            var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
+            var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, circleAttr.r + 5);
+            var initialArrow = this.paper.path("M" + (x - 2*circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
             initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
             var result = [node,labelRaph,line,content,initialArrow,terminalFrame];
          }else{
