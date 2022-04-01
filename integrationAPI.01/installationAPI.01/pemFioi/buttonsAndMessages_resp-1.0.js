@@ -1418,8 +1418,8 @@ window.displayHelper = {
    },
 
    updateTaskCSS: function(scaleFactor,limitingFactor) {
+      // console.log(scaleFactor,limitingFactor)
       $('#taskCont').width(this.taskW);
-      // $('#taskCont').height(newTaskH);
       var fixingOffset = 0; // unnecessary?
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
@@ -1456,6 +1456,7 @@ window.displayHelper = {
                }
             }else{
                   // console.log('cas qui nous occupe',scaleFactor);
+               // $('#taskCont').css('margin-top',-this.taskH*(1 - scaleFactor)/2);
                $('#taskCont').css('margin-top',0);
             }
          }
