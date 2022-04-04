@@ -44,6 +44,7 @@ window.displayHelper = {
    toggle_task: false,
    headerH: 71,   // in resp mode
    versionHeaderH: [93,93,85,48],  // in resp mode
+   altVersionHeaderH: [60,60,51,49],  // in resp mode when nbLevels = 1
    footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
    availableW: null, // width for zone_2 in responsive mode
@@ -1091,7 +1092,10 @@ window.displayHelper = {
          }
          tabsInnerHTML += '</a></span>';
       }
-      if(nbLevels < 2) { tabsInnerHTML = ''; }
+      if(nbLevels < 2) { 
+         tabsInnerHTML = ''; 
+         this.versionHeaderH = this.altVersionHeaderH;
+      }
       var tabsHTML = '<div id="tabsMenu">' + tabsInnerHTML + '</div>';
       $('#tabsContainer').append(tabsHTML);
 
