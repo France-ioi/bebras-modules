@@ -105,9 +105,9 @@
         showPopup: function() {
             if(!this.popup) {
                 this.popup = $(
-                    '<div class="quiz-popup">\
+                    '<div class="quiz-popup-inner"><div class="content"></div></div>\
+                    <div class="quiz-popup">\
                         <div class="opacity-overlay"></div>\
-                        <div class="inner"><div class="content"></div></div>\
                     </div>'
                 );
                 $(document.body).append(this.popup);
@@ -123,6 +123,7 @@
                     self.popup.hide();
                 });
             }
+            $('.quiz-popup-inner').css('top', (Math.max(0, $('.quiz-toolbar').offset().top - 140)) + 'px')
             this.popup.show();
         },
 
