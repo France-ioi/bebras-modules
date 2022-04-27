@@ -5,6 +5,7 @@
         default_language: 'en',
         language: 'en',
         language_set: false,
+        sublanguage: null,
 
         strings: {
             en: {
@@ -54,6 +55,17 @@
             },
         },
 
+        substrings: {
+            hint: {
+                en: {
+                    'solution': 'Show hint'
+                },
+                fr: {
+                    'solution': 'Afficher un indice'
+                }
+            }
+        },
+
         set: function(lng) {
             if(!lng) {
                 lng = window.stringsLanguage;
@@ -62,14 +74,22 @@
             this.language_set = true;
         },
 
+        setSublanguage: function (sublng) {
+            this.sublanguage = sublng;
+        },
+
         translate: function() {
             if(!this.language_set) {
                 this.set();
             }
             var str = '', key = arguments[0];
-            if(this.strings[this.language] && this.strings[this.language][key]) {
+            if (this.sublanguage && this.substrings[this.sublanguage] && this.substrings[this.sublanguage][this.language]) {
+                str = this.substrings[this.sublanguage][this.language][key];
+            }
+            if (!str && this.strings[this.language]) {
                 str = this.strings[this.language][key];
-            } else {
+            }
+            if (!str) {
                 str = this.strings[this.default_language][key] || key;
             }
             return str.replace('%%', arguments[1]);
@@ -167,6 +187,9 @@
         init: function() {
             if(this.holder) return;
             $('#showSolutionButton').remove();
+            if (quiz_settings.sublanguage) {
+                lang.setSublanguage(quiz_settings.sublanguage);
+            }
             this.holder = $('<div class="quiz-toolbar"></div>');
             var self = this;
             this.addButton(this.holder, 'validate', function() {
