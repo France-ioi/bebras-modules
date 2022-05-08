@@ -1918,7 +1918,7 @@ var getContext = function(display, infos, curLevel) {
       },
       chticode_rel: {
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, zOrder: 2 },
+            green_robot: { img: "green_robot.png", side: 70, nbStates: 9, isRobot: true, offsetX: -5, offsetY: 5, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
             gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
