@@ -106,6 +106,7 @@
         buttons: {},
         holder: false,
         popup: false,
+        validated: false,
 
         addButton: function(parent, name, callback) {
             var btn = $('<button class="btn btn-success">' + lang.translate(name) + '</button>');
@@ -165,6 +166,7 @@
 
 
         setValidated: function(validated) {
+            this.validated = !!validated;
             if(validated) {
                 this.buttons.validate.hide();
                 this.buttons.solution && this.buttons.solution.show();
@@ -366,7 +368,8 @@
             task.getAnswerObject = function() {
                 var answerObj = {
                     data: q.getAnswer(),
-                    versions: Quiz.versions.get()
+                    versions: Quiz.versions.get(),
+                    validated: task_toolbar.validated
                 }
                 //console.log('task.getAnswerObject', answerObj)
                 return answerObj;
@@ -378,7 +381,8 @@
                     //console.log('task.reloadAnswer', answer)
                     var answerObject = JSON.parse(answer);
                     this.reloadAnswerObject(answerObject);
-                    if(lastViews.solution) {
+                    if (answerObject.validated || lastViews.solution) {
+                        task_toolbar.setValidated(true);
                         task.gradeAnswer(answer, null, function () {});
                     }
                 } catch(e) {
