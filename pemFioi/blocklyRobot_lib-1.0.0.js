@@ -3327,6 +3327,10 @@ var getContext = function(display, infos, curLevel) {
       };
    };
 
+   context.implementsInnerState = function () {
+      return true;
+   }
+
    context.reloadInnerState = function(data) {
       context.items = data.items;
       context.multicell_items = data.multicell_items;
