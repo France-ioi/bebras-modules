@@ -29,6 +29,10 @@ function ContextCursor(params) {
         }
     }
 
+    this.get = function() {
+        return this.position ? {x: this.position.x, y: this.position.y} : null;
+    }
+
     this.reset = function() {
         this.position = false;
     }
@@ -275,6 +279,10 @@ function BarcodeDisplay(params) {
 
         render: render,
 
+        setDisplay: function (newDisplay) {
+            display = newDisplay;
+        },
+
         getSize: function(callback) {
             loadImage(function() {
                 callback({
@@ -432,6 +440,10 @@ function UserDisplay(params) {
             render();
         },
 
+        setDisplay: function (newDisplay) {
+            display = newDisplay;
+        },
+
         setSize: function(new_data_size) {
             var l = new_data_size.width * new_data_size.height
             if(pixels.length == l) {
@@ -440,6 +452,22 @@ function UserDisplay(params) {
             data_size = new_data_size;
             pixels = new Array(l).fill(255)
             render();
+        },
+
+        getInnerState: function() {
+            return {
+                data_size,
+                pixels,
+                cursor_position: cursor ? cursor.get() : null,
+            };
+        },
+
+        reloadInnerState: function(data) {
+            data_size = data.data_size;
+            pixels = data.pixels;
+            if (data.cursor_position) {
+                cursor.set(data.cursor_position.x, data.cursor_position.y);
+            }
         },
 
         clear: function() {
@@ -513,6 +541,23 @@ function StringDisplay(params) {
         setData: function(str) {
             data = '' + str;
             render();
+        },
+
+        render,
+
+        setDisplay: function (newDisplay) {
+            display = newDisplay;
+        },
+
+        getInnerState: function() {
+            return {
+                data,
+            };
+        },
+
+        reloadInnerState: function(data) {
+            data = '' + data.data;
+            diff = '';
         },
 
 
