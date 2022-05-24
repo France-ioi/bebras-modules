@@ -79,6 +79,7 @@ var getContext = function(display, infos, curLevel) {
     var context = quickAlgoContext(display, infos)
     context.inlinePopupMessage = true;
     var strings = context.setLocalLanguageStrings(language_strings)
+    var innerState = null;
 
     /*
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
@@ -150,6 +151,12 @@ var getContext = function(display, infos, curLevel) {
             context.userDisplay.reset();
         }
 
+        if (null === innerState) {
+            innerState = {
+                userDisplay: context.userDisplay.getInnerState(),
+                stringDisplay: context.stringDisplay.getInnerState(),
+            };
+        }
     }
 
 
@@ -165,6 +172,43 @@ var getContext = function(display, infos, curLevel) {
 
 
 
+    context.redrawDisplay = function() {
+        if (context.barcodeDisplay) {
+            context.barcodeDisplay.setDisplay(context.display);
+            if (context.display) {
+                context.barcodeDisplay.render();
+            }
+        }
+        if (context.userDisplay) {
+            context.userDisplay.setDisplay(context.display);
+            if (context.display) {
+                context.userDisplay.render();
+            }
+        }
+        if (context.stringDisplay) {
+            context.stringDisplay.setDisplay(context.display);
+            if (context.display) {
+                context.stringDisplay.render();
+            }
+        }
+    }
+
+    context.getInnerState = function() {
+        innerState.userDisplay = context.userDisplay.getInnerState();
+        innerState.stringDisplay = context.stringDisplay.getInnerState();
+
+        return innerState;
+    };
+
+    context.implementsInnerState = function () {
+        return true;
+    }
+
+    context.reloadInnerState = function(data) {
+        innerState = data;
+        context.userDisplay.reloadInnerState(data.userDisplay);
+        context.stringDisplay.reloadInnerState(data.stringDisplay);
+    };
 
 
     context.gradeResult = function() {
