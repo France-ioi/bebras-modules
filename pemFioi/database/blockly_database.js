@@ -309,11 +309,6 @@ var getContext = function(display, infos, curLevel) {
             task_tables = taskInfos.tables || {};
         }
 
-        if(ready) {
-            return;
-        }
-        ready = true;
-
 
         task_files.initLevel({
             strings: strings.ui.files_repository,
@@ -325,7 +320,9 @@ var getContext = function(display, infos, curLevel) {
         }
 
         wrapper = $('<div class="renderers_wrapper"></div>');
-        $('#grid').append(wrapper);
+        if (context.display) {
+            $('#grid').empty().append(wrapper);
+        }
 
         window.db_helper = new DatabaseHelper(
             Object.assign({
