@@ -962,6 +962,9 @@ function HistogramRenderer(options) {
                 var key = Object.keys(dataset._meta)[0];
                 var meta_data = dataset._meta[key].data;                            
                 for (var i = 0; i<dataset.data.length; i++) {
+                    if (i > meta_data.length - 1) {
+                        continue;
+                    }
                     var model = meta_data[i]._model,
                         scale_max = meta_data[i]._yScale.maxHeight;
                         left = meta_data[i]._xScale.left;
