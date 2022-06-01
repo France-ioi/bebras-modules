@@ -3220,7 +3220,8 @@ var getContext = function(display, infos, curLevel) {
       infos.bottomMargin += infos.cellSide;
    }
 
-   
+   var innerState = {};
+
    switch(infos.blocklyColourTheme) {
       case "bwinf":
          context.provideBlocklyColours = function() {
@@ -3316,15 +3317,15 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.getInnerState = function() {
-      return {
-         items: context.items,
-         multicell_items: context.multicell_items,
-         last_connect: context.last_connext,
-         wires: context.wires,
-         nbMoves: context.nbMoves,
-         time: context.time,
-         bag: context.bag,
-      };
+      innerState.items = context.items;
+      innerState.multicell_items = context.multicell_items;
+      innerState.last_connect = context.last_connect;
+      innerState.wires = context.wires;
+      innerState.nbMoves = context.nbMoves;
+      innerState.time = context.time;
+      innerState.bag = context.bag;
+
+      return innerState;
    };
 
    context.implementsInnerState = function () {
@@ -3332,6 +3333,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.reloadInnerState = function(data) {
+      innerState = data;
       context.items = data.items;
       context.multicell_items = data.multicell_items;
       context.last_connect = data.last_connect;
