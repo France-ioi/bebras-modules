@@ -424,7 +424,13 @@ var getContext = function(display, infos) {
    var scale = 1;
    var paper;
 
-   context.turtle = {displayTurtle : new makeTurtle(infos.coords), displaySolutionTurtle : new makeTurtle(infos.coords), invisibleTurtle : new makeTurtle(infos.coords), invisibleSolutionTurtle : new makeTurtle(infos.coords)};
+   context.turtle = {
+      displayTurtle: new makeTurtle(infos.coords),
+      displaySolutionTurtle: new makeTurtle(infos.coords),
+      invisibleTurtle: new makeTurtle(infos.coords),
+      invisibleSolutionTurtle: new makeTurtle(infos.coords),
+      svgTurtle: null
+   };
 
    switch (infos.blocklyColourTheme) {
       case "bwinf":
@@ -486,17 +492,17 @@ var getContext = function(display, infos) {
          canvas.width = 300;
          canvas.height = 300;
          canvas.style.width = "300px";
-         canvas.style.heigth = "300px";
+         canvas.style.height = "300px";
          canvas.style.border = "1px solid black";
          canvas.style.display = "none";
 
          //document.body.appendChild(canvas); // for debug
-         return canvas;
+         return canvas.getContext('2d');
       }
 
       if (gridInfos) {
-         context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
-         context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
+         context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas());
+         context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas());
 
          context.turtle.invisibleTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
          context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
@@ -508,6 +514,13 @@ var getContext = function(display, infos) {
          if (context.display) {
             context.drawSolution(context.turtle.displaySolutionTurtle);
          }
+      }
+
+      if (window.C2S) {
+         // Canvas2SVG library is loaded, we create the SVG at the same time
+         context.turtle.svgTurtle = new makeTurtle(infos.coords);
+         context.turtle.svgTurtle.setDrawingContext(new window.C2S(300, 300));
+         context.turtle.svgTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
       }
    };
 
@@ -540,10 +553,56 @@ var getContext = function(display, infos) {
    context.updateScale = function() {
    };
 
+   context.exportGridAsSvg = function (name) {
+      if (!window.C2S) {
+         console.error("Unable to export as SVG, canvas2svg library is not loaded.");
+         return;
+      }
+
+      var svgTurtle = context.turtle.svgTurtle;
+      var svg = svgTurtle.drawingContext.getSvg();
+      var svgImages = svg.getElementsByTagName('image');
+      for (var i = 0; i < svgImages.length; i++) {
+         svgImages[i].remove();
+      }
+
+      var bgimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      bgimg.setAttribute('x', 0);
+      bgimg.setAttribute('y', 0);
+      bgimg.setAttribute('width', 300);
+      bgimg.setAttribute('height', 300);
+      bgimg.setAttribute('style', 'opacity: 0.4; filter: alpha(opacity=10);');
+      bgimg.setAttribute('xlink:href', context.infos.overlayFileName);
+      svg.prepend(bgimg);
+
+      var turtleFileName = "turtle.svg";
+      if ($("#turtleImg").length > 0) {
+         turtleFileName = $("#turtleImg").attr("src");
+      }
+
+      var turtleimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      turtleimg.setAttribute('x', svgTurtle.x - 12);
+      turtleimg.setAttribute('y', svgTurtle.y - 15);
+      turtleimg.setAttribute('width', 22);
+      turtleimg.setAttribute('height', 27);
+      turtleimg.setAttribute('style', 'padding-right: 2px; padding-bottom: 3px;');
+      turtleimg.setAttribute('xlink:href', turtleFileName);
+      if (svgTurtle.direction) {
+         turtleimg.setAttribute('transform', "rotate(" + (-svgTurtle.directionDeg) + ", " + svgTurtle.x + ", " + svgTurtle.y + ")");
+      }
+      svg.append(turtleimg);
+
+      return svg;
+   }
+
+
    function callOnAllTurtles(fn) {
       fn(context.turtle.invisibleTurtle);
       if (context.display) {
          fn(context.turtle.displayTurtle);
+      }
+      if (context.turtle.svgTurtle) {
+         fn(context.turtle.svgTurtle);
       }
    }
 

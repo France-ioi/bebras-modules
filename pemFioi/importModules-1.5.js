@@ -40,6 +40,7 @@
          'randomGenerator-1.0': {src: modulesPath+"/pemFioi/randomGenerator-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/randomGenerator-1.0.js"},
          'shape-paths': {src: modulesPath+"/pemFioi/shape-paths.js", id: "shape-paths"},
          'zen3d': { src: modulesPath + "/ext/zen3d/zen3d.min.js", id: "zen3d" },
+         'canvas2svg': { src: modulesPath + "/ext/canvas2svg/canvas2svg.js", id: "canvas2svg" },
 
          'showdown': {src: modulesPath+"/ext/showdown/showdown.min.js", id: "showdown"},
          'showdownConvert': {src: modulesPath+"/pemFioi/showdownConvert.js", id: "showdownConvert"},

@@ -91,6 +91,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Code Python",
       blocklyToPythonIntro: "Le code ci-dessous est l'équivalent dans le langage Python de votre programme Blockly.",
       blocklyToPythonPassComment: '# Insérer des instructions ici',
+      svgExport: "Exporter l'affichage au format SVG",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       limitElements: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
@@ -235,6 +236,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Python code",
       blocklyToPythonIntro: "",
       blocklyToPythonPassComment: '# Insert instructions here',
+      svgExport: "Export display as SVG",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
@@ -380,6 +382,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Python-Code",
       blocklyToPythonIntro: "",
       blocklyToPythonPassComment: '# Befehle hier eingeben',
+      svgExport: "Export display as SVG", // TODO :: translate
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Befehle verfügbar.",
@@ -526,6 +529,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Python código",
       blocklyToPythonIntro: "",
       blocklyToPythonPassComment: '# Insertar instrucciones aquí',
+      svgExport: "Export display as SVG", // TODO: translate
       limitBlocks: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.",
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
       limitElements: "{remainingBlocks} elementos disponibles de {maxBlocks} autorizados.",
@@ -670,6 +674,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Python code",
       blocklyToPythonIntro: "",
       blocklyToPythonPassComment: '# Insert instructions here',
+      svgExport: "Export display as SVG", // TODO: translate
       limitBlocks: "Delčkov na voljo: {remainingBlocks}",
       limitBlocksOver: "{remainingBlocks} delčkov preko meje {maxBlocks}",
       limitElements: "{remainingBlocks} elementov izmed {maxBlocks} imaš še na voljo.",
@@ -816,6 +821,7 @@ var quickAlgoLanguageStrings = {
       blocklyToPythonTitle: "Codice Python",
       blocklyToPythonIntro: "Il codice sottostante è l'equivalente in linguaggio Python del tuo programma Blockly.",
       blocklyToPythonPassComment: '# Inserisci delle istruzioni qui',
+      svgExport: "Export display as SVG", // TODO: translate
       limitBlocks: "{remainingBlocks} blocchi restati su {maxBlocks} autorizzati.",
       limitBlocksOver: "{remainingBlocks} blocchi utilizzati in eccesso per {maxBlocks} autorizzati.",
       limitElements: "{remainingBlocks} blocchi restanti su {maxBlocks} autorizzati.",
