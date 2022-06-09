@@ -282,7 +282,7 @@ var getContext = function(display, infos, curLevel) {
          infos.bottomMargin = infos.cellSide / 2;
       }
    }
-   if (infos.showLabels) {
+   if (infos.showLabels && infos.rowLabelEnabled) {
       infos.rightMargin += infos.cellSide;
    }
    if (infos.showLabels || infos.showContLabels) {
@@ -339,8 +339,8 @@ var getContext = function(display, infos, curLevel) {
       context.success = false;
       context.nbMoves = 0;
       context.time = 0;
-      // context.animate = true;
-      context.animate = false;
+      context.animate = true;
+      // context.animate = false;
       
       if(infos.bagInit != undefined) {
          for(var i = 0;i < infos.bagInit.count;i++) {
@@ -493,7 +493,7 @@ var getContext = function(display, infos, curLevel) {
       var x = infos.leftMargin*scale + w*cranePos;
 
       var lineH = nbRows + craneH;
-      var y0Line = (infos.topMargin + (craneH - lineH)*cSide)*scale;
+      var y0Line = infos.topMargin*scale;
       var yLineClip1 = (infos.topMargin + craneWheelsPos)*scale;
       var yLineClip2 = (infos.topMargin + craneClawsAxisPos)*scale;
       var hClip = yLineClip2 - yLineClip1;
@@ -571,8 +571,10 @@ var getContext = function(display, infos, curLevel) {
          contOutline = paper.path("").attr(infos.contOutlineAttr);
       }
       if(infos.showLabels) {
-         for(var iRow = 0;iRow < context.nbRows;iRow++) {
-            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+         if(infos.rowLabelEnabled){
+            for(var iRow = 0;iRow < context.nbRows;iRow++) {
+               rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+            }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
@@ -841,10 +843,12 @@ var getContext = function(display, infos, curLevel) {
       }
       var textFontSize = {"font-size": cSide * scale / 2};
       if(infos.showLabels) {
-         for(var iRow = 0;iRow < context.nbRows;iRow++) {
-            var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
-            var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin) * scale;
-            rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
+         if(infos.rowLabelEnabled){
+            for(var iRow = 0;iRow < context.nbRows;iRow++) {
+               var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
+               var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin) * scale;
+               rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
+            }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var x = (cSide * (iCol + nbColCont) + infos.leftMargin + cSide / 2) * scale;
@@ -1023,6 +1027,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.take = function(callback) {
+      // console.log("take",context.display)
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
       }
@@ -1043,23 +1048,22 @@ var getContext = function(display, infos, curLevel) {
       context.craneContent = withdrawable;
       
       if(context.display) {
-         var craneAttr = getCraneAttr();
          if(context.animate){
-            var itemAttr = itemAttributes(topBlock);
-            console.log(itemAttr)
-            // var yDown = 
+            context.takeAnim(topBlock,callback);
          }else{
+            var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
          }
       }
 
-      context.advanceTime(1);
-      if(callback){
+      // context.advanceTime(1);
+      if(callback && !context.display){
          context.waitDelay(callback);
       }
    };
 
    context.drop = function(callback) {
+      console.log(context.runner)
       // console.log("drop")
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
@@ -1080,11 +1084,94 @@ var getContext = function(display, infos, curLevel) {
       context.craneContent = undefined;
       
       if(context.display) {
-         var craneAttr = getCraneAttr();
-         setCraneAttr(craneAttr);
-         redisplayItem(tempItem,false,"drop");
+         if(context.animate){
+            context.dropAnim(tempItem,callback);
+         }else{
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
+            redisplayItem(tempItem,false);
+         }
+      }else if(callback){
+         context.waitDelay(callback);
       }
-      context.waitDelay(callback);
+   };
+
+   context.takeAnim = function(topBlock,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = infos.actionDelay*(topBlock.row + 1);
+      var itemAttr = itemAttributes(topBlock);
+      var yClawDown = itemAttr.y - craneItemOffset*scale;
+      var deltaY = yClawDown - craneAttr.yClaws;
+      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
+      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
+      var cyDown = craneAttr.cy + deltaY;
+      var itemY = (infos.topMargin + craneClawsPos + craneItemOffset + topBlock.offsetY)*scale;
+
+      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
+      var animClawDown = new Raphael.animation({ y: yClawDown },delay);
+      var animClawDownEnd = new Raphael.animation({ y: yClawDown },delay,function() {
+         context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
+         context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
+         
+      });
+      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cx,cyDown] },infos.actionDelay);
+      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cx,cyDown] },infos.actionDelay,function() {
+         context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+         context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
+         context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
+         context.raphaelFactory.animate("animCrane_item_up" + Math.random(), topBlock.element, animItemUp);
+      });
+      var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",clutchAngle,craneAttr.cx,craneAttr.cy] },delay);
+      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",-clutchAngle,craneAttr.cx,craneAttr.cy] },delay);
+      var animItemUp = new Raphael.animation({ y: itemY },delay,function() {
+         if(callback){
+            context.waitDelay(callback);
+            // callback();
+         }
+      });
+
+      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
+      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDownEnd);
+   };
+
+   context.dropAnim = function(item,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = infos.actionDelay*(item.row + 1);
+      var itemAttr = itemAttributes(item);
+      var yClawDown = itemAttr.y - craneItemOffset*scale;
+      var deltaY = yClawDown - craneAttr.yClaws;
+      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
+      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
+      var cyDown = craneAttr.cy + deltaY;
+      // var itemY = (infos.topMargin + craneClawsPos + craneItemOffset + topBlock.offsetY)*scale;
+
+      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
+      var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cx,cyDown] },delay);
+      var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cx,cyDown] },delay);
+      var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
+         context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
+         context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+      });
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cx,cyDown] },infos.actionDelay);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cx,cyDown] },infos.actionDelay,function() {
+         context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+         context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
+         context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
+      });
+      var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
+      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,function() {
+         if(callback){
+            context.waitDelay(callback);
+         }
+      });
+
+      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
+      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
+      context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
    };
 
    context.tryToGo = function(col) {
@@ -1149,34 +1236,34 @@ var getContext = function(display, infos, curLevel) {
       }
    };
    
-   context.moveItem = function(item, newRow, newCol) {
-      var animate = (item.row != newRow) || (item.col != newCol);
-      var robot = context.getRobot();
-      if(context.display) {
-         resetItemsZOrder(newRow, newCol);
-         resetItemsZOrder(item.row, item.col);
-         resetItemsZOrder(robot.row, robot.col);
-      }
-      item.row = newRow;
-      item.col = newCol;
+   // context.moveItem = function(item, newRow, newCol) {
+   //    var animate = (item.row != newRow) || (item.col != newCol);
+   //    var robot = context.getRobot();
+   //    if(context.display) {
+   //       resetItemsZOrder(newRow, newCol);
+   //       resetItemsZOrder(item.row, item.col);
+   //       resetItemsZOrder(robot.row, robot.col);
+   //    }
+   //    item.row = newRow;
+   //    item.col = newCol;
       
-      if(context.display) {
-         if(animate) {
-            attr = itemAttributes(item);
-            context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
-         }
-         else {
-            attr = itemAttributes(item);
-            if(infos.actionDelay > 0) {
-               context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
-                  item.element.attr(attr);
-               }, infos.actionDelay / 2);
-            } else {
-               item.element.attr(attr);
-            }
-         }
-      }
-   };
+   //    if(context.display) {
+   //       if(animate) {
+   //          attr = itemAttributes(item);
+   //          context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
+   //       }
+   //       else {
+   //          attr = itemAttributes(item);
+   //          if(infos.actionDelay > 0) {
+   //             context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
+   //                item.element.attr(attr);
+   //             }, infos.actionDelay / 2);
+   //          } else {
+   //             item.element.attr(attr);
+   //          }
+   //       }
+   //    }
+   // };
    
    context.destroy = function(item) {
       // console.log("destroy")
