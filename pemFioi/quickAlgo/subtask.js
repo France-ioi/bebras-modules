@@ -75,7 +75,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
-      var allowSvgExport = levelGridInfos.allowSvgExport || subTask.getTaskParam('svgexport') || getUrlParameter('svgexport') || false;
+      subTask.allowSvgExport = levelGridInfos.allowSvgExport || subTask.getTaskParam('svgexport') || getUrlParameter('svgexport') || false;
 
       if (this.display) {
          if (window.quickAlgoInterface.loadUserTaskData)
@@ -89,10 +89,10 @@ var initBlocklySubTask = function(subTask, language) {
             hideControls: levelGridInfos.hideControls,
             introMaxHeight: levelGridInfos.introMaxHeight,
             canEditSubject: !!levelGridInfos.canEditSubject,
-            allowSvgExport: allowSvgExport
+            allowSvgExport: !!subTask.allowSvgExport
          });
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
-         if (allowSvgExport) {
+         if (subTask.allowSvgExport) {
             displayHelper.alwaysAskLevelChange = true;
          }
       }
@@ -717,7 +717,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       if (subTask.context.exportGridAsSvg) {
          // Use the library's function if exists
-         var svgSource = subTask.context.exportGridAsSvg();
+         var svgSource = subTask.context.exportGridAsSvg(subTask.allowSvgExport);
          if (!svgSource) { return; }
       } else {
          var svgSource = $('#grid svg');

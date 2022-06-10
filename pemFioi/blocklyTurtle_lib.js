@@ -553,7 +553,7 @@ var getContext = function(display, infos) {
    context.updateScale = function() {
    };
 
-   context.exportGridAsSvg = function (name) {
+   context.exportGridAsSvg = function (option) {
       if (!window.C2S) {
          console.error("Unable to export as SVG, canvas2svg library is not loaded.");
          return;
@@ -561,36 +561,40 @@ var getContext = function(display, infos) {
 
       var svgTurtle = context.turtle.svgTurtle;
       var svg = svgTurtle.drawingContext.getSvg();
+      // Remove leftover images from previous export
       var svgImages = svg.getElementsByTagName('image');
       for (var i = 0; i < svgImages.length; i++) {
          svgImages[i].remove();
       }
 
-      var bgimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-      bgimg.setAttribute('x', 0);
-      bgimg.setAttribute('y', 0);
-      bgimg.setAttribute('width', 300);
-      bgimg.setAttribute('height', 300);
-      bgimg.setAttribute('style', 'opacity: 0.4; filter: alpha(opacity=10);');
-      bgimg.setAttribute('xlink:href', context.infos.overlayFileName);
-      svg.prepend(bgimg);
+      if (option == 'full') {
+         // Make an export with the background and the turtle
+         var bgimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+         bgimg.setAttribute('x', 0);
+         bgimg.setAttribute('y', 0);
+         bgimg.setAttribute('width', 300);
+         bgimg.setAttribute('height', 300);
+         bgimg.setAttribute('style', 'opacity: 0.4; filter: alpha(opacity=10);');
+         bgimg.setAttribute('xlink:href', context.infos.overlayFileName);
+         svg.prepend(bgimg);
 
-      var turtleFileName = "turtle.svg";
-      if ($("#turtleImg").length > 0) {
-         turtleFileName = $("#turtleImg").attr("src");
-      }
+         var turtleFileName = "turtle.svg";
+         if ($("#turtleImg").length > 0) {
+            turtleFileName = $("#turtleImg").attr("src");
+         }
 
-      var turtleimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-      turtleimg.setAttribute('x', svgTurtle.x - 12);
-      turtleimg.setAttribute('y', svgTurtle.y - 15);
-      turtleimg.setAttribute('width', 22);
-      turtleimg.setAttribute('height', 27);
-      turtleimg.setAttribute('style', 'padding-right: 2px; padding-bottom: 3px;');
-      turtleimg.setAttribute('xlink:href', turtleFileName);
-      if (svgTurtle.direction) {
-         turtleimg.setAttribute('transform', "rotate(" + (-svgTurtle.directionDeg) + ", " + svgTurtle.x + ", " + svgTurtle.y + ")");
+         var turtleimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+         turtleimg.setAttribute('x', svgTurtle.x - 12);
+         turtleimg.setAttribute('y', svgTurtle.y - 15);
+         turtleimg.setAttribute('width', 22);
+         turtleimg.setAttribute('height', 27);
+         turtleimg.setAttribute('style', 'padding-right: 2px; padding-bottom: 3px;');
+         turtleimg.setAttribute('xlink:href', turtleFileName);
+         if (svgTurtle.direction) {
+            turtleimg.setAttribute('transform', "rotate(" + (-svgTurtle.directionDeg) + ", " + svgTurtle.x + ", " + svgTurtle.y + ")");
+         }
+         svg.append(turtleimg);
       }
-      svg.append(turtleimg);
 
       return svg;
    }
