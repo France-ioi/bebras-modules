@@ -744,7 +744,6 @@ var initBlocklySubTask = function(subTask, language) {
 
       function finalizeExport() {
          var data = svg[0].outerHTML;
-         console.log(data);
          data = new Blob([data], { type: 'image/svg+xml' });
          var objectURL = window.URL.createObjectURL(data);
 
