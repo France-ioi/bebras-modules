@@ -3,7 +3,7 @@
         Various utility functions for all modes.
 */
 
-var getUrlParameter = function getUrlParameter(sParam) {
+var getUrlParameter = function (sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1));
     var sURLVariables = sPageURL.split('&');
 
