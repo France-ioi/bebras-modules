@@ -1588,8 +1588,8 @@ var robotEndFunctionGenerator = {
 };
 
 if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('robot', getContext);
+   quickAlgoLibraries.register('crane', getContext);
 } else {
    if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['robot', getContext]);
+   window.quickAlgoLibrariesList.push(['crane', getContext]);
 }
