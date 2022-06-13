@@ -29,6 +29,7 @@ window.displayHelper = {
    stoppedShowingResult: false,
    previousMessages: {},
    popupMessageShown: false,
+   alwaysAskLevelChange: false,
 
    thresholds: {},
    // Legacy settings for old tasks ; new ones are expected to use thresholds
@@ -1548,8 +1549,13 @@ window.displayHelper = {
          }
       }
       var self = this;
+
       // Offer an option to stay on the task instead of forcing nextTask
-      var noButtonText = actionNext == "nextTask" ? this.strings.no : null;
+      var noButtonText = null;
+      if (this.alwaysAskLevelChange || actionNext == "nextTask") {
+         noButtonText = this.strings.no;
+      }
+
       this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
             // TODO: replace with something compatible with the API.

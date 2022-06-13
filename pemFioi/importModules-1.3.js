@@ -27,6 +27,7 @@ var importableModules = function () {
       'ace_language_tools': {src: modulesPath+"/ext/ace/ext-language_tools.js", id: "ace_language_tools"},
       'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
       'fonts-loader-1.0': {src: modulesPath+"/pemFioi/fontsLoader-1.0.js", id: "fonts-loader"},
+      'canvas2svg': { src: modulesPath + "/ext/canvas2svg/canvas2svg.js", id: "canvas2svg" },
 
       'prismjs': {src: modulesPath+"/ext/prismjs/prism.js", id: "prismjs"},
       'prismjs-css': {type: "stylesheet", src: modulesPath+"/ext/prismjs/prism.css", id: "prismjs-css"},

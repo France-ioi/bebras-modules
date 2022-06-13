@@ -52,6 +52,7 @@
          'papaparse': {src: modulesPath+"/ext/PapaParse/papaparse.js", id: "papaparse.js"}, // csv parser
          'chartjs': {src: modulesPath+"/ext/chartjs/Chart.min.js", id: "Chart.js"},
          'chartjs_styles': {type: "stylesheet", src: modulesPath+"/ext/chartjs/Chart.min.css", id: "Chart.css"},
+         'canvas2svg': { src: modulesPath + "/ext/canvas2svg/canvas2svg.js", id: "canvas2svg" },
 
          'showdown': {src: modulesPath+"/ext/showdown/showdown.min.js", id: "showdown"},
          'showdownConvert': {src: modulesPath+"/pemFioi/showdownConvert.js", id: "showdownConvert"},

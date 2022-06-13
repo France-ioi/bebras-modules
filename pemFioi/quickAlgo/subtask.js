@@ -29,6 +29,10 @@ var initBlocklySubTask = function(subTask, language) {
       language = "fr";
    }
 
+   subTask.getTaskParam = function (name) {
+      return subTask.taskParams && subTask.taskParams.options ? subTask.taskParams.options[name] : null;
+   }
+
    subTask.loadLevel = function(curLevel) {
       var levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
       subTask.levelGridInfos = levelGridInfos;
@@ -43,7 +47,7 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.state = {};
       subTask.iTestCase = 0;
       subTask.nbExecutions = 0;
-      subTask.logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
+      subTask.logOption = subTask.getTaskParam('log');
       subTask.clearWbe();
       if(!window.taskResultsCache) {
          window.taskResultsCache = {};
@@ -71,6 +75,8 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
+      subTask.allowSvgExport = levelGridInfos.allowSvgExport || subTask.getTaskParam('svgexport') || getUrlParameter('svgexport') || false;
+
       if (this.display) {
          if (window.quickAlgoInterface.loadUserTaskData)
             window.quickAlgoInterface.loadUserTaskData(levelGridInfos.userTaskData);
@@ -82,9 +88,13 @@ var initBlocklySubTask = function(subTask, language) {
             hasTestThumbnails: levelGridInfos.hasTestThumbnails,
             hideControls: levelGridInfos.hideControls,
             introMaxHeight: levelGridInfos.introMaxHeight,
-            canEditSubject: !!levelGridInfos.canEditSubject
+            canEditSubject: !!levelGridInfos.canEditSubject,
+            allowSvgExport: !!subTask.allowSvgExport
          });
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         if (subTask.allowSvgExport) {
+            displayHelper.alwaysAskLevelChange = true;
+         }
       }
 
       this.blocklyHelper.loadContext(this.context);
@@ -699,4 +709,76 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.srlStepByStepLog = function(type) {
       SrlLogger.stepByStep(subTask, type);
    };
+
+   subTask.exportGridAsSvg = function (name) {
+      // Exports the current grid as a SVG file
+      // We need to embed all images
+      if (!name) name = 'export';
+
+      if (subTask.context.exportGridAsSvg) {
+         // Use the library's function if exists
+         var svgSource = subTask.context.exportGridAsSvg(subTask.allowSvgExport);
+         if (!svgSource) { return; }
+      } else {
+         var svgSource = $('#grid svg');
+         if (!svgSource.length) { return; }
+         svgSource = svgSource[0];
+      }
+      var svg = $(svgSource.outerHTML);
+
+      var imagesToFetch = [];
+      var hrefsToReplace = {};
+      var svgImages = svg.find('image');
+      for (var i = 0; i < svgImages.length; i++) {
+         var image = $(svgImages[i]);
+         var url = image.attr('xlink:href');
+         if (url && url.substr(0, 5) != 'data:') {
+            if (arrayContains(imagesToFetch, url)) {
+               hrefsToReplace[url].push(image);
+            } else {
+               imagesToFetch.push(url);
+               hrefsToReplace[url] = [image];
+            }
+         }
+      }
+
+      function finalizeExport() {
+         var data = svg[0].outerHTML;
+         data = new Blob([data], { type: 'image/svg+xml' });
+         var objectURL = window.URL.createObjectURL(data);
+
+         var anchor = $("<a href='" + objectURL + "' download='" + name + "'.svg'>&nbsp;</a>");
+         anchor[0].click();
+      }
+
+      if (!imagesToFetch.length) {
+         finalizeExport();
+         return;
+      }
+
+      function fetchImage(url) {
+         var xhr = new XMLHttpRequest();
+         xhr.responseType = 'arraybuffer';
+         xhr.open('GET', url);
+         xhr.onload = function () {
+            var mime = xhr.getResponseHeader('Content-Type');
+            var codes = new Uint8Array(xhr.response);
+            var bin = String.fromCharCode.apply(null, codes);
+            var encodedData = 'data:' + mime + ';base64,' + btoa(bin);
+            for (var j = 0; j < hrefsToReplace[url].length; j++) {
+               hrefsToReplace[url][j].attr('xlink:href', encodedData);
+            }
+            imagesDone++;
+            if (imagesDone >= imagesToFetch.length) {
+               setTimeout(finalizeExport, 0);
+            }
+         };
+         xhr.send();
+      }
+
+      var imagesDone = 0;
+      for (var i = 0; i < imagesToFetch.length; i++) {
+         fetchImage(imagesToFetch[i]);
+      }
+   }
 }
