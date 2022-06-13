@@ -106,6 +106,26 @@ var getContext = function(display, infos, curLevel) {
             stroke: "black",
             fill: "none"
          },
+         craneAttr: {
+            wheelsPosY: 13, // for line clip
+            wheelsOffsetX: 12.5,
+            wheelsW: 85,
+            wheelsH: 60,
+            clawsAxisPos: 33,
+            clawsPos: 27,
+            clawW: 40,
+            clawH: 33,
+            clawOffset: 5,
+            clutchAngle: 20,
+            craneItemOffset: 10
+         },
+         craneSrc: {
+            rail: imgPath+"crane/rail.png",
+            wheels: imgPath+"crane/wheels.png",
+            line: imgPath+"crane/line.png",
+            leftClaw: imgPath+"crane/left_claw.png",
+            rightClaw: imgPath+"crane/right_claw.png"
+         },
          itemTypes: {
             circle: { num: 2, img: imgPath+"card_roundDotted.png", side: 60, isMovable: true, zOrder: 1 },
             square: { num: 3, img: imgPath+"card_squareQuadrille.png", side: 60, isMovable: true, zOrder: 1},
@@ -113,14 +133,128 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.dev
       },
+      sciFi: {
+         backgroundElements: [
+            { 
+               img: "background.png",
+               width: 1,   // % of total width if relative
+               height: 1,
+               x: 0,
+               y: 0,
+               relative: true
+            },
+            { 
+               img: "cloud_1.png",
+               width: 200*0.7,
+               height: 50*0.7,
+               x: 0.8,
+               y: 0.3
+            },
+            { 
+               img: "cloud_2.png",
+               width: 225*0.7,
+               height: 103*0.7,
+               x: -0.1,
+               y: 0.1
+            },
+            { 
+               img: "cloud_3.png",
+               width: 117*0.7,
+               height: 41*0.7,
+               x: 0.4,
+               y: 0.8
+            },
+         ],
+         cellAttr: {
+            stroke: "#525252",
+            "stroke-width": 0.2,
+            fill: "none"
+         },
+         contAttr: {
+            stroke: "white",
+            "stroke-width": 0,
+            fill: "lightgrey"
+         },
+         contOutlineAttr: {
+            "stroke-width": 3,
+            stroke: "black",
+            fill: "none"
+         },
+         labelFrameAttr: {
+            stroke: "none",
+            fill: "#043565",
+            r: 3
+         },
+         labelAttr: {
+            fill: "white",
+            "font-weight": "bold"
+         },
+         labelSize: 0.3, // % of cellSize
+         labelFrameSize: 0.5,
+         craneAttr: {
+            wheelsPosY: 13, // for line clip
+            wheelsOffsetX: -30,
+            wheelsOffsetY: 2,
+            wheelsW: 120,
+            wheelsH: 42,
+            shaftW: 13,
+            shaftH: 17,
+            shaftOffsetY: 50,
+            shaftOffsetX: 23.5,
+            clawW: 20,
+            clawH: 24,
+            clawsOffsetY: 56,
+            leftClawOffsetX: 11,
+            rightClawOffsetX: 29,
+            leftClawCx: 27,
+            leftClawCy: 60,
+            rightClawCx: 33,
+            rightClawCy: 60,
+            clutchAngle: 30,
+            craneItemOffset: 12
+         },
+         craneSrc: {
+            rail: imgPath+"crane/rail.png",
+            wheels: "crane_wheels.png",
+            line: "crane_line.png",
+            leftClaw: "crane_left_claw_open.png",
+            rightClaw: "crane_right_claw_open.png",
+            shaft: "crane_shaft.png",
+         },
+         craneZOrder: {
+            wheels: 1,
+            line: 0,
+            leftClaw: 2,
+            rightClaw: 0,
+            shaft: 1,
+            item: 1
+         },
+         itemTypes: {
+            tower_1: { num: 2, img: "tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 28 },
+            tower_2: { num: 3, img: "tower_2.png", side: 60, isMovable: true, zOrder: 1 },
+            tower_3: { num: 4, img: "tower_3.png", side: 60, isMovable: true, zOrder: 1},
+            tower_4: { num: 5, img: "tower_4.png", side: 60, isMovable: true, zOrder: 1},
+            tower_5: { num: 6, img: "tower_5.png", side: 60, isMovable: true, zOrder: 1},
+            tower_6: { num: 7, img: "tower_6.png", side: 60, isMovable: true, zOrder: 1},
+            tower_7: { num: 8, img: "tower_7.png", side: 60, isMovable: true, zOrder: 1},
+            tower_8: { num: 9, img: "tower_8.png", side: 60, isMovable: true, zOrder: 1},
+            tower_9: { num: 10, img: "tower_9.png", side: 60, isMovable: true, zOrder: 1},
+            tower_10: { num: 11, img: "tower_10.png", side: 60, isMovable: true, zOrder: 1},
+            tower_11: { num: 12, img: "tower_11.png", side: 60, isMovable: true, zOrder: 1},
+            tower_12: { num: 13, img: "tower_12.png", side: 60, isMovable: true, zOrder: 1},
+         },
+         checkEndCondition: robotEndConditions.dev
+      },
    };
 
 
-   var craneRailSrc = imgPath+"crane/rail.png";
-   var craneWheelsSrc = imgPath+"crane/wheels.png";
-   var craneLineSrc = imgPath+"crane/line.png";
-   var craneLeftClawSrc = imgPath+"crane/left_claw.png";
-   var craneRightClawSrc = imgPath+"crane/right_claw.png";
+   // var craneRailSrc = imgPath+"crane/rail.png";
+   // var craneWheelsSrc = imgPath+"crane/wheels.png";
+   // var craneLineSrc = imgPath+"crane/line.png";
+   // var craneLeftClawSrc = imgPath+"crane/left_claw.png";
+   // var craneRightClawSrc = imgPath+"crane/right_claw.png";
+   // var cloudSrc = imgPath+"crane/cloud.png";
+
 
    var iconSrc = $("img[src$='icon.png']").attr("src");
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
@@ -243,18 +377,29 @@ var getContext = function(display, infos, curLevel) {
    var rowsLabels = [];
    var contLabels = [];
    var contOutline;
-   // var cardLabels = [];
 
    var crane = {};
    var craneH = 1.5; // as rows
-   var craneWheelsPos = 13; 
-   var craneClawsAxisPos = 33; 
-   var craneClawsPos = 27; 
-   var craneClawW = 40;
-   var craneClawH = 33;
-   var craneClawOffset = 5;
-   var clutchAngle = 20;
-   var craneItemOffset = 10;
+   var { 
+      wheelsPosY, 
+      wheelsOffsetX, wheelsOffsetY, 
+      wheelsW, 
+      wheelsH,
+      shaftW, shaftH,
+      shaftOffsetY, shaftOffsetX,
+      clawW, clawH, 
+      clawsOffsetY,
+      leftClawOffsetX, rightClawOffsetX,
+      leftClawCx, leftClawCy,
+      rightClawCx, rightClawCy,
+      clutchAngle, 
+      craneItemOffset } = infos.craneAttr;
+   // var { 
+   //    craneRailSrc, 
+   //    craneWheelsSrc, 
+   //    craneLineSrc, 
+   //    craneLeftClawSrc, 
+   //    craneRightClawSrc } = infos.craneSrc;
 
    context.highlightAttr = {
       stroke: "red",
@@ -491,62 +636,96 @@ var getContext = function(display, infos, curLevel) {
       var nbRows = Math.max(context.nbRows,nbRowsCont);
 
       var x = infos.leftMargin*scale + w*cranePos;
+      var xWheels = x + wheelsOffsetX*scale;
+      var yWheels = y + wheelsOffsetY*scale;
 
       var lineH = nbRows + craneH;
       var y0Line = infos.topMargin*scale;
-      var yLineClip1 = (infos.topMargin + craneWheelsPos)*scale;
-      var yLineClip2 = (infos.topMargin + craneClawsAxisPos)*scale;
+      var yLineClip1 = (infos.topMargin + wheelsPosY)*scale;
+      var yLineClip2 = (infos.topMargin + shaftOffsetY + 2)*scale;
       var hClip = yLineClip2 - yLineClip1;
       var lineClip = [x,yLineClip1,w,hClip];
 
-      var xLeftClaw = x - craneClawOffset*scale;
-      var xRightClaw = x + w + (craneClawOffset - craneClawW)*scale;
-      var yClaws = (infos.topMargin + craneClawsPos)*scale;
+      var xShaft = x + shaftOffsetX*scale;
+      var yShaft = y + shaftOffsetY*scale;
 
-      var cx = x + w/2;
-      var cy = yLineClip2;
+      var xLeftClaw = x + leftClawOffsetX*scale;
+      var xRightClaw = x + rightClawOffsetX*scale;
+      var yClaws = (infos.topMargin + clawsOffsetY)*scale;
 
-      return { x, y, w, h, y0Line, lineClip, yClaws, xLeftClaw, xRightClaw, cx, cy }
+      // var cx = x + w/2;
+      // var cy = yLineClip2;
+      var cxLeft = x + leftClawCx*scale;
+      var cyLeft = y + leftClawCy*scale;
+      var cxRight = x + rightClawCx*scale;
+      var cyRight = y + rightClawCy*scale;
+
+      return { x, y, w, h, xWheels, yWheels, y0Line, lineClip, 
+         xShaft, yShaft, yClaws, xLeftClaw, xRightClaw, 
+         cxLeft, cyLeft, cxRight, cyRight }
    };
 
    function setCraneAttr(attr) {
       var cSide = infos.cellSide;
       var x = attr.x, y = attr.y;
       var width = attr.w, height = attr.h;
-      crane.wheels.attr({ x, y, width, height });
+      crane.wheels.attr({ x: attr.xWheels, y: attr.yWheels, width: wheelsW*scale, height: wheelsH*scale });
       for(var iRow = 0; iRow < crane.line.length; iRow++){
          var yLine = attr.y0Line + iRow*cSide*scale;
          crane.line[iRow].attr({x, y: yLine, width, height });
       }
       crane.line.attr("clip-rect",attr.lineClip);
+      crane.shaft.attr({
+         x: attr.xShaft, 
+         y: attr.yShaft, 
+         width: shaftW*scale, 
+         height: shaftH*scale 
+      })
       crane.leftClaw.attr({ 
          x: attr.xLeftClaw, 
          y: attr.yClaws, 
-         width: craneClawW*scale, 
-         height: craneClawH*scale 
+         width: clawW*scale, 
+         height: clawH*scale 
       });
       crane.rightClaw.attr({ 
          x: attr.xRightClaw, 
          y: attr.yClaws, 
-         width: craneClawW*scale, 
-         height: craneClawH*scale 
+         width: clawW*scale, 
+         height: clawH*scale 
       });
 
       if(context.craneContent){
          var item = context.craneContent;
+         // console.log(item)
          var angle = clutchAngle;
-         crane.leftClaw.transform(["R",-angle,attr.cx,attr.cy]);
-         crane.rightClaw.transform(["R",angle,attr.cx,attr.cy]);
+         crane.leftClaw.transform(["R",-angle,attr.cxLeft,attr.cyLeft]);
+         crane.rightClaw.transform(["R",angle,attr.cxRight,attr.cyRight]);
          var elem = item.element;
-         var newY = (infos.topMargin + craneClawsPos + craneItemOffset + item.offsetY)*scale;
-         elem.attr({ x, y: newY }).toFront();
+         var newY = attr.yClaws + (craneItemOffset + item.offsetY)*scale;
+         if(item.catchOffsetY){
+            newY -= item.catchOffsetY*scale;
+         }
+         elem.attr({ x, y: newY });
       }else{
          crane.leftClaw.transform("");
          crane.rightClaw.transform("");
       }
+      // crane.wheels.toFront();
+      // crane.leftClaw.toFront();
+      resetCraneZOrder();
    };
    
    var resetBoard = function() {
+      if(infos.backgroundElements && infos.backgroundElements.length > 0){
+         var bgElem = infos.backgroundElements;
+         context.background = [];
+         for(var elem of bgElem){
+            if(elem.img){
+               context.background.push(paper.image(elem.img,0,0,0,0));
+            }
+         }
+         // context.background = paper.rect(0,0,0,0).attr(backgroundAttr);
+      }
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
@@ -577,7 +756,14 @@ var getContext = function(display, infos, curLevel) {
             }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
+            if(!infos.labelFrameAttr){
+               colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
+            }else{
+               // colsLabels[iCol] = paper.set();
+               var frame = paper.rect(0,0,0,0).attr(infos.labelFrameAttr);
+               var text = paper.text(0, 0, (iCol + 1));
+               colsLabels[iCol] = [frame,text];
+            }
          }
       }
       if(infos.showContLabels) {
@@ -595,21 +781,23 @@ var getContext = function(display, infos, curLevel) {
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
-
+      var src = infos.craneSrc;
       crane.rail = paper.set();
       for(var iCol = 0; iCol < nbCol; iCol++){
-         crane.rail.push(paper.image(craneRailSrc,0,0,0,0));
+         crane.rail.push(paper.image(src.rail,0,0,0,0));
       }
       paper.setStart();
-      crane.wheels = paper.image(craneWheelsSrc,0,0,0,0);
+      crane.wheels = paper.image(src.wheels,0,0,0,0);
       var lineH = nbRows + craneH;
       crane.line = paper.set();
       for(var iRow = 0; iRow < lineH; iRow++){
-         crane.line.push(paper.image(craneLineSrc,0,0,0,0));
+         crane.line.push(paper.image(src.line,0,0,0,0));
       }
-      crane.leftClaw = paper.image(craneLeftClawSrc,0,0,0,0);
-      crane.rightClaw = paper.image(craneRightClawSrc,0,0,0,0);
+      crane.leftClaw = paper.image(src.leftClaw,0,0,0,0);
+      crane.rightClaw = paper.image(src.rightClaw,0,0,0,0);
+      crane.shaft = paper.image(src.shaft,0,0,0,0);
       crane.all = paper.setFinish();
+      resetCraneZOrder();
    };
    
    var resetItem = function(initItem, redisplay) {
@@ -724,6 +912,21 @@ var getContext = function(display, infos, curLevel) {
       }
    }; 
 
+   var resetCraneZOrder = function() {
+      // console.log("resetZOrder")
+      var elem = [];
+      for(var elemName in infos.craneZOrder) {
+         var val = infos.craneZOrder[elemName];
+         if(context.craneContent && elemName == "item"){
+            var obj = context.craneContent.element;
+         }else{
+            var obj = crane[elemName];
+         }
+         elem.push({ zOrder: val, element: obj });
+      }
+      sortCellItems(elem);
+   };
+
    var redisplayItem = function(item, resetZOrder) {
       if(context.display !== true)
          return;
@@ -824,6 +1027,30 @@ var getContext = function(display, infos, curLevel) {
       var paperHeight = (cSide * (nbRows + craneH) + infos.topMargin + infos.bottomMargin)* scale;
       paper.setSize(paperWidth, paperHeight);
 
+      var x0 = infos.leftMargin*scale;
+      var y0 = (infos.topMargin + craneH*cSide)*scale;
+
+      if(infos.backgroundElements && infos.backgroundElements.length > 0){
+         var bgElem = infos.backgroundElements;
+         var gridWidth = nbCol*cSide*scale;
+         var gridHeight = nbRows*cSide*scale;
+         var clipRect = [x0,y0,gridWidth,gridHeight];
+         for(var iElem = 0; iElem < bgElem.length; iElem++){
+            var dat = bgElem[iElem];
+            var obj = context.background[iElem];
+            // var x = infos.leftMargin*scale + dat.x*gridWidth;
+            var x = dat.x*paperWidth;
+            // var y = (infos.topMargin + craneH*cSide)*scale + dat.y*gridHeight;
+            var y = dat.y*paperHeight;
+            // var width = (dat.relative) ? dat.width*gridWidth : dat.width*scale;
+            var width = (dat.relative) ? dat.width*paperWidth : dat.width*scale;
+            // var height = (dat.relative) ? dat.height*gridHeight : dat.height*scale;
+            var height = (dat.relative) ? dat.height*paperHeight : dat.height*scale;
+            // obj.attr({ x, y, width, height,"clip-rect": clipRect });
+            obj.attr({ x, y, width, height });
+         }
+      }
+
       for(var iRow = 0;iRow < nbRows;iRow++) {
          for(var iCol = 0;iCol < nbCol;iCol++) {
             if(cells[iRow][iCol] === undefined)
@@ -843,24 +1070,35 @@ var getContext = function(display, infos, curLevel) {
       }
       var textFontSize = {"font-size": cSide * scale / 2};
       if(infos.showLabels) {
+         var labelAttr = infos.labelAttr || textFontSize;
          if(infos.rowLabelEnabled){
             for(var iRow = 0;iRow < context.nbRows;iRow++) {
                var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
                var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin) * scale;
-               rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
+               rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
             }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var x = (cSide * (iCol + nbColCont) + infos.leftMargin + cSide / 2) * scale;
             var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin) * scale;
-            colsLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
+            if(!infos.labelFrameAttr){
+               colsLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
+            }else{
+               var frSize = infos.labelFrameSize*cSide*scale;
+               var labelSize = infos.labelSize*cSide*scale;
+               var xFr = x - frSize/2;
+               var yFr = y - frSize/2;
+               var yLabel = yFr + frSize/2;
+               colsLabels[iCol][0].attr({x: xFr, y: yFr, width: frSize, height: frSize});
+               colsLabels[iCol][1].attr({x, y, "font-size": labelSize}).attr(labelAttr);
+            }
          }
       }
       if(infos.showContLabels) {
          for(var iCol = 0;iCol < nbColCont;iCol++) {
             var x = (cSide * iCol + infos.leftMargin + cSide / 2) * scale;
             var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin) * scale;
-            contLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
+            contLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
          }
       }
       // console.log("updateScale")
@@ -1027,7 +1265,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.take = function(callback) {
-      // console.log("take",context.display)
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
       }
@@ -1048,6 +1285,7 @@ var getContext = function(display, infos, curLevel) {
       context.craneContent = withdrawable;
       
       if(context.display) {
+         resetCraneZOrder();
          if(context.animate){
             context.takeAnim(topBlock,callback);
          }else{
@@ -1057,13 +1295,13 @@ var getContext = function(display, infos, curLevel) {
       }
 
       // context.advanceTime(1);
-      if(callback && !context.display){
+      if(callback && (!context.display || !context.animate)){
          context.waitDelay(callback);
       }
    };
 
    context.drop = function(callback) {
-      console.log(context.runner)
+      // console.log(context.runner)
       // console.log("drop")
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
@@ -1091,7 +1329,9 @@ var getContext = function(display, infos, curLevel) {
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
          }
-      }else if(callback){
+      }
+
+      if(callback && (!context.display || !context.animate)){
          context.waitDelay(callback);
       }
    };
@@ -1100,67 +1340,80 @@ var getContext = function(display, infos, curLevel) {
       var craneAttr = getCraneAttr();
       var delay = infos.actionDelay*(topBlock.row + 1);
       var itemAttr = itemAttributes(topBlock);
-      var yClawDown = itemAttr.y - craneItemOffset*scale;
+
+      var catchOffsetY = topBlock.catchOffsetY || 0;
+      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
       var deltaY = yClawDown - craneAttr.yClaws;
+      var yShaftDown = craneAttr.yShaft + deltaY;
       var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
       lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
-      var cyDown = craneAttr.cy + deltaY;
-      var itemY = (infos.topMargin + craneClawsPos + craneItemOffset + topBlock.offsetY)*scale;
+      var cyLeftDown = craneAttr.cyLeft + deltaY;
+      var cyRightDown = craneAttr.cyRight + deltaY;
+      var itemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY)*scale;
 
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
       var animClawDown = new Raphael.animation({ y: yClawDown },delay);
-      var animClawDownEnd = new Raphael.animation({ y: yClawDown },delay,function() {
+      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
          context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
          context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
          
       });
-      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cx,cyDown] },infos.actionDelay);
-      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cx,cyDown] },infos.actionDelay,function() {
+      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
+      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
          context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+         context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
          context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
          context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
          context.raphaelFactory.animate("animCrane_item_up" + Math.random(), topBlock.element, animItemUp);
       });
       var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
-      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",clutchAngle,craneAttr.cx,craneAttr.cy] },delay);
-      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",-clutchAngle,craneAttr.cx,craneAttr.cy] },delay);
+      var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
+      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",clutchAngle,craneAttr.cxRight,craneAttr.cyRight] },delay);
+      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",-clutchAngle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
       var animItemUp = new Raphael.animation({ y: itemY },delay,function() {
          if(callback){
             context.waitDelay(callback);
-            // callback();
          }
       });
 
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
-      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDownEnd);
+      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
+      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
    };
 
    context.dropAnim = function(item,callback) {
       var craneAttr = getCraneAttr();
       var delay = infos.actionDelay*(item.row + 1);
       var itemAttr = itemAttributes(item);
-      var yClawDown = itemAttr.y - craneItemOffset*scale;
+
+      var catchOffsetY = item.catchOffsetY || 0;
+      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
       var deltaY = yClawDown - craneAttr.yClaws;
+      var yShaftDown = craneAttr.yShaft + deltaY;
       var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
       lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
-      var cyDown = craneAttr.cy + deltaY;
-      // var itemY = (infos.topMargin + craneClawsPos + craneItemOffset + topBlock.offsetY)*scale;
+      var cyLeftDown = craneAttr.cyLeft + deltaY;
+      var cyRightDown = craneAttr.cyRight + deltaY;
+      // var itemY = (infos.topMargin + clawsPos + craneItemOffset + topBlock.offsetY)*scale;
 
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
-      var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cx,cyDown] },delay);
-      var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cx,cyDown] },delay);
+      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay);
+      var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },delay);
+      var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },delay);
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       });
-      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cx,cyDown] },infos.actionDelay);
-      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cx,cyDown] },infos.actionDelay,function() {
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
          context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+         context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
          context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
          context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
       });
       var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
       var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
       var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,function() {
          if(callback){
@@ -1169,6 +1422,7 @@ var getContext = function(display, infos, curLevel) {
       });
 
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
@@ -1190,12 +1444,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.moveCrane = function(newCol, callback) {
-      if (context.display) {
-         crane.all.toFront();
-         if(context.craneContent){
-            context.craneContent.element.toFront();
-         }
-      }
       var animate = (context.cranePos != newCol);
       
       var oldPos = context.cranePos;
@@ -1205,13 +1453,15 @@ var getContext = function(display, infos, curLevel) {
          var craneAttr = getCraneAttr();
          if(infos.actionDelay > 0) {
             if(animate && context.animate) {
-               var anim = new Raphael.animation({ x: craneAttr.x },infos.actionDelay);
+               var anim = new Raphael.animation({ x: craneAttr.xWheels },infos.actionDelay);
                var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },infos.actionDelay);
+               var animShaft = new Raphael.animation({ x: craneAttr.xShaft },infos.actionDelay);
                var angle = (context.craneContent) ? clutchAngle : 0;
-               var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cx,craneAttr.cy] },infos.actionDelay);
-               var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cx,craneAttr.cy] },infos.actionDelay);
+               var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
+               var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
                context.raphaelFactory.animate("animCrane_wheels_" + Math.random(), crane.wheels, anim);
                context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
+               context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.shaft, animShaft);
                context.raphaelFactory.animate("animCrane_leftClaw_" + Math.random(), crane.leftClaw, animLeftClaw);
                context.raphaelFactory.animate("animCrane_rightClaw_" + Math.random(), crane.rightClaw, animRightClaw);
                if(context.craneContent){
