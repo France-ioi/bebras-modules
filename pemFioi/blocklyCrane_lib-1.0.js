@@ -134,37 +134,37 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.dev
       },
       sciFi: {
-         backgroundElements: [
-            { 
-               img: "assets/background.png",
-               width: 1,   // % of total width if relative
-               height: 1,
-               x: 0,
-               y: 0,
-               relative: true
-            },
-            { 
-               img: "assets/cloud_1.png",
-               width: 200*0.7,
-               height: 50*0.7,
-               x: 0.8,
-               y: 0.3
-            },
-            { 
-               img: "assets/cloud_2.png",
-               width: 225*0.7,
-               height: 103*0.7,
-               x: -0.1,
-               y: 0.1
-            },
-            { 
-               img: "assets/cloud_3.png",
-               width: 117*0.7,
-               height: 41*0.7,
-               x: 0.4,
-               y: 0.8
-            },
-         ],
+         // backgroundElements: [
+         //    { 
+         //       img: "assets/background.png",
+         //       width: 1,   // % of total width if relative
+         //       height: 1,
+         //       x: 0,
+         //       y: 0,
+         //       relative: true
+         //    },
+         //    { 
+         //       img: "assets/cloud_1.png",
+         //       width: 200*0.7,
+         //       height: 50*0.7,
+         //       x: 0.8,
+         //       y: 0.3
+         //    },
+         //    { 
+         //       img: "assets/cloud_2.png",
+         //       width: 225*0.7,
+         //       height: 103*0.7,
+         //       x: -0.1,
+         //       y: 0.1
+         //    },
+         //    { 
+         //       img: "assets/cloud_3.png",
+         //       width: 117*0.7,
+         //       height: 41*0.7,
+         //       x: 0.4,
+         //       y: 0.8
+         //    },
+         // ],
          cellAttr: {
             stroke: "#525252",
             "stroke-width": 0.2,
@@ -193,7 +193,7 @@ var getContext = function(display, infos, curLevel) {
          labelFrameSize: 0.5,
          craneAttr: {
             wheelsPosY: 13, // for line clip
-            wheelsOffsetX: -30,
+            wheelsOffsetX: -45,
             wheelsOffsetY: 2,
             wheelsW: 120,
             wheelsH: 42,
