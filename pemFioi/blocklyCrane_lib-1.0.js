@@ -136,7 +136,7 @@ var getContext = function(display, infos, curLevel) {
       sciFi: {
          backgroundElements: [
             { 
-               img: "background.png",
+               img: "assets/background.png",
                width: 1,   // % of total width if relative
                height: 1,
                x: 0,
@@ -144,21 +144,21 @@ var getContext = function(display, infos, curLevel) {
                relative: true
             },
             { 
-               img: "cloud_1.png",
+               img: "assets/cloud_1.png",
                width: 200*0.7,
                height: 50*0.7,
                x: 0.8,
                y: 0.3
             },
             { 
-               img: "cloud_2.png",
+               img: "assets/cloud_2.png",
                width: 225*0.7,
                height: 103*0.7,
                x: -0.1,
                y: 0.1
             },
             { 
-               img: "cloud_3.png",
+               img: "assets/cloud_3.png",
                width: 117*0.7,
                height: 41*0.7,
                x: 0.4,
@@ -215,11 +215,11 @@ var getContext = function(display, infos, curLevel) {
          },
          craneSrc: {
             rail: imgPath+"crane/rail.png",
-            wheels: "crane_wheels.png",
-            line: "crane_line.png",
-            leftClaw: "crane_left_claw_open.png",
-            rightClaw: "crane_right_claw_open.png",
-            shaft: "crane_shaft.png",
+            wheels: "assets/crane_wheels.png",
+            line: "assets/crane_line.png",
+            leftClaw: "assets/crane_left_claw_open.png",
+            rightClaw: "assets/crane_right_claw_open.png",
+            shaft: "assets/crane_shaft.png",
          },
          craneZOrder: {
             wheels: 1,
@@ -230,18 +230,18 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            tower_1: { num: 2, img: "tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 28 },
-            tower_2: { num: 3, img: "tower_2.png", side: 60, isMovable: true, zOrder: 1 },
-            tower_3: { num: 4, img: "tower_3.png", side: 60, isMovable: true, zOrder: 1},
-            tower_4: { num: 5, img: "tower_4.png", side: 60, isMovable: true, zOrder: 1},
-            tower_5: { num: 6, img: "tower_5.png", side: 60, isMovable: true, zOrder: 1},
-            tower_6: { num: 7, img: "tower_6.png", side: 60, isMovable: true, zOrder: 1},
-            tower_7: { num: 8, img: "tower_7.png", side: 60, isMovable: true, zOrder: 1},
-            tower_8: { num: 9, img: "tower_8.png", side: 60, isMovable: true, zOrder: 1},
-            tower_9: { num: 10, img: "tower_9.png", side: 60, isMovable: true, zOrder: 1},
-            tower_10: { num: 11, img: "tower_10.png", side: 60, isMovable: true, zOrder: 1},
-            tower_11: { num: 12, img: "tower_11.png", side: 60, isMovable: true, zOrder: 1},
-            tower_12: { num: 13, img: "tower_12.png", side: 60, isMovable: true, zOrder: 1},
+            tower_1: { num: 2, img: "assets/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 28 },
+            tower_2: { num: 3, img: "assets/tower_2.png", side: 60, isMovable: true, zOrder: 1 },
+            tower_3: { num: 4, img: "assets/tower_3.png", side: 60, isMovable: true, zOrder: 1},
+            tower_4: { num: 5, img: "assets/tower_4.png", side: 60, isMovable: true, zOrder: 1},
+            tower_5: { num: 6, img: "assets/tower_5.png", side: 60, isMovable: true, zOrder: 1},
+            tower_6: { num: 7, img: "assets/tower_6.png", side: 60, isMovable: true, zOrder: 1},
+            tower_7: { num: 8, img: "assets/tower_7.png", side: 60, isMovable: true, zOrder: 1},
+            tower_8: { num: 9, img: "assets/tower_8.png", side: 60, isMovable: true, zOrder: 1},
+            tower_9: { num: 10, img: "assets/tower_9.png", side: 60, isMovable: true, zOrder: 1},
+            tower_10: { num: 11, img: "assets/tower_10.png", side: 60, isMovable: true, zOrder: 1},
+            tower_11: { num: 12, img: "assets/tower_11.png", side: 60, isMovable: true, zOrder: 1},
+            tower_12: { num: 13, img: "assets/tower_12.png", side: 60, isMovable: true, zOrder: 1},
          },
          checkEndCondition: robotEndConditions.dev
       },
