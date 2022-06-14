@@ -81,7 +81,13 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    };
-   
+
+   var iconSrc = $("img[src$='icon.png']").attr("src");
+   var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
+   function imgUrlWithPrefix(url) {
+      return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
+   }
+
    var contextParams = {
       none: {
          hideSaveOrLoad: true,
@@ -215,11 +221,11 @@ var getContext = function(display, infos, curLevel) {
          },
          craneSrc: {
             rail: imgPath+"crane/rail.png",
-            wheels: "assets/crane_wheels.png",
-            line: "assets/crane_line.png",
-            leftClaw: "assets/crane_left_claw_open.png",
-            rightClaw: "assets/crane_right_claw_open.png",
-            shaft: "assets/crane_shaft.png",
+            wheels: imgUrlWithPrefix("assets/crane_wheels.png"),
+            line: imgUrlWithPrefix("assets/crane_line.png"),
+            leftClaw: imgUrlWithPrefix("assets/crane_left_claw_open.png"),
+            rightClaw: imgUrlWithPrefix("assets/crane_right_claw_open.png"),
+            shaft: imgUrlWithPrefix("assets/crane_shaft.png"),
          },
          craneZOrder: {
             wheels: 1,
@@ -255,12 +261,6 @@ var getContext = function(display, infos, curLevel) {
    // var craneRightClawSrc = imgPath+"crane/right_claw.png";
    // var cloudSrc = imgPath+"crane/cloud.png";
 
-
-   var iconSrc = $("img[src$='icon.png']").attr("src");
-   var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
-   function imgUrlWithPrefix(url) {
-      return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
-   }
    
    if(infos.newBlocks == undefined)
       infos.newBlocks = [];
