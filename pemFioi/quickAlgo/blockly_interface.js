@@ -142,6 +142,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
             }
+            if(options.disable !== undefined) { wsConfig.disable = options.disable; }
 
             // Clean events if the previous unload wasn't done properly
             Blockly.removeEvents();
@@ -382,7 +383,9 @@ function getBlocklyInterface(maxBlocks, subTask) {
                }
             }
             this.onChangeResetDisplay();
-            this.subTask.onChange();
+            if(this.subTask) {
+               this.subTask.onChange();
+            }
          } else {
             Blockly.svgResize(this.workspace);
          }
@@ -495,7 +498,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             // subject title when edition is enabled...
             var additional = {};
 
-            if (this.quickAlgoInterface.saveAdditional)
+            if (this.quickAlgoInterface && this.quickAlgoInterface.saveAdditional)
                this.quickAlgoInterface.saveAdditional(additional);
 
             var additionalNode = document.createElement("additional");
