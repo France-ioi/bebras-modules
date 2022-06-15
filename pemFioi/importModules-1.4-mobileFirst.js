@@ -243,6 +243,21 @@
             'quickAlgo_context',
             'quickAlgo_css'
          ],
+         blockly_codecast: [
+            'acorn',
+            'acorn-walk',
+            'interpreter',
+            'blockly',
+            'blockly_blocks',
+            'blockly_javascript',
+            'blockly_python',
+            'blockly_' + strLang,
+            'blockly_fioi',
+            'quickAlgo_utils',
+            'quickAlgo_i18n',
+            'quickAlgo_blockly_blocks',
+            'quickAlgo_blockly_interface',
+         ],
          scratch: [
             'acorn',
             'acorn-walk',
