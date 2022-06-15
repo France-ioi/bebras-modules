@@ -261,7 +261,7 @@
          {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
          {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
          {name: 'python-analysis', languages: ['python'], included: ['react', 'react_dom', 'immutable', 'codecast_analysis', 'codecast_python_stack_view_container', 'codecast_python_function_header', 'codecast_python_function_locals', 'codecast_python_function_view', 'codecast_python_stack_view', 'codecast_python_variable', 'codecast_python_variable_value', 'codecast_css']},
-         {name: 'codecast-7.0', included: ['codecast7.0_css', 'codecast7.0_js', 'codecast7.0_loader']}
+         { name: 'codecast-7.0', included: ['codecast7.0_css', 'codecast7.0_js', 'codecast7.0_loader'] },
          {name: 'codecast-7.1', included: ['codecast7.1_css', 'codecast7.1_js', 'codecast7.1_loader']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
