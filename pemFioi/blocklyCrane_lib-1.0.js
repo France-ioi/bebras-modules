@@ -42,17 +42,23 @@ var getContext = function(display, infos, curLevel) {
                left: "déplacer vers la gauche",
                right: "déplacer vers la droite",
                take: "prendre",
-               drop: "déposer"               
+               drop: "poser",
+               colHeight: "hauteur de la colonne",
+               placeMarker: "Placer le marqueur n°",             
+               goToMarker: "Aller au marqueur n°"             
             },
             code: {
-               left: "deplacerGauche",
-               right: "deplacerDroite",
+               left: "gauche",
+               right: "droite",
                take: "prendre",
-               drop: "deposer"
+               drop: "poser",
+               colHeight: "hauteurColonne",
+               placeMarker: "placerMarqueur",
+               goToMarker: "allerAuMarqueur"
             },
             description: {
-               left: "déplacerGauche() fait se déplacer la grue d'une case vers la gauche",
-               right: "déplacerDroite() fait se déplacer la grue d'une case vers la droite",
+               left: "gauche() fait se déplacer la grue d'une case vers la gauche",
+               right: "droite() fait se déplacer la grue d'une case vers la droite",
             },
             messages: {
                outside: "La grue ne peut pas aller plus loin dans cette direction !",
@@ -63,8 +69,18 @@ var getContext = function(display, infos, curLevel) {
                holdingBlock: "La grue ne peut pas prendre plus d'un bloc en même temps",
                emptyCrane: "La grue ne porte pas de bloc",
                cannotDrop: "Vous ne pouvez pas déposer de bloc dans cette colonne",
-               failureMissing: "La case encadrée en rouge est vide alors qu'elle devrait contenir un bloc",
-               failureWrongBlock: "La case encadrée en rouge ne contient pas le bon bloc",
+               wrongMarkerNumber: "Le numéro du marqueur doit être compris entre 1 et 9",
+               noMarker: function(num) {
+                  return "Le marqueur n°"+num+" n'existe pas"
+               },
+               failureMissing: function(nb) {
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureWrongBlock: function(nb) {
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
             startingBlockName: "Programme du robot"
@@ -134,37 +150,37 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.dev
       },
       sciFi: {
-         // backgroundElements: [
-         //    { 
-         //       img: "assets/background.png",
-         //       width: 1,   // % of total width if relative
-         //       height: 1,
-         //       x: 0,
-         //       y: 0,
-         //       relative: true
-         //    },
-         //    { 
-         //       img: "assets/cloud_1.png",
-         //       width: 200*0.7,
-         //       height: 50*0.7,
-         //       x: 0.8,
-         //       y: 0.3
-         //    },
-         //    { 
-         //       img: "assets/cloud_2.png",
-         //       width: 225*0.7,
-         //       height: 103*0.7,
-         //       x: -0.1,
-         //       y: 0.1
-         //    },
-         //    { 
-         //       img: "assets/cloud_3.png",
-         //       width: 117*0.7,
-         //       height: 41*0.7,
-         //       x: 0.4,
-         //       y: 0.8
-         //    },
-         // ],
+         backgroundElements: [
+            // { 
+            //    img: "assets/background.png",
+            //    width: 1,   // % of total width if relative
+            //    height: 1,
+            //    x: 0,
+            //    y: 0,
+            //    relative: true
+            // },
+            // { 
+            //    img: "assets/cloud_1.png",
+            //    width: 200*0.7,
+            //    height: 50*0.7,
+            //    x: 0.8,
+            //    y: 0.3
+            // },
+            // { 
+            //    img: "assets/cloud_2.png",
+            //    width: 225*0.7,
+            //    height: 103*0.7,
+            //    x: -0.1,
+            //    y: 0.1
+            // },
+            // { 
+            //    img: "assets/cloud_3.png",
+            //    width: 117*0.7,
+            //    height: 41*0.7,
+            //    x: 0.4,
+            //    y: 0.8
+            // },
+         ],
          cellAttr: {
             stroke: "#525252",
             "stroke-width": 0.2,
@@ -230,7 +246,7 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            tower_1: { num: 2, img: "assets/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 28 },
+            tower_1: { num: 2, img: "assets/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
             tower_2: { num: 3, img: "assets/tower_2.png", side: 60, isMovable: true, zOrder: 1 },
             tower_3: { num: 4, img: "assets/tower_3.png", side: 60, isMovable: true, zOrder: 1},
             tower_4: { num: 5, img: "assets/tower_4.png", side: 60, isMovable: true, zOrder: 1},
@@ -341,7 +357,47 @@ var getContext = function(display, infos, curLevel) {
          this.drop(callback);
       }
    });
-   
+
+   infos.newBlocks.push({
+      name: "colHeight",
+      type: "sensors",
+      block: { name: "colHeight", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getColHeight());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "placeMarker",
+      type: "actions",
+      block: { name: "placeMarker", params: [null] , blocklyXml: "<block type='placeMarker'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>" },
+      func: function(value, callback) {
+         this.placeMarker(value);
+         this.waitDelay(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "goToMarker",
+      type: "actions",
+      block: { name: "goToMarker", params: [null] , blocklyXml: "<block type='goToMarker'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>" },
+      func: function(value, callback) {
+         this.goToMarker(value,callback);
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -377,6 +433,7 @@ var getContext = function(display, infos, curLevel) {
    var rowsLabels = [];
    var contLabels = [];
    var contOutline;
+   var backgroundObj;
 
    var crane = {};
    var craneH = 1.5; // as rows
@@ -394,15 +451,38 @@ var getContext = function(display, infos, curLevel) {
       rightClawCx, rightClawCy,
       clutchAngle, 
       craneItemOffset } = infos.craneAttr;
-   // var { 
-   //    craneRailSrc, 
-   //    craneWheelsSrc, 
-   //    craneLineSrc, 
-   //    craneLeftClawSrc, 
-   //    craneRightClawSrc } = infos.craneSrc;
 
-   context.highlightAttr = {
+   var markerRectSide = 30;
+   var markerPoleH = 20;
+   var markerH = markerRectSide + markerPoleH - wheelsPosY;
+   var markerTextSize = 16;
+
+   markerAttr = infos.markerAttr || {
+      rect: {
+         stroke: "none",
+         fill: "#5158BB",
+         r: 3
+      },
+      backRect: {
+         stroke: "none",
+         fill: "#1D1E47",
+         r: 3
+      },
+      pole: {
+         stroke: "#5158BB",
+         "stroke-width": 5
+      },
+      text: {
+         "font-weight": "bold",
+         fill: "white"
+      }
+   };
+   context.highlight1Attr = infos.highlight1Attr || {
       stroke: "red",
+      "stroke-width": 3
+   };
+   context.highlight2Attr = infos.highlight2Attr || {
+      stroke: "yellow",
       "stroke-width": 3
    };
 
@@ -476,9 +556,11 @@ var getContext = function(display, infos, curLevel) {
       
       context.items = [];
       context.multicell_items = [];
+
+      context.markers = [];
       
-      context.last_connect = undefined;
-      context.wires = [];
+      // context.last_connect = undefined;
+      // context.wires = [];
       
       context.lost = false;
       context.success = false;
@@ -574,7 +656,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.highlightCells = function(cellPos) {
+   context.highlightCells = function(cellPos,attr) {
       var p = context.paper;
       var scale = context.scale;
       var cSide = infos.cellSide;
@@ -585,8 +667,18 @@ var getContext = function(display, infos, curLevel) {
          var { row, col } = pos;
          // var x = (cSide * col + infos.leftMargin) * scale;
          // var y = (cSide * (craneH + row) + infos.topMargin) * scale;
-         var { x, y } = context.getCellCoord(row,col);
-         var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(context.highlightAttr);
+         if(row == "crane"){
+            var item = context.craneContent;
+            var craneAttr = getCraneAttr();
+            var y = craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale;
+            if(item.catchOffsetY){
+               y -= item.catchOffsetY*scale;
+            }
+            var x = craneAttr.x;
+         }else{
+            var { x, y } = context.getCellCoord(row,col);
+         }
+         var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(attr);
          context.highlights.push({ row, col, obj });
       }
    };
@@ -595,8 +687,20 @@ var getContext = function(display, infos, curLevel) {
       var scale = context.scale;
       var cSide = infos.cellSide;
       var x = (cSide * col + infos.leftMargin) * scale;
-      var y = (cSide * (craneH + row) + infos.topMargin) * scale;
+      var y = (cSide * (craneH + row) + infos.topMargin + markerH) * scale;
       return { x, y }
+   };
+
+   context.getColHeight = function() {
+      var nbRowsCont = this.nbRowsCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+
+      var col = this.cranePos;
+      var topBlock = this.findTopBlock(col);
+
+      var h = nbRows - topBlock.row;
+
+      return h
    };
    
    var itemAttributes = function(item) {
@@ -607,9 +711,9 @@ var getContext = function(display, infos, curLevel) {
 
       var itemType = infos.itemTypes[item.type];
       
-      var x0 = (infos.leftMargin /*+ infos.cellSide * nbColCont*/)*scale;
+      var x0 = infos.leftMargin*scale;
       var x = x0 + (infos.cellSide * item.col + item.offsetX)* scale;
-      var y0 = (infos.topMargin + infos.cellSide * craneH)*scale;
+      var y0 = (infos.topMargin + markerH + infos.cellSide * craneH)*scale;
       var y = y0 + (infos.cellSide * item.row + (item.side - infos.cellSide) + item.offsetY) * scale;
       if(context.nbRows < nbRowsCont){
          y += infos.cellSide*(nbRowsCont - context.nbRows) * scale;
@@ -630,7 +734,7 @@ var getContext = function(display, infos, curLevel) {
    function getCraneAttr() {
       var cSide = infos.cellSide;
       var w = cSide*scale, h = w;
-      var y = infos.topMargin*scale;
+      var y = (infos.topMargin + markerH)*scale;
       var cranePos = context.cranePos;
       var nbRowsCont = context.nbRowsCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
@@ -640,9 +744,9 @@ var getContext = function(display, infos, curLevel) {
       var yWheels = y + wheelsOffsetY*scale;
 
       var lineH = nbRows + craneH;
-      var y0Line = infos.topMargin*scale;
-      var yLineClip1 = (infos.topMargin + wheelsPosY)*scale;
-      var yLineClip2 = (infos.topMargin + shaftOffsetY + 2)*scale;
+      var y0Line = y;
+      var yLineClip1 = y + wheelsPosY*scale;
+      var yLineClip2 = y + (shaftOffsetY + 2)*scale;
       var hClip = yLineClip2 - yLineClip1;
       var lineClip = [x,yLineClip1,w,hClip];
 
@@ -651,10 +755,8 @@ var getContext = function(display, infos, curLevel) {
 
       var xLeftClaw = x + leftClawOffsetX*scale;
       var xRightClaw = x + rightClawOffsetX*scale;
-      var yClaws = (infos.topMargin + clawsOffsetY)*scale;
+      var yClaws = y + clawsOffsetY*scale;
 
-      // var cx = x + w/2;
-      // var cy = yLineClip2;
       var cxLeft = x + leftClawCx*scale;
       var cyLeft = y + leftClawCy*scale;
       var cxRight = x + rightClawCx*scale;
@@ -927,6 +1029,140 @@ var getContext = function(display, infos, curLevel) {
       sortCellItems(elem);
    };
 
+   
+   
+   context.updateScale = function() {
+      // console.log("updateScale")
+      if(!context.display) {
+         return;
+      }
+      if(paper == null) {
+         return;
+      }
+      
+      if(window.quickAlgoResponsive) {
+         var areaWidth = Math.max(200, $('#grid').width()-24);
+         var areaHeight = Math.max(150, $('#grid').height()-24);
+      } else {
+         var areaWidth = 400;
+         var areaHeight = 600;
+      }
+
+      var nbRowsCont = context.nbRowsCont;
+      var nbColCont = context.nbColCont;
+      var nbCol = context.nbCols + nbColCont;
+      var nbRows = Math.max(context.nbRows,nbRowsCont);
+      var cSide = infos.cellSide;
+
+      var newCellSide = 0;
+      if(context.nbCols && context.nbRows) {
+         var marginAsCols = (infos.leftMargin + infos.rightMargin) / cSide;
+         var marginAsRows = (infos.topMargin + infos.bottomMargin) / cSide;
+         var markerHeightAsRows = markerH / cSide;
+         newCellSide = Math.min(cSide, Math.min(areaWidth / (nbCol + marginAsCols), areaHeight / (nbRows + craneH + markerHeightAsRows + marginAsRows)));
+      }
+      scale = newCellSide / cSide;
+      context.scale = scale;
+      var paperWidth = (cSide * nbCol + infos.leftMargin + infos.rightMargin)* scale;
+      var paperHeight = (cSide * (nbRows + craneH + markerHeightAsRows) + infos.topMargin + infos.bottomMargin)* scale;
+      paper.setSize(paperWidth, paperHeight);
+
+      var x0 = infos.leftMargin*scale;
+      var y0 = (infos.topMargin + craneH*cSide + markerH)*scale;
+
+      if(infos.backgroundElements && infos.backgroundElements.length > 0){
+         var bgElem = infos.backgroundElements;
+         var gridWidth = nbCol*cSide*scale;
+         var gridHeight = nbRows*cSide*scale;
+         var clipRect = [x0,y0,gridWidth,gridHeight];
+         backgroundObj = paper.set();
+         for(var iElem = 0; iElem < bgElem.length; iElem++){
+            var dat = bgElem[iElem];
+            var obj = context.background[iElem];
+            var x = dat.x*paperWidth;
+            var y = dat.y*paperHeight;
+            var width = (dat.relative) ? dat.width*paperWidth : dat.width*scale;
+            var height = (dat.relative) ? dat.height*paperHeight : dat.height*scale;
+            obj.attr({ x, y, width, height });
+            backgroundObj.push(obj);
+         }
+      }
+
+      for(var iRow = 0;iRow < nbRows;iRow++) {
+         for(var iCol = 0;iCol < nbCol;iCol++) {
+            if(cells[iRow][iCol] === undefined)
+               continue;
+            var { x, y } = this.getCellCoord(iRow,iCol);
+            cells[iRow][iCol].attr({x: x, y: y, width: cSide * scale, height: cSide * scale});
+         }
+      }
+      if(infos.showContOutline && nbRowsCont > 0){
+         var x1 = infos.leftMargin * scale;
+         var x2 = (infos.leftMargin + nbColCont*cSide) * scale;
+         var y1 = (nbRowsCont >= context.nbRows) ? (infos.topMargin + craneH*cSide) * scale : (infos.topMargin + (context.nbRows - nbRowsCont + craneH ) * cSide) * scale;
+         var y2 = y1 + nbRowsCont * cSide * scale;
+         contOutline.attr("path",["M",x1,y1,"V",y2,"H",x2,"V",y1]);
+      }
+      var textFontSize = {"font-size": cSide * scale / 2};
+      if(infos.showLabels) {
+         var labelAttr = infos.labelAttr || textFontSize;
+         if(infos.rowLabelEnabled){
+            for(var iRow = 0;iRow < context.nbRows;iRow++) {
+               var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
+               var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin + markerH) * scale;
+               rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
+            }
+         }
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            var x = (cSide * (iCol + nbColCont) + infos.leftMargin + cSide / 2) * scale;
+            var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin + markerH) * scale;
+            if(!infos.labelFrameAttr){
+               colsLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
+            }else{
+               var frSize = infos.labelFrameSize*cSide*scale;
+               var labelSize = infos.labelSize*cSide*scale;
+               var xFr = x - frSize/2;
+               var yFr = y - frSize/2;
+               var yLabel = yFr + frSize/2;
+               colsLabels[iCol][0].attr({x: xFr, y: yFr, width: frSize, height: frSize});
+               colsLabels[iCol][1].attr({x, y, "font-size": labelSize}).attr(labelAttr);
+            }
+         }
+      }
+      if(infos.showContLabels) {
+         for(var iCol = 0;iCol < nbColCont;iCol++) {
+            var x = (cSide * iCol + infos.leftMargin + cSide / 2) * scale;
+            var y = (infos.topMargin + markerH + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin) * scale;
+            contLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
+         }
+      }
+      // console.log("updateScale")
+      redisplayAllItems();    
+      redisplayMarkers();  
+
+      /* crane */
+      var w = cSide*scale, h = w;
+      var y = (infos.topMargin + markerH)*scale;
+      for(var iCol = 0; iCol < nbCol; iCol++){
+         var x = (cSide*iCol + infos.leftMargin)*scale;
+         crane.rail[iCol].attr({ x, y, 
+            width: w, height: h
+         });
+      }
+      var craneAttr = getCraneAttr();
+      setCraneAttr(craneAttr);
+
+      /* highlights */
+      if(context.highlights){
+         for(var dat of context.highlights){
+            var { row, col, obj } = dat;
+            var width = cSide*scale, height = w;
+            var { x, y } = this.getCellCoord(row,col);
+            obj.attr({ x, y, width, height });
+         }
+      }
+   };
+
    var redisplayItem = function(item, resetZOrder) {
       if(context.display !== true)
          return;
@@ -943,7 +1179,7 @@ var getContext = function(display, infos, curLevel) {
 
       var itemType = infos.itemTypes[item.type];
 
-      var x0 = (infos.leftMargin /*+ infos.cellSide * nbColCont*/)*scale;
+      var x0 = infos.leftMargin*scale;
       var x = x0 + (infos.cellSide * item.col + item.offsetX)* scale;
       var y0 = (infos.topMargin + infos.cellSide * craneH)*scale;
       var y = y0 + (infos.cellSide * item.row + (item.side - infos.cellSide) + item.offsetY) * scale;
@@ -953,7 +1189,7 @@ var getContext = function(display, infos, curLevel) {
       // console.log(item.type, item.row, item.col)
 
       if(item.customDisplay !== undefined) {
-      	item.customDisplay(item);
+         item.customDisplay(item);
       }
       
       if(item.img) {
@@ -992,141 +1228,6 @@ var getContext = function(display, infos, curLevel) {
          resetItemsZOrder(item.row, item.col);
    };
    
-   context.updateScale = function() {
-      // console.log("updateScale")
-      if(!context.display) {
-         return;
-      }
-      if(paper == null) {
-         return;
-      }
-      
-      if(window.quickAlgoResponsive) {
-         var areaWidth = Math.max(200, $('#grid').width()-24);
-         var areaHeight = Math.max(150, $('#grid').height()-24);
-      } else {
-         var areaWidth = 400;
-         var areaHeight = 600;
-      }
-
-      var nbRowsCont = context.nbRowsCont;
-      var nbColCont = context.nbColCont;
-      var nbCol = context.nbCols + nbColCont;
-      var nbRows = Math.max(context.nbRows,nbRowsCont);
-      var cSide = infos.cellSide;
-
-      var newCellSide = 0;
-      if(context.nbCols && context.nbRows) {
-         var marginAsCols = (infos.leftMargin + infos.rightMargin) / cSide;
-         var marginAsRows = (infos.topMargin + infos.bottomMargin) / cSide;
-         newCellSide = Math.min(cSide, Math.min(areaWidth / (nbCol + marginAsCols), areaHeight / (nbRows + craneH + marginAsRows)));
-      }
-      scale = newCellSide / cSide;
-      context.scale = scale;
-      var paperWidth = (cSide * nbCol + infos.leftMargin + infos.rightMargin)* scale;
-      var paperHeight = (cSide * (nbRows + craneH) + infos.topMargin + infos.bottomMargin)* scale;
-      paper.setSize(paperWidth, paperHeight);
-
-      var x0 = infos.leftMargin*scale;
-      var y0 = (infos.topMargin + craneH*cSide)*scale;
-
-      if(infos.backgroundElements && infos.backgroundElements.length > 0){
-         var bgElem = infos.backgroundElements;
-         var gridWidth = nbCol*cSide*scale;
-         var gridHeight = nbRows*cSide*scale;
-         var clipRect = [x0,y0,gridWidth,gridHeight];
-         for(var iElem = 0; iElem < bgElem.length; iElem++){
-            var dat = bgElem[iElem];
-            var obj = context.background[iElem];
-            // var x = infos.leftMargin*scale + dat.x*gridWidth;
-            var x = dat.x*paperWidth;
-            // var y = (infos.topMargin + craneH*cSide)*scale + dat.y*gridHeight;
-            var y = dat.y*paperHeight;
-            // var width = (dat.relative) ? dat.width*gridWidth : dat.width*scale;
-            var width = (dat.relative) ? dat.width*paperWidth : dat.width*scale;
-            // var height = (dat.relative) ? dat.height*gridHeight : dat.height*scale;
-            var height = (dat.relative) ? dat.height*paperHeight : dat.height*scale;
-            // obj.attr({ x, y, width, height,"clip-rect": clipRect });
-            obj.attr({ x, y, width, height });
-         }
-      }
-
-      for(var iRow = 0;iRow < nbRows;iRow++) {
-         for(var iCol = 0;iCol < nbCol;iCol++) {
-            if(cells[iRow][iCol] === undefined)
-               continue;
-            // var x = (cSide * iCol + infos.leftMargin) * scale;
-            // var y = (cSide * (craneH + iRow) + infos.topMargin) * scale;
-            var { x, y } = this.getCellCoord(iRow,iCol);
-            cells[iRow][iCol].attr({x: x, y: y, width: cSide * scale, height: cSide * scale});
-         }
-      }
-      if(infos.showContOutline && nbRowsCont > 0){
-         var x1 = infos.leftMargin * scale;
-         var x2 = (infos.leftMargin + nbColCont*cSide) * scale;
-         var y1 = (nbRowsCont >= context.nbRows) ? (infos.topMargin + craneH*cSide) * scale : (infos.topMargin + (context.nbRows - nbRowsCont + craneH ) * cSide) * scale;
-         var y2 = y1 + nbRowsCont * cSide * scale;
-         contOutline.attr("path",["M",x1,y1,"V",y2,"H",x2,"V",y1]);
-      }
-      var textFontSize = {"font-size": cSide * scale / 2};
-      if(infos.showLabels) {
-         var labelAttr = infos.labelAttr || textFontSize;
-         if(infos.rowLabelEnabled){
-            for(var iRow = 0;iRow < context.nbRows;iRow++) {
-               var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
-               var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin) * scale;
-               rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
-            }
-         }
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            var x = (cSide * (iCol + nbColCont) + infos.leftMargin + cSide / 2) * scale;
-            var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin) * scale;
-            if(!infos.labelFrameAttr){
-               colsLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
-            }else{
-               var frSize = infos.labelFrameSize*cSide*scale;
-               var labelSize = infos.labelSize*cSide*scale;
-               var xFr = x - frSize/2;
-               var yFr = y - frSize/2;
-               var yLabel = yFr + frSize/2;
-               colsLabels[iCol][0].attr({x: xFr, y: yFr, width: frSize, height: frSize});
-               colsLabels[iCol][1].attr({x, y, "font-size": labelSize}).attr(labelAttr);
-            }
-         }
-      }
-      if(infos.showContLabels) {
-         for(var iCol = 0;iCol < nbColCont;iCol++) {
-            var x = (cSide * iCol + infos.leftMargin + cSide / 2) * scale;
-            var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin) * scale;
-            contLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
-         }
-      }
-      // console.log("updateScale")
-      redisplayAllItems();      
-
-      /* crane */
-      var w = cSide*scale, h = w;
-      var y = infos.topMargin*scale;
-      for(var iCol = 0; iCol < nbCol; iCol++){
-         var x = (cSide*iCol + infos.leftMargin)*scale;
-         crane.rail[iCol].attr({ x, y, 
-            width: w, height: h
-         });
-      }
-      var craneAttr = getCraneAttr();
-      setCraneAttr(craneAttr);
-
-      /* highlights */
-      if(context.highlights){
-         for(var dat of context.highlights){
-            var { row, col, obj } = dat;
-            var width = cSide*scale, height = w;
-            var { x, y } = this.getCellCoord(row,col);
-            obj.attr({ x, y, width, height });
-         }
-      }
-   };
-   
    var redisplayAllItems = function() {
       // console.log("redisplayAllItems")
       if(context.display !== true)
@@ -1156,6 +1257,54 @@ var getContext = function(display, infos, curLevel) {
          cellItems.push(item);
       }
       sortCellItems(cellItems);
+   };
+
+   redisplayMarkers = function() {
+      var nbRowsCont = context.nbRowsCont;
+      var nbColCont = context.nbColCont;
+      var nbCol = context.nbCols + nbColCont;
+      var nbRows = Math.max(context.nbRows,nbRowsCont);
+      var cSide = infos.cellSide;
+      var mSide = markerRectSide;
+      var attr = markerAttr;
+      var textFontSize = { "font-size": markerTextSize * scale };
+
+      var x0 = infos.leftMargin*scale;
+      var y0 = infos.topMargin*scale;
+      var yText = y0 + mSide*scale/2;
+      for(var iMark = 0; iMark < context.markers.length; iMark++){
+         var marker = context.markers[iMark];
+         var col = marker.col;
+         var num = marker.num;
+         var x = x0 + (cSide * (col + 0.5))* scale;
+         var xRect = x - (mSide/2)*scale;
+         var yLine1 = y0 + mSide*scale - 2;
+         var yLine2 = yLine1 + markerPoleH*scale;
+         if(marker.element){
+            marker.element[0].attr({ x: xRect, y: y0, width: mSide, height: mSide })
+            marker.element[1].attr({ x, y: yText }).attr(textFontSize)
+            marker.element[2].attr({ path: ["M",x,yLine1,"V",yLine2] }).attr(textFontSize)
+            marker.element[3].attr({ x: xRect + 2, y: y0 - 3, width: mSide, height: mSide }).hide();
+         }else{
+            var rect = paper.rect(xRect,y0,mSide,mSide).attr(attr.rect);
+            var text = paper.text(x,yText,num).attr(attr.text).attr(textFontSize);
+            var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
+            var bRect = paper.rect(xRect + 3,y0 - 3,mSide,mSide).attr(attr.backRect).toBack().hide();
+            marker.element = paper.set(rect,text,pole,bRect);
+         }
+         for(var jMark = 0; jMark < context.markers.length; jMark++){
+            if(iMark != jMark && col == context.markers[jMark].col){
+               marker.element[3].show();
+               break;
+            }
+         }
+
+      }
+      if(backgroundObj){
+         for(var iElem = backgroundObj.length - 1; iElem >= 0; iElem--){
+            backgroundObj[iElem].toBack();
+         }
+      }
    };
    
    context.advanceTime = function(epsilon) {
@@ -1230,6 +1379,17 @@ var getContext = function(display, infos, curLevel) {
       }
       return selected;
    };
+
+   context.getItemsPos = function(num) {
+      var selected = [];
+      for(var id in context.items) {
+         var item = context.items[id];
+         if(item.num == num && !item.target) {
+            selected.push({ row: item.row, col: item.col });
+         }
+      }
+      return selected;
+   };
    
    context.isOn = function(filter) {
       var item = context.getRobot();
@@ -1262,6 +1422,27 @@ var getContext = function(display, infos, curLevel) {
          // context.moveCrane(context.cranePos + dir/4, callback)
          throw ttg;
       }
+   };
+
+   context.goToMarker = function(value,callback) {
+      var newCol;
+      for(var iMark = 0; iMark < this.markers.length; iMark++){
+         if(this.markers[iMark].num == value){
+            newCol = this.markers[iMark].col;
+         }
+      }
+      if(newCol === undefined){
+         throw strings.messages.noMarker(value);
+      }
+      if(context.display){
+         for(var marker of this.markers){
+            if(marker.num == value){
+               marker.element[0].toFront();
+               marker.element[1].toFront();
+            }
+         }
+      }
+      this.moveCrane(newCol, callback);
    };
 
    context.take = function(callback) {
@@ -1452,13 +1633,18 @@ var getContext = function(display, infos, curLevel) {
       if(context.display) {
          var craneAttr = getCraneAttr();
          if(infos.actionDelay > 0) {
+            var delay = infos.actionDelay*Math.abs(newCol - oldPos);
             if(animate && context.animate) {
-               var anim = new Raphael.animation({ x: craneAttr.xWheels },infos.actionDelay);
-               var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },infos.actionDelay);
-               var animShaft = new Raphael.animation({ x: craneAttr.xShaft },infos.actionDelay);
+               var anim = new Raphael.animation({ x: craneAttr.xWheels },delay,function() {
+                  if(callback){
+                     context.callCallback(callback);
+                  }
+               });
+               var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },delay);
+               var animShaft = new Raphael.animation({ x: craneAttr.xShaft },delay);
                var angle = (context.craneContent) ? clutchAngle : 0;
-               var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
-               var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
+               var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
+               var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },delay);
                context.raphaelFactory.animate("animCrane_wheels_" + Math.random(), crane.wheels, anim);
                context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
                context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.shaft, animShaft);
@@ -1466,13 +1652,13 @@ var getContext = function(display, infos, curLevel) {
                context.raphaelFactory.animate("animCrane_rightClaw_" + Math.random(), crane.rightClaw, animRightClaw);
                if(context.craneContent){
                   var item = context.craneContent;
-                  var animItem = new Raphael.animation({ x: craneAttr.x + item.offsetX },infos.actionDelay);
+                  var animItem = new Raphael.animation({ x: craneAttr.x + item.offsetX },delay);
                   context.raphaelFactory.animate("animCrane_item_" + Math.random(), item.element, animItem);
                }
             } else {
                context.delayFactory.createTimeout("moveCrane_" + Math.random(), function() {
                   setCraneAttr(craneAttr);
-               }, infos.actionDelay / 2);
+               }, delay / 2);
             }
          } else {
             setCraneAttr(craneAttr);
@@ -1480,41 +1666,33 @@ var getContext = function(display, infos, curLevel) {
          $("#nbMoves").html(context.nbMoves);
       }
       
-      context.advanceTime(1);
-      if(callback) {
+      // context.advanceTime(1);
+      if(callback && (!context.display || !context.animate)){
          context.waitDelay(callback);
       }
    };
-   
-   // context.moveItem = function(item, newRow, newCol) {
-   //    var animate = (item.row != newRow) || (item.col != newCol);
-   //    var robot = context.getRobot();
-   //    if(context.display) {
-   //       resetItemsZOrder(newRow, newCol);
-   //       resetItemsZOrder(item.row, item.col);
-   //       resetItemsZOrder(robot.row, robot.col);
-   //    }
-   //    item.row = newRow;
-   //    item.col = newCol;
-      
-   //    if(context.display) {
-   //       if(animate) {
-   //          attr = itemAttributes(item);
-   //          context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
-   //       }
-   //       else {
-   //          attr = itemAttributes(item);
-   //          if(infos.actionDelay > 0) {
-   //             context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
-   //                item.element.attr(attr);
-   //             }, infos.actionDelay / 2);
-   //          } else {
-   //             item.element.attr(attr);
-   //          }
-   //       }
-   //    }
-   // };
-   
+
+   context.placeMarker = function(value) {
+      if(isNaN(value) || value < 1 || value > 9){
+         throw(strings.messages.wrongMarkerNumber);
+      }
+      var col = this.cranePos;
+      var alreadyExist = false;
+      for(var iMark = 0; iMark < this.markers.length; iMark++){
+         var marker = this.markers[iMark];
+         if(marker.num == value){
+            marker.col = col;
+            alreadyExist = true;
+         }
+      }
+      if(!alreadyExist){
+         this.markers.push({ num: value, col });
+      }
+      if(context.display) {
+         redisplayMarkers();
+      }
+   };
+
    context.destroy = function(item) {
       // console.log("destroy")
       context.setIndexes();
@@ -1571,18 +1749,30 @@ var robotEndConditions = {
             var gridCol = iCol + context.nbColCont;
             if(id != 1){
                var items = context.getItemsOn(gridRow,gridCol,it => !it.target);
-               // console.log(id,items)
+               var itemPos = context.getItemsPos(id);
+               if(context.craneContent && context.craneContent.num == id){
+                  itemPos.push({ row: "crane", col: context.cranePos });
+               }
                if(items.length == 0){
                   context.success = false;
                   // console.log(iRow,iCol);
                   if(context.display){
-                     context.highlightCells([{row:gridRow,col:gridCol}]);
+                     context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
+                     for(var pos of itemPos){
+                        context.highlightCells([{row:pos.row,col:pos.col}],context.highlight2Attr);
+                     }
                   }
-                  throw(window.languageStrings.messages.failureMissing);
+                  throw(window.languageStrings.messages.failureMissing(itemPos.length));
                }
                if(items[0].num != id){
                   context.success = false;
-                  throw(window.languageStrings.messages.failureWrongBlock);
+                  if(context.display){
+                     context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
+                     for(var pos of itemPos){
+                        context.highlightCells([{row:pos.row,col:pos.col}],context.highlight2Attr);
+                     }
+                  }
+                  throw(window.languageStrings.messages.failureWrongBlock(itemPos.length));
                }
             }
          }
