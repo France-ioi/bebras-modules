@@ -534,6 +534,7 @@ var getContext = function(display, infos, curLevel) {
          var paperW = infos.cellSide * (context.nbCols + context.nbColCont) * scale;
          var paperH = infos.cellSide * Math.max(context.nbRows,context.nbRowsCont) * scale;
          paper = this.raphaelFactory.create("paperMain", "grid", paperW, paperH);
+         context.paper = paper;
          resetBoard();
          // console.log("redrawDisplay")
          redisplayAllItems();
