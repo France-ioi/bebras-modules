@@ -492,6 +492,7 @@ var getContext = function(display, infos, curLevel) {
    var dustW = 80;
    var dustH = 28;
    var dustDuration = 1100;
+   var dust, dustPix;
 
    var paper;
 
@@ -884,6 +885,8 @@ var getContext = function(display, infos, curLevel) {
       // context.cells = cells;
 
       resetCrane();
+      $("#dust_pix").remove();
+      $("body").append("<img src="+dustSrc+" style='width:1px;' id='dust_pix' />");
    };
 
    function resetCrane() {
@@ -1595,7 +1598,9 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
-         dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
+         // dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
+         dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
+         $("#dust_pix").attr("src",dustSrc);
          context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
             if(dust){
                dust.remove();
