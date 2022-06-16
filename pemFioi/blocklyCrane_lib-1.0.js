@@ -434,6 +434,7 @@ var getContext = function(display, infos, curLevel) {
    var contLabels = [];
    var contOutline;
    var backgroundObj;
+   var dust;
 
    var crane = {};
    var craneH = 1.5; // as rows
@@ -485,6 +486,12 @@ var getContext = function(display, infos, curLevel) {
       stroke: "yellow",
       "stroke-width": 3
    };
+
+   var dustSrc = "assets/dust.png";
+   // var dustSrc = "assets/beredith.gif";
+   var dustW = 80;
+   var dustH = 28;
+   var dustDuration = 1100;
 
    var paper;
 
@@ -1531,7 +1538,7 @@ var getContext = function(display, infos, curLevel) {
       lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
       var cyLeftDown = craneAttr.cyLeft + deltaY;
       var cyRightDown = craneAttr.cyRight + deltaY;
-      var itemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY)*scale;
+      var itemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY + markerH)*scale;
 
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
       var animClawDown = new Raphael.animation({ y: yClawDown },delay);
@@ -1577,6 +1584,8 @@ var getContext = function(display, infos, curLevel) {
       lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
       var cyLeftDown = craneAttr.cyLeft + deltaY;
       var cyRightDown = craneAttr.cyRight + deltaY;
+      var dustY = itemAttr.y + itemAttr.height - dustH*scale/2;
+      var dustX = itemAttr.x + (itemAttr.width - dustW*scale)/2;
       // var itemY = (infos.topMargin + clawsPos + craneItemOffset + topBlock.offsetY)*scale;
 
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
@@ -1586,6 +1595,13 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+         dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
+         context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
+            if(dust){
+               dust.remove();
+               dust = null;
+            }
+         }, dustDuration);
       });
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
