@@ -267,15 +267,91 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.dev
       },
+      numbers: {
+         backgroundElements: [
+
+         ],
+         cellAttr: {
+            stroke: "#525252",
+            "stroke-width": 0.2,
+            fill: "none"
+         },
+         contAttr: {
+            stroke: "white",
+            "stroke-width": 0,
+            fill: "lightgrey"
+         },
+         contOutlineAttr: {
+            "stroke-width": 3,
+            stroke: "black",
+            fill: "none"
+         },
+         labelFrameAttr: {
+            stroke: "none",
+            fill: "#043565",
+            r: 3
+         },
+         labelAttr: {
+            fill: "white",
+            "font-weight": "bold"
+         },
+         labelSize: 0.3, // % of cellSize
+         labelFrameSize: 0.5,
+         craneAttr: {
+            wheelsPosY: 13, // for line clip
+            wheelsOffsetX: -45,
+            wheelsOffsetY: 2,
+            wheelsW: 120,
+            wheelsH: 42,
+            shaftW: 13,
+            shaftH: 17,
+            shaftOffsetY: 50,
+            shaftOffsetX: 23.5,
+            clawW: 20,
+            clawH: 24,
+            clawsOffsetY: 56,
+            leftClawOffsetX: 11,
+            rightClawOffsetX: 29,
+            leftClawCx: 27,
+            leftClawCy: 60,
+            rightClawCx: 33,
+            rightClawCy: 60,
+            clutchAngle: 30,
+            craneItemOffset: 12
+         },
+         craneSrc: {
+            rail: imgPath+"crane/rail.png",
+            wheels: imgPath+"crane/crane_wheels.png",
+            line: imgPath+"crane/crane_line.png",
+            leftClaw: imgPath+"crane/crane_left_claw_open.png",
+            rightClaw: imgPath+"crane/crane_right_claw_open.png",
+            shaft: imgPath+"crane/crane_shaft.png",
+         },
+         craneZOrder: {
+            wheels: 1,
+            line: 0,
+            leftClaw: 2,
+            rightClaw: 0,
+            shaft: 1,
+            item: 1
+         },
+         itemTypes: {
+            item_1: { num: 2, img: "01.png", side: 60, isMovable: true, zOrder: 1 },
+            item_2: { num: 3, img: "02.png", side: 60, isMovable: true, zOrder: 1 },
+            item_3: { num: 4, img: "03.png", side: 60, isMovable: true, zOrder: 1},
+            item_4: { num: 5, img: "04.png", side: 60, isMovable: true, zOrder: 1},
+            item_5: { num: 6, img: "05.png", side: 60, isMovable: true, zOrder: 1},
+            item_6: { num: 7, img: "06.png", side: 60, isMovable: true, zOrder: 1},
+            item_7: { num: 8, img: "07.png", side: 60, isMovable: true, zOrder: 1},
+            item_8: { num: 9, img: "08.png", side: 60, isMovable: true, zOrder: 1},
+            item_9: { num: 10, img: "09.png", side: 60, isMovable: true, zOrder: 1},
+            item_10: { num: 11, img: "10.png", side: 60, isMovable: true, zOrder: 1},
+            item_11: { num: 12, img: "11.png", side: 60, isMovable: true, zOrder: 1},
+            item_12: { num: 13, img: "12.png", side: 60, isMovable: true, zOrder: 1},
+         },
+         checkEndCondition: robotEndConditions.dev
+      },
    };
-
-
-   // var craneRailSrc = imgPath+"crane/rail.png";
-   // var craneWheelsSrc = imgPath+"crane/wheels.png";
-   // var craneLineSrc = imgPath+"crane/line.png";
-   // var craneLeftClawSrc = imgPath+"crane/left_claw.png";
-   // var craneRightClawSrc = imgPath+"crane/right_claw.png";
-   // var cloudSrc = imgPath+"crane/cloud.png";
 
    
    if(infos.newBlocks == undefined)
