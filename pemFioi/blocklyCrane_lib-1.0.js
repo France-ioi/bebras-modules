@@ -348,6 +348,14 @@ var getContext = function(display, infos, curLevel) {
             item_10: { num: 11, img: imgPath+"crane/numbers/10.png", side: 60, isMovable: true, zOrder: 1},
             item_11: { num: 12, img: imgPath+"crane/numbers/11.png", side: 60, isMovable: true, zOrder: 1},
             item_12: { num: 13, img: imgPath+"crane/numbers/12.png", side: 60, isMovable: true, zOrder: 1},
+            item_13: { num: 14, img: imgPath+"crane/numbers/13.png", side: 60, isMovable: true, zOrder: 1},
+            item_14: { num: 15, img: imgPath+"crane/numbers/14.png", side: 60, isMovable: true, zOrder: 1},
+            item_15: { num: 16, img: imgPath+"crane/numbers/15.png", side: 60, isMovable: true, zOrder: 1},
+            item_16: { num: 17, img: imgPath+"crane/numbers/16.png", side: 60, isMovable: true, zOrder: 1},
+            item_17: { num: 18, img: imgPath+"crane/numbers/17.png", side: 60, isMovable: true, zOrder: 1},
+            item_18: { num: 19, img: imgPath+"crane/numbers/18.png", side: 60, isMovable: true, zOrder: 1},
+            item_19: { num: 20, img: imgPath+"crane/numbers/19.png", side: 60, isMovable: true, zOrder: 1},
+            item_20: { num: 21, img: imgPath+"crane/numbers/20.png", side: 60, isMovable: true, zOrder: 1},
          },
          checkEndCondition: robotEndConditions.dev
       },
@@ -569,6 +577,8 @@ var getContext = function(display, infos, curLevel) {
    var dustH = 28;
    var dustDuration = 1100;
    var dust, dustPix;
+
+   var takeAnimDelay = 0.5*infos.actionDelay;
 
    var paper;
 
@@ -1606,7 +1616,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.takeAnim = function(topBlock,callback) {
       var craneAttr = getCraneAttr();
-      var delay = infos.actionDelay*(topBlock.row + 1);
+      var delay = takeAnimDelay*(topBlock.row + 1);
       var itemAttr = itemAttributes(topBlock);
 
       var catchOffsetY = topBlock.catchOffsetY || 0;
@@ -1652,7 +1662,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.dropAnim = function(item,callback) {
       var craneAttr = getCraneAttr();
-      var delay = infos.actionDelay*(item.row + 1);
+      var delay = takeAnimDelay*(item.row + 1);
       var itemAttr = itemAttributes(item);
 
       var catchOffsetY = item.catchOffsetY || 0;
