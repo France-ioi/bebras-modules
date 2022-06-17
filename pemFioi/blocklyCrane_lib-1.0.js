@@ -1146,7 +1146,7 @@ var getContext = function(display, infos, curLevel) {
          var marginAsCols = (infos.leftMargin + infos.rightMargin) / cSide;
          var marginAsRows = (infos.topMargin + infos.bottomMargin) / cSide;
          var markerHeightAsRows = markerH / cSide;
-         newCellSide = Math.min(cSide, Math.min(areaWidth / (nbCol + marginAsCols), areaHeight / (nbRows + craneH + markerHeightAsRows + marginAsRows)));
+         newCellSide = Math.min(cSide*2, Math.min(areaWidth / (nbCol + marginAsCols), areaHeight / (nbRows + craneH + markerHeightAsRows + marginAsRows)));
       }
       scale = newCellSide / cSide;
       context.scale = scale;
