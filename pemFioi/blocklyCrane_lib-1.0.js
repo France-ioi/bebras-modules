@@ -158,7 +158,7 @@ var getContext = function(display, infos, curLevel) {
       sciFi: {
          backgroundElements: [
             // { 
-            //    img: "assets/background.png",
+            //    img: imgPath+"crane/sciFi/background.png",
             //    width: 1,   // % of total width if relative
             //    height: 1,
             //    x: 0,
@@ -166,21 +166,21 @@ var getContext = function(display, infos, curLevel) {
             //    relative: true
             // },
             // { 
-            //    img: "assets/cloud_1.png",
+            //    img: imgPath+"crane/sciFi/cloud_1.png",
             //    width: 200*0.7,
             //    height: 50*0.7,
             //    x: 0.8,
             //    y: 0.3
             // },
             // { 
-            //    img: "assets/cloud_2.png",
+            //    img: imgPath+"crane/sciFi/cloud_2.png",
             //    width: 225*0.7,
             //    height: 103*0.7,
             //    x: -0.1,
             //    y: 0.1
             // },
             // { 
-            //    img: "assets/cloud_3.png",
+            //    img: imgPath+"crane/sciFi/cloud_3.png",
             //    width: 117*0.7,
             //    height: 41*0.7,
             //    x: 0.4,
@@ -237,11 +237,11 @@ var getContext = function(display, infos, curLevel) {
          },
          craneSrc: {
             rail: imgPath+"crane/rail.png",
-            wheels: imgUrlWithPrefix("assets/crane_wheels.png"),
-            line: imgUrlWithPrefix("assets/crane_line.png"),
-            leftClaw: imgUrlWithPrefix("assets/crane_left_claw_open.png"),
-            rightClaw: imgUrlWithPrefix("assets/crane_right_claw_open.png"),
-            shaft: imgUrlWithPrefix("assets/crane_shaft.png"),
+            wheels: imgPath+"crane/crane_wheels.png",
+            line: imgPath+"crane/crane_line.png",
+            leftClaw: imgPath+"crane/crane_left_claw_open.png",
+            rightClaw: imgPath+"crane/crane_right_claw_open.png",
+            shaft: imgPath+"crane/crane_shaft.png",
          },
          craneZOrder: {
             wheels: 1,
@@ -252,18 +252,18 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            tower_1: { num: 2, img: "assets/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
-            tower_2: { num: 3, img: "assets/tower_2.png", side: 60, isMovable: true, zOrder: 1 },
-            tower_3: { num: 4, img: "assets/tower_3.png", side: 60, isMovable: true, zOrder: 1},
-            tower_4: { num: 5, img: "assets/tower_4.png", side: 60, isMovable: true, zOrder: 1},
-            tower_5: { num: 6, img: "assets/tower_5.png", side: 60, isMovable: true, zOrder: 1},
-            tower_6: { num: 7, img: "assets/tower_6.png", side: 60, isMovable: true, zOrder: 1},
-            tower_7: { num: 8, img: "assets/tower_7.png", side: 60, isMovable: true, zOrder: 1},
-            tower_8: { num: 9, img: "assets/tower_8.png", side: 60, isMovable: true, zOrder: 1},
-            tower_9: { num: 10, img: "assets/tower_9.png", side: 60, isMovable: true, zOrder: 1},
-            tower_10: { num: 11, img: "assets/tower_10.png", side: 60, isMovable: true, zOrder: 1},
-            tower_11: { num: 12, img: "assets/tower_11.png", side: 60, isMovable: true, zOrder: 1},
-            tower_12: { num: 13, img: "assets/tower_12.png", side: 60, isMovable: true, zOrder: 1},
+            tower_1: { num: 2, img: imgPath+"crane/sciFi/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
+            tower_2: { num: 3, img: imgPath+"crane/sciFi/tower_2.png", side: 60, isMovable: true, zOrder: 1 },
+            tower_3: { num: 4, img: imgPath+"crane/sciFi/tower_3.png", side: 60, isMovable: true, zOrder: 1},
+            tower_4: { num: 5, img: imgPath+"crane/sciFi/tower_4.png", side: 60, isMovable: true, zOrder: 1},
+            tower_5: { num: 6, img: imgPath+"crane/sciFi/tower_5.png", side: 60, isMovable: true, zOrder: 1},
+            tower_6: { num: 7, img: imgPath+"crane/sciFi/tower_6.png", side: 60, isMovable: true, zOrder: 1},
+            tower_7: { num: 8, img: imgPath+"crane/sciFi/tower_7.png", side: 60, isMovable: true, zOrder: 1},
+            tower_8: { num: 9, img: imgPath+"crane/sciFi/tower_8.png", side: 60, isMovable: true, zOrder: 1},
+            tower_9: { num: 10, img: imgPath+"crane/sciFi/tower_9.png", side: 60, isMovable: true, zOrder: 1},
+            tower_10: { num: 11, img: imgPath+"crane/sciFi/tower_10.png", side: 60, isMovable: true, zOrder: 1},
+            tower_11: { num: 12, img: imgPath+"crane/sciFi/tower_11.png", side: 60, isMovable: true, zOrder: 1},
+            tower_12: { num: 13, img: imgPath+"crane/sciFi/tower_12.png", side: 60, isMovable: true, zOrder: 1},
          },
          checkEndCondition: robotEndConditions.dev
       },
@@ -336,18 +336,18 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            item_1: { num: 2, img: "01.png", side: 60, isMovable: true, zOrder: 1 },
-            item_2: { num: 3, img: "02.png", side: 60, isMovable: true, zOrder: 1 },
-            item_3: { num: 4, img: "03.png", side: 60, isMovable: true, zOrder: 1},
-            item_4: { num: 5, img: "04.png", side: 60, isMovable: true, zOrder: 1},
-            item_5: { num: 6, img: "05.png", side: 60, isMovable: true, zOrder: 1},
-            item_6: { num: 7, img: "06.png", side: 60, isMovable: true, zOrder: 1},
-            item_7: { num: 8, img: "07.png", side: 60, isMovable: true, zOrder: 1},
-            item_8: { num: 9, img: "08.png", side: 60, isMovable: true, zOrder: 1},
-            item_9: { num: 10, img: "09.png", side: 60, isMovable: true, zOrder: 1},
-            item_10: { num: 11, img: "10.png", side: 60, isMovable: true, zOrder: 1},
-            item_11: { num: 12, img: "11.png", side: 60, isMovable: true, zOrder: 1},
-            item_12: { num: 13, img: "12.png", side: 60, isMovable: true, zOrder: 1},
+            item_1: { num: 2, img: imgPath+"crane/numbers/01.png", side: 60, isMovable: true, zOrder: 1 },
+            item_2: { num: 3, img: imgPath+"crane/numbers/02.png", side: 60, isMovable: true, zOrder: 1 },
+            item_3: { num: 4, img: imgPath+"crane/numbers/03.png", side: 60, isMovable: true, zOrder: 1},
+            item_4: { num: 5, img: imgPath+"crane/numbers/04.png", side: 60, isMovable: true, zOrder: 1},
+            item_5: { num: 6, img: imgPath+"crane/numbers/05.png", side: 60, isMovable: true, zOrder: 1},
+            item_6: { num: 7, img: imgPath+"crane/numbers/06.png", side: 60, isMovable: true, zOrder: 1},
+            item_7: { num: 8, img: imgPath+"crane/numbers/07.png", side: 60, isMovable: true, zOrder: 1},
+            item_8: { num: 9, img: imgPath+"crane/numbers/08.png", side: 60, isMovable: true, zOrder: 1},
+            item_9: { num: 10, img: imgPath+"crane/numbers/09.png", side: 60, isMovable: true, zOrder: 1},
+            item_10: { num: 11, img: imgPath+"crane/numbers/10.png", side: 60, isMovable: true, zOrder: 1},
+            item_11: { num: 12, img: imgPath+"crane/numbers/11.png", side: 60, isMovable: true, zOrder: 1},
+            item_12: { num: 13, img: imgPath+"crane/numbers/12.png", side: 60, isMovable: true, zOrder: 1},
          },
          checkEndCondition: robotEndConditions.dev
       },
@@ -563,7 +563,7 @@ var getContext = function(display, infos, curLevel) {
       "stroke-width": 3
    };
 
-   var dustSrc = "assets/dust.png";
+   var dustSrc = imgPath+"crane/dust.png";
    // var dustSrc = "assets/beredith.gif";
    var dustW = 80;
    var dustH = 28;
@@ -1368,15 +1368,15 @@ var getContext = function(display, infos, curLevel) {
          var yLine1 = y0 + mSide*scale - 2;
          var yLine2 = yLine1 + markerPoleH*scale;
          if(marker.element){
-            marker.element[0].attr({ x: xRect, y: y0, width: mSide, height: mSide })
+            marker.element[0].attr({ x: xRect, y: y0, width: mSide*scale, height: mSide*scale })
             marker.element[1].attr({ x, y: yText }).attr(textFontSize)
             marker.element[2].attr({ path: ["M",x,yLine1,"V",yLine2] }).attr(textFontSize)
-            marker.element[3].attr({ x: xRect + 2, y: y0 - 3, width: mSide, height: mSide }).hide();
+            marker.element[3].attr({ x: xRect + 2, y: y0 - 3, width: mSide*scale, height: mSide*scale }).hide();
          }else{
-            var rect = paper.rect(xRect,y0,mSide,mSide).attr(attr.rect);
+            var rect = paper.rect(xRect,y0,mSide*scale,mSide*scale).attr(attr.rect);
             var text = paper.text(x,yText,num).attr(attr.text).attr(textFontSize);
             var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
-            var bRect = paper.rect(xRect + 3,y0 - 3,mSide,mSide).attr(attr.backRect).toBack().hide();
+            var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
             marker.element = paper.set(rect,text,pole,bRect);
          }
          for(var jMark = 0; jMark < context.markers.length; jMark++){
