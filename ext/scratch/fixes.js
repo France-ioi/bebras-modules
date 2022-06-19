@@ -1508,7 +1508,7 @@ Blockly.Python['data_listrepeat'] = function(block) {
 
   var blockVarName = block.getFieldValue('LIST');
   if(blockVarName) {
-    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
