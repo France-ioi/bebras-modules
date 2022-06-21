@@ -42,10 +42,11 @@ var getContext = function(display, infos, curLevel) {
                left: "déplacer vers la gauche",
                right: "déplacer vers la droite",
                take: "prendre",
-               drop: "poser",
+               putDown: "poser",
+               drop: "lâcher",
                colHeight: "hauteur de la colonne",
-               placeMarker: "Placer le marqueur n°",             
-               goToMarker: "aller au marqueur n°",
+               placeMarker: "Placer le marqueur",             
+               goToMarker: "aller au marqueur",
                expectedBlock: "brique attendue",
                topBlock: "brique du dessus",
                carriedBlock: "brique transportée",
@@ -56,7 +57,8 @@ var getContext = function(display, infos, curLevel) {
                left: "gauche",
                right: "droite",
                take: "prendre",
-               drop: "poser",
+               putDown: "poser",
+               drop: "lacher",
                colHeight: "hauteurColonne",
                placeMarker: "placerMarqueur",
                goToMarker: "allerAuMarqueur",
@@ -80,6 +82,7 @@ var getContext = function(display, infos, curLevel) {
                holdingBlock: "La grue ne peut pas prendre plus d'un bloc en même temps",
                emptyCrane: "La grue ne porte pas de bloc",
                cannotDrop: "Vous ne pouvez pas déposer de bloc dans cette colonne",
+               notWrecking: "Vous ne pouvez pas lâcher ce bloc",
                wrongMarkerNumber: "Le numéro du marqueur doit être compris entre 1 et 9",
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
@@ -275,6 +278,8 @@ var getContext = function(display, infos, curLevel) {
             tower_10: { num: 11, img: imgPath+"crane/sciFi/tower_10.png", side: 60, isMovable: true, zOrder: 1},
             tower_11: { num: 12, img: imgPath+"crane/sciFi/tower_11.png", side: 60, isMovable: true, zOrder: 1},
             tower_12: { num: 13, img: imgPath+"crane/sciFi/tower_12.png", side: 60, isMovable: true, zOrder: 1},
+            crusher: { num: 14, img: imgPath+"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+            wreckingBall: { num: 15, img: imgPath+"card_roundQuadrille.png", side: 60, isMovable: true, wrecking: true, zOrder: 1}
          },
          checkEndCondition: robotEndConditions.dev
       },
@@ -367,6 +372,8 @@ var getContext = function(display, infos, curLevel) {
             item_18: { num: 19, img: imgPath+"crane/numbers/18.png", side: 60, isMovable: true, zOrder: 1},
             item_19: { num: 20, img: imgPath+"crane/numbers/19.png", side: 60, isMovable: true, zOrder: 1},
             item_20: { num: 21, img: imgPath+"crane/numbers/20.png", side: 60, isMovable: true, zOrder: 1},
+            crusher: { num: 22, img: imgPath+"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+            wreckingBall: { num: 23, img: imgPath+"card_roundQuadrille.png", side: 60, isMovable: true, wrecking: true, zOrder: 1}
          },
          checkEndCondition: robotEndConditions.dev
       },
@@ -445,6 +452,15 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "putDown",
+      type: "actions",
+      block: { name: "putDown" },
+      func: function(callback) {
+         this.putDown(callback);
+      }
+   });
+
+   infos.newBlocks.push({
       name: "drop",
       type: "actions",
       block: { name: "drop" },
@@ -519,14 +535,21 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
-      block: { name: "placeMarker", params: [{ options: ["A", "B", "C"] }] , 
-      // blocklyXml: "<block type='placeMarker'>" +
-      //             "  <value name='PARAM_0'>" +
-      //             "    <shadow type='math_number'>" +
-      //             "      <field name='NUM'>1</field>" +
-      //             "    </shadow>" +
-      //             "  </value>" +
-      //             "</block>" 
+      block: { name: "placeMarker", 
+      params: [null] , 
+      blocklyXml: "<block type='placeMarker'>" +
+                  "  <value name='PARAM_0'>" +
+                  "    <shadow type='math_number'>" +
+                  "      <field name='NUM'>1</field>" +
+                  "    </shadow>" +
+                  "  </value>" +
+                  "</block>" ,
+            //    blocklyJson: {
+            // "args0": [{
+            //    "type": "field_dropdown", "name": "PARAM_0", "options": [
+            //       ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
+            // }]
+         // },
       },
       // block: { name: "placeMarker",
       //          params: [{ options: ["A", "B", "C"] }],
@@ -781,6 +804,7 @@ var getContext = function(display, infos, curLevel) {
       }else{
          resetItems();
       }
+      context.crushers = context.getCrushers();
    };
 
    context.redrawDisplay = function() {
@@ -858,6 +882,16 @@ var getContext = function(display, infos, curLevel) {
          var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(attr);
          context.highlights.push({ row, col, obj });
       }
+   };
+
+   context.getCrushers = function() {
+      var crushers = [];
+      for(var item of context.items){
+         if(item.crusher && !item.target){
+            crushers.push(item);
+         }
+      }
+      return crushers
    };
 
    context.getCellCoord = function(row,col) {
@@ -1264,7 +1298,26 @@ var getContext = function(display, infos, curLevel) {
       sortCellItems(elem);
    };
 
-   
+   context.crush = function() {
+      if(this.crushers.length == 0){
+         return
+      }
+      var nbRowsCont = this.nbRowsCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+      for(var item of this.items){
+         if(!item.target){
+            var { row, col } = item;
+            if(row < nbRows - 1){
+               for(var crusher of this.crushers){
+                  if(crusher.col == col && crusher.row == row + 1){
+                     this.destroy(item);
+                     return
+                  }
+               }
+            }
+         }
+      }
+   };
    
    context.updateScale = function() {
       // console.log("updateScale")
@@ -1399,10 +1452,12 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var redisplayItem = function(item, resetZOrder) {
-      if(context.display !== true)
-         return;
-      if(resetZOrder === undefined)
+      if(context.display !== true){
+         return
+      }
+      if(resetZOrder === undefined){
          resetZOrder = true;
+      }
       
       if(item.element !== undefined) {
          item.element.remove();
@@ -1692,7 +1747,7 @@ var getContext = function(display, infos, curLevel) {
       if(!topBlock.isMovable){
          throw(context.strings.messages.notMovable);
       }
-      var withdrawables = context.getItemsOn(topBlock.row, topBlock.col);
+      var withdrawables = context.getItemsOn(topBlock.row, topBlock.col, obj=>!obj.target );
 
       var withdrawable = withdrawables[0];
 
@@ -1716,9 +1771,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.drop = function(callback) {
-      // console.log(context.runner)
-      // console.log("drop")
+   context.putDown = function(callback) {
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
       }
@@ -1739,11 +1792,58 @@ var getContext = function(display, infos, curLevel) {
       
       if(context.display) {
          if(context.animate){
-            context.dropAnim(tempItem,callback);
+            context.putDownAnim(tempItem,callback);
          }else{
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
+         }
+      }
+      if(!context.display || !context.animate){
+         context.crush();
+      }
+
+      if(callback && (!context.display || !context.animate)){
+         context.waitDelay(callback);
+      }
+   };
+
+   context.drop = function(callback) {
+      // console.log(context.runner)
+      // console.log("drop")
+      if(context.craneContent == undefined){
+         throw(context.strings.messages.emptyCrane);
+      }
+      if(!context.craneContent.wrecking){
+         throw(context.strings.messages.notWrecking);
+      }
+      var currPos = context.cranePos;
+      var topBlock = context.findTopBlock(currPos);
+      // console.log(topBlock)
+      // if(!topBlock || topBlock.row == 0){
+      //    throw(context.strings.messages.cannotDrop);
+      // }
+      var newRow = (topBlock.num == 1) ? topBlock.row - 1 : topBlock.row;
+      var newCol = currPos;
+      context.craneContent.row = newRow;
+      context.craneContent.col = newCol;
+      var tempItem = context.craneContent;
+      context.items.push(tempItem);
+      context.setIndexes();
+      context.craneContent = undefined;
+      
+      if(context.display) {
+         if(context.animate){
+            context.dropAnim(tempItem,topBlock,callback);
+         }else{
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
+            redisplayItem(tempItem,false);
+         }
+      }
+      if(!context.display || !context.animate){
+         if(topBlock.num > 1){
+            context.destroy(topBlock);
          }
       }
 
@@ -1798,7 +1898,7 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
    };
 
-   context.dropAnim = function(item,callback) {
+   context.putDownAnim = function(item,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(item.row + 1);
       var itemAttr = itemAttributes(item);
@@ -1823,6 +1923,7 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
          // dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
+         context.crush();
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
          context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
@@ -1853,6 +1954,86 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+   };
+
+   context.dropAnim = function(item,topBlock,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = takeAnimDelay*(item.row + 1);
+      var itemAttr = itemAttributes(item);
+
+      var dustY = itemAttr.y + itemAttr.height - dustH*scale/2;
+      var dustX = itemAttr.x + (itemAttr.width - dustW*scale)/2;
+      
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
+      var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
+         if(topBlock && topBlock.num > 1){
+            context.destroy(topBlock);
+         }
+         dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
+         $("#dust_pix").attr("src",dustSrc);
+         context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
+            if(dust){
+               dust.remove();
+               dust = null;
+            }
+         }, dustDuration);
+         if(callback){
+            context.waitDelay(callback);
+         }
+      });
+      context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
+      context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+      context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+      // var catchOffsetY = item.catchOffsetY || 0;
+      // var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
+      // var deltaY = yClawDown - craneAttr.yClaws;
+      // var yShaftDown = craneAttr.yShaft + deltaY;
+      // var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
+      // lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
+      // var cyLeftDown = craneAttr.cyLeft + deltaY;
+      // var cyRightDown = craneAttr.cyRight + deltaY;
+      
+      // // var itemY = (infos.topMargin + clawsPos + craneItemOffset + topBlock.offsetY)*scale;
+
+      // var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
+      // var animShaftDown = new Raphael.animation({ y: yShaftDown },delay);
+      // var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },delay);
+      // var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },delay);
+      // var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
+      //    context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
+      //    context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+      //    // dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
+      //    dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
+      //    $("#dust_pix").attr("src",dustSrc);
+      //    context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
+      //       if(dust){
+      //          dust.remove();
+      //          dust = null;
+      //       }
+      //    }, dustDuration);
+      // });
+      // var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
+      // var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
+      //    context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+      //    context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
+      //    context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
+      //    context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
+      // });
+      // var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      // var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
+      // var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
+      // var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,function() {
+      //    if(callback){
+      //       context.waitDelay(callback);
+      //    }
+      // });
+
+      // context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      // context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
+      // context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
+      // context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
+      // context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
    };
 
    context.tryToGo = function(col) {
@@ -1940,7 +2121,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.destroy = function(item) {
-      // console.log("destroy")
       context.setIndexes();
       context.items.splice(item.index, 1);
 
