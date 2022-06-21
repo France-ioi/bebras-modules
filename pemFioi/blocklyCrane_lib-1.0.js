@@ -45,7 +45,12 @@ var getContext = function(display, infos, curLevel) {
                drop: "poser",
                colHeight: "hauteur de la colonne",
                placeMarker: "Placer le marqueur n°",             
-               goToMarker: "Aller au marqueur n°"             
+               goToMarker: "aller au marqueur n°",
+               expectedBlock: "brique attendue",
+               topBlock: "brique du dessus",
+               carriedBlock: "brique transportée",
+               topBlockBroken: "brique du dessus est cassée",
+               carriedBlockBroken: "brique transportée est cassée",            
             },
             code: {
                left: "gauche",
@@ -54,7 +59,13 @@ var getContext = function(display, infos, curLevel) {
                drop: "poser",
                colHeight: "hauteurColonne",
                placeMarker: "placerMarqueur",
-               goToMarker: "allerAuMarqueur"
+               goToMarker: "allerAuMarqueur",
+               expectedBlock: "briqueAttendue",
+               topBlock: "briqueDuDessus",           
+               carriedBlock: "briqueTransportee",
+               topBlockBroken: "briqueDuDessusCassee",
+               carriedBlockBroken: "briqueTransporteeCassee",                
+
             },
             description: {
                left: "gauche() fait se déplacer la grue d'une case vers la gauche",
@@ -452,15 +463,85 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "expectedBlock",
+      type: "sensors",
+      block: { name: "expectedBlock", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getExpectedBlock());
+      }
+   });
+
+   // infos.newBlocks.push({
+   //    name: "expectedBlockAt",
+   //    type: "sensors",
+   //    block: { name: "expectedBlockAt", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.getExpectedBlock());
+   //    }
+   // });
+
+   infos.newBlocks.push({
+      name: "topBlock",
+      type: "sensors",
+      block: { name: "topBlock", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getTopBlock());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "topBlockBroken",
+      type: "sensors",
+      block: { name: "topBlockBroken", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isTopBlockBroken());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "carriedBlock",
+      type: "sensors",
+      block: { name: "carriedBlock", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getCarriedBlock());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "carriedBlockBroken",
+      type: "sensors",
+      block: { name: "carriedBlockBroken", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isCarriedBlockBroken());
+      }
+   });
+
+   infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
-      block: { name: "placeMarker", params: [null] , blocklyXml: "<block type='placeMarker'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>1</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>" },
+      block: { name: "placeMarker", params: [{ options: ["A", "B", "C"] }] , 
+      // blocklyXml: "<block type='placeMarker'>" +
+      //             "  <value name='PARAM_0'>" +
+      //             "    <shadow type='math_number'>" +
+      //             "      <field name='NUM'>1</field>" +
+      //             "    </shadow>" +
+      //             "  </value>" +
+      //             "</block>" 
+      },
+      // block: { name: "placeMarker",
+      //          params: [{ options: ["A", "B", "C"] }],
+      //          params_names: ['marker'],
+      //          // type: "field_dropdown",
+      //          // options: [["A","1"], ["B","2"], ["C","2"]]
+      //          // yieldsValue: true,
+      //          // blocklyXml: "<block type='placeMarker'>" +
+      //          //    "  <value name='PARAM_0' type='field_dropdown'>" +
+      //          // //    "    <shadow type='Const'>" +
+      //          // //    "      <field name='field_dropdown'></field>" +
+      //          // //    "    </shadow>" +
+      //          //    "  </value>" +
+      //          //    "</block>" 
+      //       },
       func: function(value, callback) {
          this.placeMarker(value);
          this.waitDelay(callback);
@@ -470,13 +551,14 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "goToMarker",
       type: "actions",
-      block: { name: "goToMarker", params: [null] , blocklyXml: "<block type='goToMarker'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>1</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>" },
+      block: { name: "goToMarker", params: [null] , 
+      blocklyXml: "<block type='goToMarker'>" +
+                  "  <value name='PARAM_0'>" +
+                  "    <shadow type='math_number'>" +
+                  "      <field name='NUM'>1</field>" +
+                  "    </shadow>" +
+                  "  </value>" +
+                  "</block>" },
       func: function(value, callback) {
          this.goToMarker(value,callback);
       }
@@ -796,6 +878,62 @@ var getContext = function(display, infos, curLevel) {
       var h = nbRows - topBlock.row;
 
       return h
+   };
+
+   context.getExpectedBlock = function() {
+      var col = this.cranePos;
+      var nbRowsCont = this.nbRowsCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+
+      for(var row = nbRows - 1; row >= 0; row--){
+         var tar = this.target[row][col];
+         if(tar > 1){
+            for(var item of this.items){
+               if(item.row == row && item.col == col && !item.target){
+                  continue
+               }
+            }
+            // console.log(tar)
+            return tar
+         }
+      }
+      // console.log(0)
+      return 0
+   };
+
+   context.getTopBlock = function() {
+      var col = this.cranePos;
+      var topblock = this.findTopBlock(col);
+      if(!topBlock){
+         return 0
+      }
+      return topBlock
+   };
+
+   context.getCarriedBlock = function() {
+      if(!this.craneContent){
+         // console.log(0)
+         return 0
+      }
+      // console.log(this.craneContent.num);
+      return this.craneContent.num
+   };
+
+   context.isTopBlockBroken = function() {
+      var col = this.cranePos;
+      var topblock = this.findTopBlock(col);
+      if(!topBlock){
+         return 0
+      }
+      return (topBlock.broken === true)
+   };
+
+   context.isCarriedBlockBroken = function() {
+      if(!this.craneContent){
+         // console.log(0)
+         return false
+      }
+      return (this.craneContent.broken === true)
    };
    
    var itemAttributes = function(item) {
