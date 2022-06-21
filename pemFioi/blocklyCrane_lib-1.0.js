@@ -536,20 +536,20 @@ var getContext = function(display, infos, curLevel) {
       name: "placeMarker",
       type: "actions",
       block: { name: "placeMarker", 
-      params: [null] , 
-      blocklyXml: "<block type='placeMarker'>" +
-                  "  <value name='PARAM_0'>" +
-                  "    <shadow type='math_number'>" +
-                  "      <field name='NUM'>1</field>" +
-                  "    </shadow>" +
-                  "  </value>" +
-                  "</block>" ,
-            //    blocklyJson: {
-            // "args0": [{
-            //    "type": "field_dropdown", "name": "PARAM_0", "options": [
-            //       ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
-            // }]
-         // },
+      // params: [null] , 
+      // blocklyXml: "<block type='placeMarker'>" +
+      //             "  <value name='PARAM_0'>" +
+      //             "    <shadow type='math_number'>" +
+      //             "      <field name='NUM'>1</field>" +
+      //             "    </shadow>" +
+      //             "  </value>" +
+      //             "</block>" ,
+            blocklyJson: {
+            "args0": [{
+               "type": "field_dropdown", "name": "PARAM_0", "options": [
+                  ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
+            }]
+         },
       },
       // block: { name: "placeMarker",
       //          params: [{ options: ["A", "B", "C"] }],
@@ -574,14 +574,22 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "goToMarker",
       type: "actions",
-      block: { name: "goToMarker", params: [null] , 
-      blocklyXml: "<block type='goToMarker'>" +
-                  "  <value name='PARAM_0'>" +
-                  "    <shadow type='math_number'>" +
-                  "      <field name='NUM'>1</field>" +
-                  "    </shadow>" +
-                  "  </value>" +
-                  "</block>" },
+      block: { name: "goToMarker", 
+      // params: [null] , 
+      // blocklyXml: "<block type='goToMarker'>" +
+      //             "  <value name='PARAM_0'>" +
+      //             "    <shadow type='math_number'>" +
+      //             "      <field name='NUM'>1</field>" +
+      //             "    </shadow>" +
+      //             "  </value>" +
+      //             "</block>" },
+      blocklyJson: {
+            "args0": [{
+               "type": "field_dropdown", "name": "PARAM_0", "options": [
+                  ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
+            }]
+         },
+      },
       func: function(value, callback) {
          this.goToMarker(value,callback);
       }
@@ -1565,7 +1573,7 @@ var getContext = function(display, infos, curLevel) {
       for(var iMark = 0; iMark < context.markers.length; iMark++){
          var marker = context.markers[iMark];
          var col = marker.col;
-         var num = marker.num;
+         var name = marker.name;
          var x = x0 + (cSide * (col + 0.5))* scale;
          var xRect = x - (mSide/2)*scale;
          var yLine1 = y0 + mSide*scale - 2;
@@ -1577,7 +1585,7 @@ var getContext = function(display, infos, curLevel) {
             marker.element[3].attr({ x: xRect + 2, y: y0 - 3, width: mSide*scale, height: mSide*scale }).hide();
          }else{
             var rect = paper.rect(xRect,y0,mSide*scale,mSide*scale).attr(attr.rect);
-            var text = paper.text(x,yText,num).attr(attr.text).attr(textFontSize);
+            var text = paper.text(x,yText,name).attr(attr.text).attr(textFontSize);
             var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
             var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
             marker.element = paper.set(rect,text,pole,bRect);
@@ -1717,7 +1725,7 @@ var getContext = function(display, infos, curLevel) {
    context.goToMarker = function(value,callback) {
       var newCol;
       for(var iMark = 0; iMark < this.markers.length; iMark++){
-         if(this.markers[iMark].num == value){
+         if(this.markers[iMark].name == value){
             newCol = this.markers[iMark].col;
          }
       }
@@ -1726,7 +1734,7 @@ var getContext = function(display, infos, curLevel) {
       }
       if(context.display){
          for(var marker of this.markers){
-            if(marker.num == value){
+            if(marker.name == value){
                marker.element[0].toFront();
                marker.element[1].toFront();
             }
@@ -2100,20 +2108,20 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.placeMarker = function(value) {
-      if(isNaN(value) || value < 1 || value > 9){
-         throw(strings.messages.wrongMarkerNumber);
-      }
+      // if(isNaN(value) || value < 1 || value > 9){
+      //    throw(strings.messages.wrongMarkerNumber);
+      // }
       var col = this.cranePos;
       var alreadyExist = false;
       for(var iMark = 0; iMark < this.markers.length; iMark++){
          var marker = this.markers[iMark];
-         if(marker.num == value){
+         if(marker.name == value){
             marker.col = col;
             alreadyExist = true;
          }
       }
       if(!alreadyExist){
-         this.markers.push({ num: value, col });
+         this.markers.push({ name: value, col });
       }
       if(context.display) {
          redisplayMarkers();
