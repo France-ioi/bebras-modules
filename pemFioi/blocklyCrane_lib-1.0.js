@@ -519,29 +519,15 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
-      block: { name: "placeMarker", params: [{ options: ["A", "B", "C"] }] , 
-      // blocklyXml: "<block type='placeMarker'>" +
-      //             "  <value name='PARAM_0'>" +
-      //             "    <shadow type='math_number'>" +
-      //             "      <field name='NUM'>1</field>" +
-      //             "    </shadow>" +
-      //             "  </value>" +
-      //             "</block>" 
+      block: {
+         name: "placeMarker",
+         blocklyJson: {
+            "args0": [{
+               "type": "field_dropdown", "name": "PARAM_0", "options": [
+                  ["A", "A"], ["B", "B"], ["C", "C"]]
+            }]
+         },
       },
-      // block: { name: "placeMarker",
-      //          params: [{ options: ["A", "B", "C"] }],
-      //          params_names: ['marker'],
-      //          // type: "field_dropdown",
-      //          // options: [["A","1"], ["B","2"], ["C","2"]]
-      //          // yieldsValue: true,
-      //          // blocklyXml: "<block type='placeMarker'>" +
-      //          //    "  <value name='PARAM_0' type='field_dropdown'>" +
-      //          // //    "    <shadow type='Const'>" +
-      //          // //    "      <field name='field_dropdown'></field>" +
-      //          // //    "    </shadow>" +
-      //          //    "  </value>" +
-      //          //    "</block>" 
-      //       },
       func: function(value, callback) {
          this.placeMarker(value);
          this.waitDelay(callback);
