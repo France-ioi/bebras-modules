@@ -272,8 +272,14 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            tower_1: { num: 2, img: imgPath+"crane/sciFi/tower_1.png", side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
-            tower_2: { num: 3, img: imgPath+"crane/sciFi/tower_2.png", side: 60, isMovable: true, zOrder: 1 },
+            tower_1: { num: 2, 
+               img: imgPath+"crane/sciFi/tower_1.png", 
+               brokenImg: imgPath+"crane/sciFi/tower_1_broken.png",
+               side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
+            tower_2: { num: 3, 
+               img: imgPath+"crane/sciFi/tower_2.png", 
+               brokenImg: imgPath+"crane/sciFi/tower_2_broken.png",
+               side: 60, isMovable: true, zOrder: 1 },
             tower_3: { num: 4, img: imgPath+"crane/sciFi/tower_3.png", side: 60, isMovable: true, zOrder: 1},
             tower_4: { num: 5, img: imgPath+"crane/sciFi/tower_4.png", side: 60, isMovable: true, zOrder: 1},
             tower_5: { num: 6, img: imgPath+"crane/sciFi/tower_5.png", side: 60, isMovable: true, zOrder: 1},
@@ -772,6 +778,7 @@ var getContext = function(display, infos, curLevel) {
          context.nbColCont =  (context.nbRowsCont > 0) ? context.container[0].length : 0;
          context.initCranePos = gridInfos.initCranePos || 0;
          context.target = gridInfos.target || [];
+         context.broken = gridInfos.broken || [];
       }
       context.cranePos = context.initCranePos;
       context.craneContent = null;
@@ -1275,11 +1282,13 @@ var getContext = function(display, infos, curLevel) {
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var itemTypeNum = context.tiles[iRow][iCol];
+            var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
                   col: iCol + nbColCont,
-                  type: itemTypeByNum[itemTypeNum]
+                  type: itemTypeByNum[itemTypeNum],
+                  broken
                }, false);
             }
             var targetNum = context.target[iRow][iCol];
@@ -1559,7 +1568,13 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(item.img) {
-         var src = (item.target && item.targetImg) ? imgUrlWithPrefix(item.targetImg) : imgUrlWithPrefix(item.img);
+         if(item.target && item.targetImg){
+            var src = imgUrlWithPrefix(item.targetImg);
+         }else if(item.broken && item.brokenImg){
+            var src = imgUrlWithPrefix(item.brokenImg);
+         }else{
+            var src = imgUrlWithPrefix(item.img);
+         }
          item.element = paper.image(src, x, y, item.side * item.nbStates * scale, item.side * scale);
          if(item.target && !item.targetImg){
             item.element.attr("opacity",0.3);
