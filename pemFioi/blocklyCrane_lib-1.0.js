@@ -48,7 +48,10 @@ var getContext = function(display, infos, curLevel) {
                placeMarker: "Placer le marqueur",             
                goToMarker: "aller au marqueur",
                expectedBlock: "brique attendue",
+               expectedBlockAt: "brique attendue ligne %1 colonne %2",
                topBlock: "brique du dessus",
+               blockAt: "brique ligne %1 colonne %2",
+               brokenBlockAt: "brique cassée ligne %1 colonne %2",
                carriedBlock: "brique transportée",
                topBlockBroken: "brique du dessus est cassée",
                carriedBlockBroken: "brique transportée est cassée",            
@@ -63,7 +66,10 @@ var getContext = function(display, infos, curLevel) {
                placeMarker: "placerMarqueur",
                goToMarker: "allerAuMarqueur",
                expectedBlock: "briqueAttendue",
+               expectedBlockAt: "briqueAttendueA",
                topBlock: "briqueDuDessus",           
+               blockAt: "briqueA",
+               brokenBlockAt: "briqueCasseeA",
                carriedBlock: "briqueTransportee",
                topBlockBroken: "briqueDuDessusCassee",
                carriedBlockBroken: "briqueTransporteeCassee",                
@@ -83,7 +89,7 @@ var getContext = function(display, infos, curLevel) {
                emptyCrane: "La grue ne porte pas de bloc",
                cannotDrop: "Vous ne pouvez pas déposer de bloc dans cette colonne",
                notWrecking: "Vous ne pouvez pas lâcher ce bloc",
-               wrongMarkerNumber: "Le numéro du marqueur doit être compris entre 1 et 9",
+               wrongCoordinates: "Les coordonnées sont invalides",
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
@@ -487,14 +493,21 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-   // infos.newBlocks.push({
-   //    name: "expectedBlockAt",
-   //    type: "sensors",
-   //    block: { name: "expectedBlockAt", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.getExpectedBlock());
-   //    }
-   // });
+   infos.newBlocks.push({
+      name: "expectedBlockAt",
+      type: "sensors",
+      block: { name: "expectedBlockAt", yieldsValue: 'int',
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(row,col,callback) {
+         this.callCallback(callback, this.getExpectedBlockAt(row,col));
+      }
+   });
 
    infos.newBlocks.push({
       name: "topBlock",
@@ -511,6 +524,38 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "topBlockBroken", yieldsValue: true },
       func: function(callback) {
          this.callCallback(callback, this.isTopBlockBroken());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "blockAt",
+      type: "sensors",
+      block: { name: "blockAt", yieldsValue: 'int',
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(row,col,callback) {
+         this.callCallback(callback, this.getBlockAt(row,col));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "brokenBlockAt",
+      type: "sensors",
+      block: { name: "brokenBlockAt", yieldsValue: 'bool',
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(row,col,callback) {
+         this.callCallback(callback, this.isBlockAtBroken(row,col));
       }
    });
 
@@ -536,35 +581,13 @@ var getContext = function(display, infos, curLevel) {
       name: "placeMarker",
       type: "actions",
       block: { name: "placeMarker", 
-      // params: [null] , 
-      // blocklyXml: "<block type='placeMarker'>" +
-      //             "  <value name='PARAM_0'>" +
-      //             "    <shadow type='math_number'>" +
-      //             "      <field name='NUM'>1</field>" +
-      //             "    </shadow>" +
-      //             "  </value>" +
-      //             "</block>" ,
-            blocklyJson: {
+         blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
                   ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
             }]
-         },
+         }
       },
-      // block: { name: "placeMarker",
-      //          params: [{ options: ["A", "B", "C"] }],
-      //          params_names: ['marker'],
-      //          // type: "field_dropdown",
-      //          // options: [["A","1"], ["B","2"], ["C","2"]]
-      //          // yieldsValue: true,
-      //          // blocklyXml: "<block type='placeMarker'>" +
-      //          //    "  <value name='PARAM_0' type='field_dropdown'>" +
-      //          // //    "    <shadow type='Const'>" +
-      //          // //    "      <field name='field_dropdown'></field>" +
-      //          // //    "    </shadow>" +
-      //          //    "  </value>" +
-      //          //    "</block>" 
-      //       },
       func: function(value, callback) {
          this.placeMarker(value);
          this.waitDelay(callback);
@@ -575,14 +598,6 @@ var getContext = function(display, infos, curLevel) {
       name: "goToMarker",
       type: "actions",
       block: { name: "goToMarker", 
-      // params: [null] , 
-      // blocklyXml: "<block type='goToMarker'>" +
-      //             "  <value name='PARAM_0'>" +
-      //             "    <shadow type='math_number'>" +
-      //             "      <field name='NUM'>1</field>" +
-      //             "    </shadow>" +
-      //             "  </value>" +
-      //             "</block>" },
       blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -935,12 +950,23 @@ var getContext = function(display, infos, curLevel) {
                   continue
                }
             }
-            // console.log(tar)
             return tar
          }
       }
-      // console.log(0)
       return 0
+   };
+
+   context.getExpectedBlockAt = function(row,col) {
+      var nbRowsCont = this.nbRowsCont;
+      var nbColCont = this.nbColCont;
+      var nbCol = this.nbCols + nbColCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+      if(row < 1 || row > nbRows || col < 1 || col > nbCol){
+         throw(strings.messages.wrongCoordinates);
+      }
+      var tar = this.target[row - 1][col - 1];
+      // console.log( (tar > 1) ? tar : 0)
+      return (tar > 1) ? tar : 0
    };
 
    context.getTopBlock = function() {
@@ -950,6 +976,19 @@ var getContext = function(display, infos, curLevel) {
          return 0
       }
       return topBlock
+   };
+
+   context.getBlockAt = function(row,col) {
+      var nbRowsCont = this.nbRowsCont;
+      var nbColCont = this.nbColCont;
+      var nbCol = this.nbCols + nbColCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+      if(row < 1 || row > nbRows || col < 1 || col > nbCol){
+         throw(strings.messages.wrongCoordinates);
+      }
+      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
+      var id = (items.length == 0) ? 0 : items[0].num;
+      return id
    };
 
    context.getCarriedBlock = function() {
@@ -976,6 +1015,20 @@ var getContext = function(display, infos, curLevel) {
          return false
       }
       return (this.craneContent.broken === true)
+   };
+
+   context.isBlockAtBroken = function(row,col) {
+      var nbRowsCont = this.nbRowsCont;
+      var nbColCont = this.nbColCont;
+      var nbCol = this.nbCols + nbColCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+      if(row < 1 || row > nbRows || col < 1 || col > nbCol){
+         throw(strings.messages.wrongCoordinates);
+      }
+      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
+      var broken = (items.length == 0) ? false : (items[0].broken === true);
+      
+      return broken
    };
    
    var itemAttributes = function(item) {
@@ -1129,14 +1182,19 @@ var getContext = function(display, infos, curLevel) {
       if(infos.showLabels) {
          if(infos.rowLabelEnabled){
             for(var iRow = 0;iRow < context.nbRows;iRow++) {
-               rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+               if(!infos.labelFrameAttr){
+                  rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+               }else{
+                  var frame = paper.rect(0,0,0,0).attr(infos.labelFrameAttr);
+                  var text = paper.text(0, 0, (iRow + 1));
+                  rowsLabels[iRow] = [frame,text];
+               }
             }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             if(!infos.labelFrameAttr){
                colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
             }else{
-               // colsLabels[iCol] = paper.set();
                var frame = paper.rect(0,0,0,0).attr(infos.labelFrameAttr);
                var text = paper.text(0, 0, (iCol + 1));
                colsLabels[iCol] = [frame,text];
@@ -1406,7 +1464,17 @@ var getContext = function(display, infos, curLevel) {
             for(var iRow = 0;iRow < context.nbRows;iRow++) {
                var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
                var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin + markerH) * scale;
-               rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
+               if(!infos.labelFrameAttr){
+                  rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
+               }else{
+                  var frSize = infos.labelFrameSize*cSide*scale;
+                  var labelSize = infos.labelSize*cSide*scale;
+                  var xFr = x - frSize/2;
+                  var yFr = y - frSize/2;
+                  var yLabel = yFr + frSize/2;
+                  rowsLabels[iRow][0].attr({x: xFr, y: yFr, width: frSize, height: frSize});
+                  rowsLabels[iRow][1].attr({x, y, "font-size": labelSize}).attr(labelAttr);
+               }
             }
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
@@ -1993,55 +2061,6 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
       context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
-      // var catchOffsetY = item.catchOffsetY || 0;
-      // var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
-      // var deltaY = yClawDown - craneAttr.yClaws;
-      // var yShaftDown = craneAttr.yShaft + deltaY;
-      // var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
-      // lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
-      // var cyLeftDown = craneAttr.cyLeft + deltaY;
-      // var cyRightDown = craneAttr.cyRight + deltaY;
-      
-      // // var itemY = (infos.topMargin + clawsPos + craneItemOffset + topBlock.offsetY)*scale;
-
-      // var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
-      // var animShaftDown = new Raphael.animation({ y: yShaftDown },delay);
-      // var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },delay);
-      // var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },delay);
-      // var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
-      //    context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
-      //    context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
-      //    // dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
-      //    dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
-      //    $("#dust_pix").attr("src",dustSrc);
-      //    context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
-      //       if(dust){
-      //          dust.remove();
-      //          dust = null;
-      //       }
-      //    }, dustDuration);
-      // });
-      // var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
-      // var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
-      //    context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
-      //    context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
-      //    context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
-      //    context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
-      // });
-      // var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
-      // var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
-      // var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
-      // var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,function() {
-      //    if(callback){
-      //       context.waitDelay(callback);
-      //    }
-      // });
-
-      // context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
-      // context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
-      // context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
-      // context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
-      // context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
    };
 
    context.tryToGo = function(col) {
