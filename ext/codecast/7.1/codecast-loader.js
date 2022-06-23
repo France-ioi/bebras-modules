@@ -1,6 +1,13 @@
 $(document).ready(function() {
   if (window.taskData) {
     var taskInstructionsHtml = $('#taskIntro').html();
+
+    var hints = $('#taskHints > div').toArray().map(elm => {
+      return {
+        content: elm.innerHTML.trim()
+      };
+    });
+
     var additionalOptions = window.taskData.codecastParameters ? window.taskData.codecastParameters : {};
 
     var codecastParameters = $.extend(true, {
@@ -22,6 +29,7 @@ $(document).ready(function() {
       authProviders: ["algorea", "guest"],
       task: window.taskData,
       taskInstructions: taskInstructionsHtml,
+      taskHints: hints,
     }, additionalOptions);
 
     Codecast.start(codecastParameters);
