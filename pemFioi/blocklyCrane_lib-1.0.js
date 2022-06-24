@@ -787,6 +787,7 @@ var getContext = function(display, infos, curLevel) {
       context.multicell_items = [];
 
       context.markers = [];
+      this.highlights = [];
       
       // context.last_connect = undefined;
       // context.wires = [];
@@ -893,7 +894,6 @@ var getContext = function(display, infos, curLevel) {
       var cSide = infos.cellSide;
       // console.log(infos)
       
-      context.highlights = [];
       for(var pos of cellPos){
          var { row, col } = pos;
          // var x = (cSide * col + infos.leftMargin) * scale;
@@ -1526,8 +1526,8 @@ var getContext = function(display, infos, curLevel) {
       setCraneAttr(craneAttr);
 
       /* highlights */
-      if(context.highlights){
-         for(var dat of context.highlights){
+      if(this.highlights.length > 0){
+         for(var dat of this.highlights){
             var { row, col, obj } = dat;
             var width = cSide*scale, height = w;
             var { x, y } = this.getCellCoord(row,col);
@@ -1765,7 +1765,7 @@ var getContext = function(display, infos, curLevel) {
       var selected = [];
       for(var id in context.items) {
          var item = context.items[id];
-         if(item.num == num && !item.target) {
+         if(item.num == num && !item.target && !item.broken) {
             selected.push({ row: item.row, col: item.col });
          }
       }
