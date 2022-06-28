@@ -1363,11 +1363,11 @@ var getContext = function(display, infos, curLevel) {
       }
       if(context.initCraneContent != undefined){
          resetItem({
-            row: -1,
+            row: 0,
             col: context.initCranePos,
             type: itemTypeByNum[context.initCraneContent]
          }, false);
-         var it = context.getItemsOn(-1,context.initCranePos, obj => !obj.target);
+         var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target);
          context.setIndexes();
          context.items.splice(it[0].index, 1);
          context.craneContent = it[0];
@@ -2305,12 +2305,16 @@ var robotEndConditions = {
                var items = context.getItemsOn(gridRow,gridCol,it => !it.target);
                // console.log(id,items)
                if(items.length > 0){
-                  context.success = false;
-                  // console.log(iRow,iCol);
-                  if(context.display){
-                     context.highlightCells([{row:gridRow,col:gridCol}]);
+                  for(var item of items){
+                     if(!item.wrecking){
+                        context.success = false;
+                        // console.log(iRow,iCol);
+                        if(context.display){
+                           context.highlightCells([{row:gridRow,col:gridCol}]);
+                        }
+                        throw(window.languageStrings.messages.failureUnwanted);
+                     }
                   }
-                  throw(window.languageStrings.messages.failureUnwanted);
                }
             }
          }
