@@ -746,7 +746,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var dustSrc = imgPath+"crane/dust.png";
-   // var dustSrc = "assets/beredith.gif";
    var dustW = 80;
    var dustH = 28;
    var dustDuration = 1100;
@@ -812,6 +811,7 @@ var getContext = function(display, infos, curLevel) {
          context.tiles = gridInfos.tiles;
          context.container = gridInfos.container || [];
          context.initItems = gridInfos.initItems;
+         context.initCraneContent = gridInfos.initCraneContent;
          context.nbRows = context.tiles.length;
          context.nbCols = context.tiles[0].length;
          context.nbRowsCont =  context.container.length;
@@ -1360,6 +1360,17 @@ var getContext = function(display, infos, curLevel) {
       }
       for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
          resetItem(context.initItems[iItem], false);
+      }
+      if(context.initCraneContent != undefined){
+         resetItem({
+            row: -1,
+            col: context.initCranePos,
+            type: itemTypeByNum[context.initCraneContent]
+         }, false);
+         var it = context.getItemsOn(-1,context.initCranePos, obj => !obj.target);
+         context.setIndexes();
+         context.items.splice(it[0].index, 1);
+         context.craneContent = it[0];
       }
       
       if(context.display){
