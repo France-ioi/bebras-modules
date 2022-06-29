@@ -881,6 +881,7 @@ var getContext = function(display, infos, curLevel) {
          paper = this.raphaelFactory.create("paperMain", "grid", paperW, paperH);
          context.paper = paper;
          resetBoard();
+         resetCrane();
          resetItems();
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
@@ -901,6 +902,8 @@ var getContext = function(display, infos, curLevel) {
          paper = this.raphaelFactory.create("paperMain", "grid", paperW, paperH);
          context.paper = paper;
          resetBoard();
+         // resetItems();
+         resetCrane();
          // console.log("redrawDisplay")
          redisplayAllItems();
          context.updateScale();
@@ -1267,7 +1270,6 @@ var getContext = function(display, infos, curLevel) {
       }
       // context.cells = cells;
 
-      resetCrane();
       $("#dust_pix").remove();
       $("body").append("<img src="+dustSrc+" style='width:1px;' id='dust_pix' />");
    };
@@ -1293,6 +1295,10 @@ var getContext = function(display, infos, curLevel) {
       crane.rightClaw = paper.image(src.rightClaw,0,0,0,0);
       crane.shaft = paper.image(src.shaft,0,0,0,0);
       crane.all = paper.setFinish();
+
+      if(context.craneContent){
+         redisplayItem(context.craneContent)
+      }
       resetCraneZOrder();
    };
    
@@ -2322,7 +2328,7 @@ var robotEndConditions = {
                         context.success = false;
                         // console.log(iRow,iCol);
                         if(context.display){
-                           context.highlightCells([{row:gridRow,col:gridCol}]);
+                           context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
                         }
                         throw(window.languageStrings.messages.failureUnwanted);
                      }
