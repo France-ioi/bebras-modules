@@ -1035,12 +1035,13 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.getTopBlock = function() {
+      // console.log("[yo] getTopBlock")
       var col = this.cranePos;
-      var topblock = this.findTopBlock(col);
+      var topBlock = this.findTopBlock(col);
       if(!topBlock){
          return 0
       }
-      return topBlock
+      return topBlock.num
    };
 
    context.getBlockAt = function(row,col) {
@@ -1096,6 +1097,36 @@ var getContext = function(display, infos, curLevel) {
       var broken = (items.length == 0) ? false : (items[0].broken === true);
       
       return broken
+   };
+
+   context.findTopBlock = function(col) {
+      // console.log("[yo] findTopBlock",col)
+      var itemsInCol = context.findItemsInCol(col);
+      if(itemsInCol.length == 0){
+         var nbRowsCont = context.nbRowsCont;
+         var nbRows = Math.max(context.nbRows,nbRowsCont);
+         return { row: nbRows, col, num: 1 }
+      }
+      var topRow = Infinity;
+      var topBlock;
+      for(var item of itemsInCol){
+         if(item.row < topRow){
+            topBlock = item;
+            topRow = item.row;
+         }
+      }
+      // console.log("[yo]",itemsInCol,topBlock)
+      return topBlock
+   };
+
+   context.findItemsInCol = function(col) {
+      var itemsInCol = [];
+      for(var item of context.items){
+         if(item.col == col && !item.target && !item.isMask){
+            itemsInCol.push(item);
+         }
+      }
+      return itemsInCol
    };
    
    var itemAttributes = function(item) {
@@ -2255,35 +2286,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    
-   context.findTopBlock = function(col) {
-      // console.log("findTopBlock",col)
-      var itemsInCol = context.findItemsInCol(col);
-      if(itemsInCol.length == 0){
-         var nbRowsCont = context.nbRowsCont;
-         var nbRows = Math.max(context.nbRows,nbRowsCont);
-         return { row: nbRows, col, num: 1 }
-      }
-      var topRow = Infinity;
-      var topBlock;
-      for(var item of itemsInCol){
-         if(item.row < topRow){
-            topBlock = item;
-            topRow = item.row;
-         }
-      }
-      // console.log(topBlock)
-      return topBlock
-   };
-
-   context.findItemsInCol = function(col) {
-      var itemsInCol = [];
-      for(var item of context.items){
-         if(item.col == col && !item.target && !item.isMask){
-            itemsInCol.push(item);
-         }
-      }
-      return itemsInCol
-   };
+   
 
    function maskToFront() {
       for(var item of context.items){
