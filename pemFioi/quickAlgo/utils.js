@@ -345,7 +345,7 @@ SrlLogger.logMouse = function(e) {
    if(e.type == 'mousemove') {
       // Throttle mousemove events
       SrlLogger.mouseMoveIgnore = true;
-      setTimeout(function() { SrlLogger.mouseMoveIgnore = false; }, 200);
+      setTimeout(function () { SrlLogger.mouseMoveIgnore = false; }, 100);
 
       if(SrlLogger.mouseButtons['left'] || SrlLogger.mouseButtons['right']) {
          state = 'drag';
