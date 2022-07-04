@@ -640,7 +640,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
-      block: { name: "placeMarker", 
+      block: { name: "placeMarker", params: [null],
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -655,9 +655,9 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
-      name: "goToMarker",
+      name: "goToMarker", 
       type: "actions",
-      block: { name: "goToMarker", 
+      block: { name: "goToMarker", params: [null],
       blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
