@@ -834,13 +834,14 @@ var getContext = function(display, infos, curLevel) {
          context.target = gridInfos.target || [];
          context.broken = gridInfos.broken || [];
          context.mask = gridInfos.mask || [];
-         context.markers = gridInfos.initMarkers || [];
+         context.initMarkers = gridInfos.initMarkers || [];
       }
       context.cranePos = context.initCranePos;
       context.craneContent = null;
       
       context.items = [];
       context.multicell_items = [];
+      context.markers = [];
 
       this.highlights = [];
       
@@ -886,6 +887,9 @@ var getContext = function(display, infos, curLevel) {
          resetBoard();
          resetCrane();
          resetItems();
+         for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
+            context.markers.push(Beav.Object.clone(context.initMarkers[iMark]));
+         }
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
       }else{
