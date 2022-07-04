@@ -834,6 +834,7 @@ var getContext = function(display, infos, curLevel) {
          context.target = gridInfos.target || [];
          context.broken = gridInfos.broken || [];
          context.mask = gridInfos.mask || [];
+         context.markers = gridInfos.initMarkers || [];
       }
       context.cranePos = context.initCranePos;
       context.craneContent = null;
@@ -841,7 +842,6 @@ var getContext = function(display, infos, curLevel) {
       context.items = [];
       context.multicell_items = [];
 
-      context.markers = [];
       this.highlights = [];
       
       // context.last_connect = undefined;
@@ -895,7 +895,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.redrawDisplay = function() {
-      // console.log("redrawDisplay",context.display)
+      // console.log("[crane] redrawDisplay")
       if(context.display) {
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
@@ -905,10 +905,9 @@ var getContext = function(display, infos, curLevel) {
          paper = this.raphaelFactory.create("paperMain", "grid", paperW, paperH);
          context.paper = paper;
          resetBoard();
-         // resetItems();
          resetCrane();
-         // console.log("redrawDisplay")
-         redisplayAllItems();
+         // redisplayMarkers();
+         // redisplayAllItems();
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
       }
@@ -1750,6 +1749,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    redisplayMarkers = function() {
+      // console.log("[crane] redisplayMarkers")
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
@@ -1771,17 +1771,15 @@ var getContext = function(display, infos, curLevel) {
          var yLine1 = y0 + mSide*scale - 2;
          var yLine2 = yLine1 + markerPoleH*scale;
          if(marker.element){
-            marker.element[0].attr({ x: xRect, y: y0, width: mSide*scale, height: mSide*scale })
-            marker.element[1].attr({ x, y: yText }).attr(textFontSize)
-            marker.element[2].attr({ path: ["M",x,yLine1,"V",yLine2] }).attr(textFontSize)
-            marker.element[3].attr({ x: xRect + 2, y: y0 - 3, width: mSide*scale, height: mSide*scale }).hide();
-         }else{
-            var rect = paper.rect(xRect,y0,mSide*scale,mSide*scale).attr(attr.rect);
-            var text = paper.text(x,yText,name).attr(attr.text).attr(textFontSize);
-            var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
-            var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
-            marker.element = paper.set(rect,text,pole,bRect);
+            marker.element.remove();
          }
+         var rect = paper.rect(xRect,y0,mSide*scale,mSide*scale).attr(attr.rect);
+         var text = paper.text(x,yText,name).attr(attr.text).attr(textFontSize);
+         var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
+         var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
+         marker.element = paper.set(rect,text,pole,bRect);
+         // console.log("[yo]",iMark,col,name,marker.element)
+
          for(var jMark = 0; jMark < context.markers.length; jMark++){
             if(iMark != jMark && col == context.markers[jMark].col){
                marker.element[3].show();
