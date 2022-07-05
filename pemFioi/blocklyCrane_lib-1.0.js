@@ -45,7 +45,7 @@ var getContext = function(display, infos, curLevel) {
                putDown: "poser",
                drop: "lâcher",
                colHeight: "hauteur de la colonne",
-               placeMarker: "Placer le marqueur",             
+               placeMarker: "placer le marqueur",             
                goToMarker: "aller au marqueur",
                expectedBlock: "brique attendue",
                expectedBlockAt: "brique attendue ligne %1 colonne %2",
@@ -644,7 +644,7 @@ var getContext = function(display, infos, curLevel) {
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
-                  ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
+                  ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
             }]
          }
       },
@@ -661,7 +661,7 @@ var getContext = function(display, infos, curLevel) {
       blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
-                  ["A", "A"], ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"], ["E", "E"]]
+                  ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
             }]
          },
       },
@@ -2258,7 +2258,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       // context.advanceTime(1);
-      if(callback && (!context.display || !context.animate)){
+      if(callback && (!context.display || !context.animate || !animate)){
          context.waitDelay(callback);
       }
    };
