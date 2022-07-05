@@ -843,6 +843,10 @@ var getContext = function(display, infos, curLevel) {
       context.multicell_items = [];
       context.markers = [];
 
+      for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
+         context.markers.push(Beav.Object.clone(context.initMarkers[iMark]));
+      }
+
       this.highlights = [];
       
       // context.last_connect = undefined;
@@ -887,9 +891,6 @@ var getContext = function(display, infos, curLevel) {
          resetBoard();
          resetCrane();
          resetItems();
-         for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
-            context.markers.push(Beav.Object.clone(context.initMarkers[iMark]));
-         }
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
       }else{
