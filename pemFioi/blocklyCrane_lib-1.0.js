@@ -1014,11 +1014,16 @@ var getContext = function(display, infos, curLevel) {
       for(var row = nbRows - 1; row >= 0; row--){
          var tar = this.target[row][col];
          if(tar > 1){
+            var occupied = false;
             for(var item of this.items){
                if(item.row == row && item.col == col && !item.target){
-                  continue
+                  occupied = true;
                }
             }
+            if(occupied){
+               continue
+            }
+            // console.log(tar,row,col,this.items)
             return tar
          }
       }
