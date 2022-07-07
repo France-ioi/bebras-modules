@@ -136,6 +136,8 @@
 
          'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
          'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
+         'numeric_keypad': { src: modulesPath + "/pemFioi/shared/numeric_keypad/keypad.js", id: "numeric_keypad" },
+         'numeric_keypad_css': { type: "stylesheet", src: modulesPath + "/pemFioi/shared/numeric_keypad/keypad.css", id: "numeric_keypad_css" },
 
          // Quiz task
          'quiz_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz/quizStyles-0.1.css", id: "quiz_styles"},
