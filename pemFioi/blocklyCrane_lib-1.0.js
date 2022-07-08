@@ -2228,7 +2228,8 @@ var getContext = function(display, infos, curLevel) {
             if(animate && context.animate) {
                var anim = new Raphael.animation({ x: craneAttr.xWheels },delay,function() {
                   if(callback){
-                     context.callCallback(callback);
+                     // context.callCallback(callback);
+                     // context.waitDelay(callback);
                   }
                });
                var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },delay);
@@ -2258,7 +2259,8 @@ var getContext = function(display, infos, curLevel) {
       }
       
       // context.advanceTime(1);
-      if(callback && (!context.display || !context.animate || !animate)){
+      // if(callback && (!context.display || !context.animate || !animate)){
+      if(callback){
          context.waitDelay(callback);
       }
    };
