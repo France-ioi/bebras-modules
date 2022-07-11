@@ -130,6 +130,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             wsConfig.readOnly = !!options.readOnly || this.readOnly;
             if(options.zoom) {
                wsConfig.zoom.controls = !!options.zoom.controls;
+               wsConfig.zoom.wheel = !!options.zoom.wheel;
                wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
             }
             if (this.scratchMode) {
