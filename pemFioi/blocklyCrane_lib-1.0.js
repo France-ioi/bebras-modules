@@ -1145,22 +1145,20 @@ var getContext = function(display, infos, curLevel) {
       var nbRows = Math.max(context.nbRows,nbRowsCont);
 
       var itemType = infos.itemTypes[item.type];
+
+      if(item.num == 1){
+         item.offsetX = 0;
+         item.offsetY = 0;
+         item.side = infos.cellSide;
+      }
       
       var x0 = infos.leftMargin*scale;
       var x = x0 + (infos.cellSide * item.col + item.offsetX)* scale;
       var y0 = (infos.topMargin + markerH + infos.cellSide * craneH)*scale;
-      var y = y0 + (infos.cellSide * item.row + /*(item.side - infos.cellSide) +*/ item.offsetY) * scale;
+      var y = y0 + (infos.cellSide * item.row + item.offsetY) * scale;
       if(context.nbRows < nbRowsCont){
          y += infos.cellSide*(nbRowsCont - context.nbRows) * scale;
       }
-
-      // var xClip = x;
-
-      // var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
-      // if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
-      //    x += item.side * scale / 2;
-      //    y += item.side * scale / 2;
-      // }
       
       var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale/*, "clip-rect": clipRect*/};
       return ret;
@@ -1899,7 +1897,8 @@ var getContext = function(display, infos, curLevel) {
       }else if(ttg == false){
          context.waitDelay(callback);
       }else{
-         // context.moveCrane(context.cranePos + dir/4, callback)
+         // console.log(context.cranePos + dir/4)
+         context.moveCrane(context.cranePos + dir/2)
          throw ttg;
       }
    };
@@ -1932,26 +1931,38 @@ var getContext = function(display, infos, curLevel) {
       var currPos = context.cranePos;
       var topBlock = context.findTopBlock(currPos);
       if(!topBlock || topBlock.num == 1){
-         throw(context.strings.messages.nothingToTake);
+         if(!context.display){
+            throw(context.strings.messages.nothingToTake);
+         }
+         topBlock.row = topBlock.row - 1;
+         callback = null;
       }
-      if(!topBlock.isMovable){
+      if(!topBlock.isMovable && topBlock.num != 1){
          throw(context.strings.messages.notMovable);
       }
-      var withdrawables = context.getItemsOn(topBlock.row, topBlock.col, obj=>!obj.target && !obj.isMask );
+      if(topBlock.num != 1){
+         var withdrawables = context.getItemsOn(topBlock.row, topBlock.col, obj=>!obj.target && !obj.isMask );
 
-      var withdrawable = withdrawables[0];
+         var withdrawable = withdrawables[0];
 
-      context.setIndexes();
-      context.items.splice(withdrawable.index, 1);
-      context.craneContent = withdrawable;
+         context.setIndexes();
+         context.items.splice(withdrawable.index, 1);
+         context.craneContent = withdrawable;
+      }
       
       if(context.display) {
          resetCraneZOrder();
          if(context.animate){
             context.takeAnim(topBlock,callback);
+            if(topBlock.num == 1){
+               throw(context.strings.messages.nothingToTake);
+            }
          }else{
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
+            if(topBlock.num == 1){
+               throw(context.strings.messages.nothingToTake);
+            }
          }
       }
 
@@ -2008,10 +2019,6 @@ var getContext = function(display, infos, curLevel) {
       }
       var currPos = context.cranePos;
       var topBlock = context.findTopBlock(currPos);
-      // console.log(topBlock)
-      // if(!topBlock || topBlock.row == 0){
-      //    throw(context.strings.messages.cannotDrop);
-      // }
       var newRow = (topBlock.num == 1) ? topBlock.row - 1 : topBlock.row;
       var newCol = currPos;
       context.craneContent.row = newRow;
@@ -2087,6 +2094,9 @@ var getContext = function(display, infos, curLevel) {
       });
       var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
+         if(topBlock.num == 1){
+            return
+         }
          context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
          context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
          context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
@@ -2219,7 +2229,8 @@ var getContext = function(display, infos, curLevel) {
       var animate = (context.cranePos != newCol);
       
       var oldPos = context.cranePos;
-      context.cranePos = Math.floor(newCol);
+      // context.cranePos = Math.floor(newCol);
+      context.cranePos = newCol;
       
       if(context.display) {
          var craneAttr = getCraneAttr();
