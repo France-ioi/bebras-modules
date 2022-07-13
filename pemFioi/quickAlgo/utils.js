@@ -315,9 +315,9 @@ SrlLogger.logMouseInit = function() {
 
    SrlLogger.mouseButtons = {'left': false, 'right': false};
 
-   window.addEventListener('mousedown', SrlLogger.logMouse);
-   window.addEventListener('mousemove', SrlLogger.logMouse);
-   window.addEventListener('mouseup', SrlLogger.logMouse);
+   window.addEventListener('mousedown', SrlLogger.logMouse, true);
+   window.addEventListener('mousemove', SrlLogger.logMouse, true);
+   window.addEventListener('mouseup', SrlLogger.logMouse, true);
 
    SrlLogger.logMouseInitialized = true;
 };
@@ -403,7 +403,7 @@ SrlLogger.logMouse = function(e) {
 SrlLogger.logKeyboardInit = function() {
    if(SrlLogger.logKeyboardInitialized) { return; }
 
-   window.addEventListener('keydown', SrlLogger.logKeyboard);
+   window.addEventListener('keydown', SrlLogger.logKeyboard, true);
 
    SrlLogger.logKeyboardInitialized = true;
 };
