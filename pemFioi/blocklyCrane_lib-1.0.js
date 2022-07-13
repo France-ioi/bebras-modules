@@ -93,6 +93,10 @@ var getContext = function(display, infos, curLevel) {
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
+               partialSuccess: function(thresh) {
+                  var perc = Math.round(thresh*100);
+                  return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+               },
                failureMissing: function(nb) {
                   var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
                   return "La case encadrée en rouge devrait contenir "+str+" en jaune"
@@ -100,6 +104,10 @@ var getContext = function(display, infos, curLevel) {
                failureWrongBlock: function(nb) {
                   var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
                   return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureBrokenBlock: function(nb) {
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
                },
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
@@ -843,6 +851,7 @@ var getContext = function(display, infos, curLevel) {
       context.multicell_items = [];
       context.markers = [];
 
+
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
          context.markers.push(Beav.Object.clone(context.initMarkers[iMark]));
       }
@@ -854,6 +863,7 @@ var getContext = function(display, infos, curLevel) {
       
       context.lost = false;
       context.success = false;
+      context.partialSuccessThreshold = 0.5;
       context.nbMoves = 0;
       context.time = 0;
       context.animate = true;
@@ -2324,10 +2334,32 @@ var getContext = function(display, infos, curLevel) {
 var robotEndConditions = {
    dev: function(context, lastTurn) {
       var tar = context.target;
+      var til = context.tiles;
+      var bro = context.broken;
       if(!tar){
          context.success = true;
          throw(window.languageStrings.messages.success);
       }
+      var nbRequired = 0;
+      var nbWellPlaced = 0;
+      for(var iRow = 0; iRow < tar.length; iRow++){
+         for(var iCol = 0; iCol < tar[iRow].length; iCol++){
+            var idTar = tar[iRow][iCol];
+            var idTil = til[iRow][iCol];
+            var idBro = (bro.length > 0) ? bro[iRow][iCol] : 0;
+            var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
+            var gridCol = iCol + context.nbColCont;
+            if(idTar != 1 && (idTil != idTar || idBro == 1)){
+               nbRequired++;
+               var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+               if(items.length > 0 && items[0].num == idTar && !items[0].broken){
+                  nbWellPlaced++;
+               }
+            }
+         }
+      }
+      var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold) ? true : false;
+      // console.log("[yo]",nbRequired,nbWellPlaced,nbRequired*context.partialSuccessThreshold,partialSuccess)
       for(var iRow = 0; iRow < tar.length; iRow++){
          for(var iCol = 0; iCol < tar[iRow].length; iCol++){
             var id = tar[iRow][iCol];
@@ -2348,7 +2380,9 @@ var robotEndConditions = {
                         context.highlightCells([{row:pos.row,col:pos.col}],context.highlight2Attr);
                      }
                   }
-                  throw(window.languageStrings.messages.failureMissing(itemPos.length));
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureMissing(itemPos.length);
+                  throw(errorMsg);
                }
                if(items[0].num != id){
                   context.success = false;
@@ -2358,7 +2392,21 @@ var robotEndConditions = {
                         context.highlightCells([{row:pos.row,col:pos.col}],context.highlight2Attr);
                      }
                   }
-                  throw(window.languageStrings.messages.failureWrongBlock(itemPos.length));
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureWrongBlock(itemPos.length);
+                  throw(errorMsg);
+               }
+               if(items[0].broken){
+                  context.success = false;
+                  if(context.display){
+                     context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
+                     for(var pos of itemPos){
+                        context.highlightCells([{row:pos.row,col:pos.col}],context.highlight2Attr);
+                     }
+                  }
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureBrokenBlock(itemPos.length);
+                  throw(errorMsg);
                }
             }
          }
@@ -2390,166 +2438,6 @@ var robotEndConditions = {
       context.success = true;
       throw(window.languageStrings.messages.success);
    },
-   // checkReachExit: function(context, lastTurn) {
-   //    var robot = context.getRobot();
-   //    if(context.isOn(function(obj) { return obj.isExit === true; })) {
-   //       context.success = true;
-   //       throw(window.languageStrings.messages.successReachExit);
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(window.languageStrings.messages.failureReachExit);
-   //    }
-   // },
-   // checkPickedAllWithdrawables: function(context, lastTurn) {
-   //    var solved = true;
-   //    for(var row = 0;row < context.nbRows;row++) {
-   //       for(var col = 0;col < context.nbCols;col++) {
-   //          if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-   //             solved = false;
-   //          }
-   //       }
-   //    }
-      
-   //    if(solved) {
-   //       context.success = true;
-   //       throw(window.languageStrings.messages.successPickedAllWithdrawables);
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-   //    }
-   // },
-   // checkPlugsWired: function(context, lastTurn) {
-   //    var solved = true;
-   //    for(var row = 0;row < context.nbRows;row++) {
-   //       for(var col = 0;col < context.nbCols;col++) {
-   //          if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
-   //             solved = false;
-   //          }
-   //       }
-   //    }
-      
-   //    if(solved) {
-   //       context.success = true;
-   //       throw(window.languageStrings.messages.successPlugsWired);
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(window.languageStrings.messages.failurePlugsWired);
-   //    }
-   // },
-   // checkContainersFilled: function(context, lastTurn) {
-   //    var solved = true;
-      
-   //    var messages = [
-   //       window.languageStrings.messages.failureContainersFilled,
-   //       window.languageStrings.messages.failureContainersFilledLess,
-   //       window.languageStrings.messages.failureContainersFilledBag
-   //    ];
-   //    var message = 2;
-   //    if (context.infos.maxMoves != undefined) {
-   //       if (context.nbMoves > context.infos.maxMoves) {
-   //          context.success = false;
-   //          throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
-   //       }
-   //    }
-   //    for(var row = 0;row < context.nbRows;row++) {
-   //       for(var col = 0;col < context.nbCols;col++) {
-   //          var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-   //          if(containers.length != 0) {
-   //             var container = containers[0];
-   //             if(container.containerSize == undefined && container.containerFilter == undefined) {
-   //                container.containerSize = 1;
-   //             }
-   //             var filter;
-   //             if(container.containerFilter == undefined)
-   //                filter = function(obj) { return obj.isWithdrawable === true; };
-   //             else
-   //                filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
-               
-   //             if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
-   //                solved = false;
-   //                message = Math.min(message, 1);
-   //             }
-   //             else if(context.getItemsOn(row, col, filter).length == 0) {
-   //                solved = false;
-   //                message = Math.min(message, 0);
-   //             }
-               
-   //             if(container.containerFilter != undefined) {
-   //                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
-   //                   solved = false;
-   //                   message = Math.min(message, 0);
-   //                }
-   //                for(var item in context.bag) {
-   //                   if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
-   //                      solved = false;
-   //                      message = Math.min(message, 2);
-   //                   }
-   //                }
-   //             }
-   //          }
-   //          else {
-   //             if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
-   //                solved = false;
-   //                message = Math.min(message, 0);
-   //             }
-   //          }
-   //       }
-   //    }
-      
-   //    if(solved) {
-   //       context.success = true;
-   //       throw(window.languageStrings.messages.successContainersFilled);
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(messages[message]);
-   //    }
-   // },
-   // checkBothReachAndCollect: function(context, lastTurn) {
-   //    var robot = context.getRobot();
-   //    if(context.isOn(function(obj) { return obj.isExit === true; })) {
-   //       var solved = true;
-   //       for(var row = 0;row < context.nbRows;row++) {
-   //          for(var col = 0;col < context.nbCols;col++) {
-   //             if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-   //                solved = false;
-   //                throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-   //             }
-   //          }
-   //       }
-         
-   //       if(solved) {
-   //          context.success = true;
-   //          throw(window.languageStrings.messages.successPickedAllWithdrawables);
-   //       }
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(window.languageStrings.messages.failureReachExit);
-   //    }
-   // },
-   // checkLights: function(context, lastTurn) {
-   //    var solved = true;
-   //    for(var row = 0;row < context.nbRows;row++) {
-   //       for(var col = 0;col < context.nbCols;col++) {
-   //          if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
-   //             solved = false;
-   //          }
-   //       }
-   //    }
-      
-   //    if(solved) {
-   //       context.success = true;
-   //       throw(window.languageStrings.messages.successLights);
-   //    }
-   //    if(lastTurn) {
-   //       context.success = false;
-   //       throw(window.languageStrings.messages.failureLights);
-   //    }
-   // }
 };
 
 
