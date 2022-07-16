@@ -1766,7 +1766,7 @@ var getContext = function(display, infos, curLevel) {
       sortCellItems(cellItems);
    };
 
-   redisplayMarkers = function() {
+   var redisplayMarkers = function() {
       // console.log("[crane] redisplayMarkers")
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
