@@ -1008,13 +1008,13 @@ window.displayHelper = {
       return this.levelsMaxScores;
    },
 
-   displayLevel: function(newLevel, calledFromSet) {
+   displayLevel: function (newLevel, calledFromSet, isLocked) {
       // Only displays a level, without requesting a level change to the task
       if(!calledFromSet) {
          this.taskLevel = newLevel;
       }
 
-      if (this.popupMessageShown) {
+      if (this.popupMessageShown && !isLocked) {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
@@ -1041,8 +1041,11 @@ window.displayHelper = {
    },
 
    setLevel: function(newLevel, force) {
+      // Check for locked level
+      var lockedLevel = $('#tab_' + newLevel).hasClass('lockedLevel');
+
       // Always make sure we're displaying the level
-      this.displayLevel(newLevel, true);
+      this.displayLevel(newLevel, true, lockedLevel);
 
       // Skip actually changing the level if we're already on this level
       if (this.taskLevel == newLevel && !force) {
