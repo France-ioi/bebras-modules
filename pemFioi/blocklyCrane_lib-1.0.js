@@ -2282,7 +2282,7 @@ var getContext = function(display, infos, curLevel) {
       // context.advanceTime(1);
       // if(callback && (!context.display || !context.animate || !animate)){
       if(callback){
-         context.waitDelay(callback);
+         context.waitDelay(callback, null, delay);
       }
    };
 
