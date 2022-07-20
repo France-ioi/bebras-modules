@@ -372,76 +372,76 @@ var getContext = function(display, infos, curLevel) {
             item: 1
          },
          itemTypes: {
-            item_1: { num: 2, 
+            item_1: { num: 2, id: 1,
                img: imgPath+"crane/numbers/01.png",
                brokenImg: imgPath+"crane/numbers/broken_01.png", side: 60, isMovable: true, zOrder: 1 },
-            item_2: { num: 3, 
+            item_2: { num: 3, id: 2,
                img: imgPath+"crane/numbers/02.png",
                brokenImg: imgPath+"crane/numbers/broken_02.png", side: 60, isMovable: true, zOrder: 1 },
-            item_3: { num: 4, 
+            item_3: { num: 4, id: 3,
                img: imgPath+"crane/numbers/03.png",
                brokenImg: imgPath+"crane/numbers/broken_03.png", side: 60, isMovable: true, zOrder: 1},
-            item_4: { num: 5, 
+            item_4: { num: 5, id: 4,
                img: imgPath+"crane/numbers/04.png",
                brokenImg: imgPath+"crane/numbers/broken_04.png", side: 60, isMovable: true, zOrder: 1},
-            item_5: { num: 6, 
+            item_5: { num: 6, id: 5,
                img: imgPath+"crane/numbers/05.png",
                brokenImg: imgPath+"crane/numbers/broken_05.png", side: 60, isMovable: true, zOrder: 1},
-            item_6: { num: 7, 
+            item_6: { num: 7, id: 6, 
                img: imgPath+"crane/numbers/06.png",
                brokenImg: imgPath+"crane/numbers/broken_06.png", side: 60, isMovable: true, zOrder: 1},
-            item_7: { num: 8, 
+            item_7: { num: 8, id: 7,
                img: imgPath+"crane/numbers/07.png",
                brokenImg: imgPath+"crane/numbers/broken_07.png", side: 60, isMovable: true, zOrder: 1},
-            item_8: { num: 9, 
+            item_8: { num: 9, id: 8,
                img: imgPath+"crane/numbers/08.png",
                brokenImg: imgPath+"crane/numbers/broken_08.png", side: 60, isMovable: true, zOrder: 1},
-            item_9: { num: 10, 
+            item_9: { num: 10, id: 9,
                img: imgPath+"crane/numbers/09.png",
                brokenImg: imgPath+"crane/numbers/broken_09.png", side: 60, isMovable: true, zOrder: 1},
-            item_10: { num: 11, 
+            item_10: { num: 11, id: 10,
                img: imgPath+"crane/numbers/10.png",
                brokenImg: imgPath+"crane/numbers/broken_10.png", side: 60, isMovable: true, zOrder: 1},
-            item_11: { num: 12, 
+            item_11: { num: 12, id: 11,
                img: imgPath+"crane/numbers/11.png",
                brokenImg: imgPath+"crane/numbers/broken_11.png", side: 60, isMovable: true, zOrder: 1},
-            item_12: { num: 13, 
+            item_12: { num: 13, id: 12,
                img: imgPath+"crane/numbers/12.png",
                brokenImg: imgPath+"crane/numbers/broken_12.png", side: 60, isMovable: true, zOrder: 1},
-            item_13: { num: 14, 
+            item_13: { num: 14, id: 13,
                img: imgPath+"crane/numbers/13.png",
                brokenImg: imgPath+"crane/numbers/broken_13.png", side: 60, isMovable: true, zOrder: 1},
-            item_14: { num: 15, 
+            item_14: { num: 15, id: 14,
                img: imgPath+"crane/numbers/14.png",
                brokenImg: imgPath+"crane/numbers/broken_14.png", side: 60, isMovable: true, zOrder: 1},
-            item_15: { num: 16, 
+            item_15: { num: 16, id: 15,
                img: imgPath+"crane/numbers/15.png",
                brokenImg: imgPath+"crane/numbers/broken_15.png", side: 60, isMovable: true, zOrder: 1},
-            item_16: { num: 17, 
+            item_16: { num: 17, id: 16,
                img: imgPath+"crane/numbers/16.png",
                brokenImg: imgPath+"crane/numbers/broken_16.png", side: 60, isMovable: true, zOrder: 1},
-            item_17: { num: 18, 
+            item_17: { num: 18, id: 17,
                img: imgPath+"crane/numbers/17.png",
                brokenImg: imgPath+"crane/numbers/broken_17.png", side: 60, isMovable: true, zOrder: 1},
-            item_18: { num: 19, 
+            item_18: { num: 19, id: 18,
                img: imgPath+"crane/numbers/18.png",
                brokenImg: imgPath+"crane/numbers/broken_18.png", side: 60, isMovable: true, zOrder: 1},
-            item_19: { num: 20, 
+            item_19: { num: 20, id: 19,
                img: imgPath+"crane/numbers/19.png",
                brokenImg: imgPath+"crane/numbers/broken_19.png", side: 60, isMovable: true, zOrder: 1},
-            item_20: { num: 21, 
+            item_20: { num: 21, id: 20,
                img: imgPath+"crane/numbers/20.png",
                brokenImg: imgPath+"crane/numbers/broken_20.png", side: 60, isMovable: true, zOrder: 1},
-            item_21: { num: 24, 
+            item_21: { num: 24, id: 21,
                img: imgPath+"crane/numbers/21.png",
                brokenImg: imgPath+"crane/numbers/broken_21.png", side: 60, isMovable: true, zOrder: 1},
-            item_22: { num: 25, 
+            item_22: { num: 25, id: 22,
                img: imgPath+"crane/numbers/22.png",
                brokenImg: imgPath+"crane/numbers/broken_22.png", side: 60, isMovable: true, zOrder: 1},
-            item_23: { num: 26, 
+            item_23: { num: 26, id: 23,
                img: imgPath+"crane/numbers/23.png",
                brokenImg: imgPath+"crane/numbers/broken_23.png", side: 60, isMovable: true, zOrder: 1},
-            item_24: { num: 27, 
+            item_24: { num: 27, id: 24,
                img: imgPath+"crane/numbers/24.png",
                brokenImg: imgPath+"crane/numbers/broken_24.png", side: 60, isMovable: true, zOrder: 1},
             crusher: { num: 22, img: imgPath+"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
@@ -1034,7 +1034,7 @@ var getContext = function(display, infos, curLevel) {
                continue
             }
             // console.log(tar,row,col,this.items)
-            return tar
+            return this.getItemId(tar)
          }
       }
       return 0
@@ -1050,7 +1050,8 @@ var getContext = function(display, infos, curLevel) {
       }
       var tar = this.target[row - 1][col - 1];
       // console.log( (tar > 1) ? tar : 0)
-      return (tar > 1) ? tar : 0
+      var num = (tar > 1) ? tar : 0;
+      return this.getItemId(num)
    };
 
    context.getTopBlock = function() {
@@ -1060,7 +1061,7 @@ var getContext = function(display, infos, curLevel) {
       if(!topBlock){
          return 0
       }
-      return topBlock.num
+      return topBlock.id
    };
 
    context.getBlockAt = function(row,col) {
@@ -1072,7 +1073,7 @@ var getContext = function(display, infos, curLevel) {
          throw(strings.messages.wrongCoordinates);
       }
       var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
-      var id = (items.length == 0) ? 0 : items[0].num;
+      var id = (items.length == 0) ? 0 : items[0].id;
       return id
    };
 
@@ -1082,7 +1083,8 @@ var getContext = function(display, infos, curLevel) {
          return 0
       }
       // console.log(this.craneContent.num);
-      return this.craneContent.num
+      var id = this.craneContent.id
+      return id
    };
 
    context.isTopBlockBroken = function() {
@@ -1852,7 +1854,17 @@ var getContext = function(display, infos, curLevel) {
          var item = context.items[id];
          item.index = id;
       }
-   }
+   };
+
+   context.getItemId = function(num) {
+      for(var type in infos.itemTypes) {
+         var item = infos.itemTypes[type];
+         if(item.num == num){
+            return item.id
+         }
+      }
+      return null
+   };
    
    context.getItemsOn = function(row, col, filter) {
       if(filter === undefined) {
@@ -2442,67 +2454,7 @@ var robotEndConditions = {
 
 
 var robotEndFunctionGenerator = {
-   allFilteredPicked: function(filter) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var row = 0;row < context.nbRows;row++) {
-            for(var col = 0;col < context.nbCols;col++) {
-               var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
-               if(filtered.length != 0) {
-                  solved = false;
-               }
-            }
-         }
-         
-         for(var item in context.bag) {
-            if(!filter(context.bag[item])) {
-               context.success = false;
-               throw(window.languageStrings.messages.failureUnfilteredObject);
-            }
-         }
-         
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
-         }
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-         }
-      };
-   },
-   allNumbersWritten: function(numbers) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var iNumber in numbers) {
-            var number = numbers[iNumber];
-            var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
-            if(items.length == 0)
-               throw("Error: no number here");
-            
-            var expected;
-            if(typeof number.value === "number") {
-               expected = number.value;
-            } else {
-               expected = number.value.bind(context)();
-            }
-            
-            if(expected != items[0].value) {
-               solved = false;
-            }
-         }
-         
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successNumbersWritten);
-         }
-         
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failureNumbersWritten);
-         }
-      };
-   }
+
 };
 
 if(window.quickAlgoLibraries) {
