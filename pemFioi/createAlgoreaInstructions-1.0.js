@@ -12,14 +12,14 @@ function createAlgoreaInstructions(subTask) {
       var gridInfos = extractLevelSpecific(subTask.gridInfos,level);
       var data = subTask.data;
 
-      var instHTML = getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level);
+      var instHTML = getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang);
 
       quickAlgoInterface.taskIntroContent = instHTML;
       quickAlgoInterface.setupTaskIntro(level);
    }
 }
 
-function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level) {
+function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
    var nbTests = data[level].length;
 
    return getAlgoreaIntro();
