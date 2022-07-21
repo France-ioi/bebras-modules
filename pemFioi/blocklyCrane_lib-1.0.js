@@ -373,7 +373,7 @@ var getContext = function(display, infos, curLevel) {
          },
          itemTypes: {
             item_1: { num: 2, id: 1,
-               img: imgPath+"crane/numbers/01.png",
+               img: { a: imgPath+"crane/numbers/01.png", b: imgPath+"crane/numbers/01_alt.png" },
                brokenImg: imgPath+"crane/numbers/broken_01.png", side: 60, isMovable: true, zOrder: 1 },
             item_2: { num: 3, id: 2,
                img: imgPath+"crane/numbers/02.png",
@@ -1375,7 +1375,7 @@ var getContext = function(display, infos, curLevel) {
          item[property] = infos.itemTypes[item.type][property];
       }
       if(context.display && redisplay) {
-         redisplayItem(item,false,"resetItem");
+         redisplayItem(item,false);
       }
    };
    
@@ -1393,22 +1393,30 @@ var getContext = function(display, infos, curLevel) {
       var rowShift = (context.nbRows >= nbRowsCont) ? 0 : (nbRowsCont - context.nbRows);
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            var itemTypeNum = context.tiles[iRow][iCol];
+            var itemData = context.getItemData(context.tiles[iRow][iCol]);
+            var itemTypeNum = itemData.num;
+
             var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
                   col: iCol + nbColCont,
                   type: itemTypeByNum[itemTypeNum],
+                  imgId: itemData.imgId,
+                  deco: itemData.deco, 
                   broken
                }, false);
             }
-            var targetNum = context.target[iRow][iCol];
+            var targetData = context.getItemData(context.target[iRow][iCol]);
+            var targetNum = targetData.num;
+            // console.log("[yo]",targetData)
             if(itemTypeByNum[targetNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
                   col: iCol + nbColCont,
                   type: itemTypeByNum[targetNum],
+                  imgId: targetData.imgId,
+                  deco: targetData.deco, 
                   target: true
                }, false);
             }
@@ -1467,6 +1475,21 @@ var getContext = function(display, infos, curLevel) {
       if(context.display){
          redisplayAllItems();
       }
+   };
+
+   context.getItemData = function(val) {
+      if(!isNaN(val)){
+         var num = val;
+         var imgId = "a";
+         var deco = null;
+      }else if(typeof val == "string"){
+         var match = val.match(/(\d+)([a-z])(\d)?/);
+         var num = match[1];
+         var imgId = match[2];
+         var deco = match[3];
+      }
+      
+      return { num, imgId, deco }
    };
    
    var resetItemsZOrder = function(row, col) {
@@ -1682,9 +1705,6 @@ var getContext = function(display, infos, curLevel) {
       if(context.nbRows < nbRowsCont){
          y += infos.cellSide*(nbRowsCont - context.nbRows) * scale;
       }
-      // if(item.type == "mask" || item.type == "item_2")
-      //    console.log("[y]",item.type,y)
-      // console.log(item.type, item.row, item.col)
 
       if(item.customDisplay !== undefined) {
          item.customDisplay(item);
@@ -1692,12 +1712,19 @@ var getContext = function(display, infos, curLevel) {
       
       if(item.img) {
          if(item.target && item.targetImg){
-            var src = imgUrlWithPrefix(item.targetImg);
+            var srcObj = item.targetImg;
          }else if(item.broken && item.brokenImg){
-            var src = imgUrlWithPrefix(item.brokenImg);
+            var srcObj = item.brokenImg;
          }else{
-            var src = imgUrlWithPrefix(item.img);
+            var srcObj = item.img;
          }
+         if(typeof srcObj != "object"){
+            var src = imgUrlWithPrefix(srcObj);
+         }else{
+            var imgId = item.imgId;
+            var src = imgUrlWithPrefix(srcObj[imgId]);
+         }
+
          item.element = paper.image(src, x, y, item.side * scale, item.side * scale);
 
          if(item.target && !item.targetImg){
@@ -1731,9 +1758,6 @@ var getContext = function(display, infos, curLevel) {
          item.element.attr(itemAttributes(item));
       if(resetZOrder)
          resetItemsZOrder(item.row, item.col);
-      // if(item.type == "mask"){
-      //    console.log("yo",item.element)
-      // }
    };
    
    var redisplayAllItems = function() {
@@ -1880,11 +1904,11 @@ var getContext = function(display, infos, curLevel) {
       return selected;
    };
 
-   context.getItemsPos = function(num) {
+   context.getItemsPos = function(num,imgId) {
       var selected = [];
       for(var id in context.items) {
          var item = context.items[id];
-         if(item.num == num && !item.target && !item.broken) {
+         if(item.num == num && item.imgId == imgId && !item.target && !item.broken) {
             selected.push({ row: item.row, col: item.col });
          }
       }
@@ -2356,15 +2380,23 @@ var robotEndConditions = {
       var nbWellPlaced = 0;
       for(var iRow = 0; iRow < tar.length; iRow++){
          for(var iCol = 0; iCol < tar[iRow].length; iCol++){
-            var idTar = tar[iRow][iCol];
-            var idTil = til[iRow][iCol];
-            var idBro = (bro.length > 0) ? bro[iRow][iCol] : 0;
+            var tarData = context.getItemData(tar[iRow][iCol]);
+            var numTar = tarData.num;
+            var idTar = tarData.imgId;
+
+            var tilData = context.getItemData(til[iRow][iCol]);
+            var numTil = tilData.num;
+            var idTil = tilData.imgId;
+            
+            var numBro = (bro.length > 0) ? bro[iRow][iCol] : 0;
+            
             var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
             var gridCol = iCol + context.nbColCont;
-            if(idTar != 1 && (idTil != idTar || idBro == 1)){
+            
+            if(numTar != 1 && (numTil != numTar || numBro == 1)){
                nbRequired++;
                var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
-               if(items.length > 0 && items[0].num == idTar && !items[0].broken){
+               if(items.length > 0 && items[0].num == numTar && !items[0].broken){
                   nbWellPlaced++;
                }
             }
@@ -2374,13 +2406,16 @@ var robotEndConditions = {
       // console.log("[yo]",nbRequired,nbWellPlaced,nbRequired*context.partialSuccessThreshold,partialSuccess)
       for(var iRow = 0; iRow < tar.length; iRow++){
          for(var iCol = 0; iCol < tar[iRow].length; iCol++){
-            var id = tar[iRow][iCol];
+            var tarData = context.getItemData(tar[iRow][iCol]);
+            var numTar = tarData.num;
+            var idTar = tarData.imgId;
+            // var id = tar[iRow][iCol];
             var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
             var gridCol = iCol + context.nbColCont;
-            if(id != 1){
+            if(numTar != 1){
                var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
-               var itemPos = context.getItemsPos(id);
-               if(context.craneContent && context.craneContent.num == id){
+               var itemPos = context.getItemsPos(numTar,idTar); // *
+               if(context.craneContent && context.craneContent.num == numTar){
                   itemPos.push({ row: "crane", col: context.cranePos });
                }
                if(items.length == 0){
@@ -2396,7 +2431,7 @@ var robotEndConditions = {
                   errorMsg += window.languageStrings.messages.failureMissing(itemPos.length);
                   throw(errorMsg);
                }
-               if(items[0].num != id){
+               if(items[0].num != numTar || items[0].imgId != idTar){
                   context.success = false;
                   if(context.display){
                      context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
@@ -2423,6 +2458,7 @@ var robotEndConditions = {
             }
          }
       }
+
       for(var iRow = 0; iRow < tar.length; iRow++){
          for(var iCol = 0; iCol < tar[iRow].length; iCol++){
             var id = tar[iRow][iCol];
