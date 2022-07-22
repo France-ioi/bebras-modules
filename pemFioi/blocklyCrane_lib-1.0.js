@@ -897,6 +897,7 @@ var getContext = function(display, infos, curLevel) {
          var paperW = infos.cellSide * (context.nbCols + context.nbColCont) * scale;
          var paperH = infos.cellSide * (Math.max(context.nbRows,context.nbRowsCont)  + craneH) * scale;
          paper = this.raphaelFactory.create("paperMain", "grid", paperW, paperH);
+         $("#grid").css("user-select","none");
          context.paper = paper;
          resetBoard();
          resetCrane();
@@ -1909,7 +1910,10 @@ var getContext = function(display, infos, curLevel) {
       for(var id in context.items) {
          var item = context.items[id];
          if(item.num == num && item.imgId == imgId && !item.target && !item.broken) {
-            selected.push({ row: item.row, col: item.col });
+            let { row, col} = item;
+            if(context.target[row][col] != num){
+               selected.push({ row, col });
+            }
          }
       }
       return selected;
