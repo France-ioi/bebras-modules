@@ -98,10 +98,16 @@ var getContext = function(display, infos, curLevel) {
                   return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
                },
                failureMissing: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge devrait contenir un bloc"
+                  }
                   var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
                   return "La case encadrée en rouge devrait contenir "+str+" en jaune"
                },
                failureWrongBlock: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge ne devrait pas contenir ce bloc"
+                  }
                   var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
                   return "La case encadrée en rouge devrait contenir "+str+" en jaune"
                },
@@ -844,6 +850,7 @@ var getContext = function(display, infos, curLevel) {
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
       }
+      context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
       context.craneContent = null;
       
@@ -2406,8 +2413,7 @@ var robotEndConditions = {
             }
          }
       }
-      var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold) ? true : false;
-      // console.log("[yo]",nbRequired,nbWellPlaced,nbRequired*context.partialSuccessThreshold,partialSuccess)
+      var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
       for(var iRow = 0; iRow < tar.length; iRow++){
          for(var iCol = 0; iCol < tar[iRow].length; iCol++){
             var tarData = context.getItemData(tar[iRow][iCol]);
