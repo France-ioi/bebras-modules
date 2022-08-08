@@ -450,8 +450,8 @@ var getContext = function(display, infos, curLevel) {
             item_24: { num: 27, id: 24,
                img: imgPath+"crane/numbers/24.png",
                brokenImg: imgPath+"crane/numbers/broken_24.png", side: 60, isMovable: true, zOrder: 1},
-            crusher: { num: 22, img: imgPath+"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
-            wreckingBall: { num: 23, img: imgPath+"card_roundQuadrille.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
+            crusher: { num: 22, img: imgPath+"crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+            wreckingBall: { num: 23, img: imgPath+"crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
             mask: { num: 28, img: imgPath+"crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
             // mask: { num: 28, img: imgPath+"card_squareStriped.png", side: 80, offsetX: 0, offsetY: 0, isMovable: false, zOrder: 2},
          },
@@ -850,6 +850,7 @@ var getContext = function(display, infos, curLevel) {
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
          context.customBlocks = gridInfos.customBlocks || {};
+         context.successAnim = gridInfos.successAnim || [];
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
@@ -865,6 +866,7 @@ var getContext = function(display, infos, curLevel) {
       }
 
       this.highlights = [];
+      this.successAnimObj = [];
       
       // context.last_connect = undefined;
       // context.wires = [];
@@ -977,8 +979,6 @@ var getContext = function(display, infos, curLevel) {
       
       for(var pos of cellPos){
          var { row, col } = pos;
-         // var x = (cSide * col + infos.leftMargin) * scale;
-         // var y = (cSide * (craneH + row) + infos.topMargin) * scale;
          if(row == "crane"){
             var item = context.craneContent;
             var craneAttr = getCraneAttr();
@@ -993,6 +993,20 @@ var getContext = function(display, infos, curLevel) {
          var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(attr);
          context.highlights.push({ row, col, obj });
       }
+   };
+
+   context.showSuccessAnim = function() {
+      var p = this.paper;
+      var scale = this.scale;
+      var cSide = infos.cellSide;
+      
+      for(var anim of this.successAnim){
+         var { row, col, img, width, height } = anim;
+         var { x, y } = context.getCellCoord(row,col);
+         var obj = p.image(img,x,y,cSide*width*scale,cSide*height*scale);
+         context.successAnimObj.push({ row, col, width, height, obj });
+      }
+      console.log("[yo showSuccessAnim")
    };
 
    context.getCrushers = function() {
@@ -1685,6 +1699,17 @@ var getContext = function(display, infos, curLevel) {
             var width = cSide*scale, height = w;
             var { x, y } = this.getCellCoord(row,col);
             obj.attr({ x, y, width, height });
+         }
+      }
+
+      /* success anims */
+      if(this.successAnimObj.length > 0){
+         for(var dat of this.successAnimObj){
+            var { row, col, width, height, obj } = dat;
+            var w = cSide*width*scale, h = cSide*height*scale;
+            var { x, y } = this.getCellCoord(row,col);
+            obj.attr({ x, y, width: w, height: h });
+            // console.log("[yo",x,y,w,h)
          }
       }
    };
@@ -2422,7 +2447,6 @@ var robotEndConditions = {
             var tarData = context.getItemData(tar[iRow][iCol]);
             var numTar = tarData.num;
             var idTar = tarData.imgId;
-            // var id = tar[iRow][iCol];
             var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
             var gridCol = iCol + context.nbColCont;
             if(numTar != 1){
@@ -2433,7 +2457,6 @@ var robotEndConditions = {
                }
                if(items.length == 0){
                   context.success = false;
-                  // console.log(iRow,iCol);
                   if(context.display){
                      context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
                      for(var pos of itemPos){
@@ -2479,12 +2502,10 @@ var robotEndConditions = {
             var gridCol = iCol + context.nbColCont;
             if(id == 1){
                var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
-               // console.log(id,items)
                if(items.length > 0){
                   for(var item of items){
                      if(!item.wrecking){
                         context.success = false;
-                        // console.log(iRow,iCol);
                         if(context.display){
                            context.highlightCells([{row:gridRow,col:gridCol}],context.highlight1Attr);
                         }
@@ -2496,6 +2517,9 @@ var robotEndConditions = {
          }
       }
 
+      if(context.display){
+         context.showSuccessAnim();
+      }
       context.success = true;
       throw(window.languageStrings.messages.success);
    },
