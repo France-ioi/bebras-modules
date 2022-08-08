@@ -777,7 +777,7 @@ var getContext = function(display, infos, curLevel) {
    var dustW = 80;
    var dustH = 28;
    var dustDuration = 1100;
-   var dust, dustPix;
+   var dust;
 
    var takeAnimDelay = 0.5*infos.actionDelay;
 
@@ -932,8 +932,6 @@ var getContext = function(display, infos, curLevel) {
          context.paper = paper;
          resetBoard();
          resetCrane();
-         // redisplayMarkers();
-         // redisplayAllItems();
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
       }
@@ -1000,13 +998,18 @@ var getContext = function(display, infos, curLevel) {
       var scale = this.scale;
       var cSide = infos.cellSide;
       
-      for(var anim of this.successAnim){
-         var { row, col, img, width, height } = anim;
+      for(var anim of this.successAnim.img){
+         var { row, col, src, width, height } = anim;
          var { x, y } = context.getCellCoord(row,col);
-         var obj = p.image(img,x,y,cSide*width*scale,cSide*height*scale);
+         var obj = p.image(src,x,y,cSide*width*scale,cSide*height*scale);
          context.successAnimObj.push({ row, col, width, height, obj });
       }
-      console.log("[yo showSuccessAnim")
+      if(this.successAnim.hideOtherBlocks){
+         for(item of this.items){
+            item.element.hide();
+         }
+      }
+      // console.log("[yo showSuccessAnim")
    };
 
    context.getCrushers = function() {
@@ -2229,7 +2232,6 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
-         // dust = paper.image(dustSrc+"?"+Math.random(),dustX,dustY,dustW*scale,dustH*scale);
          context.crush();
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
