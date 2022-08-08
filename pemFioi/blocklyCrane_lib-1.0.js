@@ -849,6 +849,7 @@ var getContext = function(display, infos, curLevel) {
          context.broken = gridInfos.broken || [];
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
+         context.customBlocks = gridInfos.customBlocks || {};
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
@@ -1717,7 +1718,9 @@ var getContext = function(display, infos, curLevel) {
       if(item.customDisplay !== undefined) {
          item.customDisplay(item);
       }
-      
+      if(infos.customBlocks){
+         Object.assign(item,context.customBlocks[item.num]);
+      }
       if(item.img) {
          if(item.target && item.targetImg){
             var srcObj = item.targetImg;
