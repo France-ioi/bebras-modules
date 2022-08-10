@@ -1,5 +1,6 @@
 
 var imgPath = modulesPath+"img/algorea/";
+var mp3Path = modulesPath+"mp3/";
 
 var getContext = function(display, infos, curLevel) {
    var localLanguageStrings = {
@@ -877,6 +878,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbMoves = 0;
       context.time = 0;
       context.animate = true;
+      context.soundEnabled = true;
       // context.animate = false;
       
       if(infos.bagInit != undefined) {
@@ -914,6 +916,9 @@ var getContext = function(display, infos, curLevel) {
          resetItems();
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
+
+         // $("#background_music").remove();
+         // $("body").append("<audio src='background.mp3' autoplay loop id='background_music'></audio>");
       }else{
          resetItems();
       }
@@ -967,6 +972,11 @@ var getContext = function(display, infos, curLevel) {
       if(context.display && paper != null) {
          paper.remove();
       }
+   };
+
+   context.changeSoundEnabled = function (enabled) {
+      this.soundEnabled = enabled;
+      console.log("[yo",this.soundEnabled)
    };
 
    context.highlightCells = function(cellPos,attr) {
@@ -2241,6 +2251,9 @@ var getContext = function(display, infos, curLevel) {
                dust = null;
             }
          }, dustDuration);
+
+         $("#noise").remove();
+         $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
       });
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
@@ -2282,6 +2295,7 @@ var getContext = function(display, infos, curLevel) {
          }
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
+
          context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
             if(dust){
                dust.remove();
