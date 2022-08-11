@@ -850,7 +850,7 @@ var getContext = function(display, infos, curLevel) {
          context.broken = gridInfos.broken || [];
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
-         context.customBlocks = gridInfos.customBlocks || {};
+         context.customItems = gridInfos.customItems || {};
          context.successAnim = gridInfos.successAnim || [];
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
@@ -919,6 +919,11 @@ var getContext = function(display, infos, curLevel) {
 
          // $("#background_music").remove();
          // $("body").append("<audio src='background.mp3' autoplay loop id='background_music'></audio>");
+         // document.getElementById('background_music').play();
+         // $("audio")[0].play();
+         // $("html").mousemove(function() {
+         //    $("#background_music")[0].play();
+         // })
       }else{
          resetItems();
       }
@@ -976,7 +981,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.changeSoundEnabled = function (enabled) {
       this.soundEnabled = enabled;
-      console.log("[yo",this.soundEnabled)
+      // console.log("[yo",this.soundEnabled)
    };
 
    context.highlightCells = function(cellPos,attr) {
@@ -1756,8 +1761,8 @@ var getContext = function(display, infos, curLevel) {
       if(item.customDisplay !== undefined) {
          item.customDisplay(item);
       }
-      if(infos.customBlocks){
-         Object.assign(item,context.customBlocks[item.num]);
+      if(infos.customItems){
+         Object.assign(item,context.customItems[item.num]);
       }
       if(item.img) {
          if(item.target && item.targetImg){
@@ -1773,7 +1778,11 @@ var getContext = function(display, infos, curLevel) {
             var imgId = item.imgId;
             var src = imgUrlWithPrefix(srcObj[imgId]);
          }
-
+         if(infos.customItems){
+            var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
+            var newSrc = "assets/png/"+fileName;
+            src = newSrc;
+         }
          item.element = paper.image(src, x, y, item.side * scale, item.side * scale);
 
          if(item.target && !item.targetImg){
