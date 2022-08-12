@@ -917,13 +917,11 @@ var getContext = function(display, infos, curLevel) {
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
 
-         // $("#background_music").remove();
-         // $("body").append("<audio src='background.mp3' autoplay loop id='background_music'></audio>");
-         // document.getElementById('background_music').play();
-         // $("audio")[0].play();
-         // $("html").mousemove(function() {
-         //    $("#background_music")[0].play();
-         // })
+         $("html").click(function() {
+            if($("#background_music").length > 0){
+               $("#background_music")[0].play();
+            }
+         })
       }else{
          resetItems();
       }
@@ -2257,10 +2255,11 @@ var getContext = function(display, infos, curLevel) {
          if(dust){
             dust.remove();
             dust = null;
+            context.delayFactory.destroy("removeDust");
          }
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
-         context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
+         context.delayFactory.createTimeout("removeDust", function() {
             if(dust){
                dust.remove();
                dust = null;
