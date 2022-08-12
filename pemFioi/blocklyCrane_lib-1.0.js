@@ -851,7 +851,7 @@ var getContext = function(display, infos, curLevel) {
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
          context.customItems = gridInfos.customItems || {};
-         context.successAnim = gridInfos.successAnim || [];
+         context.successAnim = gridInfos.successAnim || {};
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
@@ -1013,11 +1013,13 @@ var getContext = function(display, infos, curLevel) {
       var scale = this.scale;
       var cSide = infos.cellSide;
       
-      for(var anim of this.successAnim.img){
-         var { row, col, src, width, height } = anim;
-         var { x, y } = context.getCellCoord(row,col);
-         var obj = p.image(src,x,y,cSide*width*scale,cSide*height*scale);
-         context.successAnimObj.push({ row, col, width, height, obj });
+      if(this.successAnim.img && this.successAnim.img.length > 0){
+         for(var anim of this.successAnim.img){
+            var { row, col, src, width, height } = anim;
+            var { x, y } = context.getCellCoord(row,col);
+            var obj = p.image(src,x,y,cSide*width*scale,cSide*height*scale);
+            context.successAnimObj.push({ row, col, width, height, obj });
+         }
       }
       if(this.successAnim.hideOtherBlocks){
          for(item of this.items){
@@ -2252,6 +2254,10 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
          context.crush();
+         if(dust){
+            dust.remove();
+            dust = null;
+         }
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
          context.delayFactory.createTimeout("removeDust_" + Math.random(), function() {
@@ -2301,6 +2307,10 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
          if(topBlock && topBlock.num > 1){
             context.destroy(topBlock);
+         }
+         if(dust){
+            dust.remove();
+            dust = null;
          }
          dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
          $("#dust_pix").attr("src",dustSrc);
