@@ -980,6 +980,8 @@ var getContext = function(display, infos, curLevel) {
    context.changeSoundEnabled = function (enabled) {
       this.soundEnabled = enabled;
       // console.log("[yo",this.soundEnabled)
+      var vol = (this.soundEnabled) ? 1 : 0;
+      $("audio").prop('volume', vol);
    };
 
    context.highlightCells = function(cellPos,attr) {
@@ -2268,6 +2270,8 @@ var getContext = function(display, infos, curLevel) {
 
          $("#noise").remove();
          $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
+         var vol = (context.soundEnabled) ? 1 : 0;
+         $("audio").prop('volume', vol);
       });
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
