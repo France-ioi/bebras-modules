@@ -2184,6 +2184,7 @@ var getContext = function(display, infos, curLevel) {
                for(var crusher of this.crushers){
                   if(crusher.col == col && crusher.row == row + 1){
                      this.destroy(item);
+                     this.addSound("brick_crush");
                      return
                   }
                }
@@ -2211,6 +2212,9 @@ var getContext = function(display, infos, curLevel) {
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
       var animClawDown = new Raphael.animation({ y: yClawDown },delay);
       var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
+         // console.log("[yo",topBlock)
+         var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
+         context.addSound(soundName);
          context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
          context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
          
@@ -2267,6 +2271,7 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
          context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
          context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+         context.addSound("brick_putDown");
          context.crush();
          if(dust){
             dust.remove();
@@ -2282,10 +2287,10 @@ var getContext = function(display, infos, curLevel) {
             }
          }, dustDuration);
 
-         $("#noise").remove();
-         $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
-         var vol = (context.soundEnabled) ? 1 : 0;
-         $("audio").prop('volume', vol);
+         // $("#noise").remove();
+         // $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
+         // var vol = (context.soundEnabled) ? 1 : 0;
+         // $("audio").prop('volume', vol);
       });
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
@@ -2324,6 +2329,9 @@ var getContext = function(display, infos, curLevel) {
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
          if(topBlock && topBlock.num > 1){
             context.destroy(topBlock);
+            var soundName = "wreckingBall_destroy";
+         }else{
+            var soundName = "wreckingBall_drop";
          }
          if(dust){
             dust.remove();
@@ -2338,10 +2346,12 @@ var getContext = function(display, infos, curLevel) {
                dust = null;
             }
          }, dustDuration);
+         context.addSound(soundName);
          if(callback){
             context.waitDelay(callback);
          }
       });
+      context.addSound("wreckingBall_fall");
       context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
       context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
@@ -2411,6 +2421,13 @@ var getContext = function(display, infos, curLevel) {
       if(callback){
          context.waitDelay(callback, null, delay);
       }
+   };
+
+   context.addSound = function(name) {
+      $("#noise").remove();
+      $("body").append("<audio src='"+mp3Path+name+".mp3' autoplay id='noise'></audio>");
+      var vol = (context.soundEnabled) ? 1 : 0;
+      $("audio").prop('volume', vol);
    };
 
    context.placeMarker = function(value) {
