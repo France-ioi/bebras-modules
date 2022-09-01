@@ -892,7 +892,9 @@ var getContext = function(display, infos, curLevel) {
       context.nbMoves = 0;
       context.time = 0;
       context.animate = true;
-      context.soundEnabled = true;
+      if (undefined === context.soundEnabled) {
+         context.soundEnabled = true;
+      }
       // context.animate = false;
       
       if(infos.bagInit != undefined) {
@@ -938,6 +940,8 @@ var getContext = function(display, infos, curLevel) {
                $("#background_music")[0].play();
             }
          })
+         var vol = (context.soundEnabled) ? 1 : 0;
+         $("audio").prop('volume', vol);
       }else{
          resetItems();
       }
