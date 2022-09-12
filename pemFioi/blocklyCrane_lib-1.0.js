@@ -2219,11 +2219,11 @@ var getContext = function(display, infos, curLevel) {
       var animClawDown = new Raphael.animation({ y: yClawDown },delay);
       var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
          // console.log("[yo",topBlock)
-         if(topBlock.num != 1){
+         // if(topBlock.num != 1){
             var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
-         }else{
-            var soundName = "claws_close";
-         }
+         // }else{
+         //    var soundName = "claws_close";
+         // }
          context.addSound(soundName);
          context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
          context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
@@ -2234,7 +2234,7 @@ var getContext = function(display, infos, curLevel) {
          if(topBlock.num == 1){
             return
          }
-         context.addSound("line_up");
+         // context.addSound("line_up");
          context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
          context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
          context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
@@ -2250,7 +2250,7 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback);
          }
       });
-      context.addSound("line_down");
+      // context.addSound("line_down");
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
@@ -2305,7 +2305,7 @@ var getContext = function(display, infos, curLevel) {
       });
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
-         context.addSound("line_up");
+         // context.addSound("line_up");
          context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
          context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
          context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
@@ -2320,7 +2320,7 @@ var getContext = function(display, infos, curLevel) {
          }
       });
 
-      context.addSound("line_down");
+      // context.addSound("line_down");
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
       context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
@@ -2364,7 +2364,7 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback);
          }
       });
-      context.addSound("wreckingBall_fall");
+      // context.addSound("wreckingBall_fall");
       context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
       context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
@@ -2409,7 +2409,7 @@ var getContext = function(display, infos, curLevel) {
                var angle = (context.craneContent) ? clutchAngle : 0;
                var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
                var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },delay);
-               context.addSound("crane_move");
+               // context.addSound("crane_move");     
                context.raphaelFactory.animate("animCrane_wheels_" + Math.random(), crane.wheels, anim);
                context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
                context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.shaft, animShaft);
