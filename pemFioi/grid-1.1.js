@@ -344,7 +344,6 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this.highlightCell = function(row, col, attr, xPad, yPad) {
       var cellPos = this.getCellPos(row, col);
       var cellSize = this.getCellSize(row, col);
-
       if(attr === null || attr === undefined) {
          attr = {};
       }
@@ -383,7 +382,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       if(this.cellHighlights[id]) {
          var xHighlight = cellPos.x + xPad;
          var yHighlight = cellPos.y + yPad;
-         this.cellHighlights[id].attr({ x: xHighlight, y: yHighlight });
+         this.cellHighlights[id].attr({ x: xHighlight, y: yHighlight }).attr(attr);
          this.cellHighlights[id].show();
       } else {
          this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
