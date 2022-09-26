@@ -2096,8 +2096,11 @@ var getContext = function(display, infos, curLevel) {
       }
 
       // context.advanceTime(1);
-      if(callback && (!context.display || !context.animate)){
-         context.waitDelay(callback);
+      // if(callback && (!context.display || !context.animate)){
+      if(callback){
+         var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
+         // console.log("[yo",delay)
+         context.waitDelay(callback,null,delay);
       }
    };
 
@@ -2252,10 +2255,10 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
       context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
 
-      if(callback){
-         // console.log("[yo",2*delay + aDelay)
-         context.waitDelay(callback,null,2*delay + aDelay);
-      }
+      // if(callback){
+      //    // console.log("[yo",2*delay + aDelay)
+      //    context.waitDelay(callback,null,2*delay + aDelay);
+      // }
    };
 
    context.putDownAnim = function(item,callback) {
