@@ -2202,6 +2202,7 @@ var getContext = function(display, infos, curLevel) {
    context.takeAnim = function(topBlock,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(topBlock.row + 1);
+      var aDelay = infos.actionDelay;
       var itemAttr = itemAttributes(topBlock);
       maskToFront();
 
@@ -2218,19 +2219,14 @@ var getContext = function(display, infos, curLevel) {
       var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
       var animClawDown = new Raphael.animation({ y: yClawDown },delay);
       var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
-         // console.log("[yo",topBlock)
-         // if(topBlock.num != 1){
-            var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
-         // }else{
-         //    var soundName = "claws_close";
-         // }
+         var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
          context.addSound(soundName);
          context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
          context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
          
       });
-      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
-      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
+      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },aDelay);
+      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },aDelay,function() {
          if(topBlock.num == 1){
             return
          }
@@ -2246,15 +2242,20 @@ var getContext = function(display, infos, curLevel) {
       var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",clutchAngle,craneAttr.cxRight,craneAttr.cyRight] },delay);
       var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",-clutchAngle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
       var animItemUp = new Raphael.animation({ y: itemY },delay,function() {
-         if(callback){
-            context.waitDelay(callback);
-         }
+         // if(callback){
+         //    context.waitDelay(callback);
+         // }
       });
       // context.addSound("line_down");
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
       context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
+
+      if(callback){
+         // console.log("[yo",2*delay + aDelay)
+         context.waitDelay(callback,null,2*delay + aDelay);
+      }
    };
 
    context.putDownAnim = function(item,callback) {
@@ -2432,7 +2433,6 @@ var getContext = function(display, infos, curLevel) {
       }
       
       // context.advanceTime(1);
-      // if(callback && (!context.display || !context.animate || !animate)){
       if(callback){
          context.waitDelay(callback, null, delay);
       }
