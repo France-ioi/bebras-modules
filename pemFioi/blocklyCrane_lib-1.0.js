@@ -757,6 +757,10 @@ var getContext = function(display, infos, curLevel) {
    var markerRectSide = 30;
    var markerPoleH = 20;
    var markerH = markerRectSide + markerPoleH - wheelsPosY;
+   var currBlocks = subTask.gridInfos.includeBlocks.generatedBlocks.robot;
+   if(!Beav.Array.has(currBlocks,"placeMarker") && !Beav.Array.has(currBlocks,"goToMarker")){
+      markerH = 0;
+   }
    var markerTextSize = 16;
 
    markerAttr = infos.markerAttr || {
