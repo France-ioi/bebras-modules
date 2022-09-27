@@ -1612,7 +1612,7 @@ var getContext = function(display, infos, curLevel) {
       
       if(window.quickAlgoResponsive) {
          var areaWidth = Math.max(200, $('#grid').width()-24);
-         var areaHeight = Math.max(150, $('#grid').height()-24);
+         var areaHeight = Math.max(150, $('#grid').height()/*-24*/);
       } else {
          var areaWidth = 400;
          var areaHeight = 600;
@@ -1636,7 +1636,7 @@ var getContext = function(display, infos, curLevel) {
       var paperWidth = (cSide * nbCol + infos.leftMargin + infos.rightMargin)* scale;
       var paperHeight = (cSide * (nbRows + craneH + markerHeightAsRows) + infos.topMargin + infos.bottomMargin)* scale;
       paper.setSize(paperWidth, paperHeight);
-
+      // console.log("[yo",infos.bottomMargin)
       var x0 = infos.leftMargin*scale;
       var y0 = (infos.topMargin + craneH*cSide + markerH)*scale;
 
@@ -1696,6 +1696,7 @@ var getContext = function(display, infos, curLevel) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var x = (cSide * (iCol + nbColCont) + infos.leftMargin + cSide / 2) * scale;
             var y = (infos.topMargin + cSide*(nbRows + craneH - 0.5) + infos.bottomMargin + markerH) * scale;
+            // console.log("[yo",y)
             if(!infos.labelFrameAttr){
                colsLabels[iCol].attr({x: x, y: y}).attr(labelAttr);
             }else{
