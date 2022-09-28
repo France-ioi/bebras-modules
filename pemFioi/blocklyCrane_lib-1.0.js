@@ -2147,7 +2147,7 @@ var getContext = function(display, infos, curLevel) {
 
       if(callback/* && (!context.display || !context.animate)*/){
          var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelay;
-         context.waitDelay(callback);
+         context.waitDelay(callback, null, delay);
       }
    };
 
