@@ -1725,7 +1725,7 @@ var getContext = function(display, infos, curLevel) {
       if(item.customDisplay !== undefined) {
          item.customDisplay(item);
       }
-      if(infos.customItems){
+      if((infos.customItems) && (item.num < 90)){
          Object.assign(item,context.customItems[item.num]);
       }
       if(item.img) {
@@ -1742,7 +1742,7 @@ var getContext = function(display, infos, curLevel) {
             var imgId = item.imgId;
             var src = imgUrlWithPrefix(srcObj[imgId]);
          }
-         if(infos.customItems){
+         if((infos.customItems) && (item.num < 90)){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
             var newSrc = "assets/png/"+fileName;
             src = newSrc;
