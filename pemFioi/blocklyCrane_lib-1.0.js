@@ -133,6 +133,102 @@ var getContext = function(display, infos, curLevel) {
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
             startingBlockName: "Programme du robot"
+         },
+         en: {
+            label: {
+               left: "déplacer vers la gauche",
+               right: "move to the right",
+               take: "take",
+               putDown: "put down",
+               drop: "drop",
+               colHeight: "hauteur de la colonne",
+               placeMarker: "placer le marqueur",             
+               goToMarker: "aller au marqueur",
+               expectedBlock: "brique attendue",
+               expectedBlockAt: "brique attendue ligne %1 colonne %2",
+               topBlock: "brique du dessus",
+               blockAt: "brique ligne %1 colonne %2",
+               brokenBlockAt: "brique cassée ligne %1 colonne %2",
+               carriedBlock: "brique transportée",
+               topBlockBroken: "brique du dessus est cassée",
+               carriedBlockBroken: "brique transportée est cassée",            
+            },
+            code: {
+               left: "gauche",
+               right: "right",
+               take: "take",
+               putDown: "putDown",
+               drop: "drop",
+               colHeight: "hauteurColonne",
+               placeMarker: "placerMarqueur",
+               goToMarker: "allerAuMarqueur",
+               expectedBlock: "briqueAttendue",
+               expectedBlockAt: "briqueAttendueA",
+               topBlock: "briqueDuDessus",           
+               blockAt: "briqueA",
+               brokenBlockAt: "briqueCasseeA",
+               carriedBlock: "briqueTransportee",
+               topBlockBroken: "briqueDuDessusCassee",
+               carriedBlockBroken: "briqueTransporteeCassee",                
+
+            },
+            description: {
+               left: "@() Déplace la grue d'une case vers la gauche.",
+               right: "@() Déplace la grue d'une case vers la droite.",
+               take: "@() Prend la brique se trouvant sous la grue.",
+               putDown: "@() Pose la brique transportée par la grue.",
+               drop: "@() Lâche le boulet de démolition porté par la grue.",
+               colHeight: "@() Retourne le nombre de briques se trouvant dans la colonne sous la grue.",
+               placeMarker: "@(nom) Place un marqueur portant ce nom à la position actuelle de la grue, ou y déplace le marqueur de ce nom s'il existe déjà.",             
+               goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
+               expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
+               expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
+               topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
+               blockAt: "@(ligne, colonne) Retourne le numéro du type de brique se trouvant dans la grille à la ligne et à la colonne indiquées.",
+               brokenBlockAt: "@(ligne, colonne) Retourne True si la brique se trouvant à la ligne et à la colonne indiquées est cassée, et False sinon.",
+               carriedBlock: "@() Retourne le numéro du type de la brique actuellement transportée par la grue.",
+               topBlockBroken: "@() Retourne True si la brique se trouvant au sommet de la colonne où se trouve la grue est cassée, et False sinon.",
+               carriedBlockBroken: "@() Retourne True si la brique actuellement transportée par la grue est cassée, et False sinon.",            
+            },
+            messages: {
+               outside: "La grue ne peut pas aller plus loin dans cette direction !",
+               success: "Bravo, vous avez réussi !",
+               failure: "Vous n'avez pas atteint l'objectif",
+               nothingToTake: "Il n'y a pas de bloc dans cette colonne !",
+               notMovable: "Ce bloc ne peut pas être déplacé",
+               holdingBlock: "La grue ne peut pas prendre plus d'un bloc en même temps",
+               emptyCrane: "La grue ne porte pas de bloc",
+               cannotDrop: "Vous ne pouvez pas déposer de bloc dans cette colonne",
+               notWrecking: "Vous ne pouvez pas lâcher ce bloc",
+               wrongCoordinates: "Les coordonnées sont invalides",
+               noMarker: function(num) {
+                  return "Le marqueur n°"+num+" n'existe pas"
+               },
+               partialSuccess: function(thresh) {
+                  var perc = Math.round(thresh*100);
+                  return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+               },
+               failureMissing: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge devrait contenir un bloc"
+                  }
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureWrongBlock: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge ne devrait pas contenir ce bloc"
+                  }
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureBrokenBlock: function(nb) {
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
+               },
+               failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
+            },
+            startingBlockName: "Programme du robot"
          }
       },
       default: {
