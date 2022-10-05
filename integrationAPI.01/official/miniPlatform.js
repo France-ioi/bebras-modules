@@ -15,6 +15,12 @@
    // demo platform key
    var demo_key = 'buddy'
 
+   function getUrlParameterByName(name) {
+     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+       results = regex.exec(location.href);
+     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+   }
 
    var languageStrings = {
       ar: {
@@ -444,8 +450,8 @@ $(document).ready(function() {
        var testEdge = parent.TaskProxyManager; // generates an exception on edge when in a platform (parent not available)
    } catch(ex) {
        // iframe from files:// url are considered cross-domain by Chrome
-       if(location.protocol !== 'file:') {
-         hasPlatform = true;
+       if(location.protocol !== 'file:' && getUrlParameterByName('iframe') !== 'noApi') {
+           hasPlatform = true;
        }
    }
    if (!hasPlatform) {
