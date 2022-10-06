@@ -1083,7 +1083,14 @@ var getContext = function(display, infos, curLevel) {
             item.element.hide();
          }
       }
-      // console.log("[yo showSuccessAnim")
+      if(this.successAnim.hideBlockType){
+         for(item of this.items){
+            // console.log("[yo",item.type,this.successAnim.hideBlockType)
+            if(item.type == this.successAnim.hideBlockType){
+               item.element.hide();
+            }
+         }
+      }
    };
 
    context.getCrushers = function() {
@@ -1561,7 +1568,6 @@ var getContext = function(display, infos, curLevel) {
          for(var iRow = 0; iRow < context.mask.length;iRow++) {
             for(var iCol = 0; iCol < context.mask[0].length;iCol++) {
                if(context.mask[iRow][iCol]){
-                  // console.log("mask",iRow,iCol,rowShift)
                   resetItem({
                      row: iRow + rowShift,
                      col: iCol,
