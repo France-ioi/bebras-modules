@@ -1271,8 +1271,9 @@ var getContext = function(display, infos, curLevel) {
       if(context.nbRows < nbRowsCont){
          y += infos.cellSide*(nbRowsCont - context.nbRows) * scale;
       }
-      
-      var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale/*, "clip-rect": clipRect*/};
+      var w = item.width || item.side;
+      var h = item.height || item.side;
+      var ret = {x: x, y: y, width: w * item.nbStates * scale, height: h * scale/*, "clip-rect": clipRect*/};
       return ret;
    };
 
@@ -1474,6 +1475,14 @@ var getContext = function(display, infos, curLevel) {
       for(var property in infos.itemTypes[item.type]) {
          item[property] = infos.itemTypes[item.type][property];
       }
+      if(initItem.type == "mask" && infos.windowMaskSrc){
+         item.img = infos.windowMaskSrc;
+         item.width = context.nbCols*60;
+         item.height = context.nbRows*60;
+         item.offsetY = 0;
+         item.offsetX = 0;
+      }
+
       if(context.display && redisplay) {
          redisplayItem(item,false);
       }
@@ -1542,15 +1551,23 @@ var getContext = function(display, infos, curLevel) {
       }
 
       /** mask **/
-      for(var iRow = 0; iRow < context.mask.length;iRow++) {
-         for(var iCol = 0; iCol < context.mask[0].length;iCol++) {
-            if(context.mask[iRow][iCol]){
-               // console.log("mask",iRow,iCol,rowShift)
-               resetItem({
-                  row: iRow + rowShift,
-                  col: iCol,
-                  type: "mask"
-               }, false);
+      if(infos.windowMaskSrc){
+         resetItem({
+            row: rowShift,
+            col: 0,
+            type: "mask"
+         }, false);
+      }else{
+         for(var iRow = 0; iRow < context.mask.length;iRow++) {
+            for(var iCol = 0; iCol < context.mask[0].length;iCol++) {
+               if(context.mask[iRow][iCol]){
+                  // console.log("mask",iRow,iCol,rowShift)
+                  resetItem({
+                     row: iRow + rowShift,
+                     col: iCol,
+                     type: "mask"
+                  }, false);
+               }
             }
          }
       }
@@ -1843,7 +1860,9 @@ var getContext = function(display, infos, curLevel) {
             var newSrc = "assets/png/"+fileName;
             src = newSrc;
          }
-         item.element = paper.image(src, x, y, item.side * scale, item.side * scale);
+         var w = item.width || item.side;
+         var h = item.height || item.side;
+         item.element = paper.image(src, x, y, w * scale, h * scale);
 
          if(item.target && !item.targetImg){
             item.element.attr("opacity",0.3);
