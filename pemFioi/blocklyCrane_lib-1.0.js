@@ -228,7 +228,7 @@ var getContext = function(display, infos, curLevel) {
                },
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
-            startingBlockName: "Programme du robot"
+            startingBlockName: "Program of the robot"
          }
       },
       default: {
