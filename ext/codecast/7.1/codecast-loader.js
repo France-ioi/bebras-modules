@@ -9,6 +9,9 @@ $(document).ready(function() {
     });
 
     var additionalOptions = window.taskData.codecastParameters ? window.taskData.codecastParameters : {};
+    if (window.codecastPreload) {
+      additionalOptions.preload = true;
+    }
 
     var codecastParameters = $.extend(true, {
       start: 'task',
@@ -24,7 +27,7 @@ $(document).ready(function() {
       canChangePlatform: true,
       canChangeLanguage: true,
       controls: {},
-      audioWorkerUrl: modulesPath + "ext/codecast/7.0/index.worker.worker.js",
+      // audioWorkerUrl: modulesPath + "ext/codecast/7.0/index.worker.worker.js",
       baseUrl: "https://codecast.france-ioi.org/v7",
       authProviders: ["algorea", "guest"],
       task: window.taskData,
