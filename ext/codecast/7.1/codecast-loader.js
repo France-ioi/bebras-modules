@@ -33,7 +33,7 @@ $(document).ready(function() {
       task: window.taskData,
       taskInstructions: taskInstructionsHtml,
       taskHints: hints,
-    }, additionalOptions);
+    }, additionalOptions, window.codecastPreload ? window.codecastPreload : {});
 
     Codecast.start(codecastParameters);
   }
