@@ -16,9 +16,11 @@ function convertDOM() {
    $("#zone_2").detach().appendTo("#zone_12");
    
    var consigne = $("<div class='consigne'></div>");
+   $("<h3><i class='far fa-sticky-not'></i>"+taskStrings.introTitle.toUpperCase()+"</h3>").appendTo(consigne);
    var text = $("<div id='text'></div>");
    $("#zone_1").children().detach().appendTo(text);
-   text.appendTo(consigne);
+   text.appendTo(consigne);    
+   consigne.append("<div class='spacer' style='clear: both;'></div>");       
    consigne.appendTo("#zone_1");
 
    var taskCont = $("<div id='taskCont'></div>");
