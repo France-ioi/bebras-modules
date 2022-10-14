@@ -793,6 +793,7 @@ window.displayHelper = {
          $('#zone_012').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
 
          if(!views.solution || this.hideSolutionButton){
+         // if(true){
             $('#showExercice, #showSolution').hide();
             $('#zone_3').addClass('noSolution');
          }
@@ -2307,7 +2308,8 @@ window.displayHelper = {
    },
    // TODO: rename function below to getFullFeedbackValidate, assuming it is not called from outside this file
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
-      var strValidate = ($('#task[alkindi]').length > 0) ? this.strings.validate : this.strings.validate.toUpperCase();
+      var strValidate = this.strings.validate;
+      // var strValidate = ($('#task[alkindi]').length > 0) ? this.strings.validate : this.strings.validate.toUpperCase();
       if (this.customValidateString != undefined) {
          strValidate = this.customValidateString;
       }
@@ -2382,7 +2384,8 @@ window.displayHelper = {
       var disabledStr = this.readOnly ? ' disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            var strRestart = ($('#task[alkindi]').length > 0) ? this.strings.restart : this.strings.restart.toUpperCase();
+            var strRestart = this.strings.restart;
+            // var strRestart = ($('#task[alkindi]').length > 0) ? this.strings.restart : this.strings.restart.toUpperCase();
             if(!this.responsive){
                messages.cancel = '<input type="button" value="' + this.strings.restart + '" onclick="displayHelper.restartAll();"' + disabledStr + '/></div>';
             }else{
