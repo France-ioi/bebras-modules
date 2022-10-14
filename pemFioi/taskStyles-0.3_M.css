@@ -420,6 +420,11 @@ h1 .stars {
    border-radius: 10px 0 0 0;
    height: 100%;
 }
+.layout_1 .noSolution #displayHelperAnswering,
+.layout_2 .noSolution #displayHelperAnswering {
+   right: 50%;
+   transform: translateX(50%);
+}
 #displayHelper_validate,
 #displayHelper_cancel {
    display: inline-block;
@@ -427,6 +432,7 @@ h1 .stars {
 }
 #displayHelper_validate > div,
 #displayHelper_cancel > div {
+   width: 150px;
    border: none;
    border-radius: 50px;
    color: white;
@@ -434,17 +440,19 @@ h1 .stars {
    padding: 6px 12px;
    font-size: 14px;
    cursor: pointer;
+   text-align: center;
 }
 #displayHelper_validate > div i,
 #displayHelper_cancel > div i {
-   margin-right: 10px;
+   display: none;
+   /*margin-right: 10px;*/
 }
 #displayHelper_validate > div {
-   background: #9acc68;
+   background: #4a90e2;
    margin-right: 10px;
 }
 #displayHelper_cancel > div {
-   background: #f5a623;
+   background: #4a4a4a;
    margin: 0 10px;
 }
 
@@ -498,6 +506,7 @@ h1 .stars {
    left: 0;
    padding: 10px 30px 10px 20px;
    max-width: 100%;
+   font-size: 1.2em;
    cursor: pointer;
 }
 #error i:first-of-type {
@@ -922,8 +931,8 @@ h1 .stars {
    background: white;
    border-radius: 0;
 }
-[alkindi].layout_3 .hideButtons #displayHelperAnswering,
-[alkindi].layout_4 .hideButtons #displayHelperAnswering {
+.layout_3 .hideButtons #displayHelperAnswering,
+.layout_4 .hideButtons #displayHelperAnswering {
    display: none;
 }
 
@@ -945,9 +954,9 @@ h1 .stars {
 [alkindi].layout_3 #displayHelper_validate > div {
    width: 100px;
 }
-[alkindi].layout_3 .compact #displayHelper_cancel > div,
-[alkindi].layout_4 #displayHelper_cancel > div,
-[alkindi].layout_4 #displayHelper_validate > div {
+.layout_3 .compact #displayHelper_cancel > div,
+.layout_4 #displayHelper_cancel > div,
+.layout_4 #displayHelper_validate > div {
    width: auto;
    border-radius: 50px;
 }
@@ -957,13 +966,13 @@ h1 .stars {
 [alkindi].layout_3 .compact #displayHelper_cancel > div span {
    display: none
 }
-[alkindi].layout_3 .compact #displayHelper_cancel > div i,
+.layout_3 .compact #displayHelper_cancel > div i,
 /*[alkindi].layout_3 #displayHelper_validate > div i,*/
-[alkindi].layout_4 #displayHelper_cancel > div i,
-[alkindi].layout_4 #displayHelper_validate > div i {
+.layout_4 #displayHelper_cancel > div i,
+.layout_4 #displayHelper_validate > div i {
    display: inline;
 }
-[alkindi].layout_3 #displayHelper_cancel > div i {
+.layout_3 #displayHelper_cancel > div i {
    margin-right: 0;
 }
 [alkindi].layout_3 #displayHelper_validate > div span,
