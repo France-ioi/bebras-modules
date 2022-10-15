@@ -2,6 +2,8 @@ function convertDOM() {
    if($("#zone_012").length > 0){
       return
    }
+   $("head").prepend("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+
    $("#task").append("<div id='zone_012'></div>");
    $("#task").append("<div id='zone_3'></div>");
    $("#task").append("<span id='error'></span>");
