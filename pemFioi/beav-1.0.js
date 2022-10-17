@@ -349,10 +349,10 @@ Beav.Navigator.supportsResponsive = function() {
       return false
    }
    var navVersion = Beav.Navigator.getVersion();
-   if(navVersion[0].toLowerCase() == 'msie' || navVersion == 'IE 11'){
+   if(navVersion[0].toLowerCase() == 'msie'){
       return false
    }
-   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 5){
+   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 68){
       return false
    }
    return true
