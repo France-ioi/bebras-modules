@@ -793,7 +793,6 @@ window.displayHelper = {
          $('#zone_012').append($('<div id="scroll_arr_right"><i class="fas fa-chevron-right"></i></div>'));
 
          if(!views.solution || this.hideSolutionButton){
-         // if(true){
             $('#showExercice, #showSolution').hide();
             $('#zone_3').addClass('noSolution');
          }
