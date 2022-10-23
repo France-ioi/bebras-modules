@@ -210,35 +210,53 @@ const template = `
     var importableModules = JSON.parse(${jsondata});
     var importedModules = {};
     window.importModules = function(modulesList) {
-        var modulesStr = '';
-        for(var iMod in modulesList) {
-           var moduleName = modulesList[iMod];
-           var curModule = importableModules[moduleName];
-           if(curModule) {
-              // Avoid importing the same module twice
-              if(importedModules[moduleName] === true) {
-                 continue;
+       var modulesStr = '';
+       for(var iMod in modulesList) {
+         var moduleName = modulesList[iMod];
+         var curModule = importableModules[moduleName];
+         if(curModule) {
+            // Avoid importing the same module twice
+            if(importedModules[moduleName] === true) {
+               continue;
+            } else {
+               importedModules[moduleName] = true;
+            }
+  
+           var modClass = curModule.classStr ? curModule.classStr : "remove";
+           var modContent = curModule.content;
+           var modId = curModule.id ? curModule.id : moduleName;
+           if (document.getElementById('jsContent')) {
+              if (curModule.type == 'stylesheet') {
+                 var newScript = document.createElement('style');
               } else {
-                 importedModules[moduleName] = true;
+                 var newScript = document.createElement('script');
+                 newScript.type = 'text/javascript';
               }
-     
-              var modClass = curModule.classStr ? curModule.classStr : ${JSON.stringify(defaultClassStr)};
-              var modContent = curModule.content;
-              var modId = curModule.id ? curModule.id : moduleName;
-              if(curModule.type == 'stylesheet') {
-                 modulesStr += '<style class="'+modClass+'" id="'+modId+'">' + modContent + '</style>';
+              newScript.class = modClass;
+              newScript.id = modId;
+              if (window.addEventListener) {
+                 newScript.appendChild(document.createTextNode(modContent));
               } else {
-                 modulesStr += '<script class="'+modClass+'" type="text/javascript" id="'+modId+'">' + modContent + '</script>';
+                 newScript.text = modContent;
               }
-           } else if(window.mainImportModules) {
-              window.mainImportModules([modulesList[iMod]]);
+              document.getElementById('jsContent').appendChild(newScript);
            } else {
-              console.error("Module '"+moduleName+"' unknown.");
+              if (curModule.type == 'stylesheet') {
+                 modulesStr += '<style class="' + modClass + '" id="' + modId + '">' + modContent + '</style>';
+              } else {
+                 modulesStr += '<script class="' + modClass + '" type="text/javascript" id="' + modId + '">' + modContent + '</script>';
+              }
            }
+        } else if(window.mainImportModules) {
+           window.mainImportModules([modulesList[iMod]]);
+        } else {
+           console.error("Module '"+moduleName+"' unknown.");
         }
+     }
+     if(modulesStr) {
         document.write(modulesStr);
-    }
-
+     }
+   }
 })();
 `
 
