@@ -172,7 +172,10 @@ var importableModules = function () {
       'blockly-base': {src: modulesPath+"bundles/blockly-base.js", id: "bundle-blockly-base"},
       'scratch-base': {src: modulesPath+"bundles/scratch-base.js", id: "bundle-scratch-base"},
       'quickAlgo-all-blockly': {src: modulesPath+"bundles/quickAlgo-all-blockly.js", id: "bundle-quickAlgo-all-blockly"},
-      'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"}
+      'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"},
+
+      // Loaders
+      'loader-buttonsAndMessages': {src: modulesPath+'/loaders/loader-buttonsAndMessages.js', id: 'loader-buttonsAndMessages'}
    }
 }
 
