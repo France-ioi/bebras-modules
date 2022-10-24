@@ -868,7 +868,8 @@ window.displayHelper = {
          $('#taskCont > *').prependTo($('#zone_2'));
          $('#zone_012, #zone_12, #zone_3, #taskCont').remove();
       }      
-      $('#tabsContainer').after('<div id="popupMessage"></div>');
+      // $('#tabsContainer').after('<div id="popupMessage"></div>');
+      $('#task').append('<div id="popupMessage"></div>');
 
       // console.log(views)
    },
@@ -982,13 +983,12 @@ window.displayHelper = {
                displayHelper.setLevel(newLevel);
             });
          }else{
-            $('#zone_0 #tabsMenu .li').on('click', function(event) {
+            $('#tabsMenu .li').on('click', function(event) {
                // console.log("click compact",displayHelper.compactMode)
                if(displayHelper.layout == 3 && displayHelper.compactMode){
                   return
                }
                if(displayHelper.responsive && displayHelper.layout == 4){
-                  /* click version in resp layout4 */
                   $('.layout_4 #tabsMenuAlt').show();
                   return
                }
@@ -1292,7 +1292,7 @@ window.displayHelper = {
       setTimeout(function() {
          $('html').hide(0).show(0);
       }, 500);
-      $("html").css("overflow-y","auto");
+      // $("html").css("overflow-y","auto");
       if(this.scaleFactor != this.prevScaleFactor){
          this.prevScaleFactor = this.scaleFactor;
          // this.updateTaskDimensions();
