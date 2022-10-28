@@ -109,17 +109,25 @@ window.implementGetResources = function(task) {
 
       // Images
       var images = [];
-      var image = '';
-      $('#task img').each(function() {
-         var src = $(this).attr('src');
-         if (src) {
-            image = src.toString();
-            if ($.inArray(image, images) === -1) {
-               res.task.push({ type: 'image', url: image });
-               images.push(image);
+      function addImageTo(imageList) {
+         return function () {
+            var src = $(this).attr('src');
+            var classes = $(this).attr('class');
+            classes = classes ? classes.split(/\s+/) : null;
+            if (src) {
+               var imageSrc = src.toString();
+               if ($.inArray(imageSrc, images) === -1) {
+                  var imgData = { type: 'image', url: imageSrc };
+                  if (classes && classes.length > 0) {
+                     imgData.classes = classes;
+                  }
+                  imageList.push(imgData);
+                  images.push(imageSrc);
+               }
             }
          }
-      });
+      }
+      $('#task img').each(addImageTo(res.task));
       fillImages($('#task').html(), images, res.task);
       $('script').each(function() {
          if ($(this).hasClass('remove') || $(this).attr('src') || $(this).attr('href')) {
@@ -127,23 +135,11 @@ window.implementGetResources = function(task) {
          }
          fillImages($(this).html(), images, res.task);
       });
-      $('#solution img').each(function() {
-         image = $(this).attr('src').toString();
-         if ($.inArray(image, images) === -1) {
-            res.solution.push({ type: 'image', url: image });
-            images.push(image);
-         }
-      });
+      $('#solution img').each(addImageTo(res.solution));
       fillImages($('#solution').html(), images, res.solution);
       $('.hint').each(function() {
          var hintnum = $(this).attr('hint-num');
-         $('[hint-num='+hintnum+'] img').each(function() {
-            image = $(this).attr('src').toString();
-            if ($.inArray(image, images) === -1) {
-               res.hints[hintnum].push({ type: 'image', url: image });
-               images.push(image);
-            }
-         });
+         $('[hint-num=' + hintnum + '] img').each(addImageTo(res.hints[hintnum]));
          fillImages($(this).html(), images, res.hints[hintnum]);
       });
 
