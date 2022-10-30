@@ -492,7 +492,7 @@ Beav.Geometry.distance = function(x1,y1,x2,y2) {
    Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
    To call instead of element.drag(onMove, onStart, onEnd);
 */
-Beav.dragWithTouch = function(element, onMove, onStart, onEnd, displayHelper) {
+Beav.dragWithTouch = function (element, onMove, onStart, onEnd) {
    var touchingX = 0;
    var touchingY = 0;
    var disabled = false;
@@ -521,8 +521,8 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd, displayHelper) {
       var touches = evt.changedTouches;
       var dx = touches[0].pageX - touchingX;
       var dy = touches[0].pageY - touchingY;
-      if(displayHelper){
-         var scale = displayHelper.scaleFactor || 1;
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
       }else{
          var scale = 1;
       }
@@ -536,8 +536,8 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd, displayHelper) {
    
    function callOnMove(dx,dy,x,y,event) {
       disabled = true;
-      if(displayHelper){
-         var scale = displayHelper.scaleFactor || 1;
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
       }else{
          var scale = 1;
       }
