@@ -28,7 +28,7 @@ var fontsToLoad = [];
 var fontsLoaded = {};
 
 function appendFont(path) {
-    $('head').append('<link rel="stylesheet" href="' + path + '">');
+    $('head').append('<link rel="stylesheet" href="' + path + '" class="remove">');
 }
 
 function checkFontLoaded(fontName) {
