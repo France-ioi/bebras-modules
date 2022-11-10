@@ -1557,7 +1557,6 @@ window.displayHelper = {
          });
          $(window).resize(function () {
             displayHelper.updateLayout();
-            // console.log(task)
             // task.displayedSubTask.resetDisplay();
          });
          this.bUseFullWidth = true;
