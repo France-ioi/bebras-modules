@@ -55,7 +55,9 @@ var getContext = function(display, infos, curLevel) {
                brokenBlockAt: "brique cassée ligne %1 colonne %2",
                carriedBlock: "brique transportée",
                topBlockBroken: "brique du dessus est cassée",
-               carriedBlockBroken: "brique transportée est cassée",            
+               carriedBlockBroken: "brique transportée est cassée",  
+               onMarker: "sur le marqueur %1"
+
             },
             code: {
                left: "gauche",
@@ -74,6 +76,7 @@ var getContext = function(display, infos, curLevel) {
                carriedBlock: "briqueTransportee",
                topBlockBroken: "briqueDuDessusCassee",
                carriedBlockBroken: "briqueTransporteeCassee",                
+               onMarker: "surMarqueur"
 
             },
             description: {
@@ -700,6 +703,21 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "onMarker",
+      type: "sensors",
+      block: { name: "onMarker", yieldsValue: 'bool',
+         blocklyJson: {
+               "args0": [{
+               "type": "field_dropdown", "name": "PARAM_0", "options": [
+                  ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
+            }]
+         } },
+      func: function(value,callback) {
+         this.callCallback(callback, this.isOnMarker(value));
+      }
+   });
+
+   infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
       block: { name: "placeMarker", params: [null],
@@ -1225,6 +1243,15 @@ var getContext = function(display, infos, curLevel) {
       var broken = (items.length == 0) ? false : (items[0].broken === true);
       
       return broken
+   };
+
+   context.isOnMarker = function(markerID) {
+      for(var mark of this.markers){
+         if(mark.col == this.cranePos && mark.name == markerID){
+            return true
+         }
+      }
+      return false
    };
 
    context.findTopBlock = function(col) {
