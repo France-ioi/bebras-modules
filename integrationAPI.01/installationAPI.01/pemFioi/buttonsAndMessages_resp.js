@@ -1223,6 +1223,7 @@ window.displayHelper = {
          $('#task, #main_header').removeClass();
          $('#task').css("height",(h - headerH)+'px');
          $('#task').css("margin-top",headerH+'px');
+         $('#task').css("overflow", "auto");
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
          $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
@@ -1272,7 +1273,12 @@ window.displayHelper = {
             $('#side_zone').removeClass('show');
          }
          if (this.layout !== 1) {
-            $('#zone_12').css("overflow-x","auto");
+            $('#zone_12').css("overflow-x", "auto");
+            if (displayHelper.verticalScroll && $(window).scrollTop() < displayHelper.newTaskH - displayHelper.availableH - 1) {
+               $('#zone_12').css("overflow-y", "auto");
+            } else {
+               $('#zone_12').css("overflow-y", "hidden");
+            }
          }
          $('#task, #main_header').addClass('layout_'+this.layout);
          if(this.layout == 2){   // bug fix
