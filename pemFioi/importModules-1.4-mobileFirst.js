@@ -4,6 +4,8 @@
 
    var importableModules = function () {
       // Wait to have modulesPath defined before executing the function
+      var modulesPath = window.modulesPath;
+      if(modulesPath.slice(-1) == '/') { modulesPath = modulesPath.slice(0, -1); }
       return {
          'jquery-1.7.1': {src: modulesPath+"/ext/jquery/1.7/jquery.min.js", id: "http://code.jquery.com/jquery-1.7.1.min.js"},
          'jquery-ui-1.10.3': {src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js", id: "https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"},
