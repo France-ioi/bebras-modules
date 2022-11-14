@@ -18,6 +18,16 @@ var importableFonts = function () {
              check: '12px "Source Sans Pro"',
              src: "https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
              // TODO : local source
+        },
+        'inconsolata': {
+            check: '12px "Inconsolata"',
+            src: mp+"/fonts/inconsolata/inconsolata.css",
+            cdn: "https://static4.castor-informatique.fr/modules/fonts/inconsolata/inconsolata.css"
+        },
+        'open-sans': {
+            check: '12px "Open Sans"',
+            src: mp+"/fonts/open-sans/open-sans.css",
+            cdn: "https://static4.castor-informatique.fr/modules/fonts/open-sans/open-sans.css"
         }
     };
 }
