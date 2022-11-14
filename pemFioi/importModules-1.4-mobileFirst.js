@@ -130,6 +130,9 @@
          'codecast7.1_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.1/index.css", id: "codecast7.1_css"},
          'codecast7.1_js': {src: modulesPath+"/ext/codecast/7.1/index.js", id: "codecast7.1_js"},
          'codecast7.1_loader': {src: modulesPath+"/ext/codecast/7.1/codecast-loader.js", id: "codecast7.1_loader"},
+         'codecast7.2_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.2/index.css", id: "codecast7.2_css"},
+         'codecast7.2_js': {src: modulesPath+"/ext/codecast/7.2/index.js", id: "codecast7.2_js"},
+         'codecast7.2_loader': {src: modulesPath+"/ext/codecast/7.2/codecast-loader.js", id: "codecast7.2_loader"},
 
          'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
          'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
@@ -317,7 +320,8 @@
          {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
          {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
          {name: 'codecast-7.0', included: ['codecast7.0_css', 'codecast7.0_js', 'codecast7.0_loader']},
-         {name: 'codecast-7.1', included: ['codecast7.1_css', 'codecast7.1_js', 'codecast7.1_loader']}
+         {name: 'codecast-7.1', included: ['codecast7.1_css', 'codecast7.1_js', 'codecast7.1_loader']},
+         {name: 'codecast-7.2', included: ['codecast7.2_css', 'codecast7.2_js', 'codecast7.2_loader']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
 //      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
