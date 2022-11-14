@@ -4,8 +4,6 @@
 
    var importableModules = function () {
       // Wait to have modulesPath defined before executing the function
-      var modulesPath = window.modulesPath;
-      if(modulesPath.slice(-1) == '/') { modulesPath = modulesPath.slice(0, -1); }
       return {
          'jquery-1.7.1': {src: modulesPath+"/ext/jquery/1.7/jquery.min.js", id: "http://code.jquery.com/jquery-1.7.1.min.js"},
          'jquery-ui-1.10.3': {src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js", id: "https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"},
@@ -120,9 +118,9 @@
          'scratch_procedures': {src: modulesPath+"/ext/scratch/procedures.js", id: "scratch_procedures"},
 
          'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
-         'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
-         'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
-         'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
+         'skulpt_quickAlgo': {src: modulesPath+"/ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
+         'skulpt_stdlib': {src: modulesPath+"/ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
+         'skulpt_debugger': {src: modulesPath+"/ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
          'codecast7.0_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.0/index.css", id: "codecast7.0_css"},
          'codecast7.0_js': {src: modulesPath+"/ext/codecast/7.0/index.js", id: "codecast7.0_js"},
