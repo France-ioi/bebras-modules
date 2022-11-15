@@ -657,6 +657,7 @@ body.coursera #displayHelper_validate input[type=button],
 body.coursera #popupMessage button,
 body.coursera .btn {
   background-color: #0056D2;
+  color: #fff;
 }
 
 body.coursera answer.selected .answer-block,
