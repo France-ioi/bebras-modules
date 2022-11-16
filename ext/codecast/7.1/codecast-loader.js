@@ -12,6 +12,9 @@ $(document).ready(function() {
     if (window.codecastPreload) {
       additionalOptions.preload = true;
     }
+    if (!additionalOptions.language && window.stringsLanguage) {
+      additionalOptions.language = window.stringsLanguage;
+    }
 
     var codecastParameters = $.extend(true, {
       start: 'task',
