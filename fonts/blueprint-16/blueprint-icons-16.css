@@ -1,0 +1,6 @@
+@font-face {
+    font-family: "Icons16";
+    font-style: normal;
+    font-weight: normal;
+    src: url("blueprint-icons-16.woff") format("woff"), url("blueprint-icons-16.ttf") format("truetype");
+}
