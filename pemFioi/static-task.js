@@ -126,7 +126,13 @@ window.taskGetResourcesPost = function (res, callback) {
    callback(res);
 }
 
+window.platformOpenUrl = function (target) {
+   if (!window.platform) { return; }
+   window.platform.openUrl(target, function () { });
+}
+
 window.platformScrollTo = function (target) {
+   if (!window.platform) { return; }
    var offset = 0;
    if (typeof target == 'number') {
       offset = target;
@@ -136,7 +142,7 @@ window.platformScrollTo = function (target) {
       }
       var offset = target.offset().top;
    }
-   platform.updateDisplay({ scrollTop: offset });
+   window.platform.updateDisplay({ scrollTop: offset });
 }
 
 if (window.$) {
@@ -154,8 +160,10 @@ if (window.$) {
       }
       $('body').css('width', '');
 
+      // Handle staticTaskOptions
       var sto = window.staticTaskOptions || {};
       if (sto.autoValidate) {
+         // Auto-validate with a score after 5s
          setTimeout(function () {
             window.staticTaskAnswer = "page_read";
             try {
@@ -164,6 +172,7 @@ if (window.$) {
          }, typeof sto.autoValidate == 'number' ? sto.autoValidate : 5000);
       }
       if (sto.addReturnButton && !$('div.return-button').length) {
+         // Add a return button
          var btnHtml = '<div class="return-button"><button onclick="platform.validate(\'top\');">';
          btnHtml += typeof sto.addReturnButton == 'string' ? sto.addReturnButton : 'Revenir à la liste des questions';
          btnHtml += '</button></div>';
