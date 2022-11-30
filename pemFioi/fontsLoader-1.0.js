@@ -28,6 +28,11 @@ var importableFonts = function () {
             check: '12px "Open Sans"',
             src: mp+"/fonts/open-sans/open-sans.css",
             cdn: "https://static4.castor-informatique.fr/modules/fonts/open-sans/open-sans.css"
+        },
+        'blueprint-16': {
+            check: '12px "Icons16"',
+            src: mp+"/fonts/blueprint-16/blueprint-icons-16.css",
+            cdn: "https://static4.castor-informatique.fr/modules/fonts/blueprint-16/blueprint-icons-16.css"
         }
     };
 }
