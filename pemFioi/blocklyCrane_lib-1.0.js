@@ -88,7 +88,8 @@ var getContext = function(display, infos, curLevel) {
                colHeight: "@() Retourne le nombre de briques se trouvant dans la colonne sous la grue.",
                placeMarker: "@(nom) Place un marqueur portant ce nom à la position actuelle de la grue, ou y déplace le marqueur de ce nom s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
-               expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
+               onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
+			   expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
                expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
                topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
                blockAt: "@(ligne, colonne) Retourne le numéro du type de brique se trouvant dans la grille à la ligne et à la colonne indiquées.",
@@ -705,7 +706,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onMarker",
       type: "sensors",
-      block: { name: "onMarker", yieldsValue: 'bool',
+      block: { name: "onMarker", params: [null], yieldsValue: 'bool',
          blocklyJson: {
                "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
