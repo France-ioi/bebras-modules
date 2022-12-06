@@ -407,6 +407,7 @@ function getConceptViewerBaseConcepts() {
         {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
         {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list'},
         {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function'},
+        {id: 'extra_markers', name: 'Marqueurs', url: baseUrl+'#extra_markers'},
         {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
         {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'},
         {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
