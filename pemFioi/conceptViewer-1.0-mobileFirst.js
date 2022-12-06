@@ -19,6 +19,7 @@ var conceptViewerStrings = {
       "extra_variable": 'Variables',
       "extra_list": 'Listes',
       "extra_function": 'Fonctions',
+      "extra_markers": 'Marqueurs',
       "robot_commands": 'Commandes du robot',
       "arguments": 'Fonctions avec arguments',
     }
@@ -43,6 +44,7 @@ var conceptViewerStrings = {
       "extra_variable": 'Variables',
       "extra_list": 'Lists',
       "extra_function": 'Functions',
+      "extra_markers": 'Markers',
       "robot_commands": 'Robot commands',
       "arguments": 'Functions with arguments',
     }
@@ -67,6 +69,7 @@ var conceptViewerStrings = {
       "extra_variable": 'Variables',
       "extra_list": 'Listas',
       "extra_function": 'Funciones',
+      "extra_markers": 'Markers',
       "robot_commands": 'Comandos del robot',
       "arguments": 'Funciones con argumentos',
     }
@@ -91,6 +94,7 @@ var conceptViewerStrings = {
       "extra_variable": 'Variabili',
       "extra_list": 'Elenchi',
       "extra_function": 'Funzioni',
+      "extra_markers": 'Markers',
       "robot_commands": 'Robot commands',
       "arguments": 'Funzioni conargomenti',
     }
