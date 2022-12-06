@@ -29,6 +29,9 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Afficher",
       },
+      description: {
+
+      },
       exerciseTypeAbout: {
          default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> " +
