@@ -1,0 +1,3 @@
+- Modified manually the fillurl function to always return URLs without the location (ref: https://github.com/DmitryBaranovskiy/raphael/blob/b5fdbdc9850827eb49622cd0bc81b26025f8128a/dev/raphael.svg.js#L138)
+- Change `supportsTouch = true` for all devices, so that for all devices we listen both to the mouse events and the touch events (following good practice from https://web.dev/mobile-touchandmouse/) to handle easily mouse devices, touch devices, and hybrid mouse-and-touch devices
+- Use `{passive: "false"}` in event listeners to allow Raphaël.js doing `event.preventDefault()` in the mouse events and in the touch events, without triggering an Intervention error " Unable to preventDefault inside passive event listener"
