@@ -78,6 +78,10 @@ var makeTurtle = function(coords) {
 
       this.placeTurtle();
    }
+   this.jump = function(x, y) {
+	   this.x = x;
+	   this.y = y;
+   }
    this.start_painting = function() {
       this.paint = true;
       if(this.turtle) {
@@ -163,7 +167,8 @@ var getContext = function(display, infos) {
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
-            inputvalue: "lire un nombre sur l'entrée"
+            inputvalue: "lire un nombre sur l'entrée",
+            jump: "aller à la position (%1,%2)"
          },
          code: {
             move: "avancer",
@@ -195,7 +200,8 @@ var getContext = function(display, infos) {
             turn: "drehe",
             alert: "alert",
             log: "log",
-            inputvalue: "eingabewert"
+            inputvalue: "eingabewert",
+			jump: "jump"
          },
          description: {
             moveamount: '@() la tortue avance du nombre de pas indiqué en paramètre. Exemple : @(50)',
@@ -211,7 +217,8 @@ var getContext = function(display, infos) {
             penup: '@() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
             pendown: '@() la tortue place son pinceau dans la position où il laisse une trace.',
             colourvalue: '@() la trace du pinceau aura la couleur indiquée en paramètre. Exemple : @(\'red\')',
-            inputvalue: '@() lire un nombre en entrée.'
+            inputvalue: '@() lire un nombre en entrée.',
+            inputvalue: '@() place la tortue à des cooronnées données.'
          },
          startingBlockName: "Programme de la tortue",
          messages: {
@@ -667,6 +674,14 @@ var getContext = function(display, infos) {
       context.waitDelay(callback);
    }
 
+   context.turtle.jump = function(x, y, callback) {
+      callOnAllTurtles(function(turtle) {
+		  turtle.jump(x, y);
+      });
+
+      context.waitDelay(callback);
+   }
+
    context.turtle.peneither = function(status, callback) {
       callOnAllTurtles(function(turtle) {
          if (status == "up") {
@@ -757,6 +772,7 @@ var getContext = function(display, infos) {
             { name: "move" },
             { name: "moveamount", params: [null]},
             { name: "movebackamount", params: [null]},
+            { name: "jump", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 0},{"type": "field_number", "name": "PARAM_1", "value": 0}]}},
             { name: "moveamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "movebackamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "turnleft" },
