@@ -706,8 +706,8 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onMarker",
       type: "sensors",
-      countAs: 2,
-      block: { name: "onMarker", params: [null], yieldsValue: 'bool',
+      block: {
+         name: "onMarker", params: [null], yieldsValue: 'bool', countAs: 2,
          blocklyJson: {
                "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -722,8 +722,8 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "placeMarker",
       type: "actions",
-      countAs: 2,
-      block: { name: "placeMarker", params: [null],
+      block: {
+         name: "placeMarker", params: [null], countAs: 2,
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -740,8 +740,8 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "goToMarker", 
       type: "actions",
-      countAs: 2,
-      block: { name: "goToMarker", params: [null],
+      block: {
+         name: "goToMarker", params: [null], countAs: 2,
       blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
