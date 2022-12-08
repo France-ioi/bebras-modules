@@ -64,6 +64,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
    return {
       allBlocksAllowed: [],
+      blockCounts: {},
 
       addBlocksAllowed: function(blocks) {
          for(var i=0; i < blocks.length; i++) {
@@ -190,9 +191,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          // Get the number of blocks allowed
          if(!this.maxBlocks) { return Infinity; }
          var remaining = workspace.remainingCapacity(this.maxBlocks+1);
+         var allBlocks = workspace.getAllBlocks();
          if(this.maxBlocks && remaining == Infinity) {
             // Blockly won't return anything as we didn't set a limit
-            remaining = this.maxBlocks+1 - workspace.getAllBlocks().length;
+            remaining = this.maxBlocks + 1 - allBlocks.length;
+         }
+         for (var i = 0; i < allBlocks.length; i++) {
+            var block = allBlocks[i];
+            if (typeof this.blockCounts[block.type] != 'undefined') {
+               remaining -= this.blockCounts[block.type] - 1;
+            }
          }
          return remaining;
       },
@@ -642,7 +650,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
       },
 
+      applyBlockOptions: function (block) {
+         if (typeof block.countAs != 'undefined') {
+            this.blockCounts[block.name] = block.countAs;
+         }
+      },
+
       createGeneratorsAndBlocks: function() {
+         this.blockCounts = {};
          var customGenerators = this.mainContext.customBlocks;
          for (var objectName in customGenerators) {
             for (var categoryName in customGenerators[objectName]) {
@@ -657,6 +672,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   this.completeCodeGenerators(block, objectName);
                   this.applyCodeGenerators(block);
                   this.createBlock(block);
+                  this.applyBlockOptions(block);
                }
                // TODO: Anything of this still needs to be done?
                //this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
