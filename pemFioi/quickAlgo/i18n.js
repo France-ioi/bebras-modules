@@ -30,7 +30,16 @@ var quickAlgoLanguageStrings = {
          display: "Afficher",
       },
       description: {
-
+         if: "Mot clé pour exécuter un bloc d'instructions seulement si une condition est vérifiée",
+         else:"Mot clé pour exécuter un bloc d'instructions si la condition spécifiée après un if n'est pas vérifiée",
+         elif: "Mot clé pour ajouter une branche à une instruction conditionnelle",
+         for: "Mot clé pour répéter un bloc d'instructions un certain nombre de fois",
+         while: "Mot clé pour répéter un bloc d'instructions tant qu'une condition est vérifiée",
+         not: "Opérateur logique de négation",
+         and: "Opérateur logique ET",
+         or: "Opérateur logique OU",
+         def: "Mot clé pour définir une fonction"
+         //list, set, _getitem_, _setitem_, lambda, break, continue, setattr, map, split
       },
       exerciseTypeAbout: {
          default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
