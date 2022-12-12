@@ -418,8 +418,8 @@ h1 .stars {
    border-radius: 10px 0 0 0;
    height: 100%;
 }
-.layout_1 .noSolution #displayHelperAnswering,
-.layout_2 .noSolution #displayHelperAnswering {
+.layout_1 .noSolution #displayHelperAnswering:not(.forceRight),
+.layout_2 .noSolution #displayHelperAnswering:not(.forceRight) {
    right: 50%;
    transform: translateX(50%);
 }
