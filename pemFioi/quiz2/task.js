@@ -205,7 +205,7 @@
             $('solution, .solution, #solution').each(function() {
                if($(this).text().trim() != '') { hasSolution = true; }
             });
-            if(hasSolution) {
+            if (hasSolution && window.miniPlatformShowSolution) {
                 this.addButton(this.holder, 'solution', function() {
                     miniPlatformShowSolution();
                 });
