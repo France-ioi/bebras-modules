@@ -204,11 +204,13 @@ var NumericKeypad = {
     }
 }
 
-(function () {
+function detectTouchInit() {
     var detectTouch = null;
     detectTouch = function () {
         window.touchDetected = true;
         window.removeEventListener('touchstart', detectTouch);
     }
     window.addEventListener('touchstart', detectTouch);
-})();
+}
+
+detectTouchInit();
