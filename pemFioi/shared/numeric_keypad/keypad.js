@@ -2,6 +2,7 @@ var NumericKeypad = {
 
     bodyStyle: document.createElement('style'),
     bodyMinHeight: 0,
+    attachedInputs: [],
 
     data: {
         value: '',
@@ -14,7 +15,7 @@ var NumericKeypad = {
         if($('#numeric-keypad').length) { return; }
 
         // Type of the screen element
-        var screenType = window.touchDetected ? 'div' : 'input';
+        var screenType = NumericKeypad.touchDetected ? 'div' : 'input';
 
         var html = '' +
             '<div id="numeric-keypad"><div class="keypad">' +
@@ -54,7 +55,7 @@ var NumericKeypad = {
 
     handleKeypadKey: function(e) {
         // Update if we detected a touch event
-        if($('input.keypad-value').length && window.touchDetected) {
+        if ($('input.keypad-value').length && NumericKeypad.touchDetected) {
             $('input.keypad-value').replaceWith('<div class="keypad-value"></div>');
         }
 
@@ -183,7 +184,16 @@ var NumericKeypad = {
         this.bodyStyle.innerText = 'body, #container { min-height: ' + this.bodyMinHeight + 'px; }';
         $('#container').css('padding-bottom', '110px');
 
+        if (self.touchDetected) {
+            input.attr('inputmode', 'none');
+            input.attr('readonly', 'readonly');
+        }
+        self.attachedInputs.push(input);
+
         input.on('focus', function() {
+            if (self.touchDetected) {
+                input.blur();
+            }   
             self.renderKeypad();
             $('#numeric-keypad').show();
             var position = input.offset();
@@ -201,16 +211,19 @@ var NumericKeypad = {
             };
             self.handleKeypadKey(null);
         });
+    },
+
+    detectTouchInit: function () {
+        var self = this;
+        var detectTouch = function () {
+            self.touchDetected = true;
+            window.removeEventListener('touchstart', detectTouch);
+            for (var i = 0; i < self.attachedInputs.length; i++) {
+                self.attachedInputs[i].attr('inputmode', 'none').attr('readonly', 'readonly');
+            }
+        }
+        window.addEventListener('touchstart', detectTouch);
     }
 }
 
-function detectTouchInit() {
-    var detectTouch = null;
-    detectTouch = function () {
-        window.touchDetected = true;
-        window.removeEventListener('touchstart', detectTouch);
-    }
-    window.addEventListener('touchstart', detectTouch);
-}
-
-detectTouchInit();
+NumericKeypad.detectTouchInit();
