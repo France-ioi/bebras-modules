@@ -141,14 +141,11 @@ var algoreaInstructionsStrings = {
          }else{
             text += "toutes les cases ";
          }
-         text += "avec un point noir";
-         if(nbWhite > 0){
-            text += " et uniquement ";
-            if(nbBlack > 1){
-               text += "celles-là";
-            }else{
-               text += "celle-là";
-            }
+         text += "avec un point noir, et uniquement ";
+         if(nbBlack > 1){
+            text += "celles-là";
+         }else{
+            text += "celle-là";
          }
          text += ".";
          return text
