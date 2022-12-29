@@ -721,6 +721,8 @@ var algoreaInstructionsStrings = {
                      return "écrire le nombre"
                   }
                   return "ecrireNombre()"
+               case "obstacleInFront":
+                  return "astéroïde devant"
                default: 
                   return "undefined"
             }
