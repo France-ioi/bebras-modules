@@ -518,8 +518,11 @@ var algoreaInstructionsStrings = {
                   }
                   return "listes"
                case 'blockly_controls_whileUntil':
-                  if(lang != "python"){
+                  if(lang == "blockly"){
                      return "répéter tant que ou jusqu'à"
+                  }
+                  if(lang == "scratch"){
+                     return "répéter jusqu'à"
                   }
                   return "l'instruction while"
                case 'blockly_logic_operation':
