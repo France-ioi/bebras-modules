@@ -2078,7 +2078,7 @@ var getContext = function(display, infos, curLevel) {
             }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -15, offsetY: -14},
             obstacle: { num: 7, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
             net: { num: 8, img: "net.png", side: 60, zOrder: 2 },
-            board: { num: 9, img: "island.png", side: 75, isContainer: true, isWritable: true, offsetX: -7, offsetY: 0, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            board: { num: 9, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -14, offsetY: -14 },
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
