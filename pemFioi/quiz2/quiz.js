@@ -118,7 +118,8 @@ Quiz.UI = function(params) {
         feedback_on_wrong_choices: "first_under_question", // none | first_under_question | first_under_choice | selected_only | all
         feedback_on_correct_choices: "all", //  none | selected_only | all
         show_solutions: "all", // none | correct_only | all
-        alert_if_no_answer: true // bool
+        alert_if_no_answer: true, // bool
+        keypad_input_only: false // bool, if true, only keypad input is allowed for number inputs
     }
     var params = Object.assign(default_params, params);
     Quiz.params = params;
