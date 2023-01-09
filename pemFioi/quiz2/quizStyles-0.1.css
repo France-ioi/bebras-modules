@@ -237,9 +237,6 @@ question.horizontal answer .answer-block {
   margin-left: 0;
   padding-left: 0;
 }
-question.horizontal answer .answer-label,
-question.horizontal answer .answer-code {
-}
 question.horizontal answer .answer-label {
   text-align: center;
   padding: 1em 10px;
@@ -811,4 +808,8 @@ body.coursera .fill-gaps-toolbar .word,
 body.coursera .fill-gaps-text .word,
 body.coursera .fill-gaps-text .placeholder-hover {
   border-color: #0056D2;
+}
+
+.mjx-chtml {
+  font-size: 100% !important;
 }
