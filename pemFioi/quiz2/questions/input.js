@@ -20,7 +20,7 @@
         } else if(format == 'number') {
             validator = '^-?[0-9]*[,.]?[0-9]*$';
             if('NumericKeypad' in window) {
-                NumericKeypad.attach(input);
+                NumericKeypad.attach(input, { keypadInputOnly: params && params.keypad_input_only });
             }
         } else if(format == 'regexp') {
             validator = answer.attr('validator');

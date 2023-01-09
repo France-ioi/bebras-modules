@@ -3,6 +3,7 @@ var NumericKeypad = {
     bodyStyle: document.createElement('style'),
     bodyMinHeight: 0,
     attachedInputs: [],
+    keypadInputOnly: false,
 
     data: {
         value: '',
@@ -11,11 +12,12 @@ var NumericKeypad = {
         callbackFinished: function() {},
     },
 
+
     renderKeypad: function() {
         if($('#numeric-keypad').length) { return; }
 
         // Type of the screen element
-        var screenType = NumericKeypad.touchDetected ? 'div' : 'input';
+        var screenType = (NumericKeypad.touchDetected || this.keypadInputOnly) ? 'div' : 'input';
 
         var html = '' +
             '<div id="numeric-keypad"><div class="keypad">' +
@@ -176,22 +178,24 @@ var NumericKeypad = {
     },
 
 
-    attach: function(input) {
+    attach: function (input, options) {
         var self = this;
+
+        this.keypadInputOnly = !!(options && options.keypadInputOnly);
 
         // Make sure the body has enough height for the keypad
         this.bodyMinHeight = Math.max(this.bodyMinHeight, (input.offset().top || 0) + 272);
         this.bodyStyle.innerText = 'body, #container { min-height: ' + this.bodyMinHeight + 'px; }';
         $('#container').css('padding-bottom', '110px');
 
-        if (self.touchDetected) {
+        if (self.touchDetected || this.keypadInputOnly) {
             input.attr('inputmode', 'none');
             input.attr('readonly', 'readonly');
         }
         self.attachedInputs.push(input);
 
         input.on('focus', function() {
-            if (self.touchDetected) {
+            if (self.touchDetected || this.keypadInputOnly) {
                 input.blur();
             }   
             self.renderKeypad();
