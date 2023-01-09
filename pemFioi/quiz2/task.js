@@ -196,10 +196,10 @@
             }
             this.holder = $('<div class="quiz-toolbar"></div>');
             var self = this;
-            this.addButton(this.holder, 'validate', function() {
-                platform.validate('done');
+            this.addButton(this.holder, 'validate', function () {
                 self.freezeTask();
                 self.setValidated(true);
+                platform.validate('done');
             });
             var hasSolution = false;
             $('solution, .solution, #solution').each(function() {
