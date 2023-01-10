@@ -3913,7 +3913,7 @@ exports.verbs = {
    ]
  };
 
-exports.adverbTypes = ["aftVerb","aftNegVerb","beforeAdj"];
+exports.adverbTypes = ["aftVerb",/*"aftNegVerb",*/"beforeAdj"];
 exports.adverbs =  {
    "aftVerb": [
       "abominablement",
