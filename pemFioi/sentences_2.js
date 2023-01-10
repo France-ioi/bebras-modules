@@ -27,6 +27,277 @@ if(typeof require != 'undefined') {
     var block = "";
 }
 
+/*** DICTIONARY ***/
+
+var dictionary = [
+  // {word: "NOUS", type: 'pronoun'},
+  // {word: "MANGERONS", type: 'verb', verb_group: '1'},
+  // {word: "DANS", type: 'preposition'},
+  // {word: "LA", type: 'article'},
+  // {word: "GRANDE", type: 'adjective'},
+  // {word: "SALLE", type: 'noun'},
+  // {word: "IL", type: 'pronoun'},
+  // {word: "EST", type: 'verb', verb_group: '3'},
+  // {word: "NE", type: 'verb', verb_group: '3'},
+  // {word: "A", type: 'preposition'},
+  // {word: "L", type: 'article'},
+  // {word: "EST", type: 'noun'},
+];
+var dictionaryAvailableCriteria = [
+  {
+    name: 'type',
+    label: "Type",
+    type: 'select',
+    values: [
+      {value: 'verb', label: 'Verbe'},
+      {value: 'noun', label: 'Nom'},
+      {value: 'adjective', label: 'Adjectif'},
+      {value: 'adj_num', label: 'Adjectif numérique'},
+      {value: 'adj_dem', label: 'Adjectif démonstratif'},
+      {value: 'adverb', label: 'Adverbe'},
+      {value: 'article', label: 'Article'},
+      // {value: 'pronoun', label: 'Pronom'},
+      // {value: 'preposition', label: 'Préposition'},
+    ]
+  },
+  {
+    name: 'verb_group',
+    label: "Groupe",
+    type: 'select',
+    condition: "type = verb",
+    values: [
+      {value: '1', label: 'Premier groupe'},
+      {value: '2', label: 'Deuxième groupe'},
+      {value: '3', label: 'Troisième groupe'},
+    ]
+  },
+  {
+    name: 'verb_mode',
+    label: "Mode",
+    type: 'select',
+    condition: "type = verb",
+    values: [
+      {value: 'inf', label: 'Infinitif'},
+      {value: 'ind', label: 'Indicatif'}
+    ]
+  },
+  {
+    name: 'verb_person',
+    label: "Personne",
+    type: 'select',
+    condition: "type = verb",
+    values: [
+      {value: '1', label: 'Première personne du singulier'},
+      {value: '2', label: 'Deuxième personne du singulier'},
+      {value: '3', label: 'Troisième personne du singulier'},
+      {value: '4', label: 'Première personne du pluriel'},
+      {value: '5', label: 'Deuxième personne du pluriel'},
+      {value: '6', label: 'Troisième personne du pluriel'}
+    ]
+  },
+  {
+    name: 'gender',
+    label: "Genre",
+    type: 'select',
+    condition: "type == noun || type == adjective || type == article || type == adj_dem" ,
+    values: [
+      {value: 'M', label: 'Masculin'},
+      {value: 'F', label: 'Féminin'}
+    ]
+  },
+  {
+    name: 'number',
+    label: "Nombre",
+    type: 'select',
+    condition: "type == noun || type == adjective || type == article || type == adj_dem",
+    values: [
+      {value: '0', label: 'Singulier'},
+      {value: '1', label: 'Pluriel'}
+    ]
+  },
+  {
+    name: 'art_type',
+    label: "Type",
+    type: 'select',
+    condition: "type == article",
+    values: [
+      {value: 'def', label: 'Défini'},
+      {value: 'ind', label: 'Indéfini'}
+    ]
+  }
+];
+
+function generateDictionary() {
+   var types = ["verb","noun","adj","adv","det","pronoun"];
+   for(var type of types){
+      switch(type){
+      case "verb":
+         addVerbsToDict();
+         break;
+      case "noun":
+         addNounsToDict();
+         break;
+      case "adj":
+         addAdjToDict();
+         break;
+      case "adv":
+         addAdvToDict();
+         break;
+      case "det":
+         addDetToDict();
+         break;
+      case "pronoun":
+         // addPronounsToDict();
+         break;
+      }
+   }
+   // console.log(JSON.stringify(dictionary).length);
+   console.log(dictionary);
+   return {dictionaryAvailableCriteria,dictionary}
+};
+
+function addVerbsToDict() {
+   for(var verbType of verbTypes){
+      if(verbType != "modal"){
+         for(var verb of verbs[verbType]){
+            var g = verb[1];
+            var entry = { word: cleanUpSpecialChars(verb[0],true,true), type: "verb", verb_group: g, verb_mode: "inf" };
+            if(!inDictionary(entry)){
+               dictionary.push(entry);
+            }
+            for(var tense in conjugations[g]){
+               for(var pers = 0; pers < 6; pers++){
+                  var plural = (pers > 2) ? 1 : 0;
+                  var person = pers%3 + 1;
+                  var word = conjugate(verb,person,plural,"M",tense,false,null,false);
+                  var entry = { word: cleanUpSpecialChars(word,true,true), type: "verb", verb_group: g, verb_mode: "ind", verb_person: pers + 1 };
+                  if(!inDictionary(entry)){
+                     dictionary.push(entry);
+                  }
+               }
+            }
+         }
+      }
+   }
+};
+
+function addNounsToDict() {
+   for(var nounType of nounTypes){
+      if(/*nounType == "name" ||nounType == "country" ||*/ nounType == "city"){
+         continue;
+      }
+      for(var g = 0; g < 2; g++){
+         var gender = (g == 0) ? "M" : "F";
+         for(var noun of nouns[nounType][gender]){
+            for(var pl = 0; pl < 2; pl++){
+               if(pl == 1 && (nounType == "name" || nounType == "country")){
+                  continue;
+               }
+               var word = (pl == 0) ? noun[pl] : pluralize(noun[0],noun[1]);
+               var entry = { word: cleanUpSpecialChars(word,true,true), type: "noun", gender, number: pl };
+               if(!inDictionary(entry)){
+                  dictionary.push(entry);
+               }
+            }
+         }   
+      }
+   }
+};
+
+function addAdjToDict() {
+   for(var adjType of adjectiveTypes){
+      for(var g = 0; g < 2; g++){
+         var gender = (g == 0) ? "M" : "F";
+         for(var adj of adjectives[adjType]){
+            for(var pl = 0; pl < 2; pl++){
+               var word = makeAdjectiveAgree(adj,gender,pl);
+               var entry = { word: cleanUpSpecialChars(word,true,true), type: "adjective", gender, number: pl };
+               if(!inDictionary(entry)){
+                  dictionary.push(entry);
+               }
+            }
+         }   
+      }
+   }
+};
+
+function addAdvToDict() {
+   for(var advType of adverbTypes){
+      for(var adv of adverbs[advType]){
+         var word = adv;
+         var entry = { word: cleanUpSpecialChars(word,true,true), type: "adverb" };
+         if(!inDictionary(entry)){
+            dictionary.push(entry);
+         }
+      }     
+   }
+};
+
+function addDetToDict() {
+   for(var detType of determinerTypes){
+      var type = detType[0];
+      switch(type){
+      case "definite_article":
+      case "indefinite_article":
+         var t = "article";
+         break;
+      case "demonstrative_adjective":
+         var t = "adj_dem";
+         break;
+      case "numeral_adjective":
+         var t = "adj_num";
+      }
+      if(t != "adj_num"){
+         for(var g = 0; g < 2; g++){
+            var gender = (g == 0) ? "M" : "F";
+            for(var pl = 0; pl < 2; pl++){
+               var word = determiners[type][gender][0][pl];
+               // console.log(word)
+               var entry = { word: cleanUpSpecialChars(word,true,true), type: t, gender, number: pl };
+               if(type == "definite_article"){
+                  entry.art_type = "def";
+               }else if(type == "indefinite_article"){
+                  entry.art_type = "ind";
+               }
+               if(!inDictionary(entry)){
+                  dictionary.push(entry);
+               }
+            }
+         }
+      }else{
+         for(var det of determiners[type]){
+            var word = det[0];
+            var entry = { word: cleanUpSpecialChars(word,true,true), type: t };
+            if(!inDictionary(entry)){
+               dictionary.push(entry);
+            }
+         }
+      }    
+   }
+};
+
+function inDictionary(entry) {
+   for(var ent of dictionary){
+      var same = true;
+      if(ent.word != entry.word){
+         return false
+      }
+      for(var field of dictionaryAvailableCriteria){
+         var crit = field.name;
+         if(ent[crit] != entry[crit]){
+            same = false;
+         }
+      }
+      if(same){
+         console.log("doublon",entry,ent)
+         return true
+      }
+   }
+   return false
+};
+
+/*** text generator ***/
+
 function init() {
    $("#form").html(createForm);
    initHandlers();
@@ -842,7 +1113,7 @@ function elideH(str) {
    return str;
 };
 
-function cleanUpSpecialChars(str, withSpaces) {
+function cleanUpSpecialChars(str, withSpaces, keepDash) {
     str = str.replace(/[ÀÁÂÃÄÅ]/g,"A");
     str = str.replace(/[àáâãäå]/g,"a");
     str = str.replace(/[ÈÉÊË]/g,"E");
@@ -852,9 +1123,13 @@ function cleanUpSpecialChars(str, withSpaces) {
     str = str.replace(/[ùüû]/g,"u");
     str = str.replace(/[Ç]/g,"C");
     str = str.replace(/[ç]/g,"c");
-    str = str.replace(/['-]/g," ");
+    if(!keepDash){
+      str = str.replace(/['-]/g," ");
+    }
     str = str.replace(/ {2,}/gi," ");
-    str = str.replace(/[^a-zA-Z ]/gi,''); // final clean up
+    if(!keepDash){
+      str = str.replace(/[^a-zA-Z ]/gi,''); // final clean up
+   }
     str = str.trim();
     if (!withSpaces) {
        str = str.replace(/[ ]/g,"");
