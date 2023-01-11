@@ -43,6 +43,7 @@ var dictionary = [
   // {word: "L", type: 'article'},
   // {word: "EST", type: 'noun'},
 ];
+var inDic = {};
 var dictionaryAvailableCriteria = [
   {
     name: 'type',
@@ -85,7 +86,7 @@ var dictionaryAvailableCriteria = [
     name: 'verb_person',
     label: "Personne",
     type: 'select',
-    condition: "type == verb",
+    condition: "type == verb && verb_mode != inf",
     values: [
       {value: '1', label: 'Première personne du singulier'},
       {value: '2', label: 'Deuxième personne du singulier'},
@@ -127,6 +128,20 @@ var dictionaryAvailableCriteria = [
   }
 ];
 
+
+// Stackoverflow
+String.prototype.hashCode = function() {
+  var hash = 0,
+    i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 function generateDictionary() {
    var types = ["verb","noun","adj","adv","det","pronoun"];
    for(var type of types){
@@ -164,6 +179,8 @@ function addVerbsToDict() {
             var entry = { word: cleanUpSpecialChars(verb[0],true,true), type: "verb", verb_group: g, verb_mode: "inf" };
             if(!inDictionary(entry)){
                dictionary.push(entry);
+               var hash = JSON.stringify(entry).hashCode();
+               inDic[hash] = true;
             }
             for(var tense in conjugations[g]){
                for(var pers = 0; pers < 6; pers++){
@@ -278,22 +295,27 @@ function addDetToDict() {
 };
 
 function inDictionary(entry) {
-   for(var ent of dictionary){
-      var same = true;
-      if(ent.word != entry.word){
-         same = false;
-      }
-      for(var field of dictionaryAvailableCriteria){
-         var crit = field.name;
-         if(ent[crit] != entry[crit]){
-            same = false;
-            continue;
-         }
-      }
-      if(same){
-         // console.log("doublon",entry,ent)
-         return true
-      }
+   // for(var ent of dictionary){
+   //    var same = true;
+   //    if(ent.word != entry.word){
+   //       same = false;
+   //    }
+   //    for(var field of dictionaryAvailableCriteria){
+   //       var crit = field.name;
+   //       if(ent[crit] != entry[crit]){
+   //          same = false;
+   //          continue;
+   //       }
+   //    }
+   //    if(same){
+   //       // console.log("doublon",entry,ent)
+   //       return true
+   //    }
+   // }
+   // return false
+   var hash = JSON.stringify(entry);
+   if(inDic[hash]){
+      return true
    }
    return false
 };
