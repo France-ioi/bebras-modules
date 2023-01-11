@@ -64,7 +64,7 @@ var dictionaryAvailableCriteria = [
     name: 'verb_group',
     label: "Groupe",
     type: 'select',
-    condition: "type = verb",
+    condition: "type == verb",
     values: [
       {value: '1', label: 'Premier groupe'},
       {value: '2', label: 'Deuxième groupe'},
@@ -75,7 +75,7 @@ var dictionaryAvailableCriteria = [
     name: 'verb_mode',
     label: "Mode",
     type: 'select',
-    condition: "type = verb",
+    condition: "type == verb",
     values: [
       {value: 'inf', label: 'Infinitif'},
       {value: 'ind', label: 'Indicatif'}
@@ -85,7 +85,7 @@ var dictionaryAvailableCriteria = [
     name: 'verb_person',
     label: "Personne",
     type: 'select',
-    condition: "type = verb",
+    condition: "type == verb",
     values: [
       {value: '1', label: 'Première personne du singulier'},
       {value: '2', label: 'Deuxième personne du singulier'},
