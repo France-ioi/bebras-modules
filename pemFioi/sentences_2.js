@@ -171,26 +171,28 @@ function generateDictionary() {
    return {dictionaryAvailableCriteria,dictionary}
 };
 
+function addEntryToDic(entry) {
+   if(!inDictionary(entry)){
+      dictionary.push(entry);
+      var hash = JSON.stringify(entry).hashCode();
+      inDic[hash] = true;
+   }
+};
+
 function addVerbsToDict() {
    for(var verbType of verbTypes){
       if(verbType != "modal"){
          for(var verb of verbs[verbType]){
             var g = verb[1];
             var entry = { word: cleanUpSpecialChars(verb[0],true,true), type: "verb", verb_group: g, verb_mode: "inf" };
-            if(!inDictionary(entry)){
-               dictionary.push(entry);
-               var hash = JSON.stringify(entry).hashCode();
-               inDic[hash] = true;
-            }
+            addEntryToDic(entry);
             for(var tense in conjugations[g]){
                for(var pers = 0; pers < 6; pers++){
                   var plural = (pers > 2) ? 1 : 0;
                   var person = pers%3 + 1;
                   var word = conjugate(verb,person,plural,"M",tense,false,null,false);
                   var entry = { word: cleanUpSpecialChars(word,true,true), type: "verb", verb_group: g, verb_mode: "ind", verb_person: pers + 1 };
-                  if(!inDictionary(entry)){
-                     dictionary.push(entry);
-                  }
+                  addEntryToDic(entry);
                }
             }
          }
@@ -212,9 +214,7 @@ function addNounsToDict() {
                }
                var word = (pl == 0) ? noun[pl] : pluralize(noun[0],noun[1]);
                var entry = { word: cleanUpSpecialChars(word,true,true), type: "noun", gender, number: pl };
-               if(!inDictionary(entry)){
-                  dictionary.push(entry);
-               }
+               addEntryToDic(entry);
             }
          }   
       }
@@ -229,9 +229,7 @@ function addAdjToDict() {
             for(var pl = 0; pl < 2; pl++){
                var word = makeAdjectiveAgree(adj,gender,pl);
                var entry = { word: cleanUpSpecialChars(word,true,true), type: "adjective", gender, number: pl };
-               if(!inDictionary(entry)){
-                  dictionary.push(entry);
-               }
+               addEntryToDic(entry);
             }
          }   
       }
@@ -244,9 +242,7 @@ function addAdvToDict() {
          var word = adv;
          var entry = { word: cleanUpSpecialChars(word,true,true), type: "adverb" };
 
-         if(!inDictionary(entry)){
-            dictionary.push(entry);
-         }
+         addEntryToDic(entry);
       }     
    }
 };
@@ -277,18 +273,14 @@ function addDetToDict() {
                }else if(type == "indefinite_article"){
                   entry.art_type = "ind";
                }
-               if(!inDictionary(entry)){
-                  dictionary.push(entry);
-               }
+               addEntryToDic(entry);   
             }
          }
       }else{
          for(var det of determiners[type]){
             var word = det[0];
             var entry = { word: cleanUpSpecialChars(word,true,true), type: t };
-            if(!inDictionary(entry)){
-               dictionary.push(entry);
-            }
+            addEntryToDic(entry);
          }
       }    
    }
@@ -313,8 +305,9 @@ function inDictionary(entry) {
    //    }
    // }
    // return false
-   var hash = JSON.stringify(entry);
+   var hash = JSON.stringify(entry).hashCode();
    if(inDic[hash]){
+      // console.log("doublon",entry)
       return true
    }
    return false
