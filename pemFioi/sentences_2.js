@@ -226,6 +226,7 @@ function addAdvToDict() {
       for(var adv of adverbs[advType]){
          var word = adv;
          var entry = { word: cleanUpSpecialChars(word,true,true), type: "adverb" };
+
          if(!inDictionary(entry)){
             dictionary.push(entry);
          }
@@ -280,16 +281,17 @@ function inDictionary(entry) {
    for(var ent of dictionary){
       var same = true;
       if(ent.word != entry.word){
-         return false
+         same = false;
       }
       for(var field of dictionaryAvailableCriteria){
          var crit = field.name;
          if(ent[crit] != entry[crit]){
             same = false;
+            continue;
          }
       }
       if(same){
-         console.log("doublon",entry,ent)
+         // console.log("doublon",entry,ent)
          return true
       }
    }
