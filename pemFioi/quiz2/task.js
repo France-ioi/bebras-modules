@@ -381,7 +381,7 @@
                     //console.log('task.reloadAnswer', answer)
                     var answerObject = JSON.parse(answer);
                     this.reloadAnswerObject(answerObject);
-                    if (answerObject.validated || lastViews.solution) {
+                    if (quiz_settings.hide_restart && (answerObject.validated || lastViews.solution)) {
                         task_toolbar.setValidated(true);
                         task.gradeAnswer(answer, null, function () {});
                     }
