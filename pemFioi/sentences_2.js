@@ -118,7 +118,7 @@ var dictionaryAvailableCriteria = [
   },
   {
     name: 'art_type',
-    label: "Type",
+    label: "Article",
     type: 'select',
     condition: "type == article",
     values: [
