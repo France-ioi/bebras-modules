@@ -67,9 +67,9 @@ var dictionaryAvailableCriteria = [
     type: 'select',
     condition: "type == verb",
     values: [
-      {value: '1', label: 'Premier groupe'},
-      {value: '2', label: 'Deuxième groupe'},
-      {value: '3', label: 'Troisième groupe'},
+      {value: '1', label: '1er groupe'},
+      {value: '2', label: '2ème groupe'},
+      {value: '3', label: '3ème groupe'},
     ]
   },
   {
@@ -88,12 +88,12 @@ var dictionaryAvailableCriteria = [
     type: 'select',
     condition: "type == verb && verb_mode != inf",
     values: [
-      {value: '1', label: 'Première personne du singulier'},
-      {value: '2', label: 'Deuxième personne du singulier'},
-      {value: '3', label: 'Troisième personne du singulier'},
-      {value: '4', label: 'Première personne du pluriel'},
-      {value: '5', label: 'Deuxième personne du pluriel'},
-      {value: '6', label: 'Troisième personne du pluriel'}
+      {value: '1', label: '1e pers. singulier'},
+      {value: '2', label: '2e pers. singulier'},
+      {value: '3', label: '3e pers. singulier'},
+      {value: '4', label: '1e pers. pluriel'},
+      {value: '5', label: '2e pers. pluriel'},
+      {value: '6', label: '3e pers. pluriel'}
     ]
   },
   {
