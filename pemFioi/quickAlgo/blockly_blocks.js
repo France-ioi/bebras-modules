@@ -2183,8 +2183,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
 
-         if(typeof this.includeBlocks.procedures !== 'undefined') {
-            var proceduresOptions = this.includeBlocks.procedures;
+         var proceduresOptions = this.includeBlocks.procedures;
+         if (typeof proceduresOptions !== 'undefined') {
             if(proceduresOptions.noret) { Blockly.Procedures.flyoutOptions.includedBlocks['noret'] = true; }
             if(proceduresOptions.ret) { Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true; }
             if(proceduresOptions.ifret) { Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true; }
@@ -2270,6 +2270,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
          if(Blockly.Variables.flyoutOptions.includedBlocks['incr']) {
             this.addBlocksAllowed(['math_change']);
+         }
+
+         // Disable arguments in procedures if variables are not allowed
+         if (!Blockly.Variables.flyoutOptions.any && proceduresOptions && typeof proceduresOptions.disableArgs == 'undefined') {
+            Blockly.Procedures.flyoutOptions.disableArgs = true;
          }
 
          var xmlString = "";
