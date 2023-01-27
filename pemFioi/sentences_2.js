@@ -167,7 +167,7 @@ function generateDictionary() {
       }
    }
    // console.log(JSON.stringify(dictionary).length);
-   console.log(dictionary);
+   // console.log(dictionary);
    return {dictionaryAvailableCriteria,dictionary}
 };
 
