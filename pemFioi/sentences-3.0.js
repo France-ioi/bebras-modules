@@ -529,7 +529,7 @@ function generateVerbListFromLexicon(params) {
    var nbVerbs = Math.round(totVerbs*ratio);
    var avoirDat = {"id":"12042","1_ortho":"avoir","groupe":"3","tr_direct":"1","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
    var etreDat = {"id":"57185","1_ortho":"être","groupe":"3","tr_direct":"0","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
-   // shuffleArray(allVerbs,params.rng);
+   shuffleArray(allVerbs,params.rng);
    verbs.intransitive = [];
    verbs.transitive = [];
    verbs.pronominal = [];
