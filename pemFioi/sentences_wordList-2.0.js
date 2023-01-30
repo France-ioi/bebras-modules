@@ -304,11 +304,11 @@ exports.exceptionsGroup3 = [
    [ "dévêtir", "revêtir", "vêtir" ], // 32
    [ "dépourvoir", "pourvoir", "repourvoir" ]  // 33
 ];
-exports.conjugationType = [
-   { conj: conjugations[0], pp: pastParticiples[0] }, // groupe 1
-   { conj: conjugations[1], pp: pastParticiples[1] }, // groupe 2
-   { conj: conjugations[1], pp: pastParticiples[1] }, // groupe 2
-];
+// exports.conjugationType = [
+//    { conj: conjugations[0], pp: pastParticiples[0] }, // groupe 1
+//    { conj: conjugations[1], pp: pastParticiples[1] }, // groupe 2
+//    { conj: conjugations[1], pp: pastParticiples[1] }, // groupe 2
+// ];
 
 exports.negationWords = [
    "pas",
@@ -442,7 +442,7 @@ exports.pronouns = {
    //    ["laquelle", 0, 0],
    //    ["lesquelles", 0, 1] ]  
 };
-exports.nounTypes = ["name","job","animal","plant","country","city"];
+exports.nounTypes = ["name","job","animal","plant","country","city","lex"];
 exports.nouns = {
    "name": { 
       "M": [
@@ -1440,8 +1440,30 @@ exports.nouns = {
       [ "Toulouse" ],
       [ "Varsovie" ],
       [ "Vienne" ]       
-   ]
+   ],
+   "lex": { M: [], F: [] }
 };
+exports.exceptionsNouns = [
+   [  // plural -al -> als
+      "acétal", "ammonal", "aval", 
+      "bal", "barbital", 
+      "cal", "cantal", "captal", "caracal", "carnaval", "cérémonial", "chacal", "chloral", "chrysocal", "copal", "corral", 
+      "dial", "dispersal", 
+      "emmental", "éthanal", "deal", "festival", "foiral", "furfural", "futal", 
+      "gal", "galgal", "gavial", "gardénal", "gayal", "goal", "graal", "joual", "kraal", "kursaal", 
+      "matorral", "mescal", "metical", "mezcal", "méthanal", "minerval", "mistral", 
+      "narval", "nopal", "pal", "pascal", "hectopascal", "kilopascal", 
+      "penthotal", "phénobarbital", "pipéronal", "quetzal",
+      "raval", "récital", "régal", "rétinal", "revival", "rial", "rital", "riyal", "roberval", "rorqual", "roseval", "ryal",
+      "salicional", "sal", "sandal", "santal", "saroual", "serial", "serval", "sial", "sisal", "sonal", "spiritual",
+      "tagal", "tefal", "tergal", "thiopental", "tical", "tincal", "trial", "véronal", "zicral" ],
+   [  // plural ail -> aux
+      "corail", "bail", "émail", "soupirail", "travail", "vantail", "vitrail" ]
+   [  // plural ou -> oux
+      "bijou, caillou, chou, genou, hibou, joujou, pou et maintenant ripou" ],
+   [  // plural u -> us
+      "bleu", "pneu", "émeu", "landau", "restau", "sarrau" ]
+   ];
 exports.adjectiveTypes = ["before","after"];   // placé avant ou après le nom
 exports.adjectives = { // [M-S,F-S]
    "before": [
