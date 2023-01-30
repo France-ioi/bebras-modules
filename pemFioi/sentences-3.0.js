@@ -6,7 +6,8 @@ if(typeof require != 'undefined') {
         auxConjugations,
         allerConj,
         exceptions,
-        // exceptionsGroup3,
+        exceptionsNouns,
+        exceptionsGroup3,
         negationWords,
         determinerTypes,
         determiners,
@@ -520,6 +521,7 @@ function initHandlers() {
 
 function generateWordListFromLexicon(params) {
    generateVerbListFromLexicon(params);
+   generateNounListFromLexicon(params);
    updateBatches();
 };
 
@@ -555,7 +557,34 @@ function generateVerbListFromLexicon(params) {
       count++;
       verbsIncluded[verbDat.id] = true;
    }
-   console.log(count,verbs)
+   console.log(count,"verbs :",verbs);
+};
+
+function generateNounListFromLexicon(params) {
+   var ratio = (params.nouns && params.nouns.ratio) ? params.nouns.ratio : 1;
+   var totNouns = allNouns.length;
+   var nbNouns = Math.round(totNouns*ratio);
+   shuffleArray(allNouns,params.rng);
+   nouns.lex.M = [];
+   nouns.lex.F = [];
+   var nounsIncluded = {};
+   var count = 0;
+   for(var iNoun = 0; iNoun < nbNouns; iNoun++){
+      var nounDat = allNouns[iNoun];
+      if(nounDat["5_genre"] == "m" || !nounDat["5_genre"]){
+         if(!nounsIncluded[nounDat.id]){
+            nouns.lex.M.push([nounDat["1_ortho"]]);
+         }
+      }
+      if(nounDat["5_genre"] == "f" || !nounDat["5_genre"]){
+         if(!nounsIncluded[nounDat.id]){
+            nouns.lex.F.push([nounDat["1_ortho"]]);
+         }
+      }
+      count++;
+      nounsIncluded[nounDat.id] = true;
+   }
+   console.log(count,"nouns :",nouns);
 };
 
 //Stackoverflow
@@ -1078,12 +1107,16 @@ function pluralize(str,plural) {
       }
       return newStr;
    }
-   if(str.endsWith("s") || str.endsWith("x")){
+   if(str.endsWith("s") || str.endsWith("x") || str.endsWith("z")){
       return str;
-   }else if(str.endsWith("al") && str != "chacal" && str != "banal" && str != "narval"){
+   }else if(str.endsWith("al") && !exceptionsNouns[0].includes(str) && str != "banal"){
       return str.replace(/al$/,"aux");
-   }else if(str.endsWith("au")){
-      return str.replace(/au$/,"aux");
+   }else if(str.endsWith("ail") && exceptionsNouns[1].includes(str)){
+      return str.replace(/ail$/,"aux");
+   }else if(str.endsWith("ou") && exceptionsNouns[2].includes(str)){
+      return str.replace(/ou$/,"oux");
+   }else if((str.endsWith("au") || str.endsWith("eu")) && !exceptionsNouns[3].includes(str)){
+      return str.replace(/u$/,"ux");
    }else{
       return str+"s";
    }
@@ -1767,198 +1800,204 @@ const tenses = [
    "futur_antérieur"
 ];
 
-const nmsNoDet = [   // [subset,weight]
-   [nouns["name"].M,1],
-   [pronouns["demonstrative"].M,1],
-   [pronouns["indefinite"].M.filter(word => word[0] != ""),1],
-   [[["il"]],1],
-   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
-];
-const nmsNoDetBeforeQue = [   // [subset,weight]
-   [nouns["name"].M,2],
-   [pronouns["demonstrative_2"].M,2],
-   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"],["Quelque chose"]],1]
-];
-const nfsNoDet = [   // [subset,weight]
-   [nouns["name"].F,1],
-   // [nouns["city"],1],
-   [pronouns["demonstrative"].F,1],
-   [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
-   [[["elle"]],1],
-   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
-];
-const nfsNoDetBeforeQue = [   // [subset,weight]
-   [nouns["name"].F,1],
-   // [nouns["city"],1],
-   [pronouns["demonstrative_2"].F,1],
-   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
-];
-const nmpNoDet = [   // [subset,weight]
-   [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
-   [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
-   [[["","ils"]],1],
-   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const nmpNoDetBeforeQue = [   // [subset,weight]
-   [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
-   [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
-   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const nfpNoDet = [   // [subset,weight]
-   [pronouns["demonstrative"].F,1],
-   [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
-   [[["","elles"]],1],
-   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const nfpNoDetBeforeQue = [   // [subset,weight]
-   [pronouns["demonstrative_2"].F,1],
-   [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
-   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const nms = [  // [subset,weight]
-   [nouns["job"].M,1],
-   [nouns["animal"].M,1],
-   [nouns["plant"].M,1],
-   [nouns["country"].M,1]
-];
-const nfs = [  // [subset,weight]
-   [nouns["job"].F,1],
-   [nouns["animal"].F,1],
-   [nouns["plant"].F,1],
-   [nouns["country"].F,1]
-];
-const nmp = [  // [subset,weight]
-   [nouns["job"].M,1],
-   [nouns["animal"].M,1],
-   [nouns["plant"].M,1]
-];
-const nfp = [  // [subset,weight]
-   [nouns["job"].F,1],
-   [nouns["animal"].F,1],
-   [nouns["plant"].F,1]
-];
-const p1 = [[[["je","nous"]]]];
-const p2 = [[[["tu","vous"]]]];
-
-const comsNoDet = [  // [subset,weight]
-   [nouns["name"].M,1],
-   [pronouns["demonstrative"].M,1],
-   [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0].toLowerCase() != "chacun" && word[0] != "")),1],
-   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
-];
-const comsNoDetBeforeQue = nmsNoDetBeforeQue;
-const cofsNoDet = [  // [subset,weight]
-   [nouns["name"].F,1],
-   [nouns["city"],1],
-   [pronouns["demonstrative"].F,1],
-   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
-];
-const cofsNoDetBeforeQue = nfsNoDetBeforeQue;
-const compNoDet = [  // [subset,weight]
-   [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
-   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const compNoDetBeforeQue = [   // [subset,weight]
-   [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
-   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const cofpNoDet = [  // [subset,weight]
-   [pronouns["demonstrative"].F,1],
-   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-const cofpNoDetBeforeQue = [   // [subset,weight]
-   [pronouns["demonstrative_2"].F,1],
-   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
-];
-
-const nmsBeforeDe = [
-   [nouns["job"].M,1],
-   [nouns["animal"].M,1],
-   [nouns["plant"].M,1]
-];
-const nfsBeforeDe = [  // [subset,weight]
-   [nouns["job"].F,1],
-   [nouns["animal"].F,1],
-   [nouns["plant"].F,1]
-];
-
-const deNoun = [
-   [nouns["name"].M,1],
-   [nouns["name"].F,1],
-   [nouns["city"],1],
-   [nouns["country"].M,1],
-   [nouns["country"].F,1]
-];
-
 var batches = {};
 updateBatches();
 function updateBatches() {
+   const nmsNoDet = [   // [subset,weight]
+      [nouns["name"].M,1],
+      [pronouns["demonstrative"].M,1],
+      [pronouns["indefinite"].M.filter(word => word[0] != ""),1],
+      [[["il"]],1],
+      [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
+   ];
+   const nmsNoDetBeforeQue = [   // [subset,weight]
+      [nouns["name"].M,2],
+      [pronouns["demonstrative_2"].M,2],
+      [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"],["Quelque chose"]],1]
+   ];
+   const nfsNoDet = [   // [subset,weight]
+      [nouns["name"].F,1],
+      // [nouns["city"],1],
+      [pronouns["demonstrative"].F,1],
+      [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
+      [[["elle"]],1],
+      [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
+   ];
+   const nfsNoDetBeforeQue = [   // [subset,weight]
+      [nouns["name"].F,1],
+      // [nouns["city"],1],
+      [pronouns["demonstrative_2"].F,1],
+      [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
+   ];
+   const nmpNoDet = [   // [subset,weight]
+      [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
+      [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
+      [[["","ils"]],1],
+      [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const nmpNoDetBeforeQue = [   // [subset,weight]
+      [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
+      [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
+      [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const nfpNoDet = [   // [subset,weight]
+      [pronouns["demonstrative"].F,1],
+      [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
+      [[["","elles"]],1],
+      [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const nfpNoDetBeforeQue = [   // [subset,weight]
+      [pronouns["demonstrative_2"].F,1],
+      [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
+      [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const nms = [  // [subset,weight]
+      // [nouns["job"].M,1],
+      // [nouns["animal"].M,1],
+      // [nouns["plant"].M,1],
+      [nouns["lex"].M,10],
+      [nouns["country"].M,1]
+   ];
+   const nfs = [  // [subset,weight]
+      // [nouns["job"].F,1],
+      // [nouns["animal"].F,1],
+      // [nouns["plant"].F,1],
+      [nouns["lex"].F,10],
+      [nouns["country"].F,1]
+   ];
+   const nmp = [  // [subset,weight]
+      // [nouns["job"].M,1],
+      // [nouns["animal"].M,1],
+      // [nouns["plant"].M,1]
+      [nouns["lex"].M,1]
+   ];
+   const nfp = [  // [subset,weight]
+      // [nouns["job"].F,1],
+      // [nouns["animal"].F,1],
+      // [nouns["plant"].F,1]
+      [nouns["lex"].F,1]
+   ];
+   const p1 = [[[["je","nous"]]]];
+   const p2 = [[[["tu","vous"]]]];
+
+   const comsNoDet = [  // [subset,weight]
+      [nouns["name"].M,1],
+      [pronouns["demonstrative"].M,1],
+      [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0].toLowerCase() != "chacun" && word[0] != "")),1],
+      [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
+   ];
+   const comsNoDetBeforeQue = nmsNoDetBeforeQue;
+   const cofsNoDet = [  // [subset,weight]
+      [nouns["name"].F,1],
+      [nouns["city"],1],
+      [pronouns["demonstrative"].F,1],
+      [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
+   ];
+   const cofsNoDetBeforeQue = nfsNoDetBeforeQue;
+   const compNoDet = [  // [subset,weight]
+      [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
+      [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const compNoDetBeforeQue = [   // [subset,weight]
+      [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
+      [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const cofpNoDet = [  // [subset,weight]
+      [pronouns["demonstrative"].F,1],
+      [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+   const cofpNoDetBeforeQue = [   // [subset,weight]
+      [pronouns["demonstrative_2"].F,1],
+      [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+   ];
+
+   const nmsBeforeDe = [
+      // [nouns["job"].M,1],
+      // [nouns["animal"].M,1],
+      // [nouns["plant"].M,1]
+      [nouns["lex"].M,1]
+   ];
+   const nfsBeforeDe = [  // [subset,weight]
+      // [nouns["job"].F,1],
+      // [nouns["animal"].F,1],
+      // [nouns["plant"].F,1]
+      [nouns["lex"].F,1]
+   ];
+
+   const deNoun = [
+      [nouns["name"].M,1],
+      [nouns["name"].F,1],
+      [nouns["city"],1],
+      [nouns["country"].M,1],
+      [nouns["country"].F,1]
+   ];
+
    batches = {
-   "N-M-S-noDet": nmsNoDet,
-   "N-F-S-noDet": nfsNoDet,
-   "N-M-S-noDetBeforeQue": nmsNoDetBeforeQue,
-   "N-F-S-noDetBeforeQue": nfsNoDetBeforeQue,
-   "N-M-P-noDet": nmpNoDet,
-   "N-F-P-noDet": nfpNoDet,
-   "N-M-P-noDetBeforeQue": nmpNoDetBeforeQue,
-   "N-F-P-noDetBeforeQue": nfpNoDetBeforeQue,
-   "N-M-S": nms,
-   "N-M-S-adj": nms,
-   "N-M-S-beforeDe": nmsBeforeDe, // N-M-S with definite article (before "de")
-   "N-M-S-adj-beforeDe": nmsBeforeDe,
-   "N-F-S": nfs,
-   "N-F-S-adj": nfs,
-   "N-F-S-beforeDe": nfsBeforeDe, // N-F-S with definite article (before "de")
-   "N-F-S-adj-beforeDe": nfsBeforeDe,
-   "N-M-P": nmp,
-   "N-M-P-adj": nmp,
-   "N-M-P-beforeDe": nmsBeforeDe, // N-M-P with definite article (before "de")
-   "N-M-P-adj-beforeDe": nmsBeforeDe,
-   "N-F-P": nfp,
-   "N-F-P-adj": nfp,
-   "N-F-P-beforeDe": nfsBeforeDe, // N-F-P with definite article (before "de")
-   "N-F-P-adj-beforeDe": nfsBeforeDe,
-   "1P-S": p1,
-   "2P-S": p2,
-   "1P-P": p1,
-   "2P-P": p2,
-   "VI": verbs["intransitive"],
-   "VT": verbs["transitive"],
-   "VP": verbs["pronominal"],
-   "VI-neg": verbs["intransitive"],
-   "VT-negWithAdv": verbs["transitive"],
-   "VI-negWithAdv": verbs["intransitive"],
-   "VT-neg": verbs["transitive"],
-   "CO-M-S-noDet": comsNoDet,
-   "CO-F-S-noDet": cofsNoDet,
-   "CO-M-S-noDetBeforeQue": comsNoDetBeforeQue,
-   "CO-F-S-noDetBeforeQue": cofsNoDetBeforeQue,
-   "CO-M-S": nms,
-   "CO-F-S": nfs,
-   "CO-M-S-adj": nms,
-   "CO-F-S-adj": nfs,
-   "CO-M-S-beforeDe": nmsBeforeDe,
-   "CO-F-S-beforeDe": nfsBeforeDe,
-   "CO-M-S-adj-beforeDe": nmsBeforeDe,
-   "CO-F-S-adj-beforeDe": nfsBeforeDe,
-   "CO-M-P-noDet": compNoDet,
-   "CO-F-P-noDet": cofpNoDet,
-   "CO-M-P-noDetBeforeQue": compNoDetBeforeQue,
-   "CO-F-P-noDetBeforeQue": cofpNoDetBeforeQue,
-   "CO-M-P": nmp,
-   "CO-F-P": nfp,
-   "CO-M-P-adj": nmp,
-   "CO-F-P-adj": nfp,
-   "CO-M-P-beforeDe": nmsBeforeDe,
-   "CO-F-P-beforeDe": nfsBeforeDe,
-   "CO-M-P-adj-beforeDe": nmsBeforeDe,
-   "CO-F-P-adj-beforeDe": nfsBeforeDe,
-   "adv-aftVerb": adverbs["aftVerb"],
-   // "adv-aftNegVerb": adverbs["aftNegVerb"],
-   "adv-beforeAdj": adverbs["beforeAdj"],
-   "adv-locution": adverbs["locution"],
-   "de+Noun": deNoun   // préposition de + nom
-};
+      "N-M-S-noDet": nmsNoDet,
+      "N-F-S-noDet": nfsNoDet,
+      "N-M-S-noDetBeforeQue": nmsNoDetBeforeQue,
+      "N-F-S-noDetBeforeQue": nfsNoDetBeforeQue,
+      "N-M-P-noDet": nmpNoDet,
+      "N-F-P-noDet": nfpNoDet,
+      "N-M-P-noDetBeforeQue": nmpNoDetBeforeQue,
+      "N-F-P-noDetBeforeQue": nfpNoDetBeforeQue,
+      "N-M-S": nms,
+      "N-M-S-adj": nms,
+      "N-M-S-beforeDe": nmsBeforeDe, // N-M-S with definite article (before "de")
+      "N-M-S-adj-beforeDe": nmsBeforeDe,
+      "N-F-S": nfs,
+      "N-F-S-adj": nfs,
+      "N-F-S-beforeDe": nfsBeforeDe, // N-F-S with definite article (before "de")
+      "N-F-S-adj-beforeDe": nfsBeforeDe,
+      "N-M-P": nmp,
+      "N-M-P-adj": nmp,
+      "N-M-P-beforeDe": nmsBeforeDe, // N-M-P with definite article (before "de")
+      "N-M-P-adj-beforeDe": nmsBeforeDe,
+      "N-F-P": nfp,
+      "N-F-P-adj": nfp,
+      "N-F-P-beforeDe": nfsBeforeDe, // N-F-P with definite article (before "de")
+      "N-F-P-adj-beforeDe": nfsBeforeDe,
+      "1P-S": p1,
+      "2P-S": p2,
+      "1P-P": p1,
+      "2P-P": p2,
+      "VI": verbs["intransitive"],
+      "VT": verbs["transitive"],
+      "VP": verbs["pronominal"],
+      "VI-neg": verbs["intransitive"],
+      "VT-negWithAdv": verbs["transitive"],
+      "VI-negWithAdv": verbs["intransitive"],
+      "VT-neg": verbs["transitive"],
+      "CO-M-S-noDet": comsNoDet,
+      "CO-F-S-noDet": cofsNoDet,
+      "CO-M-S-noDetBeforeQue": comsNoDetBeforeQue,
+      "CO-F-S-noDetBeforeQue": cofsNoDetBeforeQue,
+      "CO-M-S": nms,
+      "CO-F-S": nfs,
+      "CO-M-S-adj": nms,
+      "CO-F-S-adj": nfs,
+      "CO-M-S-beforeDe": nmsBeforeDe,
+      "CO-F-S-beforeDe": nfsBeforeDe,
+      "CO-M-S-adj-beforeDe": nmsBeforeDe,
+      "CO-F-S-adj-beforeDe": nfsBeforeDe,
+      "CO-M-P-noDet": compNoDet,
+      "CO-F-P-noDet": cofpNoDet,
+      "CO-M-P-noDetBeforeQue": compNoDetBeforeQue,
+      "CO-F-P-noDetBeforeQue": cofpNoDetBeforeQue,
+      "CO-M-P": nmp,
+      "CO-F-P": nfp,
+      "CO-M-P-adj": nmp,
+      "CO-F-P-adj": nfp,
+      "CO-M-P-beforeDe": nmsBeforeDe,
+      "CO-F-P-beforeDe": nfsBeforeDe,
+      "CO-M-P-adj-beforeDe": nmsBeforeDe,
+      "CO-F-P-adj-beforeDe": nfsBeforeDe,
+      "adv-aftVerb": adverbs["aftVerb"],
+      // "adv-aftNegVerb": adverbs["aftNegVerb"],
+      "adv-beforeAdj": adverbs["beforeAdj"],
+      "adv-locution": adverbs["locution"],
+      "de+Noun": deNoun   // préposition de + nom
+   };
 };
 
 const set = {
