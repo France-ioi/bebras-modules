@@ -42,6 +42,7 @@ function generateDictionary() {
        values: [
          {value: 'verb', label: 'Verbe'},
          {value: 'noun', label: 'Nom'},
+         {value: 'proper_noun', label: 'Nom propre'},
          {value: 'adjective', label: 'Adjectif'},
          {value: 'adj_num', label: 'Adjectif numérique'},
          {value: 'adj_dem', label: 'Adjectif démonstratif'},
@@ -153,9 +154,20 @@ function generateDictionary() {
       return false
    };
 
+   function inDictionary(entry) {
+      var hash = JSON.stringify(entry).hashCode();
+      if(inDic[hash]){
+         // console.log("doublon",entry)
+         return true
+      }
+      return false
+   };
+
    function addVerbsToDict() {
       var count = 0;
+      console.log(tenses)
       for(var verbType of verbTypes){
+         console.log(verbType);
          if(verbType != "modal"){
             for(var verb of verbs[verbType]){
                var g = verb[1];
@@ -169,22 +181,31 @@ function generateDictionary() {
                }
                
                // participe passé
-               for(var gen = 0; gen < 2; gen++){
-                  for(var num = 0; num < 2; num++){
-                     var pp = getPastParticiple(verb[0],g,gen,num);
-                     if(!pp){
-                        continue;
-                     }
-                     var gender = (gen == 0) ? 'M' : 'F';
-                     var entry = { word: cleanUpSpecialChars(pp,true,true), type: "verb", verb_group: g, verb_mode: "pp", gender, number: num };
-                     if(addEntryToDic(entry)){
-                        count++;
+               if(tenses.includes(3) || tenses.includes(4) || tenses.includes(5)){
+                  for(var gen = 0; gen < 2; gen++){
+                     for(var num = 0; num < 2; num++){
+                        var pp = getPastParticiple(verb[0],g,gen,num);
+                        if(!pp){
+                           continue;
+                        }
+                        var gender = (gen == 0) ? 'M' : 'F';
+                        var entry = { word: cleanUpSpecialChars(pp,true,true), type: "verb", verb_group: g, verb_mode: "pp", gender, number: num };
+                        if(addEntryToDic(entry)){
+                           count++;
+                        }
                      }
                   }
                }
                
-               var conj = conjugations[g - 1];
-               for(var tense in conj){
+               // var conj = conjugations[g - 1];
+               for(var tenseID of tenses){
+                  if(verbType != "aux" && tenseID > 2){
+                     continue
+                  }
+                  if(verbType == "aux" && (tenseID > 2)){
+                     tenseID -= 3;
+                  }
+                  var tense = allTenses[tenseID];
                   for(var pers = 0; pers < 6; pers++){
                      var plural = (pers > 2) ? 1 : 0;
                      var person = pers%3 + 1;
@@ -207,6 +228,8 @@ function generateDictionary() {
                   }
                }
 
+
+
             }
          }
       }
@@ -215,8 +238,12 @@ function generateDictionary() {
 
    function addNounsToDict() {
       for(var nounType of nounTypes){
-         if(/*nounType == "name" ||nounType == "country" ||*/ nounType == "city"){
-            continue;
+         if(nounType == "city"){
+            for(var noun of nouns[nounType]){
+               var word = noun[0];
+               var entry = { word: cleanUpSpecialChars(word,true,true), type: "proper_noun" };
+               addEntryToDic(entry);
+            }
          }
          for(var g = 0; g < 2; g++){
             var gender = (g == 0) ? "M" : "F";
@@ -226,7 +253,11 @@ function generateDictionary() {
                      continue;
                   }
                   var word = (pl == 0) ? noun[pl] : pluralize(noun[0],noun[1]);
-                  var entry = { word: cleanUpSpecialChars(word,true,true), type: "noun", gender, number: pl };
+                  if(nounType == "name" || nounType == "country"){
+                     var entry = { word: cleanUpSpecialChars(word,true,true), type: "proper_noun", gender };
+                  }else{
+                     var entry = { word: cleanUpSpecialChars(word,true,true), type: "noun", gender, number: pl };
+                  }
                   addEntryToDic(entry);
                }
             }   
@@ -299,15 +330,6 @@ function generateDictionary() {
       }
    };
 
-   function inDictionary(entry) {
-      var hash = JSON.stringify(entry).hashCode();
-      if(inDic[hash]){
-         // console.log("doublon",entry)
-         return true
-      }
-      return false
-   };
-
    var types = ["verb","noun","adj","adv","det","pronoun"];
    for(var type of types){
       switch(type){
@@ -336,8 +358,6 @@ function generateDictionary() {
    return {dictionaryAvailableCriteria,dictionary}
 };
 
-
-
 /*** text generator ***/
 var rng;
 
@@ -346,246 +366,373 @@ function init() {
    generateWordListFromLexicon({rng});
    $("#form").html(createForm);
    initHandlers();
-};
+   updateVerbCount();
+   updateNounCount();
 
-function createForm() {
-   var html = "<h3>Restrictions du lexique</h3>";
-   html += selectVerbs();
-   html += "<button id=\"update_word_list\">Mettre à jour</button>";
-   html += "<h3>Générer des phrases</h3>";
-   html += selectStructures();
-   html += selectSentenceNumber();
-   html += "<button id=\"createSentences\">Générer</button>";
-   html += "<h3>Générer dictionnaire</h3>";
-   html += "<button id=\"generateDictionary\">Générer</button>";
-   html += "<h3>Voir les listes de mot</h3>";
-   html += selectBlock();
-   html += "<button id=\"wordList\">Voir</button>";
-   html += "<h3>Générer un texte</h3>";
-   html += selectTextLength();
-   html += "<button id=\"createText\">Générer</button>";
-   return html;
-};
+   function createForm() {
+      var html = "<h3>Restrictions du lexique</h3>";
+      html += "<div class='line margin_bottom'>";
+      html += selectWordOrder();
+      html += "</div>";
+      html += "<div class='line margin_bottom'>";
+      html += selectVerbs();
+      html += "</div>";
+      html += "<div class='line margin_bottom'>";
+      html += selectNouns();
+      html += "</div>";
+      html += selectTenses();
+      html += "<button id=\"update_word_list\">Mettre à jour</button>";
+      html += "<h3>Générer des phrases</h3>";
+      html += selectStructures();
+      html += selectSentenceNumber();
+      html += "<button id=\"createSentences\">Générer</button>";
+      html += "<h3>Générer dictionnaire</h3>";
+      html += "<button id=\"generateDictionary\">Générer</button>";
+      html += "<span class='margin_left'>Nombre de mots : </span>";
+      html += "<span id='dictionary_count'>0</span>";
+      html += "<h3>Voir les listes de mot</h3>";
+      html += selectBlock();
+      html += "<button id=\"wordList\">Voir</button>";
+      html += "<h3>Générer un texte</h3>";
+      html += selectTextLength();
+      html += "<button id=\"createText\">Générer</button>";
+      return html;
+   };
 
-function selectVerbs() {
-   var html = "<label for=\"restriction_verbs\">Ratio des verbes</label>";
-   html += "<select id=\"restriction_verbs\">";
-   var nbSteps = 10;
-   for(var step = nbSteps; step > 0; step--){
-      var ratio = step/nbSteps;
-      html += "<option value=\""+step+"\">"+ratio+"</option>";
-   }
-   html += "</select>";
-   return html;
-};
+   function selectWordOrder() {
+      var html = "<label for=\"word_order\">Sélection de mots</label>";
+      html += "<select id=\"word_order\">";
+      for(var type = 0; type < 2; type++){
+         var str = (type == 0) ? "fréquence descendante" : "aléatoire";
+         html += "<option value=\""+type+"\">"+str+"</option>";
+      }
+      html += "</select>";
+      return html;
+   };
 
-function selectStructures() {
-   var html = "<label for=\"structures\">Structure</label>";
-   html += "<select id=\"structures\">";
-   html += "<option value=\"all\">Toutes</option>";
-   for(var structureIndex in structures){
-      var str = "";
-      for(var iBlock in structures[structureIndex][0]){
-         str += structures[structureIndex][0][iBlock]
-         if(iBlock != structures[structureIndex][0].length - 1){
-            str += "+";
+   function selectVerbs() {
+      var html = "<label for=\"restriction_verbs\">Ratio des verbes</label>";
+      html += "<select id=\"restriction_verbs\">";
+      var nbSteps = 10;
+      for(var step = nbSteps; step > 0; step--){
+         var ratio = step/nbSteps;
+         html += "<option value=\""+step+"\">"+ratio+"</option>";
+      }
+      html += "</select>";
+      html += "<span>Nombre de verbes : ";
+      html += "<span id='verb_count'>0</span>";
+      html += " (les verbes transitifs indirects ne sont pas inclus)</span>";
+      return html;
+   };
+
+   function selectNouns() {
+      var html = "<label for=\"restriction_verbs\">Ratio des noms</label>";
+      html += "<select id=\"restriction_nouns\">";
+      var nbSteps = 10;
+      for(var step = nbSteps; step > 0; step--){
+         var ratio = step/nbSteps;
+         html += "<option value=\""+step+"\">"+ratio+"</option>";
+      }
+      html += "</select>";
+      html += "<span>Nombre de noms : ";
+      html += "<span id='noun_count'>0</span>";
+      html += "</span>";
+      return html;
+   };
+
+   function selectTenses() {
+      var html = "<fieldset class='margin_bottom'>";
+      html += "<legend>Temps :</legend>";
+      for(var iTense = 0; iTense < allTenses.length; iTense++){
+         html += "<div>";
+         html += "<input type='checkbox' id='"+iTense+"' name='tenses' value='"+iTense+"' checked>";
+         html += "<label for='"+iTense+"'>"+allTenses[iTense]+"</label>";
+         html += "</div>";
+      }
+      html += "</fieldset>";
+      return html
+   };
+
+   function selectStructures() {
+      var html = "<label for=\"structures\">Structure</label>";
+      html += "<select id=\"structures\">";
+      html += "<option value=\"all\">Toutes</option>";
+      for(var structureIndex in structures){
+         var str = "";
+         for(var iBlock in structures[structureIndex][0]){
+            str += structures[structureIndex][0][iBlock]
+            if(iBlock != structures[structureIndex][0].length - 1){
+               str += "+";
+            }
+         }
+         html += "<option value=\""+structureIndex+"\">"+str+"</option>";
+      }
+      html += "</select>";
+      return html;
+   };
+
+   function selectBlock() {
+      var html = "<label for=\"blocks\">Type</label>";
+      html += "<select id=\"blocks\">";
+      for(var blockIndex in structureTypes){
+         block = structureTypes[blockIndex];
+         html += "<option value=\""+blockIndex+"\">"+block+"</option>";
+      }
+      html += "</select>";
+      html += "<label for=\"person\" class=\"verb\">Personne + nombre</label>";
+      html += "<select id=\"person\" class=\"verb\">";
+      for(var iPerson = 0; iPerson < 6; iPerson++){
+         personText = (iPerson%3 + 1)+" "+((iPerson <=2) ? "S" : "P");
+         html += "<option value=\""+iPerson+"\">"+personText+"</option>";
+      }
+      html += "</select>";
+      html += "<label for=\"tense\" class=\"verb\">Temps</label>";
+      html += "<select id=\"tense\" class=\"verb\">";
+      for(var iTense = 0; iTense < tenses.length; iTense++){
+         var tenseID = tenses[iTense];
+         tenseText = allTenses[tenseID];
+         html += "<option value=\""+iTense+"\">"+tenseText+"</option>";
+      }
+      html += "</select>";
+      html += "<label for=\"gender\" class=\"adj\">Genre</label>";
+      html += "<select id=\"gender\" class=\"adj\">";
+      html += "<option value=\"M\">M</option>";
+      html += "<option value=\"F\">F</option>";
+      html += "</select>";
+      html += "<label for=\"number\" class=\"adj\">Nombre</label>";
+      html += "<select id=\"number\" class=\"adj\">";
+      html += "<option value=\""+0+"\">S</option>";
+      html += "<option value=\""+1+"\">P</option>";
+      html += "</select>";
+      return html;
+   };
+
+   function selectSentenceNumber() {
+      var html = "<label for=\"structures\">Nombre de phrases</label>";
+      html += "<select id=\"nSentences\">";
+      for(var i = 0; i < 4; i++){
+         html += "<option value=\""+Math.pow(10,i)+"\">"+Math.pow(10,i)+"</option>";
+      }
+      html += "</select>";
+      return html;
+   };
+
+   function selectTextLength() {
+      var html = "<label for=\"minLength\">Longueur</label>";
+      html += "<select id=\"minLength\">";
+      for(var i = 1; i < 5; i++){
+         var min = Math.pow(10,i)*5;
+         html += "<option value=\""+min+"\">"+min+"</option>";
+      }
+      html += "</select>";
+      // html += "<label for=\"maxLength\">Longueur maximale</label>";
+      // html += "<select id=\"maxLength\">";
+      // for(var i = 1; i < 5; i++){
+      //    var max = Math.pow(10,i)*5 + 50;
+      //    html += "<option value=\""+max+"\">"+max+"</option>";
+      // }
+      // html += "</select>";
+      return html;
+   };
+
+   function initHandlers() {
+      $("#restriction_verbs").change(updateVerbCount);
+      $("#restriction_nouns").change(updateNounCount);
+      $("#update_word_list").off("click");
+      $("#update_word_list").click(updateWordList);
+
+      $(".verb").hide();
+      $(".adj").hide();
+      $("#blocks").change(function(){
+         if(structureTypes[$("#blocks").val()].startsWith("V")){
+            $(".verb").show();
+         }else{
+            $(".verb").hide();
+         }
+         if(structureTypes[$("#blocks").val()].startsWith("adj")){
+            $(".adj").show();
+         }else{
+            $(".adj").hide();
+         }
+      });
+      $("#createSentences").off("click");
+      $("#createSentences").click(function(){
+         var struct = $("#structures").val();
+         var n = $("#nSentences").val();
+         var text = generateSentence(rng,n,struct,true);
+         $("#text,#freq").empty();
+         $("#text").append(text);
+      });
+      $("#generateDictionary").off("click");
+      $("#generateDictionary").click(function() {
+         var dico = generateDictionary();
+         $("#text").html(JSON.stringify(dico));
+         $("#dictionary_count").text(dico.dictionary.length);
+         // console.log(dico.length)
+      });
+      $("#wordList").off("click");
+      $("#wordList").click(function(){
+         var block = $("#blocks").val();
+         var text = generateWordList(block);
+         $("#text,#freq").empty();
+         $("#text").append(text);
+      });
+      $("#createText").off("click");
+      $("#createText").click(function(){
+         var min = parseInt($("#minLength").val());
+         var max = min + 50;
+         if(min > max){
+            var newMin = max;
+            max = min;
+            min = newMin;
+            console.log("les valeurs min et max ont été inversées");
+         }
+         var text = generateText(rng,min,max,true);
+         getFrequencies(text);
+         $("#text").empty();
+         $("#text").append(text);
+      });
+   };
+
+   function updateVerbCount() {
+      var ratio = $("#restriction_verbs").val()/10;
+      var count = Math.round(allVerbs.length*ratio);
+      $("#verb_count").text(count);
+   };
+
+   function updateNounCount() {
+      var ratio = $("#restriction_nouns").val()/10;
+      var count = Math.round(allNouns.length*ratio);
+      $("#noun_count").text(count);
+   };
+
+   // function updateDictionaryCount() {
+   //    var count = 0;
+   //    $("#dictionary_count").text(count);
+   // };
+
+   function updateWordList(){
+      var currTenses = getCurrTenses();
+      if(currTenses.length == 0){
+         alert("Vous devez sélectionner au moins un temps");
+         return
+      }
+      tenses = currTenses;
+      var verbRatio = $("#restriction_verbs").val()/10;
+      var nounRatio = $("#restriction_nouns").val()/10;
+      var order = $("#word_order").val();
+      // console.log(verbRatio)
+      generateWordListFromLexicon({
+         rng, order,
+         verbs: { ratio: verbRatio }, 
+         nouns: { ratio: nounRatio }
+      });
+   };
+
+   function getCurrTenses() {
+      var currTenses = [];
+      for(var iTense = 0; iTense < allTenses.length; iTense++){
+         if($("[name=tenses]#"+iTense).prop('checked')){
+            currTenses.push(iTense);
          }
       }
-      html += "<option value=\""+structureIndex+"\">"+str+"</option>";
-   }
-   html += "</select>";
-   return html;
+      return currTenses
+   };
 };
 
-function selectBlock() {
-   var html = "<label for=\"blocks\">Type</label>";
-   html += "<select id=\"blocks\">";
-   for(var blockIndex in structureTypes){
-      block = structureTypes[blockIndex];
-      html += "<option value=\""+blockIndex+"\">"+block+"</option>";
-   }
-   html += "</select>";
-   html += "<label for=\"person\" class=\"verb\">Personne + nombre</label>";
-   html += "<select id=\"person\" class=\"verb\">";
-   for(var iPerson = 0; iPerson < 6; iPerson++){
-      personText = (iPerson%3 + 1)+" "+((iPerson <=2) ? "S" : "P");
-      html += "<option value=\""+iPerson+"\">"+personText+"</option>";
-   }
-   html += "</select>";
-   html += "<label for=\"tense\" class=\"verb\">Temps</label>";
-   html += "<select id=\"tense\" class=\"verb\">";
-   for(var iTense = 0; iTense < tenses.length; iTense++){
-      tenseText = tenses[iTense];
-      html += "<option value=\""+iTense+"\">"+tenseText+"</option>";
-   }
-   html += "</select>";
-   html += "<label for=\"gender\" class=\"adj\">Genre</label>";
-   html += "<select id=\"gender\" class=\"adj\">";
-   html += "<option value=\"M\">M</option>";
-   html += "<option value=\"F\">F</option>";
-   html += "</select>";
-   html += "<label for=\"number\" class=\"adj\">Nombre</label>";
-   html += "<select id=\"number\" class=\"adj\">";
-   html += "<option value=\""+0+"\">S</option>";
-   html += "<option value=\""+1+"\">P</option>";
-   html += "</select>";
-   return html;
-};
-
-function selectSentenceNumber() {
-   var html = "<label for=\"structures\">Nombre de phrases</label>";
-   html += "<select id=\"nSentences\">";
-   for(var i = 0; i < 4; i++){
-      html += "<option value=\""+Math.pow(10,i)+"\">"+Math.pow(10,i)+"</option>";
-   }
-   html += "</select>";
-   return html;
-};
-
-function selectTextLength() {
-   var html = "<label for=\"minLength\">Longueur</label>";
-   html += "<select id=\"minLength\">";
-   for(var i = 1; i < 5; i++){
-      var min = Math.pow(10,i)*5;
-      html += "<option value=\""+min+"\">"+min+"</option>";
-   }
-   html += "</select>";
-   // html += "<label for=\"maxLength\">Longueur maximale</label>";
-   // html += "<select id=\"maxLength\">";
-   // for(var i = 1; i < 5; i++){
-   //    var max = Math.pow(10,i)*5 + 50;
-   //    html += "<option value=\""+max+"\">"+max+"</option>";
-   // }
-   // html += "</select>";
-   return html;
-};
-
-function initHandlers() {
-   $("#update_word_list").off("click");
-   $("#update_word_list").click(function(){
-      var verbRatio = $("#restriction_verbs").val()/10;
-      // console.log(verbRatio)
-      generateWordListFromLexicon({rng, verbs: { ratio: verbRatio }});
-   });
-
-   $(".verb").hide();
-   $(".adj").hide();
-   $("#blocks").change(function(){
-      if(structureTypes[$("#blocks").val()].startsWith("V")){
-         $(".verb").show();
-      }else{
-         $(".verb").hide();
-      }
-      if(structureTypes[$("#blocks").val()].startsWith("adj")){
-         $(".adj").show();
-      }else{
-         $(".adj").hide();
-      }
-   });
-   $("#createSentences").off("click");
-   $("#createSentences").click(function(){
-      var struct = $("#structures").val();
-      var n = $("#nSentences").val();
-      var text = generateSentence(rng,n,struct,true);
-      $("#text,#freq").empty();
-      $("#text").append(text);
-   });
-   $("#generateDictionary").off("click");
-   $("#generateDictionary").click(function() {
-      var dico = generateDictionary();
-      $("#text").append(JSON.stringify(dico));
-   });
-   $("#wordList").off("click");
-   $("#wordList").click(function(){
-      var block = $("#blocks").val();
-      var text = generateWordList(block);
-      $("#text,#freq").empty();
-      $("#text").append(text);
-   });
-   $("#createText").off("click");
-   $("#createText").click(function(){
-      var min = parseInt($("#minLength").val());
-      var max = min + 50;
-      if(min > max){
-         var newMin = max;
-         max = min;
-         min = newMin;
-         console.log("les valeurs min et max ont été inversées");
-      }
-      var text = generateText(rng,min,max,true);
-      getFrequencies(text);
-      $("#text").empty();
-      $("#text").append(text);
-   });
-};
+/*** WORD LIST ***/
 
 function generateWordListFromLexicon(params) {
    generateVerbListFromLexicon(params);
    generateNounListFromLexicon(params);
    updateBatches();
+
+   function generateVerbListFromLexicon(params) {
+      var ratio = (params.verbs && params.verbs.ratio) ? params.verbs.ratio : 1;
+      var totVerbs = allVerbs.length;
+      var nbVerbs = Math.round(totVerbs*ratio);
+      var avoirDat = {"id":"12042","1_ortho":"avoir","groupe":"3","tr_direct":"1","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
+      var etreDat = {"id":"57185","1_ortho":"être","groupe":"3","tr_direct":"0","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
+      var order = params.order || 0;
+      if(order == 0){
+         var sortedVerbs = allVerbs.sort(function (a,b) { 
+            var comp = parseFloat(b["freq_moy"].replace(",",".")) - parseFloat(a["freq_moy"].replace(",",".")); 
+            // console.log(comp);
+            return comp
+         });
+      }else{
+         var sortedVerbs = allVerbs;
+         shuffleArray(sortedVerbs,params.rng);
+      }
+      // console.log("sortedVerbs:",sortedVerbs);
+      verbs.intransitive = [];
+      verbs.transitive = [];
+      verbs.pronominal = [];
+      var verbsIncluded = {};
+      var count = 0;
+      for(var iVerb = 0; iVerb < nbVerbs; iVerb++){
+         var verbDat = sortedVerbs[iVerb];
+         if(verbDat.tr_direct == "1"){
+            if(!verbsIncluded[verbDat.id])
+               verbs.transitive.push([verbDat["1_ortho"],verbDat.groupe, verbDat.aux]);
+         }
+         if(verbDat.intr == "1"){
+            if(!verbsIncluded[verbDat.id])
+               verbs.intransitive.push([verbDat["1_ortho"],verbDat.groupe, verbDat.aux]);
+         }
+         if(verbDat.pronominal != "0"){
+            if(!verbsIncluded[verbDat.id])
+               verbs.pronominal.push([verbDat["1_ortho"],verbDat.groupe, 1]);
+         }
+         if(verbDat.tr_direct != "1" && verbDat.intr != "1" && verbDat.pronominal == "0"){
+            continue
+         }
+         count++;
+         verbsIncluded[verbDat.id] = true;
+      }
+      console.log(count,"verbs :",verbs);
+   };
+
+   function generateNounListFromLexicon(params) {
+      var ratio = (params.nouns && params.nouns.ratio) ? params.nouns.ratio : 1;
+      var totNouns = allNouns.length;
+      var nbNouns = Math.round(totNouns*ratio);
+      var order = params.order || 0;
+      if(order == 0){
+         var sortedNouns = allNouns.sort(function (a,b) { 
+            var comp = parseFloat(b["freq_moy"].replace(",",".")) - parseFloat(a["freq_moy"].replace(",",".")); 
+            // console.log(comp);
+            return comp
+         });
+      }else{
+         var sortedNouns = allNouns;
+         shuffleArray(sortedNouns,params.rng);
+      }
+      // console.log("sortedNouns:",sortedNouns);
+      nouns.lex.M = [];
+      nouns.lex.F = [];
+      var nounsIncluded = {};
+      var count = 0;
+      for(var iNoun = 0; iNoun < nbNouns; iNoun++){
+         var nounDat = sortedNouns[iNoun];
+         if(nounDat["5_genre"] == "m" || !nounDat["5_genre"]){
+            if(!nounsIncluded[nounDat.id]){
+               nouns.lex.M.push([nounDat["1_ortho"]]);
+            }
+         }
+         if(nounDat["5_genre"] == "f" || !nounDat["5_genre"]){
+            if(!nounsIncluded[nounDat.id]){
+               nouns.lex.F.push([nounDat["1_ortho"]]);
+            }
+         }
+         count++;
+         nounsIncluded[nounDat.id] = true;
+      }
+      console.log(count,"nouns :",nouns);
+   };
 };
 
-function generateVerbListFromLexicon(params) {
-   var ratio = (params.verbs && params.verbs.ratio) ? params.verbs.ratio : 1;
-   var totVerbs = allVerbs.length;
-   var nbVerbs = Math.round(totVerbs*ratio);
-   var avoirDat = {"id":"12042","1_ortho":"avoir","groupe":"3","tr_direct":"1","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
-   var etreDat = {"id":"57185","1_ortho":"être","groupe":"3","tr_direct":"0","tr_indirect":"0","intr":"0","pronominal":"0","aux":"0"};
-   shuffleArray(allVerbs,params.rng);
-   verbs.intransitive = [];
-   verbs.transitive = [];
-   verbs.pronominal = [];
-   var verbsIncluded = {};
-   var count = 0;
-   for(var iVerb = 0; iVerb < nbVerbs; iVerb++){
-      var verbDat = allVerbs[iVerb];
-      if(verbDat.tr_direct == "1"){
-         if(!verbsIncluded[verbDat.id])
-            verbs.transitive.push([verbDat["1_ortho"],verbDat.groupe, verbDat.aux]);
-      }
-      if(verbDat.intr == "1"){
-         if(!verbsIncluded[verbDat.id])
-            verbs.intransitive.push([verbDat["1_ortho"],verbDat.groupe, verbDat.aux]);
-      }
-      if(verbDat.pronominal != "0"){
-         if(!verbsIncluded[verbDat.id])
-            verbs.pronominal.push([verbDat["1_ortho"],verbDat.groupe, 1]);
-      }
-      if(verbDat.tr_direct != "1" && verbDat.intr != "1" && verbDat.pronominal == "0"){
-         continue
-      }
-      count++;
-      verbsIncluded[verbDat.id] = true;
-   }
-   console.log(count,"verbs :",verbs);
-};
 
-function generateNounListFromLexicon(params) {
-   var ratio = (params.nouns && params.nouns.ratio) ? params.nouns.ratio : 1;
-   var totNouns = allNouns.length;
-   var nbNouns = Math.round(totNouns*ratio);
-   shuffleArray(allNouns,params.rng);
-   nouns.lex.M = [];
-   nouns.lex.F = [];
-   var nounsIncluded = {};
-   var count = 0;
-   for(var iNoun = 0; iNoun < nbNouns; iNoun++){
-      var nounDat = allNouns[iNoun];
-      if(nounDat["5_genre"] == "m" || !nounDat["5_genre"]){
-         if(!nounsIncluded[nounDat.id]){
-            nouns.lex.M.push([nounDat["1_ortho"]]);
-         }
-      }
-      if(nounDat["5_genre"] == "f" || !nounDat["5_genre"]){
-         if(!nounsIncluded[nounDat.id]){
-            nouns.lex.F.push([nounDat["1_ortho"]]);
-         }
-      }
-      count++;
-      nounsIncluded[nounDat.id] = true;
-   }
-   console.log(count,"nouns :",nouns);
-};
 
 //Stackoverflow
 function shuffleArray(array,rng) {
@@ -781,7 +928,7 @@ function generateWordList(block) {
       var person = personIndex%3 + 1;
       var pluralVerb = (personIndex <= 2) ? 0 : 1;
       var tenseIndex = $("#tense").val();
-      var tense = tenses[tenseIndex];
+      var tense = allTenses[tenseIndex];
       if(blockLabel === "VT" || blockLabel === "VI" || blockLabel === "VP"){
          var pronominal = (blockLabel == "VP");
          for(var word of batch){
@@ -817,6 +964,7 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
    if(block.endsWith("-de")){
       var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,gender,tense,rng,coBefore);
       var word2 = getWord("de+Noun",person,plural,gender,tense,rng,coBefore);
+      // console.log(word1,word2)
       var countryM = false;
       for(var country of nouns["country"].M){
          if(country[0].toLowerCase() === word2[0].toLowerCase()){
@@ -828,6 +976,7 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
       }else{
          var word = elide(word1[0] + " de " + word2[0]);
       }
+      // console.log(word,word1[1],word1[2],word1[3])
       return [word,word1[1],word1[2],word1[3]];
    }
    if(block.endsWith("-que")){
@@ -874,6 +1023,7 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
       case "de+Noun":
          var type = pickOne(batch,rng,false,true);
          var word = pickOne(type,rng)[0];
+         // console.log(type,word);
          break;
       case "N-M-S":
       case "N-M-S-adj":
@@ -1002,7 +1152,8 @@ function generateSentence(rng,n,struc,withSpaces,textMode){
       var person = 3;
       var plural = 0;
       var gender = "M";
-      var tense = pickOne(tenses,rng);
+      var tenseID = pickOne(tenses,rng);
+      var tense = allTenses[tenseID];
       for(var block of structure){
          var word = getWord(block,person,plural,gender,tense,rng);
          person = word[1];
@@ -1791,7 +1942,7 @@ const verbStructuresWithPC = {
       [["VT-neg"],10]
    ]
 };
-const tenses = [
+const allTenses = [
    "present",
    "imparfait",
    "futur",
@@ -1799,6 +1950,7 @@ const tenses = [
    "plus_que_parfait",
    "futur_antérieur"
 ];
+var tenses = [ 0, 1, 2, 3, 4, 5 ];
 
 var batches = {};
 updateBatches();
@@ -1925,6 +2077,8 @@ function updateBatches() {
    ];
 
    const deNoun = [
+      // [nouns["lex"].M,10],
+      // [nouns["lex"].F,10],
       [nouns["name"].M,1],
       [nouns["name"].F,1],
       [nouns["city"],1],

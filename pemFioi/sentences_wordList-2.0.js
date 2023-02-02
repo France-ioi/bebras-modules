@@ -1458,7 +1458,7 @@ exports.exceptionsNouns = [
       "salicional", "sal", "sandal", "santal", "saroual", "serial", "serval", "sial", "sisal", "sonal", "spiritual",
       "tagal", "tefal", "tergal", "thiopental", "tical", "tincal", "trial", "véronal", "zicral" ],
    [  // plural ail -> aux
-      "corail", "bail", "émail", "soupirail", "travail", "vantail", "vitrail" ]
+      "corail", "bail", "émail", "soupirail", "travail", "vantail", "vitrail" ],
    [  // plural ou -> oux
       "bijou, caillou, chou, genou, hibou, joujou, pou et maintenant ripou" ],
    [  // plural u -> us
@@ -2615,7 +2615,7 @@ exports.adjectives = { // [M-S,F-S]
 }; 
    
 exports.auxiliaryVerbs = ["avoir","être","both"];
-exports.verbTypes = ["intransitive","transitive","modal","pronominal"];
+exports.verbTypes = ["intransitive","transitive","modal","pronominal","aux"];
 exports.verbs = {
    "intransitive": [ // [verb, group, auxiliary]
       [ "abandonner", 1, 0 ],
@@ -4204,6 +4204,10 @@ exports.verbs = {
       [ "vouloir", 3, 0, "" ],
       // [ "faire", 3, 0, "" ],
       // [ "se faire", 3, 1, "" ]
+   ],
+   "aux": [
+      ["avoir",3,0],
+      ["être",3,1]
    ]
  };
 
