@@ -334,6 +334,7 @@ exports.negationWords = [
    "plus tellement",
    "plus vraiment"
    ];
+exports.negationDictionary = [ "ne", "pas", "plus", "jamais", "nullement" ];
 
 exports.determinerTypes = [
    ["definite_article",1],
@@ -348,6 +349,11 @@ exports.determiners = {
       ],
       "F": [
          [ "la", "les" ]
+      ],
+      "contractions": [
+         [ "au", "aux" ],  // à + le, à + les
+         [ "du", "des" ],  // de + le, de + les
+         [ "l" ]
       ]
    },
    "indefinite_article": {
@@ -371,6 +377,15 @@ exports.determiners = {
       ["onze"], ["douze"], ["treize"], ["quatorze"], ["quinze"], ["seize"], ["dix-sept"], ["dix-huit"], ["dix-neuf"], ["vingt"]
    ]
 };
+
+exports.prepositions = [
+   "à", "afin", "après", "auprès", "avant", "avec",
+   "chez", "concernant", "contre", "d", "dans", "de", "depuis",
+   "derrière", "dès", "desdites", "desdits", "devant", "dudit",
+   "durant", "en", "entre", "envers", "excepté", "grâce", "hormis",
+   "hors", "jusqu", "jusque", "malgré", "outre", "par", "parmi", "pendant",
+   "pour", "près", "revoici", "revoilà", "sans", "sauf", "selon", "sous",
+   "suivant", "sur", "vers", "via", "voici", "voilà" ];
 
 exports.pronounTypes = ["personal","personal_2","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
 exports.subjPronounTypes = ["personal","demonstrative_2","indefinite"];
