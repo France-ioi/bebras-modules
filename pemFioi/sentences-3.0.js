@@ -9,8 +9,10 @@ if(typeof require != 'undefined') {
         exceptionsNouns,
         exceptionsGroup3,
         negationWords,
+        negationDictionary,
         determinerTypes,
         determiners,
+        prepositions,
         pronounTypes,
         subjPronounTypes,
         pronouns,
@@ -49,7 +51,7 @@ function generateDictionary() {
          {value: 'adverb', label: 'Adverbe'},
          {value: 'article', label: 'Article'},
          // {value: 'pronoun', label: 'Pronom'},
-         // {value: 'preposition', label: 'Préposition'},
+         {value: 'preposition', label: 'Préposition'},
        ]
      },
      {
@@ -165,9 +167,9 @@ function generateDictionary() {
 
    function addVerbsToDict() {
       var count = 0;
-      console.log(tenses)
+      // console.log(tenses)
       for(var verbType of verbTypes){
-         console.log(verbType);
+         // console.log(verbType);
          if(verbType != "modal"){
             for(var verb of verbs[verbType]){
                var g = verb[1];
@@ -244,7 +246,9 @@ function generateDictionary() {
                var entry = { word: cleanUpSpecialChars(word,true,true), type: "proper_noun" };
                addEntryToDic(entry);
             }
+            continue;
          }
+         // console.log(nounType);
          for(var g = 0; g < 2; g++){
             var gender = (g == 0) ? "M" : "F";
             for(var noun of nouns[nounType][gender]){
@@ -289,6 +293,12 @@ function generateDictionary() {
             addEntryToDic(entry);
          }     
       }
+      for(var adv of negationDictionary){
+         var word = adv;
+         var entry = { word: cleanUpSpecialChars(word,true,true), type: "adverb" };
+
+         addEntryToDic(entry);
+      } 
    };
 
    function addDetToDict() {
@@ -320,6 +330,20 @@ function generateDictionary() {
                   addEntryToDic(entry);   
                }
             }
+            /* formes contractées */
+            if(type == "definite_article"){
+               var contractions = determiners[type]["contractions"];
+               for(var row = 0; row < contractions.length; row++){
+                  for(var pl = 0; pl < contractions[row].length; pl++){
+                     var word = contractions[row][pl];
+                     for(var g = 0; g < pl + 1; g++){
+                        var gender = (g == 0) ? "M" : "F";
+                        var entry = { word: cleanUpSpecialChars(word,true,true), type: t, gender, number: pl, art_type: "def" };
+                        addEntryToDic(entry);   
+                     }
+                  }
+               }
+            }
          }else{
             for(var det of determiners[type]){
                var word = det[0];
@@ -327,6 +351,15 @@ function generateDictionary() {
                addEntryToDic(entry);
             }
          }    
+      }
+   };
+
+   function addPreToDict() {
+      for(var pre of prepositions){
+         var word = pre;
+         var entry = { word: cleanUpSpecialChars(word,true,true), type: "preposition" };
+
+         addEntryToDic(entry);
       }
    };
 
@@ -347,6 +380,9 @@ function generateDictionary() {
          break;
       case "det":
          addDetToDict();
+         break;
+      case "preposition":
+         addPreToDict();
          break;
       case "pronoun":
          // addPronounsToDict();
@@ -1859,18 +1895,18 @@ const structureTypes = [
    "de+Noun" // nom après "de"
 ];
 const structures = [ // [structure,weight]
-   [["3P-S","VI-str"],40],
-   [["3P-P","VI-str"],20],
-   [["3P-S","VT-str","CO"],80],
-   [["3P-P","VT-str","CO"],40],
-   [["1P-S","VI-str"],10],
-   [["2P-S","VI-str"],10],
-   [["1P-P","VI-str"],5],
-   [["2P-P","VI-str"],5],
-   [["1P-S","VT-str","CO"],20],
-   [["2P-S","VT-str","CO"],20],
-   [["1P-P","VT-str","CO"],10],
-   [["2P-P","VT-str","CO"],10],
+   [["3P-S","VI-str"],80],
+   [["3P-P","VI-str"],40],
+   [["3P-S","VT-str","CO"],160],
+   [["3P-P","VT-str","CO"],80],
+   [["1P-S","VI-str"],20],
+   [["2P-S","VI-str"],20],
+   [["1P-P","VI-str"],10],
+   [["2P-P","VI-str"],10],
+   [["1P-S","VT-str","CO"],40],
+   [["2P-S","VT-str","CO"],40],
+   [["1P-P","VT-str","CO"],20],
+   [["2P-P","VT-str","CO"],20],
    [["adv-locution","3P-S","VI-str"],20],
    [["adv-locution","3P-P","VI-str"],10],
    [["adv-locution","3P-S","VT-str","CO"],40],
@@ -1885,28 +1921,28 @@ const structures = [ // [structure,weight]
    [["adv-locution","2P-P","VT-str","CO"],5],
 
    /*** avec subordonnée relative en "que" ***/
-   [["3P-S-que","VI-str"],8],
-   [["3P-P-que","VI-str"],4],
-   [["3P-S-que","VT-str","CO"],16],
-   [["3P-P-que","VT-str","CO"],8],
+   [["3P-S-que","VI-str"],16],
+   [["3P-P-que","VI-str"],8],
+   [["3P-S-que","VT-str","CO"],32],
+   [["3P-P-que","VT-str","CO"],16],
    [["adv-locution","3P-S-que","VI-str"],4],
    [["adv-locution","3P-P-que","VI-str"],2],
    [["adv-locution","3P-S-que","VT-str","CO"],16],
    [["adv-locution","3P-P-que","VT-str","CO"],4],
-   [["3P-S","VT-str","CO-que"],16],
-   [["3P-P","VT-str","CO-que"],8],
-   [["1P-S","VT-str","CO-que"],4],
-   [["2P-S","VT-str","CO-que"],4],
-   [["1P-P","VT-str","CO-que"],2],
-   [["2P-P","VT-str","CO-que"],2],
+   [["3P-S","VT-str","CO-que"],32],
+   [["3P-P","VT-str","CO-que"],16],
+   [["1P-S","VT-str","CO-que"],8],
+   [["2P-S","VT-str","CO-que"],8],
+   [["1P-P","VT-str","CO-que"],4],
+   [["2P-P","VT-str","CO-que"],4],
    [["adv-locution","3P-S","VT-str","CO-que"],8],
    [["adv-locution","3P-P","VT-str","CO-que"],4],
    [["adv-locution","1P-S","VT-str","CO-que"],2],
    [["adv-locution","2P-S","VT-str","CO-que"],2],
    [["adv-locution","1P-P","VT-str","CO-que"],1],
    [["adv-locution","2P-P","VT-str","CO-que"],1],
-   [["3P-S-que","VT-str","CO-que"],16],
-   [["3P-P-que","VT-str","CO-que"],8],
+   [["3P-S-que","VT-str","CO-que"],32],
+   [["3P-P-que","VT-str","CO-que"],16],
    [["adv-locution","3P-S-que","VT-str","CO-que"],8],
    [["adv-locution","3P-P-que","VT-str","CO-que"],4]
 ];
