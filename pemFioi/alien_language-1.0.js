@@ -3,7 +3,6 @@
 const voyels = [ "A", "E", "I", "O", "U", "Y" ];
 const consonants = [ "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Z" ];
 
-const defaultGramTypes = [0,1,2,3,4,5,6,7,8];
 const defaultGramTypeData = {
    0: { label: "nom" }, // attributes: { fixed: [], variable: {} }, spellingRules: [], inflections: { attrID: { valID: inflID }}
    1: { label: "pronom" },
@@ -15,6 +14,9 @@ const defaultGramTypeData = {
    7: { label: "préposition" },
    8: { label: "postposition" },
 };
+const defaultGramTypes = [0,1,2,3,4,5,6,7,8];
+const defaultMandatoryTypes = [0,2,4];
+const defaultNbMandatoryTypes = 2;
 const defaultNbGramTypes = 5;
 const defaultNbGramTypesWithNoAttr = 1;
 const defaultNbNoInflection = 1; // for one gram type, among all attr values, how many have no inflection
@@ -99,6 +101,7 @@ let attributeData;
 let attributeValues = { /* id: [] */ };
 let attributeDistribution = { /* id: { fixed: [], variable: [] } */ };
 let nbGramTypes, nbAttributes;
+let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
 let maxNbStems = 1000;  // max nb stems per gram type
@@ -535,8 +538,21 @@ function initCurrent(id) {
    let dstLength = (id == 0) ? nbGramTypes : nbAttributes;
    let srcClone = cloneObj(src);
    shuffleArray(srcClone);
-   for(let iVal = 0; iVal < dstLength; iVal++){
-      dst.push(srcClone[iVal]);
+   if(id == 0){
+      shuffleArray(mandatoryTypes);
+      for(let iVal = 0; iVal < nbMandatoryTypes; iVal++){
+         dst.push(mandatoryTypes[iVal]);
+      }
+   }
+   let loop = 0;
+   do{
+      let newType = srcClone.pop();
+      if(!dst.includes(newType)){
+         dst.push(newType);
+      }
+   }while(dst.length < dstLength && loop < 10);
+   if(loop >= 10){
+      console.error("infinite loop");
    }
 };
 
@@ -569,6 +585,7 @@ function initAttributeDistribution() {
       }
    }
    for(let id of attributes){
+      let noType = true;
       attributeDistribution[id] = { variable: [] };
       let gramClone = cloneObj(gramTypes);
       shuffleArray(gramClone);
@@ -580,9 +597,10 @@ function initAttributeDistribution() {
          if(gramTypesWithNoAttr.includes(gramID)){
             continue;
          }
-         let isVariable = getRandomValue(0,1);
+         let isVariable = (noType) ? 1 : getRandomValue(0,1);
          if(isVariable){
             attributeDistribution[id].variable.push(gramID);
+            noType = false;
          }
       }
    }
@@ -1106,6 +1124,8 @@ function createAlienLanguage(params) {
    gramTypes = [];
    gramTypeData = params.gramTypeData || cloneObj(defaultGramTypeData);
    nbGramTypes = params.nbGramTypes || defaultNbGramTypes;
+   mandatoryTypes = params.mandatoryTypes || cloneObj(defaultMandatoryTypes);
+   nbMandatoryTypes = params.nbMandatoryTypes || defaultNbMandatoryTypes;
    nbGramTypesWithNoAttr = params.nbGramTypesWithNoAttr || defaultNbGramTypesWithNoAttr;
    gramTypesWithNoAttr = [];
    nbNoInflection = params.nbNoInflection || defaultNbNoInflection;
