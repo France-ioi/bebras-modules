@@ -150,7 +150,7 @@ function initUI() {
       html += "<button id=\"display_infl_rules\" class='margin_right'>Inflexions</button>";
       html += "</fieldset>";
       html += "<fieldset class='margin_bottom'>";
-      html += "<legend>Liste de mots</legend>";
+      html += "<legend>Liste de radicaux</legend>";
       html += selectWordList();
       html += "<button id=\"display_word_list\">Voir</button>";
       html += "</fieldset>";
@@ -903,7 +903,7 @@ function mergeClusters(word) {
                   let pos2 = iChar;
                   if(clusterType == type){
                      pos1++; pos2++;
-                     console.log("final",word)
+                     // console.log("final",word)
                      final = true;
                   }
                   let cluster = word.substring(pos1,pos2);
