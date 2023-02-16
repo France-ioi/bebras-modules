@@ -2,6 +2,8 @@
 
 const voyels = [ "A", "E", "I", "O", "U", "Y" ];
 const consonants = [ "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Z" ];
+const defaultNbMissingVoyels = 1;
+const defaultNbMissingConsonants = 2;
 
 const defaultGramTypeData = {
    0: { label: "nom" }, // attributes: { fixed: [], variable: {} }, spellingRules: [], inflections: { attrID: { valID: inflID }}
@@ -120,6 +122,7 @@ let maxSameCon = 2 // no more than x times same consonant in a row
 
 let letterWeight;
 let lettersWeighted;
+let nbMissingVoyels, nbMissingConsonants;
 
 let stemSpellingRules;
 let inflectionRules;
@@ -324,7 +327,7 @@ function initUI() {
       let html = "<table>";
       html += "<tr><th colspan=2>voyelles</th><th colspan=2>consonnes</th></tr>";
       html += "<tr><th>lettre</th><th>poids</th><th>lettre</th><th>poids</th></tr>";
-      let nbRows = consonants.length;
+      let nbRows = consonants.length - nbMissingConsonants;
       let letters = [];
       for(var type = 0; type < 2; type++){
          letters[type] = [];
@@ -633,8 +636,13 @@ function initGramTypeData() {
 function initLetterWeight() {
    for(let type = 0; type < 2; type++){
       let arr = (type == 0) ? cloneObj(voyels) : cloneObj(consonants);
-      let nb = arr.length;
+      let nbMissing = (type == 0) ? nbMissingVoyels : nbMissingConsonants;
       shuffleArray(arr);
+      let missing = [];
+      for(let iChar = 0; iChar < nbMissing; iChar++){
+         missing[iChar] = arr.pop();
+      }
+      let nb = arr.length;
       let weight = 1;
       do{
          for(let iChar = 0; iChar < nb; iChar++){
@@ -1148,6 +1156,8 @@ function createAlienLanguage(params) {
 
    letterWeight = [ {/*voy*/}, {/*con*/} ];
    lettersWeighted = [[/*voy*/],[/*con*/]];
+   nbMissingVoyels = params.nbMissingVoyels || defaultNbMissingVoyels;
+   nbMissingConsonants = params.nbMissingConsonants || defaultNbMissingConsonants;
 
    stemSpellingRules = [
       { id: 0, gramTypes: { /* id : { min, max } */ } },  // length
