@@ -38,15 +38,15 @@ const defaultAttributeData = {
       ] },
    2: { label: "groupe",
       values: [
-         { id: 0, label: "premier" },
-         { id: 1, label: "deuxième" },
-         { id: 2, label: "troisième" },
+         { id: 0, label: "1er groupe" },
+         { id: 1, label: "2ème groupe" },
+         { id: 2, label: "3ème groupe" },
       ] },
    3: { label: "personne", 
       values: [
-         { id: 0, label: "première"},
-         { id: 1, label: "deuxième"},
-         { id: 2, label: "troisième"},
+         { id: 0, label: "1e pers"},
+         { id: 1, label: "2e pers"},
+         { id: 2, label: "3e pers"},
       ] },
    4: { label: "mode", 
       values: [
@@ -1415,7 +1415,123 @@ function createAlienLanguage(params) {
 
    initStructureRules();
    initStructures();
+
+   return generateDictionary();
 };
+
+function generateDictionary() {
+   const dictionaryAvailableCriteria = [];
+
+   const gramTypeValues = [];
+   for (let gramTypeID of gramTypes) {
+      gramTypeValues.push({
+         value: gramTypeID,
+         label: gramTypeData[gramTypeID].label.charAt(0).toLocaleUpperCase() + gramTypeData[gramTypeID].label.slice(1),
+      });
+   }
+
+   dictionaryAvailableCriteria.push({
+      name: 'gram_type',
+      label: 'Type',
+      type: 'select',
+      values: gramTypeValues,
+   });
+
+   for (let attrID of attributes) {
+      let label = attributeData[attrID].label;
+      let values = attributeValues[attrID];
+      let distribution = attributeDistribution[attrID];
+      const attrValues = [];
+      for (let valID of values) {
+         let name = attributeData[attrID].values[valID].label;
+         attrValues.push({
+            value: valID,
+            label: name.charAt(0).toLocaleUpperCase() + name.slice(1),
+         })
+      }
+
+      attrValues.sort((a, b) => a.value - b.value);
+
+      dictionaryAvailableCriteria.push({
+         name: attrID,
+         label: label.charAt(0).toLocaleUpperCase() + label.slice(1),
+         type: 'select',
+         values: attrValues,
+      });
+   }
+
+   const generateEntryHash = (entry) => {
+      const entriesSorted = Object.keys(entry).sort().reduce(
+        (obj, key) => {
+           obj[key] = entry[key];
+           return obj;
+        },
+        {}
+      );
+
+      return JSON.stringify(entriesSorted);
+   };
+
+   const dictionary = [];
+   // console.log({gramTypeData, attributeData})
+   const dictionayEntriesHashes = {};
+   for (let gramTypeID of gramTypes) {
+      for (let word of wordList[gramTypeID]) {
+         let stem = word.stem;
+         let fixedAttrVal = word.fixedAttrVal;
+         let currAttrValues = {};
+         for (let attrID in fixedAttrVal) {
+            currAttrValues[attrID] = fixedAttrVal[attrID];
+         }
+         let varAttr = gramTypeData[gramTypeID].attributes.variable;
+
+         let allVarAttrPossibilites = [];
+
+         let generatePossibilities = (currAttrValues, attrIndex) => {
+            if (attrIndex > varAttr.length - 1) {
+               allVarAttrPossibilites.push(currAttrValues);
+               return;
+            }
+
+            const attrID = varAttr[attrIndex];
+            let val;
+            if (currAttrValues[attrID] !== undefined) {
+               const copyAttr = cloneObj(currAttrValues);
+               copyAttr[attrID] = val;
+
+               return generatePossibilities(copyAttr, attrIndex + 1);
+            } else {
+               let possVals = attributeValues[attrID];
+               for (let possVal of possVals) {
+                  const copyAttr = cloneObj(currAttrValues);
+                  copyAttr[attrID] = possVal;
+                  generatePossibilities(copyAttr, attrIndex + 1);
+               }
+            }
+         };
+
+         generatePossibilities(currAttrValues, 0);
+         // console.log({currAttrValues, varAttr, allVarAttrPossibilites})
+
+         for (let varAttrVal of allVarAttrPossibilites) {
+            let conjugatedWord = conjugateWord(gramTypeID, stem, varAttrVal);
+
+            const wordObject = {word: conjugatedWord, gram_type: gramTypeID};
+            for (let key in varAttrVal) {
+               wordObject[key] = varAttrVal[key];
+            }
+
+            const hash = generateEntryHash(wordObject);
+            if (!(hash in dictionayEntriesHashes)) {
+               dictionayEntriesHashes[hash] = true;
+               dictionary.push(wordObject);
+            }
+         }
+      }
+   }
+
+   return {dictionary, dictionaryAvailableCriteria};
+}
 
 /* UTILS */
 
@@ -1447,3 +1563,9 @@ String.prototype.hashCode = function() {  // Stackoverflow
   }
   return hash;
 };
+
+if(typeof exports != 'undefined') {
+   exports.createAlienLanguage = createAlienLanguage;
+   exports.generateSentence = generateSentence;
+}
+
