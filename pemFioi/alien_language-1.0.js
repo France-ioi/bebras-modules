@@ -1237,8 +1237,21 @@ function generateDictionary() {
       });
    }
 
+   const generateEntryHash = (entry) => {
+      const entriesSorted = Object.keys(entry).sort().reduce(
+        (obj, key) => {
+           obj[key] = entry[key];
+           return obj;
+        },
+        {}
+      );
+
+      return JSON.stringify(entriesSorted);
+   };
+
    const dictionary = [];
-   // console.log({gramTypeData})
+   // console.log({gramTypeData, attributeData})
+   const dictionayEntriesHashes = {};
    for (let gramTypeID of gramTypes) {
       for (let word of wordList[gramTypeID]) {
          let stem = word.stem;
@@ -1281,11 +1294,15 @@ function generateDictionary() {
             let conjugatedWord = conjugateWord(gramTypeID, stem, varAttrVal);
 
             const wordObject = {word: conjugatedWord, gram_type: gramTypeID};
-            for (let key in currAttrValues) {
-               wordObject[key] = currAttrValues[key];
+            for (let key in varAttrVal) {
+               wordObject[key] = varAttrVal[key];
             }
 
-            dictionary.push(wordObject);
+            const hash = generateEntryHash(wordObject);
+            if (!(hash in dictionayEntriesHashes)) {
+               dictionayEntriesHashes[hash] = true;
+               dictionary.push(wordObject);
+            }
          }
       }
    }
