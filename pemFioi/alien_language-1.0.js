@@ -13,8 +13,8 @@ const defaultGramTypeData = {
    4: { label: "adjectif" },
    5: { label: "article" },
    6: { label: "conjonction" },
-   7: { label: "préposition" },
-   8: { label: "postposition" },
+   7: { label: "préposition", noEnd: true },
+   8: { label: "postposition", noStart: true },
 };
 const defaultGramTypes = [0,1,2,3,4,5,6,7,8];
 const defaultMandatoryTypes = [0,2,4];
@@ -91,7 +91,10 @@ const defaultAttributeData = {
       ] },
 };
 const defaultNbAttributes = 5;
+
 const defaultMaxNbWordsInSentence = 10;
+const defaultMinNbWordsInSentence = 2;
+const defaultMaxNbStructures = 5;
 
 let rng = Math.random; 
 let allGramTypes;
@@ -119,6 +122,8 @@ let maxVoy = 2 // no more than x successive voyels
 let maxSameVoy = 2 // no more than x times same voyel in a row
 let maxCon = 2 // no more than x successive consonants
 let maxSameCon = 2 // no more than x times same consonant in a row
+let maxNbStructures;
+let maxNbWordsInSentence, minNbWordsInSentence;
 
 let letterWeight;
 let lettersWeighted;
@@ -126,6 +131,7 @@ let nbMissingVoyels, nbMissingConsonants;
 
 let stemSpellingRules;
 let inflectionRules;
+let structureRules;
 
 let prefixes;
 let suffixes;
@@ -159,6 +165,10 @@ function initUI() {
       html += "<legend>Liste de radicaux</legend>";
       html += selectWordList();
       html += "<button id=\"display_word_list\">Voir</button>";
+      html += "</fieldset>";
+      html += "<fieldset>";
+      html += "<legend>Règles de construction des phrases</legend>";
+      html += "<button id=\"display_structure_rules\" class='margin_right'>Afficher</button>";
       html += "</fieldset>";
       html += "<fieldset>";
       html += "<legend>Générer phrase</legend>";
@@ -253,6 +263,8 @@ function initUI() {
       $("#display_infl_rules").click(displayInflectionRules);
       $("#display_word_list").off("click");
       $("#display_word_list").click(displayWordList);
+      $("#display_structure_rules").off("click");
+      $("#display_structure_rules").click(displayStructureRules);
       $("#generate_sentence").off("click");
       $("#generate_sentence").click(displaySentences);
    };
@@ -304,18 +316,16 @@ function initUI() {
             html += name+"</br>";
          }
          html += "</td><td>";
-         // if(distribution){
-            var allGram = cloneObj(distribution.variable);
-            if(distribution.fixed !== undefined){
-               allGram.unshift(distribution.fixed);
-            }
-            for(let gramID of allGram){
-               // console.log(gramID)
-               let type = (distribution.fixed == gramID) ? "F" : "V";
-               let name = gramTypeData[gramID].label;
-               html += name+" ("+type+")</br>";
-            }
-         // }
+         var allGram = cloneObj(distribution.variable);
+         if(distribution.fixed !== undefined){
+            allGram.unshift(distribution.fixed);
+         }
+         for(let gramID of allGram){
+            // console.log(gramID)
+            let type = (distribution.fixed == gramID) ? "F" : "V";
+            let name = gramTypeData[gramID].label;
+            html += name+" ("+type+")</br>";
+         }
          html += "</td></tr>";
       }
       html += "</table>";
@@ -503,6 +513,59 @@ function initUI() {
       for(var word of wordList[gramTypeID]){
          html += word.stem+"</br>";
       }
+      $("#text").html(html);
+   };
+
+   function displayStructureRules() {
+      $("#text").empty();
+      let html = "";
+      for(let ruleID = 2; ruleID <=3; ruleID++){
+         let ruleData = structureRules[ruleID];
+         let valStr = (ruleData.dir == 0) ? "\t de gauche à droite" : "\t de droite à gauche";
+         html += "<Span><b>"+ruleData.label+" :</b>"+valStr+"</span>";
+         html += "</br>";
+      }
+
+      html += "<table>";
+      html += "<tr><th>Règle</th>";
+      for(let gramTypeID of gramTypes){
+         html += "<th>"+gramTypeData[gramTypeID].label+"</th>";
+      }
+      html += "</tr>";
+      for(let ruleID in structureRules){
+         if(ruleID == 2 || ruleID == 3){
+            continue;
+         }
+         let ruleData = structureRules[ruleID];
+         html += "<tr>";
+         html += "<td>"+ruleData.label+"</td>";
+         for(let gramTypeID of gramTypes){
+            html += "<td>";
+            switch(ruleID){
+            case "0":
+               if(ruleData.gramTypes.includes(gramTypeID)){
+                  html += "X";
+               }
+               break;
+            case "1":
+               if(ruleData.gramTypes[gramTypeID] === 0){
+                  html += "début";
+               }else if(ruleData.gramTypes[gramTypeID] === 1){
+                  html += "fin";
+               }else if(ruleData.gramTypes[gramTypeID] === 2){
+                  html += "pas au début";
+               }else if(ruleData.gramTypes[gramTypeID] === 3){
+                  html += "pas à la fin";
+               }
+               break;
+            case "4":
+               html += ruleData.gramTypes[gramTypeID];
+            }
+            html += "</td>";
+         }
+         html += "</tr>";
+      }
+      html += "</table>";
       $("#text").html(html);
    };
 
@@ -1040,43 +1103,100 @@ function generateStem(gramType) {
    return str
 };
 
+function initStructureRules() {
+   structureRules[2].dir = getRandomValue(0,1);
+   structureRules[3].dir = getRandomValue(0,1);
+
+   for(let type of gramTypes){
+      if(mandatoryTypes.includes(type) && structureRules[0].gramTypes.length < minNbWordsInSentence){
+         structureRules[0].gramTypes.push(type);
+      }
+      if(gramTypeData[type].noEnd){
+         structureRules[1].gramTypes[type] = 3;
+         structureRules[1].pos[3] = type;
+      }
+      if(gramTypeData[type].noStart){
+         structureRules[1].gramTypes[type] = 2;
+         structureRules[1].pos[2] = type;
+      }
+   }
+
+   for(let type of gramTypes){
+      if(structureRules[1].gramTypes[type] == undefined){
+         for(let iPos = 0; iPos < 4; iPos++){
+            let hasPos = (structureRules[1].pos[iPos] != undefined) ? 0 : getRandomValue(0,1);
+            if((iPos == 2 && structureRules[1].pos[0] != undefined) || (iPos == 3 && structureRules[1].pos[1] != undefined)){
+               hasPos = 0;
+            }
+            if(hasPos){
+               structureRules[1].gramTypes[type] = iPos;
+               structureRules[1].pos[iPos] = type;
+               break;
+            }
+         }
+      }
+      structureRules[4].gramTypes[type] = (structureRules[1].gramTypes[type] === 0 || structureRules[1].gramTypes[type] === 1) ? 1 : getRandomValue(1,3);
+   }
+   // console.log(structureRules)
+};
+
 function initStructures() {
    let inList = {};
    let minWords = 2;
-   let maxWords = maxNbWordsInSentence;
-   let maxSameType = 3;
+   // let maxWords = maxNbWordsInSentence;
+   let maxWords = 0;
+   for(let type in structureRules[4].gramTypes){
+      maxWords += structureRules[4].gramTypes[type];
+   }
+   maxWords = Math.min(maxWords,maxNbWordsInSentence);
+   // console.log("maxWords",maxWords);
+   // console.log("gramTypes",gramTypes);
+   // console.log("structureRules",structureRules);
 
-   let loop;
+   let loop = 0;
+   let nbOccType = {};
    do{
-      loop = 0;
-      let length = getRandomValue(minWords,maxWords);
+      let maxLength = getRandomValue(minWords,maxWords);
       let str = [];
       let removed = []; // type ID with occurence = maxSameType
       let nbOcc = {};
-      for(let iWord = 0; iWord < length; iWord++){
-         let possTypes = cloneObj(gramTypes);
-         if(iWord > 0){ // prevent 2 successive same type
-            let prevID = str[iWord - 1 ];
-            let indexOf = possTypes.indexOf(prevID);
-            possTypes.splice(indexOf,1);
-         }
-         for(let remID of removed){
-            let indexOf = possTypes.indexOf(remID);
-            possTypes.splice(indexOf,1);
-         }
-         
-         let index = getRandomValue(0,possTypes.length - 1);
-         let newID = possTypes[index];
-         str[iWord] = newID;
+      let end = false;
+      do{
+         let possTypes = findPossTypes(str,maxLength,removed,nbOcc,nbOccType);
+         // console.log("possTypes",cloneObj(possTypes),structures.length);
+         if(possTypes.length == 0){
+            // console.log("no possTypes",str.length);
+            end = true;
+         }else{
+            let index = getRandomValue(0,possTypes.length - 1);
+            let newID = possTypes[index];
+            str.push(newID);
 
-         if(nbOcc[newID] === undefined){
-            nbOcc[newID] = 0;
+            if(nbOcc[newID] === undefined){
+               nbOcc[newID] = 0;
+            }
+            nbOcc[newID]++;
+            if(nbOccType[newID] === undefined){
+               nbOccType[newID] = 0;
+            }
+            nbOccType[newID]++;
+
+            let maxSameType = structureRules[4].gramTypes[str];
+            if(nbOcc[newID] >= maxSameType){
+               removed.push(newID);
+            }
+
+            if(newID == structureRules[1].pos[1]){
+               end = true;
+            }
          }
-         nbOcc[newID]++;
-         if(nbOcc[newID] >= maxSameType){
-            removed.push(newID);
-         }
+      }while(str.length < maxLength && !end)
+
+      let lastID = str[str.length - 1];
+      if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
+         str[str.length - 1] = structureRules[1].pos[1];
       }
+
       let hash = JSON.stringify(str).hashCode();
       if(!inList[hash]){
          inList[hash] = true;
@@ -1085,7 +1205,99 @@ function initStructures() {
          loop++;
       }
    }while(structures.length < maxNbStructures && loop < 10);
+   if(loop >= 10){
+      console.error("infinite loop")
+   }
    // console.log("structures",structures);
+};
+
+function findPossTypes(str,maxLength,removed,nbOcc,nbOccType) {
+   let possTypes = cloneObj(gramTypes);
+   let wordIndex = str.length;
+   let minLength = 2;
+   // console.log("maxLength",maxLength,wordIndex)
+   // console.log("init poss types",cloneObj(possTypes));
+   if(wordIndex > 0 && structureRules[1].pos[0] != undefined){ 
+      // if not first word, remove type with pos = start
+      let indexOf = possTypes.indexOf(structureRules[1].pos[0]);
+      if(indexOf >= 0){
+         possTypes.splice(indexOf,1);
+         // console.log("remove pos = start",cloneObj(possTypes));1
+      }
+   }
+
+   if(wordIndex < minLength - 1 && structureRules[1].pos[1] != undefined){
+      // if str too short, remove type with pos = end
+      let indexOf = possTypes.indexOf(structureRules[1].pos[1]);
+      if(indexOf >= 0){
+         possTypes.splice(indexOf,1);
+         // console.log("remove pos = end",cloneObj(possTypes));
+      }
+   }
+
+   if(wordIndex == 0){
+      if(structureRules[1].pos[2] != undefined){
+         // remove word with pos != start
+         let indexOf = possTypes.indexOf(structureRules[1].pos[2]);
+         if(indexOf >= 0){
+            possTypes.splice(indexOf,1);
+            // console.log("remove pos != start",cloneObj(possTypes));
+         }
+      }
+      if(structureRules[1].pos[0] != undefined){
+         if(structureRules[0].gramTypes.includes(structureRules[1].pos[0])){
+            possTypes = [structureRules[1].pos[0]];
+            // console.log("pos = start",cloneObj(possTypes));
+         }
+      }
+   }else{ 
+      // prevent 2 successive same type
+      let prevID = str[wordIndex - 1];
+      let indexOf = possTypes.indexOf(prevID);
+      if(indexOf >= 0){
+         possTypes.splice(indexOf,1);
+         // console.log("prevent 2 successive",prevID,cloneObj(possTypes));
+      }
+
+      if(wordIndex == maxLength - 1){
+         if(structureRules[1].pos[3] != undefined){
+            // remove word with pos != end
+            let indexOf = possTypes.indexOf(structureRules[1].pos[3]);
+            if(indexOf >= 0){
+               possTypes.splice(indexOf,1);
+               // console.log("remove pos != end",cloneObj(possTypes));
+            }
+         }
+         if(structureRules[1].pos[1] != undefined){
+            if(structureRules[0].gramTypes.includes(structureRules[1].pos[1])){
+               possTypes = [structureRules[1].pos[1]];
+               // console.log("pos = end",cloneObj(possTypes));
+            }
+         }
+      }
+   }
+   for(let remID of removed){
+      let indexOf = possTypes.indexOf(remID);
+      if(indexOf >= 0){
+         possTypes.splice(indexOf,1);
+         // console.log("rem removed",cloneObj(possTypes));
+      }
+   }
+   
+   for(let mandID of structureRules[0].gramTypes){
+      if(!nbOcc[mandID] && possTypes.includes(mandID) && mandID != structureRules[1].pos[1]){
+         possTypes = [mandID];
+         // console.log("mandatory",cloneObj(possTypes));
+         break;
+      }
+   }
+   for(let type of possTypes){
+      if(!nbOccType[type]){
+         possTypes = [type];
+         break;
+      }
+   }
+   return possTypes
 };
 
 function generateSentence(structure) {
@@ -1145,6 +1357,7 @@ function createAlienLanguage(params) {
    attributeDistribution = { /* id: { fixed: [], variable: [] } */ };
    nbAttributes = params.nbAttributes || defaultNbAttributes;
    maxNbWordsInSentence = params.maxNbWordsInSentence || defaultMaxNbWordsInSentence;
+   minNbWordsInSentence = params.minNbWordsInSentence || defaultMinNbWordsInSentence;
 
    maxNbStems = params.maxNbStems || maxNbStems;  // max nb stem per gram type
    minNbStems = params.minNbStems || minNbStems;    // min nb stem per gram type
@@ -1152,7 +1365,7 @@ function createAlienLanguage(params) {
    minStemLength = params.minWordLength || minStemLength;
    maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
    minNbAttrValues = params.minNbAttrValues || minNbAttrValues;
-   maxNbStructures = 50;
+   maxNbStructures = params.maxNbStructures || defaultMaxNbStructures;
 
    letterWeight = [ {/*voy*/}, {/*con*/} ];
    lettersWeighted = [[/*voy*/],[/*con*/]];
@@ -1173,6 +1386,15 @@ function createAlienLanguage(params) {
       { id: 4, gramTypes: { /* gramTypeID: { attrID: { val: [preID,sufID], remove: [0-2,0-2] } } */ } }, // add circonfix
    ];
 
+   structureRules = [
+      { id: 0, label: "Type obligatoire", gramTypes: [] },  // mandatory types
+      { id: 1, label: "Position", gramTypes: { /* type: pos (0: start, 1: end, 2: noStart, 3: noEnd )*/ }, pos: { /* pos: types */ } },  // type pos
+      { id: 2, label: "Sens de lecture",  /* dir: (0: ltr, 1: rtl) */ },  // reading direction
+      { id: 3, label: "Sens de conjugaison", /* dir: (0: ltr, 1: rtl) */ },  // conjugation direction
+      { id: 4, label: "Max par phrase", gramTypes: { /* type: 1-3 */ } },  // max nb per sentence
+   ];
+   
+
    prefixes = [];
    suffixes = [];
    infixes = [];
@@ -1191,6 +1413,7 @@ function createAlienLanguage(params) {
    initInflectionRules();
    generateWordList();
 
+   initStructureRules();
    initStructures();
 };
 
