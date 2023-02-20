@@ -38,15 +38,15 @@ const defaultAttributeData = {
       ] },
    2: { label: "groupe",
       values: [
-         { id: 0, label: "premier" },
-         { id: 1, label: "deuxième" },
-         { id: 2, label: "troisième" },
+         { id: 0, label: "1er groupe" },
+         { id: 1, label: "2ème groupe" },
+         { id: 2, label: "3ème groupe" },
       ] },
    3: { label: "personne", 
       values: [
-         { id: 0, label: "première"},
-         { id: 1, label: "deuxième"},
-         { id: 2, label: "troisième"},
+         { id: 0, label: "1e pers"},
+         { id: 1, label: "2e pers"},
+         { id: 2, label: "3e pers"},
       ] },
    4: { label: "mode", 
       values: [
