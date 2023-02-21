@@ -687,6 +687,20 @@ function initAttributeDistribution() {
             // console.log(gramID,"+");
          }
       }
+      if(noType){
+         console.log("noType",id);
+         let count = 0;
+         let takeFrom;
+         for(let attrID of attributes){
+            let currCount = attributeDistribution[attrID].variable.length;
+            if(currCount > count){
+               count = currCount;
+               takeFrom = attrID;
+            }
+         }
+         let gramID = attributeDistribution[takeFrom].variable.pop();
+         attributeDistribution[id].variable.push(gramID);
+      }
    }
    // console.log("attributeDistribution",attributeDistribution);
    // console.log("countNbAttr",countNbAttr);
