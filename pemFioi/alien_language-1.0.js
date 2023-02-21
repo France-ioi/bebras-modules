@@ -1152,61 +1152,82 @@ function initStructures() {
    // console.log("maxWords",maxWords);
    // console.log("gramTypes",gramTypes);
    // console.log("structureRules",structureRules);
-
-   let loop = 0;
-   let nbOccType = {};
+   let missingLoop = 0, missing;
    do{
-      let maxLength = getRandomValue(minWords,maxWords);
-      let str = [];
-      let removed = []; // type ID with occurence = maxSameType
-      let nbOcc = {};
-      let end = false;
+      let loop = 0;
+      let nbOccType = {};
       do{
-         let possTypes = findPossTypes(str,maxLength,removed,nbOcc,nbOccType);
-         // console.log("possTypes",cloneObj(possTypes),structures.length);
-         if(possTypes.length == 0){
-            // console.log("no possTypes",str.length);
-            end = true;
-         }else{
-            let index = getRandomValue(0,possTypes.length - 1);
-            let newID = possTypes[index];
-            str.push(newID);
-
-            if(nbOcc[newID] === undefined){
-               nbOcc[newID] = 0;
-            }
-            nbOcc[newID]++;
-            if(nbOccType[newID] === undefined){
-               nbOccType[newID] = 0;
-            }
-            nbOccType[newID]++;
-
-            let maxSameType = structureRules[4].gramTypes[str];
-            if(nbOcc[newID] >= maxSameType){
-               removed.push(newID);
-            }
-
-            if(newID == structureRules[1].pos[1]){
+         let maxLength = getRandomValue(minWords,maxWords);
+         let str = [];
+         let removed = []; // type ID with occurence = maxSameType
+         let nbOcc = {};
+         let end = false;
+         do{
+            let possTypes = findPossTypes(str,maxLength,removed,nbOcc,nbOccType);
+            // console.log("possTypes",cloneObj(possTypes),structures.length);
+            if(possTypes.length == 0){
+               // console.log("no possTypes",str.length);
                end = true;
+            }else{
+               let index = getRandomValue(0,possTypes.length - 1);
+               let newID = possTypes[index];
+               str.push(newID);
+
+               if(nbOcc[newID] === undefined){
+                  nbOcc[newID] = 0;
+               }
+               nbOcc[newID]++;
+               if(nbOccType[newID] === undefined){
+                  nbOccType[newID] = 0;
+               }
+               nbOccType[newID]++;
+
+               let maxSameType = structureRules[4].gramTypes[str];
+               if(nbOcc[newID] >= maxSameType){
+                  removed.push(newID);
+               }
+
+               if(newID == structureRules[1].pos[1]){
+                  end = true;
+               }
             }
+         }while(str.length < maxLength && !end)
+
+         let lastID = str[str.length - 1];
+         if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
+            str[str.length - 1] = structureRules[1].pos[1];
          }
-      }while(str.length < maxLength && !end)
 
-      let lastID = str[str.length - 1];
-      if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
-         str[str.length - 1] = structureRules[1].pos[1];
+         if(structureRules[2].dir == 1){
+            str.reverse();
+         }
+
+         let hash = JSON.stringify(str).hashCode();
+
+         if(!inList[hash]){
+            inList[hash] = true;
+            structures.push(str);
+         }else{
+            loop++;
+         }
+      }while(structures.length < maxNbStructures && loop < 10);
+
+      if(loop >= 10){
+         console.error("infinite loop")
       }
 
-      let hash = JSON.stringify(str).hashCode();
-      if(!inList[hash]){
-         inList[hash] = true;
-         structures.push(str);
-      }else{
-         loop++;
+      missing = false;
+      for(let type of gramTypes){
+         if(!nbOccType[type]){   // if type missing
+            missing = true;
+            missingLoop++;
+            break;
+         }
       }
-   }while(structures.length < maxNbStructures && loop < 10);
-   if(loop >= 10){
-      console.error("infinite loop")
+   }while(missing && missingLoop < 10)
+
+   if(missingLoop >= 10){
+      console.error("infinite missing loop")
    }
    // console.log("structures",structures);
 };
