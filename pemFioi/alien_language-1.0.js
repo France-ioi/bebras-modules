@@ -91,6 +91,7 @@ const defaultAttributeData = {
       ] },
 };
 const defaultNbAttributes = 5;
+const defaultMaxNbAttrPerType = 3;
 
 const defaultMaxNbWordsInSentence = 10;
 const defaultMinNbWordsInSentence = 2;
@@ -124,6 +125,7 @@ let maxCon = 2 // no more than x successive consonants
 let maxSameCon = 2 // no more than x times same consonant in a row
 let maxNbStructures;
 let maxNbWordsInSentence, minNbWordsInSentence;
+let maxNbAttrPerType;
 
 let letterWeight;
 let lettersWeighted;
@@ -647,33 +649,47 @@ function initAttributeValues() {
 
 function initAttributeDistribution() {
    /* choose for each attribute, which gram type has a fixed value, and which ones are variable */
+   gramTypesWithNoAttr = [];
    if(nbGramTypesWithNoAttr > 0){
-      for(var iType = 0 ;iType < nbGramTypesWithNoAttr; iType++){
+      for(var iType = 0; iType < nbGramTypesWithNoAttr; iType++){
          var gramTypeID = gramTypes[iType];
          gramTypesWithNoAttr.push(gramTypeID);
       }
+   }
+   let countNbAttr = {};
+   for(let type of gramTypes){
+      countNbAttr[type] = 0;
    }
    for(let id of attributes){
       let noType = true;
       attributeDistribution[id] = { variable: [] };
       let gramClone = cloneObj(gramTypes);
       shuffleArray(gramClone);
-      if(!gramTypesWithNoAttr.includes(gramClone[0])){
-         attributeDistribution[id].fixed = gramClone.pop();
+      if(!gramTypesWithNoAttr.includes(gramClone[0]) && countNbAttr[gramClone[0]] < maxNbAttrPerType){
+         let gramID = gramClone.shift();
+         attributeDistribution[id].fixed = gramID;
+         countNbAttr[gramID]++;
+         // console.log(gramID,"+");
+         noType = false;
       }
 
       for(let gramID of gramClone){
-         if(gramTypesWithNoAttr.includes(gramID)){
+         // console.log("countNbAttr",gramID,countNbAttr[gramID],maxNbAttrPerType);
+         if(gramTypesWithNoAttr.includes(gramID) || countNbAttr[gramID] >= maxNbAttrPerType){
+            // console.log("skip",gramTypesWithNoAttr.includes(gramID));
             continue;
          }
          let isVariable = (noType) ? 1 : getRandomValue(0,1);
          if(isVariable){
             attributeDistribution[id].variable.push(gramID);
             noType = false;
+            countNbAttr[gramID]++;
+            // console.log(gramID,"+");
          }
       }
    }
    // console.log("attributeDistribution",attributeDistribution);
+   // console.log("countNbAttr",countNbAttr);
 };
 
 function initGramTypeData() {
@@ -1391,6 +1407,7 @@ function createAlienLanguage(params) {
    attributeValues = { /* id: [] */ };
    attributeDistribution = { /* id: { fixed: [], variable: [] } */ };
    nbAttributes = params.nbAttributes || defaultNbAttributes;
+   maxNbAttrPerType = params.maxNbAttrPerType || defaultMaxNbAttrPerType;
    maxNbWordsInSentence = params.maxNbWordsInSentence || defaultMaxNbWordsInSentence;
    minNbWordsInSentence = params.minNbWordsInSentence || defaultMinNbWordsInSentence;
 
