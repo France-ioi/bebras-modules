@@ -688,7 +688,7 @@ function initAttributeDistribution() {
          }
       }
       if(noType){
-         console.log("noType",id);
+         // console.log("noType",id);
          let count = 0;
          let takeFrom;
          for(let attrID of attributes){
@@ -1164,18 +1164,37 @@ function initStructureRules() {
             if(hasPos){
                structureRules[1].gramTypes[type] = iPos;
                structureRules[1].pos[iPos] = type;
+               if(iPos == 0 && !structureRules[0].gramTypes.includes(type)){
+                  structureRules[0].gramTypes.push(type);
+               }
                break;
             }
          }
       }
       structureRules[4].gramTypes[type] = (structureRules[1].gramTypes[type] === 0 || structureRules[1].gramTypes[type] === 1) ? 1 : getRandomValue(1,3);
    }
+
+   // dev
+   // for(let type of gramTypes){
+   //    if(!structureRules[0].gramTypes.includes(type)){
+   //       let prevPos = structureRules[1].gramTypes[type];
+   //       let prevType = structureRules[1].pos[0];
+   //       structureRules[1].gramTypes[type] = 0;
+   //       structureRules[1].pos[0] = type;
+   //       structureRules[4].gramTypes[type] = 1;
+
+   //       structureRules[1].pos[prevPos] = prevType;
+   //       structureRules[1].gramTypes[prevType] = prevPos;
+   //       structureRules[0].gramTypes.push(type);
+   //       break;
+   //    }
+   // }
    // console.log(structureRules)
 };
 
 function initStructures() {
    let inList = {};
-   let minWords = 2;
+   let minWords = structureRules[0].gramTypes.length;
    // let maxWords = maxNbWordsInSentence;
    let maxWords = 0;
    for(let type in structureRules[4].gramTypes){
@@ -1187,6 +1206,7 @@ function initStructures() {
    // console.log("structureRules",structureRules);
    let missingLoop = 0, missing;
    do{
+      structures = [];
       let loop = 0;
       let nbOccType = {};
       do{
@@ -1243,9 +1263,9 @@ function initStructures() {
          }else{
             loop++;
          }
-      }while(structures.length < maxNbStructures && loop < 10);
+      }while(structures.length < maxNbStructures && loop < 50);
 
-      if(loop >= 10){
+      if(loop >= 50){
          console.error("infinite loop")
       }
 
