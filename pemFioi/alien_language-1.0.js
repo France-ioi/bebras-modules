@@ -583,6 +583,9 @@ function initUI() {
             str = structures[index];
          }
          html += generateSentence(str);
+         if(iSent < nb - 1){
+            html += " ";
+         }
       }
       $("#text").html(html);
       
@@ -1198,7 +1201,7 @@ function initStructures() {
             str[str.length - 1] = structureRules[1].pos[1];
          }
 
-         if(structureRules[2].dir == 1){
+         if(structureRules[2].dir == 1){  // if reading dir is ltr
             str.reverse();
          }
 
@@ -1328,8 +1331,13 @@ function generateSentence(structure) {
    }
    let currAttrValues = {};
    let sentence = "";
-   // let stems = [];
-   for(let gramTypeID of structure){
+   let words = [];
+   let struc = cloneObj(structure);
+   if(structureRules[3].dir == 1){  // if conjugation dir = rtl
+      struc.reverse();
+   }
+
+   for(let gramTypeID of struc){
       let list = wordList[gramTypeID];
       let index = getRandomValue(0,list.length - 1);
       let stem = list[index].stem;
@@ -1352,8 +1360,14 @@ function generateSentence(structure) {
          varAttrVal[attrID] = val;
       }
       let word = conjugateWord(gramTypeID,stem,varAttrVal);
-      sentence += word+" ";
+      words.push(word);
    }
+
+   if(structureRules[3].dir == 1){  // if conjugation dir = rtl
+      words.reverse();
+   }
+   sentence += words.join(" ");
+   // console.log(sentence)
    return sentence
 };
 
