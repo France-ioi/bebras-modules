@@ -150,7 +150,7 @@ let dictionaryBuffer;
 let dictionayEntriesHashes;
 
 function initUI() {
-   createAlienLanguage({ maxNbStems: 1000 });
+   createAlienLanguage({ maxNbStems: 50 });
 
    createForm();
    initHandlers();
@@ -941,10 +941,10 @@ function generateWordList() {
             stem = generateStem(gramType);
             fixedAttrVal = pickFixedAttributesValues(fixedAttr);
             stem = conjugateWord(gramType,stem,fixedAttrVal);
-            maxLength = findMaxLengthOfConj(stem,gramType);
+            maxLength = findMaxLengthOfConj(stem,gramType,fixedAttrVal);
             while(maxLength > maxWordLength && stem.length > 1){
                stem = stem.substring(0, stem.length - 1);
-               maxLength = findMaxLengthOfConj(stem,gramType);
+               maxLength = findMaxLengthOfConj(stem,gramType,fixedAttrVal);
             }
             nbTry++;
          }while(inList[stem] && nbTry < 10);
@@ -963,7 +963,7 @@ function generateWordList() {
    // console.log(wordList);
 };
 
-function findMaxLengthOfConj(stem,gramType) {
+function findMaxLengthOfConj(stem,gramType,fixedAttrVal) {
    dictionaryBuffer = [];
    let variableAttr = gramTypeData[gramType].attributes.variable;
    let allComb = allAttributeValuesCombinations;
@@ -979,6 +979,9 @@ function findMaxLengthOfConj(stem,gramType) {
          const wordObject = {word, gram_type: gramType};
          for (let key in comb) {
             wordObject[key] = comb[key];
+         }
+         for (let key in fixedAttrVal) {
+            wordObject[key] = fixedAttrVal[key];
          }
          dictionaryBuffer.push(wordObject);
          // console.log(word)
