@@ -6,7 +6,7 @@ const defaultNbMissingVoyels = 1;
 const defaultNbMissingConsonants = 2;
 
 const defaultGramTypeData = {
-   0: { label: "nom" }, // attributes: { fixed: [], variable: {} }, spellingRules: [], inflections: { attrID: { valID: inflID }}
+   0: { label: "nom" }, // attributes: { fixed: [], variable: [] }, spellingRules: [], inflections: { attrID: { valID: inflID }}
    1: { label: "pronom" },
    2: { label: "verbe" },
    3: { label: "adverbe" },
@@ -110,10 +110,11 @@ let nbGramTypes, nbAttributes;
 let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
-let maxNbStems = 1000;  // max nb stems per gram type
+let maxNbStems = 50;  // max nb stems per gram type
 let minNbStems = 10;    // min nb stems per gram type
-let maxStemLength = 10;
+let maxStemLength = 7;
 let minStemLength = 1;
+let maxWordLength = 10;
 let maxNbAttrValues = 10;
 let minNbAttrValues = 2;
 let maxPrefixLength = 3;
@@ -282,7 +283,7 @@ function initUI() {
       // console.log("display_gram")
       $("#text").empty();
       let html = "<table>";
-      html += "<tr><th>cat. gram.</th><th>nb de lemmes</th><th>attributs (F: fixe, V: variable)</th></tr>";
+      html += "<tr><th>cat. gram.</th><th>nb de radicaux</th><th>attributs (F: fixe, V: variable)</th></tr>";
       for(let gramTypeID of gramTypes){
          html += "<tr>";
          let { label, nbLem, attributes } = gramTypeData[gramTypeID];
@@ -926,25 +927,78 @@ function generateWordList() {
       wordList[gramType] = [];
       let dat = gramTypeData[gramType];
       let fixedAttr = dat.attributes.fixed;
+      let fixedAttrVal;
+      let stem, maxLength;
       for(let iLem = 0; iLem < dat.nbLem; iLem++){
          let nbTry = 0;
-         let stem;
          do{
             stem = generateStem(gramType);
+            fixedAttrVal = pickFixedAttributesValues(fixedAttr);
+            stem = conjugateWord(gramType,stem,fixedAttrVal);
+            maxLength = findMaxLengthOfConj(stem,gramType);
+            while(maxLength > maxWordLength && stem.length > 1){
+               stem = stem.substring(0, stem.length - 1);
+               maxLength = findMaxLengthOfConj(stem,gramType);
+            }
             nbTry++;
          }while(inList[stem] && nbTry < 10);
-
+         // console.log(maxLength,maxWordLength)
          if(inList[stem] && nbTry >= 10){
             console.error("skip duplicate",gramType,stem);
+         }else if(maxLength > maxWordLength){
+            console.error("skip too long",stem);
          }else{
             inList[stem] = true;
-            let fixedAttrVal = pickFixedAttributesValues(fixedAttr);
-            stem = conjugateWord(gramType,stem,fixedAttrVal);
             wordList[gramType].push({stem,fixedAttrVal});
          }
       }
    }
    // console.log(wordList);
+};
+
+function findMaxLengthOfConj(stem,gramType) {
+   let variableAttr = gramTypeData[gramType].attributes.variable;
+   let allComb;
+   let maxLength = 0;
+   if(variableAttr.length > 0){
+      allComb = getAllAttrComb(variableAttr,[],0);
+      for(let comb of allComb){
+         let word = conjugateWord(gramType,stem,comb);
+         maxLength = Math.max(maxLength,word.length);
+         // console.log(word)
+      }
+      // console.log(stem,gramType,maxLength);
+   }
+   return maxLength
+};
+
+function getAllAttrComb(variableAttr,allComb,index) {
+   // console.log(index,variableAttr.length,allComb)
+   let attrID = variableAttr[index];
+   let allVal = attributeValues[attrID];
+
+   if(index == 0){
+      for(let val of allVal){
+         let comb = {};
+         comb[attrID] = val;
+         allComb.push(comb);
+      }
+
+   }else if(index < variableAttr.length){
+      let newAllComb = [];
+      for(let prevVal of allComb){
+         for(let val of allVal){
+            let newComb = cloneObj(prevVal);
+            newComb[attrID] = val;
+            newAllComb.push(newComb);
+         }
+      }
+      allComb = newAllComb;
+   }else{
+      // console.log("end",allComb)
+      return allComb
+   }
+   return getAllAttrComb(variableAttr,allComb,index + 1);
 };
 
 function conjugateWord(gramType,stem,attrVal) {
