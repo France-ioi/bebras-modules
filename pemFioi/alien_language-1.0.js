@@ -1620,9 +1620,9 @@ function generateDictionary() {
          let stem = word.stem;
          let fixedAttrVal = word.fixedAttrVal;
          let currAttrValues = {};
-         for (let attrID in fixedAttrVal) {
-            currAttrValues[attrID] = fixedAttrVal[attrID];
-         }
+         // for (let attrID in fixedAttrVal) {
+         //    currAttrValues[attrID] = fixedAttrVal[attrID];
+         // }
          let varAttr = gramTypeData[gramTypeID].attributes.variable;
 
          let allVarAttrPossibilites = [];
