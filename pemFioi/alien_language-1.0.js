@@ -110,8 +110,8 @@ let nbGramTypes, nbAttributes;
 let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
-const defaultMaxNbStems = 50;  // max nb stems per gram type
-const defaultMinNbStems = 10;    // min nb stems per gram type
+const defaultMaxNbStems = 500;  // max nb stems per gram type
+const defaultMinNbStems = 400;    // min nb stems per gram type
 let maxNbStems, minNbStems;
 let maxStemLength = 7;
 let minStemLength = 1;
@@ -150,7 +150,7 @@ let dictionaryBuffer;
 let dictionayEntriesHashes;
 
 function initUI() {
-   createAlienLanguage({ maxNbStems: 50 });
+   createAlienLanguage(/*{ maxNbStems: 50 }*/);
 
    createForm();
    initHandlers();
@@ -950,9 +950,9 @@ function generateWordList() {
          }while(inList[stem] && nbTry < 10);
          // console.log(maxLength,maxWordLength)
          if(inList[stem] && nbTry >= 10){
-            console.error("skip duplicate",gramType,stem);
+            console.log("skip duplicate",gramType);
          }else if(maxLength > maxWordLength){
-            console.error("skip too long",stem);
+            console.log("skip too long",stem);
          }else{
             inList[stem] = true;
             wordList[gramType].push({stem,fixedAttrVal});
@@ -987,6 +987,8 @@ function findMaxLengthOfConj(stem,gramType,fixedAttrVal) {
          // console.log(word)
       }
       // console.log(stem,gramType,maxLength);
+   }else{
+      dictionaryBuffer.push({word: stem, gram_type: gramType});
    }
    return maxLength
 };
@@ -1491,6 +1493,18 @@ function generateSentence(structure) {
    }
    sentence += words.join(" ");
    // console.log(sentence)
+   for(let word of words){
+      let inDict = false;
+      for(let entry of dictionaryObj.dictionary){
+         if(entry.word == word){
+            inDict = true;
+            break;
+         }
+      }
+      if(!inDict){
+         console.log("not in dict :",word);
+      }
+   }
    return sentence
 };
 
