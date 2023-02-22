@@ -110,8 +110,9 @@ let nbGramTypes, nbAttributes;
 let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
-let maxNbStems = 50;  // max nb stems per gram type
-let minNbStems = 10;    // min nb stems per gram type
+const defaultMaxNbStems = 50;  // max nb stems per gram type
+const defaultMinNbStems = 10;    // min nb stems per gram type
+let maxNbStems, minNbStems;
 let maxStemLength = 7;
 let minStemLength = 1;
 let maxWordLength = 10;
@@ -1499,8 +1500,8 @@ function createAlienLanguage(params) {
    maxNbWordsInSentence = params.maxNbWordsInSentence || defaultMaxNbWordsInSentence;
    minNbWordsInSentence = params.minNbWordsInSentence || defaultMinNbWordsInSentence;
 
-   maxNbStems = params.maxNbStems || maxNbStems;  // max nb stem per gram type
-   minNbStems = params.minNbStems || minNbStems;    // min nb stem per gram type
+   maxNbStems = params.maxNbStems || defaultMaxNbStems;  // max nb stem per gram type
+   minNbStems = params.minNbStems || defaultMinNbStems;    // min nb stem per gram type
    maxStemLength = params.maxWordLength || maxStemLength;
    minStemLength = params.minWordLength || minStemLength;
    maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
