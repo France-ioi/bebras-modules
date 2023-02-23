@@ -587,7 +587,7 @@ function initUI() {
       let html = "";
       let str;
       let showInfo = $("#show_info").is(":checked");
-      console.log(showInfo)
+      // console.log(showInfo)
       for(let iSent = 0; iSent < nb; iSent++){
          if(strID > 0){
             str = structures[strID - 1];
@@ -595,7 +595,7 @@ function initUI() {
             let index = getRandomValue(0,structures.length - 1);
             str = structures[index];
          }
-         html += generateSentence(str);
+         html += generateSentence(str,showInfo);
          if(iSent < nb - 1){
             html += " ";
          }
@@ -996,7 +996,7 @@ function findMaxLengthOfConj(stem,gramType,fixedAttrVal) {
    dictionaryBuffer = [];
    let variableAttr = gramTypeData[gramType].attributes.variable;
    let allComb = allAttributeValuesCombinations;
-   let maxLength = 0;
+   let maxLength = stem.length;
    if(variableAttr.length > 0){
       if(!allComb[gramType]){
          allComb = getAllAttrComb(variableAttr,[],0);
@@ -1486,7 +1486,7 @@ function findPossTypes(str,maxLength,removed,nbOcc,nbOccType) {
    return possTypes
 };
 
-function generateSentence(structure) {
+function generateSentence(structure,showInfo) {
    if(!structure){
       let index = getRandomValue(0,structures.length - 1);
       structure = structures[index];
@@ -1504,8 +1504,10 @@ function generateSentence(structure) {
       let index = getRandomValue(0,list.length - 1);
       let stem = list[index].stem;
       let fixedAttrVal = list[index].fixedAttrVal;
+      let wordObj = { type: gramTypeID, attributes: {}, stem };
       for(let attrID in fixedAttrVal){
          currAttrValues[attrID] = fixedAttrVal[attrID];
+         wordObj.attributes[attrID] = fixedAttrVal[attrID];
       }
       let varAttr = gramTypeData[gramTypeID].attributes.variable;
       let varAttrVal = {};
@@ -1520,26 +1522,99 @@ function generateSentence(structure) {
             currAttrValues[attrID] = val;
          }
          varAttrVal[attrID] = val;
+         wordObj.attributes[attrID] = val;
       }
       let word = conjugateWord(gramTypeID,stem,varAttrVal);
-      words.push(word);
+      if(showInfo){
+         wordObj.word = word;
+         words.push(wordObj);
+      }else{
+         words.push(word);
+      }
    }
 
    if(structureRules[3].dir == 1){  // if conjugation dir = rtl
       words.reverse();
    }
-   sentence += words.join(" ");
-   // console.log(sentence)
-   for(let word of words){
-      let inDict = false;
-      for(let entry of dictionaryObj.dictionary){
-         if(entry.word == word){
-            inDict = true;
-            break;
+   if(!showInfo){
+      sentence += words.join(" ");
+      // console.log(sentence)
+      for(let word of words){
+         let inDict = false;
+         for(let entry of dictionaryObj.dictionary){
+            if(entry.word == word){
+               inDict = true;
+               break;
+            }
+         }
+         if(!inDict){
+            console.error("not in dict : ",word);
+         }
+         if(word.length > maxWordLength){
+            console.error("too long : ",word,word.length);
          }
       }
-      if(!inDict){
-         console.error("not in dict : ",word);
+   }else{
+      let src = [prefixes,infixes,suffixes];
+      for(let wordObj of words){
+         let type = wordObj.type;
+         let typeLabel = gramTypeData[type].label;
+         sentence += "<table class='word_info'>";
+         sentence += "<tr><th>Mot</th><td colspan=4>"+wordObj.word+" ("+wordObj.word.length+" lettres)</td></tr>";
+         sentence += "<tr><th>Radical</th><td>"+wordObj.stem+"</td><th>Préfixe</th><th>Infixe</th><th>Suffixe</th></tr>";
+         sentence += "<tr><th>Type</th><td>"+typeLabel+"</td>";
+         let typeRules = gramTypeData[type].spellingRules;
+         for(let iAff = 0; iAff < 3; iAff++){
+            let ruleID = iAff + 1;
+            sentence += "<td>";
+            if(typeRules.includes(ruleID)){
+               let affID = stemSpellingRules[ruleID].gramTypes[type];
+               sentence += src[iAff][affID];
+            }
+            sentence += "</td>";
+         }
+         sentence += "</tr>";
+         for(let attrID in wordObj.attributes){
+            let attrData = attributeData[attrID];
+            let isFixed = gramTypeData[type].attributes.fixed.includes(Number(attrID));
+            let attrLabel = attrData.label;
+            let val = wordObj.attributes[attrID];
+            let valLabel = attrData.values[val].label;
+            sentence += "<tr><th>"+attrLabel+"</th><td>"+valLabel+" ("+(isFixed ? "F" : "V")+")</td>";
+
+            let ruleID = gramTypeData[type].inflections[attrID][val];
+            for(var col = 0; col < 3; col++){
+               switch(col){
+               case 0:
+               case 1:
+               case 2:
+                  sentence += "<td>";
+                  if(ruleID > 0){
+                     let rule = inflectionRules[ruleID].gramTypes[type][attrID][val];
+                     let affID = rule.affID;
+                     let rem = rule.remove;
+                     if(ruleID == col + 1){
+                        sentence += src[col][affID]+"/"+rem;
+                     }
+                     if(ruleID == 4){
+                        if(col == 3){
+                           affID = affID[0];
+                           sentence += src[0][affID]+"/"+rem[0];
+                        }else if(col == 5){
+                           affID = affID[1];
+                           sentence += src[2][affID]+"/"+rem[1];
+                        }
+                     }
+                  }
+                  break;
+               default:
+                  sentence += "<td>";
+
+               }
+            }
+            sentence += "</tr>";
+         }
+         sentence += "</table>";
       }
    }
    return sentence
