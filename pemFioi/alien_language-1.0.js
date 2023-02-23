@@ -110,14 +110,14 @@ let nbGramTypes, nbAttributes;
 let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
-const defaultMaxNbStems = 500;  // max nb stems per gram type
-const defaultMinNbStems = 400;    // min nb stems per gram type
+const defaultMaxNbStems = 1000;  // max nb stems per gram type
+const defaultMinNbStems = 800;    // min nb stems per gram type
 let maxNbStems, minNbStems;
 let maxStemLength = 7;
 let minStemLength = 1;
 let maxWordLength = 10;
-let maxNbAttrValues = 10;
-let minNbAttrValues = 2;
+// let maxNbAttrValues = 10;
+// let minNbAttrValues = 2;
 let maxPrefixLength = 3;
 let maxSuffixLength = 3;
 let maxInfixLength = 2;
@@ -642,7 +642,7 @@ function initAttributeValues() {
       let length;
       if(allVal.length > 2){
          shuffleArray(allVal);
-         length = getRandomValue(2,allVal.length);
+         length = getRandomValue(3,allVal.length);
       }else{
          length = 2;
       }
@@ -664,20 +664,24 @@ function initAttributeDistribution() {
       }
    }
    let countNbAttr = {};
+   let countNbVariable = {};
    for(let type of gramTypes){
       countNbAttr[type] = 0;
+      countNbVariable[type] = 0;
    }
+   let nbFixed = 0;
    for(let id of attributes){
       let noType = true;
       attributeDistribution[id] = { variable: [] };
       let gramClone = cloneObj(gramTypes);
       shuffleArray(gramClone);
-      if(!gramTypesWithNoAttr.includes(gramClone[0]) && countNbAttr[gramClone[0]] < maxNbAttrPerType){
+      if(!gramTypesWithNoAttr.includes(gramClone[0]) && countNbAttr[gramClone[0]] < maxNbAttrPerType && nbFixed < 3){
          let gramID = gramClone.shift();
          attributeDistribution[id].fixed = gramID;
          countNbAttr[gramID]++;
          // console.log(gramID,"+");
          noType = false;
+         nbFixed++;
       }
 
       for(let gramID of gramClone){
@@ -686,15 +690,19 @@ function initAttributeDistribution() {
             // console.log("skip",gramTypesWithNoAttr.includes(gramID));
             continue;
          }
-         let isVariable = (noType) ? 1 : getRandomValue(0,1);
+         let isVariable = (noType || countNbVariable[gramID] < 2) ? 1 : getRandomValue(0,1);
          if(isVariable){
             attributeDistribution[id].variable.push(gramID);
             noType = false;
             countNbAttr[gramID]++;
+            countNbVariable[gramID]++;
             // console.log(gramID,"+");
          }
       }
-      if(noType){
+   }
+   for(let id of attributes){
+      let noVariable = (attributeDistribution[id].variable.length == 0);
+      if(noVariable){
          // console.log("noType",id);
          let count = 0;
          let takeFrom;
@@ -709,8 +717,6 @@ function initAttributeDistribution() {
          attributeDistribution[id].variable.push(gramID);
       }
    }
-   // console.log("attributeDistribution",attributeDistribution);
-   // console.log("countNbAttr",countNbAttr);
 };
 
 function initGramTypeData() {
@@ -770,6 +776,7 @@ function initLetterWeight() {
 
 function initStemSpellingRules() {
    /* choose spelling rules for each gram type */
+   let nbMin = 0, nbMax = 0; // stem length optimization
    for(let iRule = 0; iRule < stemSpellingRules.length; iRule++){
       for(let gramType of gramTypes){
          if(!gramTypeData[gramType].spellingRules){
@@ -783,9 +790,19 @@ function initStemSpellingRules() {
 
          switch(iRule) {
          case 0:
-            let min = getRandomValue(minStemLength,Math.round(maxStemLength/2));
-            let max = getRandomValue(min + 2,maxStemLength);
+            let locMin = (nbMin == 0) ? minStemLength : minStemLength + 1;
+            let min = getRandomValue(locMin,Math.round(maxStemLength/2));
+            if(min == minStemLength){
+               nbMin++;
+            } 
+            let locMax = (min == minStemLength) ? maxStemLength - 1 : maxStemLength;
+            let max = (nbMax == 0 && min > minStemLength) ? maxStemLength : getRandomValue(min + 2,locMax);
+            if(max == maxStemLength){
+               nbMax++;
+            }
             stemSpellingRules[iRule].gramTypes[gramType] = { min, max };
+            let theoreticalMaxNbLem = 150*((max + min)/2);  // to decrease nb of duplicates
+            gramTypeData[gramType].nbLem = Math.min(theoreticalMaxNbLem,gramTypeData[gramType].nbLem);
             break;
          case 1:
          case 2:
@@ -928,6 +945,8 @@ function addCharToStr(str) {
 
 function generateWordList() {
    let inList = {};
+   let nbSkipDupl = 0;
+   let skippedTypes = [];
    for(let gramType of gramTypes){
       // console.log(gramType)
       wordList[gramType] = [];
@@ -947,10 +966,13 @@ function generateWordList() {
                maxLength = findMaxLengthOfConj(stem,gramType,fixedAttrVal);
             }
             nbTry++;
-         }while(inList[stem] && nbTry < 10);
+         }while(inList[stem] && nbTry < 2);
          // console.log(maxLength,maxWordLength)
-         if(inList[stem] && nbTry >= 10){
-            console.log("skip duplicate",gramType);
+         if(inList[stem] && nbTry >= 2){
+            nbSkipDupl++;
+            if(!skippedTypes.includes(gramType)){
+               skippedTypes.push(gramType);
+            }
          }else if(maxLength > maxWordLength){
             console.log("skip too long",stem);
          }else{
@@ -959,6 +981,9 @@ function generateWordList() {
             addToDictionary();
          }
       }
+   }
+   if(nbSkipDupl > 0){
+      console.log("skip "+nbSkipDupl+" duplicates of types :",skippedTypes);
    }
    // console.log(wordList);
 };
@@ -1147,6 +1172,10 @@ function mergeClusters(word) {
             max = occ[char];
             repl = char;
          }
+      }
+      if(max == 1){
+         let index = getRandomValue(0,cluster.length - 1);
+         repl = cluster.charAt(index);
       }
       word = word.replace(cluster,repl);
    }
@@ -1502,7 +1531,7 @@ function generateSentence(structure) {
          }
       }
       if(!inDict){
-         console.log("not in dict :",word);
+         console.error("not in dict : ",word);
       }
    }
    return sentence
@@ -1536,8 +1565,8 @@ function createAlienLanguage(params) {
    minNbStems = params.minNbStems || defaultMinNbStems;    // min nb stem per gram type
    maxStemLength = params.maxWordLength || maxStemLength;
    minStemLength = params.minWordLength || minStemLength;
-   maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
-   minNbAttrValues = params.minNbAttrValues || minNbAttrValues;
+   // maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
+   // minNbAttrValues = params.minNbAttrValues || minNbAttrValues;
    maxNbStructures = params.maxNbStructures || defaultMaxNbStructures;
 
    letterWeight = [ {/*voy*/}, {/*con*/} ];
@@ -1641,75 +1670,7 @@ function initDictionary() {
       });
    }
 
-   // const generateEntryHash = (entry) => {
-   //    const entriesSorted = Object.keys(entry).sort().reduce(
-   //      (obj, key) => {
-   //         obj[key] = entry[key];
-   //         return obj;
-   //      },
-   //      {}
-   //    );
-
-   //    return JSON.stringify(entriesSorted);
-   // };
-
    const dictionary = [];
-   // console.log({gramTypeData, attributeData})
-   // const dictionayEntriesHashes = {};
-   // for (let gramTypeID of gramTypes) {
-   //    for (let word of wordList[gramTypeID]) {
-         // let stem = word.stem;
-         // let fixedAttrVal = word.fixedAttrVal;
-         // let currAttrValues = {};
-         // for (let attrID in fixedAttrVal) {
-         //    currAttrValues[attrID] = fixedAttrVal[attrID];
-         // }
-         // let varAttr = gramTypeData[gramTypeID].attributes.variable;
-
-         // let allVarAttrPossibilites = [];
-
-         // let generatePossibilities = (currAttrValues, attrIndex) => {
-         //    if (attrIndex > varAttr.length - 1) {
-         //       allVarAttrPossibilites.push(currAttrValues);
-         //       return;
-         //    }
-
-         //    const attrID = varAttr[attrIndex];
-         //    let val;
-         //    if (currAttrValues[attrID] !== undefined) {
-         //       const copyAttr = cloneObj(currAttrValues);
-         //       copyAttr[attrID] = val;
-
-         //       return generatePossibilities(copyAttr, attrIndex + 1);
-         //    } else {
-         //       let possVals = attributeValues[attrID];
-         //       for (let possVal of possVals) {
-         //          const copyAttr = cloneObj(currAttrValues);
-         //          copyAttr[attrID] = possVal;
-         //          generatePossibilities(copyAttr, attrIndex + 1);
-         //       }
-         //    }
-         // };
-
-         // generatePossibilities(currAttrValues, 0);
-         // console.log({currAttrValues, varAttr, allVarAttrPossibilites})
-
-         // for (let varAttrVal of allVarAttrPossibilites) {
-         //    let conjugatedWord = conjugateWord(gramTypeID, stem, varAttrVal);
-
-         //    const wordObject = {word: conjugatedWord, gram_type: gramTypeID};
-         //    for (let key in varAttrVal) {
-         //       wordObject[key] = varAttrVal[key];
-         //    }
-
-         //    const hash = generateEntryHash(wordObject);
-         //    if (!(hash in dictionayEntriesHashes)) {
-         //       dictionayEntriesHashes[hash] = true;
-         //       dictionary.push(wordObject);
-         //    }
-         // }
-      // }
-   // }
 
    return {dictionary, dictionaryAvailableCriteria};
 };
