@@ -1597,10 +1597,10 @@ function generateSentence(structure,showInfo) {
                         sentence += src[col][affID]+"/"+rem;
                      }
                      if(ruleID == 4){
-                        if(col == 3){
+                        if(col == 0){
                            affID = affID[0];
                            sentence += src[0][affID]+"/"+rem[0];
-                        }else if(col == 5){
+                        }else if(col == 2){
                            affID = affID[1];
                            sentence += src[2][affID]+"/"+rem[1];
                         }
