@@ -184,7 +184,9 @@ function initUI() {
       html += selectStructure();
       html += "</br>";
       html += selectSentenceNumber();
-      html += "<button id=\"generate_sentence\">Générer</button>";
+      html += "<button id=\"generate_sentence\" class='margin_right'>Générer</button>";
+      html += "<input type='checkbox' id='show_info' name='show_info'>";
+      html += "<label for='show_info'>Afficher les détails</label>";
       html += "</fieldset>";
       html += "</div>";
       $("#form").html(html);
@@ -584,6 +586,8 @@ function initUI() {
       let strID = $("#structure").val();
       let html = "";
       let str;
+      let showInfo = $("#show_info").is(":checked");
+      console.log(showInfo)
       for(let iSent = 0; iSent < nb; iSent++){
          if(strID > 0){
             str = structures[strID - 1];
@@ -1174,8 +1178,8 @@ function mergeClusters(word) {
          }
       }
       if(max == 1){
-         let index = getRandomValue(0,cluster.length - 1);
-         repl = cluster.charAt(index);
+         // let index = getRandomValue(0,cluster.length - 1);
+         // repl = cluster.charAt(index);
       }
       word = word.replace(cluster,repl);
    }
