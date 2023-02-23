@@ -787,7 +787,7 @@ function initStemSpellingRules() {
             gramTypeData[gramType].spellingRules = [];
          }
          let isRule = (iRule == 0) ? 1 : getRandomValue(0,1);
-         if(!isRule){
+         if(!isRule || iRule == 1){
             continue
          }
          gramTypeData[gramType].spellingRules.push(iRule);
