@@ -1178,8 +1178,12 @@ function mergeClusters(word) {
          }
       }
       if(max == 1){
-         // let index = getRandomValue(0,cluster.length - 1);
-         // repl = cluster.charAt(index);
+         let clusterCode = 0;
+         for(let iChar = 0; iChar < cluster.length; iChar++){
+            clusterCode += cluster.charCodeAt(iChar);
+         }
+         let index = clusterCode%cluster.length;
+         repl = cluster.charAt(index);
       }
       word = word.replace(cluster,repl);
    }
