@@ -1716,11 +1716,25 @@ function initDictionary() {
    const dictionaryAvailableCriteria = [];
 
    const gramTypeValues = [];
+   const gramTypeIdsByAttrId = {};
    for (let gramTypeID of gramTypes) {
       gramTypeValues.push({
          value: gramTypeID,
          label: gramTypeData[gramTypeID].label.charAt(0).toLocaleUpperCase() + gramTypeData[gramTypeID].label.slice(1),
       });
+      const attributes = [];
+      for (let attrId of gramTypeData[gramTypeID].attributes.fixed) {
+         attributes.push(attrId);
+      }
+      for (let attrId of gramTypeData[gramTypeID].attributes.variable) {
+         attributes.push(attrId);
+      }
+      for (let attrId of attributes) {
+         if (!(attrId in gramTypeIdsByAttrId)) {
+            gramTypeIdsByAttrId[attrId] = [];
+         }
+         gramTypeIdsByAttrId[attrId].push(gramTypeID);
+      }
    }
 
    dictionaryAvailableCriteria.push({
@@ -1745,10 +1759,13 @@ function initDictionary() {
 
       attrValues.sort((a, b) => a.value - b.value);
 
+      const condition = gramTypeIdsByAttrId[attrID].map(gramTypeId => `gram_type == ${gramTypeId}`).join(' || ');
+
       dictionaryAvailableCriteria.push({
          name: attrID,
          label: label.charAt(0).toLocaleUpperCase() + label.slice(1),
          type: 'select',
+         condition: condition,
          values: attrValues,
       });
    }
