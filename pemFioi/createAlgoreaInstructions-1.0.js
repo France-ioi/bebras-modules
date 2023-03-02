@@ -46,6 +46,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
                totalHTML += createCardsInstructions();
                break;
             case "castle":
+			case "gears":
                totalHTML += createCastleInstructions();
                break;
             case "chticode_rel":
