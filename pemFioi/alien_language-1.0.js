@@ -110,9 +110,12 @@ let nbGramTypes, nbAttributes;
 let mandatoryTypes, nbMandatoryTypes;
 let nbNoInflection;
 
-const defaultMaxNbStems = 1000;  // max nb stems per gram type
-const defaultMinNbStems = 800;    // min nb stems per gram type
+const defaultMaxNbStems = 1000;  // max nb stems per gram type if maxNbWords not specified
+const defaultMinNbStems = 800;    // min nb stems per gram type if minNbWords not specified
 let maxNbStems, minNbStems;
+const defaultMaxNbWords = 1000;  // max nb words per gram type 
+const defaultMinNbWords = 800;    // min nb words per gram type
+let maxNbWords, minNbWords;
 let maxStemLength = 7;
 let minStemLength = 1;
 let maxWordLength = 10;
@@ -752,6 +755,10 @@ function initGramTypeData() {
       if(!gramTypeData[id].nbLem){
          gramTypeData[id].nbLem = getRandomValue(minNbStems,maxNbStems);
       }
+      if(!gramTypeData[id].nbWords && maxNbWords && minNbWords){
+         gramTypeData[id].nbWords = getRandomValue(minNbWords,maxNbWords);
+      }
+      let nbWordsPerStem = 1;
       if(!gramTypeData[id].attributes){
          gramTypeData[id].attributes = { fixed: [], variable: [] };
          for(let iAtt = 0; iAtt < attributes.length; iAtt++){
@@ -760,8 +767,13 @@ function initGramTypeData() {
                gramTypeData[id].attributes.fixed.push(attID);
             }else if(attributeDistribution[attID].variable.includes(id)){
                gramTypeData[id].attributes.variable.push(attID);
+               let nbVal = attributeValues[attID].length;
+               nbWordsPerStem += nbVal;
             }
          }
+      }
+      if(gramTypeData[id].nbWords){
+         gramTypeData[id].nbLem = Math.round(gramTypeData[id].nbWords/nbWordsPerStem);
       }
    }
    // console.log("gramTypeData",gramTypeData)
@@ -1721,6 +1733,8 @@ function createAlienLanguage(params) {
 
    maxNbStems = params.maxNbStems || defaultMaxNbStems;  // max nb stem per gram type
    minNbStems = params.minNbStems || defaultMinNbStems;    // min nb stem per gram type
+   maxNbWords = params.maxNbWords || defaultMaxNbWords;  // max nb words per gram type
+   minNbWords = params.minNbWords || defaultMinNbWords;    // min nb words per gram type
    maxStemLength = params.maxWordLength || maxStemLength;
    minStemLength = params.minWordLength || minStemLength;
    // maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
