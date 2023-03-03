@@ -129,6 +129,9 @@ let maxSameVoy = 2 // no more than x times same voyel in a row
 let maxCon = 2 // no more than x successive consonants
 let maxSameCon = 2 // no more than x times same consonant in a row
 let maxNbStructures;
+const defaultNbStart = 2;
+const defaultNbEnd = 2;
+let nbStart, nbEnd;
 let maxNbWordsInSentence, minNbWordsInSentence;
 let maxNbAttrPerType;
 
@@ -583,13 +586,23 @@ function initUI() {
                }
                break;
             case "1":
-               if(ruleData.gramTypes[gramTypeID] === 0){
-                  html += "début";
-               }else if(ruleData.gramTypes[gramTypeID] === 1){
+               // if(ruleData.gramTypes[gramTypeID] === 0){
+               //    html += "début";
+               // }else if(ruleData.gramTypes[gramTypeID] === 1){
+               //    html += "fin";
+               // }else if(ruleData.gramTypes[gramTypeID] === 2){
+               //    html += "pas au début";
+               // }else if(ruleData.gramTypes[gramTypeID] === 3){
+               //    html += "pas à la fin";
+               // }
+               if(ruleData.pos[0].includes(gramTypeID)){
+                  html += "début</br> ";
+               }else{
+                  html += "pas au début</br> "
+               }
+               if(ruleData.pos[1].includes(gramTypeID)){
                   html += "fin";
-               }else if(ruleData.gramTypes[gramTypeID] === 2){
-                  html += "pas au début";
-               }else if(ruleData.gramTypes[gramTypeID] === 3){
+               }else{
                   html += "pas à la fin";
                }
                break;
@@ -1287,45 +1300,55 @@ function initStructureRules() {
    // structureRules[2].dir = getRandomValue(0,1); // reading dir
    structureRules[2].dir = 0; // reading dir
    structureRules[3].dir = getRandomValue(0,1); // conj dir
+   // console.log(nbStart,nbEnd)
+
+   for(let iPos = 0; iPos < 2; iPos++){
+      let types = cloneObj(gramTypes);
+      shuffleArray(types);
+      let nb = (iPos == 0) ? nbStart : nbEnd;
+      structureRules[1].pos[iPos] = types.slice(0,nb);
+   }
+   // console.log(structureRules[1].pos)
 
    for(let type of gramTypes){
       if(mandatoryTypes.includes(type) && structureRules[0].gramTypes.length < minNbWordsInSentence){
          structureRules[0].gramTypes.push(type);
       }
-      if(gramTypeData[type].noEnd){
-         structureRules[1].gramTypes[type] = 3;
-         structureRules[1].pos[3] = type;
-      }
-      if(gramTypeData[type].noStart){
-         structureRules[1].gramTypes[type] = 2;
-         structureRules[1].pos[2] = type;
-      }
+      // if(gramTypeData[type].noEnd){
+      //    structureRules[1].gramTypes[type] = 3;
+      //    structureRules[1].pos[3] = type;
+      // }
+      // if(gramTypeData[type].noStart){
+      //    structureRules[1].gramTypes[type] = 2;
+      //    structureRules[1].pos[2] = type;
+      // }
    }
+   
 
    for(let type of gramTypes){
-      if(structureRules[1].gramTypes[type] == undefined){
-         for(let iPos = 0; iPos < 4; iPos++){
-            let hasPos;
-            if(iPos < 2 && structureRules[0].gramTypes.includes(type)){
-               // no mandatory type at start or end
-               hasPos = 0;
-            // }else if((iPos == 2 && structureRules[1].pos[0] != undefined) || (iPos == 3 && structureRules[1].pos[1] != undefined)){
-            //    hasPos = 0;
-            }else{
-               hasPos = (structureRules[1].pos[iPos] != undefined) ? 0 : getRandomValue(0,1);
-            }
+      // if(structureRules[1].gramTypes[type] == undefined){
+      //    for(let iPos = 0; iPos < 4; iPos++){
+      //       let hasPos;
+      //       if(iPos < 2 && structureRules[0].gramTypes.includes(type)){
+      //          // no mandatory type at start or end
+      //          hasPos = 0;
+      //       // }else if((iPos == 2 && structureRules[1].pos[0] != undefined) || (iPos == 3 && structureRules[1].pos[1] != undefined)){
+      //       //    hasPos = 0;
+      //       }else{
+      //          hasPos = (structureRules[1].pos[iPos] != undefined) ? 0 : getRandomValue(0,1);
+      //       }
             
-            if(hasPos){
-               structureRules[1].gramTypes[type] = iPos;
-               structureRules[1].pos[iPos] = type;
-               // if(iPos == 0 && !structureRules[0].gramTypes.includes(type)){
-               //    structureRules[0].gramTypes.push(type);
-               // }
-               break;
-            }
-         }
-      }
-      structureRules[4].gramTypes[type] = (structureRules[1].gramTypes[type] === 0 || structureRules[1].gramTypes[type] === 1) ? 1 : getRandomValue(1,3);
+      //       if(hasPos){
+      //          structureRules[1].gramTypes[type] = iPos;
+      //          structureRules[1].pos[iPos] = type;
+      //          // if(iPos == 0 && !structureRules[0].gramTypes.includes(type)){
+      //          //    structureRules[0].gramTypes.push(type);
+      //          // }
+      //          break;
+      //       }
+      //    }
+      // }
+      structureRules[4].gramTypes[type] = /*(structureRules[1].gramTypes[type] === 0 || structureRules[1].gramTypes[type] === 1) ? 1 :*/ getRandomValue(1,3);
    }
 
    // dev
@@ -1343,7 +1366,6 @@ function initStructureRules() {
    //       break;
    //    }
    // }
-   // console.log(structureRules)
 };
 
 function initStructures(checkForErrors) {
@@ -1399,16 +1421,16 @@ function initStructures(checkForErrors) {
                      removed.push(newID);
                   }
 
-                  if(newID == structureRules[1].pos[1]){
-                     end = true;
-                  }
+                  // if(newID == structureRules[1].pos[1]){
+                  //    end = true;
+                  // }
                }
             }while(str.length < maxLength && !end)
 
-            let lastID = str[str.length - 1];
-            if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
-               str[str.length - 1] = structureRules[1].pos[1];
-            }
+            // let lastID = str[str.length - 1];
+            // if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
+            //    str[str.length - 1] = structureRules[1].pos[1];
+            // }
             let startType = str[0];
             let endType = str[str.length - 1];
             if(!startTypes.includes(startType)){
@@ -1450,9 +1472,9 @@ function initStructures(checkForErrors) {
          console.error("infinite missing loop")
       }
       startEndLoop++;
-   }while((startTypes.length == 1 || endTypes.length == 1) && startEndLoop < 10)
+   }while((startTypes.length != nbStart || endTypes.length != nbEnd) && startEndLoop < 20)
 
-   if(startEndLoop >= 10){
+   if(startEndLoop >= 20){
       console.error("infinite start end loop")
    }
 
@@ -1472,11 +1494,11 @@ function initStructures(checkForErrors) {
             endTypes.push(endType);
          }
       }
-      if(startTypes.length == 1){
-         throw("error same start")
+      if(startTypes.length < nbStart){
+         throw("error nb start")
       }
-      if(endTypes.length == 1){
-         throw("error same end")
+      if(endTypes.length < nbEnd){
+         throw("error nb end")
       }
    }
    // console.log("structures",structures);
@@ -1488,41 +1510,47 @@ function findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes
    let minLength = 2;
    // console.log("maxLength",maxLength,wordIndex)
    // console.log("init poss types",cloneObj(possTypes));
-   if(wordIndex > 0 && structureRules[1].pos[0] != undefined){ 
-      // if not first word, remove type with pos = start
-      let indexOf = possTypes.indexOf(structureRules[1].pos[0]);
-      if(indexOf >= 0){
-         possTypes.splice(indexOf,1);
-         // console.log("remove pos = start",cloneObj(possTypes));1
-      }
-   }
+   // if(wordIndex > 0 && structureRules[1].pos[0] != undefined){ 
+   //    // if not first word, remove type with pos = start
+   //    let indexOf = possTypes.indexOf(structureRules[1].pos[0]);
+   //    if(indexOf >= 0){
+   //       possTypes.splice(indexOf,1);
+   //       // console.log("remove pos = start",cloneObj(possTypes));1
+   //    }
+   // }
 
-   if(wordIndex < minLength - 1 && structureRules[1].pos[1] != undefined){
-      // if str too short, remove type with pos = end
-      let indexOf = possTypes.indexOf(structureRules[1].pos[1]);
-      if(indexOf >= 0){
-         possTypes.splice(indexOf,1);
-         // console.log("remove pos = end",cloneObj(possTypes));
-      }
-   }
+   // if(wordIndex < minLength - 1 && structureRules[1].pos[1] != undefined){
+   //    // if str too short, remove type with pos = end
+   //    let indexOf = possTypes.indexOf(structureRules[1].pos[1]);
+   //    if(indexOf >= 0){
+   //       possTypes.splice(indexOf,1);
+   //       // console.log("remove pos = end",cloneObj(possTypes));
+   //    }
+   // }
 
    if(wordIndex == 0){
-      if(structureRules[1].pos[2] != undefined){
-         // remove word with pos != start
-         let indexOf = possTypes.indexOf(structureRules[1].pos[2]);
-         if(indexOf >= 0){
-            possTypes.splice(indexOf,1);
-            // console.log("remove pos != start",cloneObj(possTypes));
+      // if(structureRules[1].pos[2] != undefined){
+      //    // remove word with pos != start
+      //    let indexOf = possTypes.indexOf(structureRules[1].pos[2]);
+      //    if(indexOf >= 0){
+      //       possTypes.splice(indexOf,1);
+      //       // console.log("remove pos != start",cloneObj(possTypes));
+      //    }
+      // }
+      possTypes = cloneObj(structureRules[1].pos[0]);
+      if(startTypes.length > 0 && startTypes.length < nbStart){
+         for(let iStart = 0; iStart < startTypes.length; iStart++){
+            let indexOf = possTypes.indexOf(startTypes[iStart]);
+            if(indexOf >= 0){
+               possTypes.splice(indexOf,1);
+            }
          }
       }
-      if(startTypes.length == 1){
-         let indexOf = possTypes.indexOf(startTypes[0]);
-         if(indexOf >= 0){
-            possTypes.splice(indexOf,1);
-         }
+   }else{ 
+      if(wordIndex == maxLength - 1){
+         possTypes = cloneObj(structureRules[1].pos[1]);
       }
 
-   }else{ 
       // prevent 2 successive same type
       let prevID = str[wordIndex - 1];
       let indexOf = possTypes.indexOf(prevID);
@@ -1532,21 +1560,35 @@ function findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes
       }
 
       if(wordIndex == maxLength - 1){
-         if(structureRules[1].pos[3] != undefined){
-            // remove word with pos != end
-            let indexOf = possTypes.indexOf(structureRules[1].pos[3]);
-            if(indexOf >= 0){
-               possTypes.splice(indexOf,1);
-               // console.log("remove pos != end",cloneObj(possTypes));
+         if(endTypes.length > 0 && endTypes.length < nbEnd){
+            for(let iEnd = 0; iEnd < endTypes.length; iEnd++){
+               if(possTypes.length <= 1){
+                  continue
+               }
+               let indexOf = possTypes.indexOf(startTypes[iEnd]);
+               if(indexOf >= 0){
+                  possTypes.splice(indexOf,1);
+               }
             }
          }
+      }
+
+      // if(wordIndex == maxLength - 1){
+      //    if(structureRules[1].pos[3] != undefined){
+      //       // remove word with pos != end
+      //       let indexOf = possTypes.indexOf(structureRules[1].pos[3]);
+      //       if(indexOf >= 0){
+      //          possTypes.splice(indexOf,1);
+      //          // console.log("remove pos != end",cloneObj(possTypes));
+      //       }
+      //    }
          // if(structureRules[1].pos[1] != undefined){
          //    if(structureRules[0].gramTypes.includes(structureRules[1].pos[1])){
          //       possTypes = [structureRules[1].pos[1]];
          //       // console.log("pos = end",cloneObj(possTypes));
          //    }
          // }
-      }
+      // }
    }
 
    for(let remID of removed){
@@ -1740,6 +1782,8 @@ function createAlienLanguage(params) {
    // maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
    // minNbAttrValues = params.minNbAttrValues || minNbAttrValues;
    maxNbStructures = params.maxNbStructures || defaultMaxNbStructures;
+   nbStart = params.nbStart || defaultNbStart;
+   nbEnd = params.nbEnd || defaultNbEnd;
 
    letterWeight = [ {/*voy*/}, {/*con*/} ];
    lettersWeighted = [[/*voy*/],[/*con*/]];
@@ -1760,9 +1804,16 @@ function createAlienLanguage(params) {
       { id: 4, gramTypes: { /* gramTypeID: { attrID: { val: [preID,sufID], remove: [0-2,0-2] } } */ } }, // add circonfix
    ];
 
+   // structureRules = [
+   //    { id: 0, label: "Type obligatoire", gramTypes: [] },  // mandatory types
+   //    { id: 1, label: "Position", gramTypes: { /* type: pos (0: start, 1: end, 2: noStart, 3: noEnd )*/ }, pos: { /* pos: types */ } },  // type pos
+   //    { id: 2, label: "Sens de lecture",  /* dir: (0: ltr, 1: rtl) */ },  // reading direction
+   //    { id: 3, label: "Sens de conjugaison", /* dir: (0: ltr, 1: rtl) */ },  // conjugation direction
+   //    { id: 4, label: "Max par phrase", gramTypes: { /* type: 1-3 */ } },  // max nb per sentence
+   // ];
    structureRules = [
       { id: 0, label: "Type obligatoire", gramTypes: [] },  // mandatory types
-      { id: 1, label: "Position", gramTypes: { /* type: pos (0: start, 1: end, 2: noStart, 3: noEnd )*/ }, pos: { /* pos: types */ } },  // type pos
+      { id: 1, label: "Position", gramTypes: { /* type: pos (0: start, 1: end )*/ }, pos: { /* pos: [types] */ } },  // type pos
       { id: 2, label: "Sens de lecture",  /* dir: (0: ltr, 1: rtl) */ },  // reading direction
       { id: 3, label: "Sens de conjugaison", /* dir: (0: ltr, 1: rtl) */ },  // conjugation direction
       { id: 4, label: "Max par phrase", gramTypes: { /* type: 1-3 */ } },  // max nb per sentence
