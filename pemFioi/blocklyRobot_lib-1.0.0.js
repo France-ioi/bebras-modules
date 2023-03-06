@@ -1117,6 +1117,7 @@ var getContext = function(display, infos, curLevel) {
                nbWithdrawables: "nbPoissonsSur",
                containerSize: "nbPoissonsCommandes",
                withdrawNum: "prendre",
+               withdrawNum_noShadow: "prendre"
             },
             description: {
                withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
