@@ -64,16 +64,16 @@ var pythonForbiddenBlocks = {
       'dict_keys': ['dict_brackets']
     },
     'logic': {
-      'controls_if': ['if', 'else', 'elif'],
+      'controls_if': ['if'],
       'controls_if_else': ['if', 'else', 'elif'],
       'logic_negate': ['not'],
       'logic_operation': ['and', 'or']
     },
     'loops': {
-       'controls_repeat': ['for'],
-       'controls_repeat_ext': ['for'],
+      'controls_repeat': ['for'],
+      'controls_repeat_ext': ['for'],
       'controls_for': ['for', 'in'],
-       'controls_forEach': ['for'],
+      'controls_forEach': ['for'],
       'controls_whileUntil': ['while'],
       'controls_untilWhile': ['while'],
       'controls_infiniteloop': ['while']
