@@ -70,10 +70,10 @@ var pythonForbiddenBlocks = {
       'logic_operation': ['and', 'or']
     },
     'loops': {
-      'controls_repeat': ['for'],
-      'controls_repeat_ext': ['for'],
-      'controls_for': ['for'],
-      'controls_forEach': ['for'],
+      'controls_repeat': ['for', 'in'],
+      'controls_repeat_ext': ['for', 'in'],
+      'controls_for': ['for', 'in'],
+      'controls_forEach': ['for', 'in'],
       'controls_whileUntil': ['while'],
       'controls_untilWhile': ['while'],
       'controls_infiniteloop': ['while']
@@ -217,10 +217,10 @@ function pythonForbidden(code, includeBlocks) {
    code = code2;
 
    // exec and eval are forbidden anyway
-   if (/(^|\W)exec\(/.exec(code)) {
+   if(/(^|\W)exec\(/.exec(code)) {
       return 'exec';
    }
-   if (/(^|\W)eval\(/.exec(code)) {
+   if(/(^|\W)eval\(/.exec(code)) {
       return 'eval';
    }
 
