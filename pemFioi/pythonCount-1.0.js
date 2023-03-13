@@ -70,10 +70,10 @@ var pythonForbiddenBlocks = {
       'logic_operation': ['and', 'or']
     },
     'loops': {
-      'controls_repeat': ['for', 'in'],
-      'controls_repeat_ext': ['for', 'in'],
+       'controls_repeat': ['for'],
+       'controls_repeat_ext': ['for'],
       'controls_for': ['for', 'in'],
-      'controls_forEach': ['for', 'in'],
+       'controls_forEach': ['for'],
       'controls_whileUntil': ['while'],
       'controls_untilWhile': ['while'],
       'controls_infiniteloop': ['while']
@@ -254,6 +254,12 @@ function pythonForbidden(code, includeBlocks) {
          if(re.exec(code)) {
             // Forbidden keyword found
             return 'fonction avec arguments'; // TODO :: i18n ?
+         }
+      } else if (forbidden[i] == 'in') {
+         var code2 = removeFromPatterns(code, [/(^|\W)for\s+\w+\s+in/]);
+         var re = /(^|\W)in(\W|$)/;
+         if (re.exec(code2)) {
+            return 'in';
          }
       } else if(forbidden[i] != 'strings') {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
