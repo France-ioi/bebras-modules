@@ -106,7 +106,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr', 'map', 'split'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr', 'map', 'split', 'in', 'max'];
    var allowed = []
 
    if(!includeBlocks) {
@@ -209,7 +209,7 @@ function pythonForbidden(code, includeBlocks) {
       /"(?:[^\\"]|\\.)*"/
       ];
 
-   code2 = removeFromPatterns(code, stringPatterns);
+   var code2 = removeFromPatterns(code, stringPatterns);
    if(window.arrayContains && arrayContains(forbidden, 'strings') && code != code2) {
       return 'chaînes de caractères';
    }
@@ -217,10 +217,10 @@ function pythonForbidden(code, includeBlocks) {
    code = code2;
 
    // exec and eval are forbidden anyway
-   if(/(^|\W)exec\((\W|$)/.exec(code)) {
+   if (/(^|\W)exec\(/.exec(code)) {
       return 'exec';
    }
-   if(/(^|\W)eval\((\W|$)/.exec(code)) {
+   if (/(^|\W)eval\(/.exec(code)) {
       return 'eval';
    }
 
@@ -236,14 +236,14 @@ function pythonForbidden(code, includeBlocks) {
             return 'crochets [ ]'; // TODO :: i18n ?
          }
       } else if(forbidden[i] == 'dict_brackets') {
-         // Special pattern for lists
+         // Special pattern for dicts
          var re = /[\{\}]/;
          if(re.exec(code)) {
             // Forbidden keyword found
             return 'accolades { }'; // TODO :: i18n ?
          }
       } else if(forbidden[i] == 'var_assign') {
-         // Special pattern for lists
+         // Special pattern for var assignment
          var re = /[^=!<>]=[^=!<>]/;
          if(re.exec(code)) {
             // Forbidden keyword found
