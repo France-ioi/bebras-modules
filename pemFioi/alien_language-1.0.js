@@ -96,6 +96,7 @@ const defaultMaxNbAttrPerType = 3;
 const defaultMaxNbWordsInSentence = 10;
 const defaultMinNbWordsInSentence = 2;
 const defaultMaxNbStructures = 5;
+const defaultNbTwoSuccessiveTypes = 1; // nb types with 2 successive words of that type
 
 let rng = Math.random; 
 let allGramTypes;
@@ -129,6 +130,7 @@ let maxSameVoy = 2 // no more than x times same voyel in a row
 let maxCon = 2 // no more than x successive consonants
 let maxSameCon = 2 // no more than x times same consonant in a row
 let maxNbStructures;
+let nbTwoSuccessiveTypes;
 const defaultNbStart = 2;
 const defaultNbEnd = 2;
 let nbStart, nbEnd;
@@ -1382,100 +1384,120 @@ function initStructures(checkForErrors) {
    // console.log("structureRules",structureRules);
    let startTypes, endTypes;
    let startEndLoop = 0;
+   let twoSuccessiveTypesLoop = 0;
+   let twoSuccessiveTypes;
    do{
-      let missingLoop = 0, missing;
       do{
-         structures = [];
-         let loop = 0;
-         let nbOccType = {};
-         startTypes = [];
-         endTypes = [];
+         let missingLoop = 0, missing;
          do{
-            let maxLength = getRandomValue(minWords,maxWords);
-            let str = [];
-            let removed = []; // type ID with occurence = maxSameType
-            let nbOcc = {};
-            let end = false;
+            structures = [];
+            twoSuccessiveTypes = [];
+            let loop = 0;
+            let nbOccType = {};
+            startTypes = [];
+            endTypes = [];
             do{
-               let possTypes = findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes);
-               // console.log("possTypes",cloneObj(possTypes),structures.length);
-               if(possTypes.length == 0){
-                  // console.log("no possTypes",str.length);
-                  end = true;
-               }else{
-                  let index = getRandomValue(0,possTypes.length - 1);
-                  let newID = possTypes[index];
-                  str.push(newID);
+               let maxLength = getRandomValue(minWords,maxWords);
+               let str = [];
+               let removed = []; // type ID with occurence = maxSameType
+               let nbOcc = {};
+               let end = false;
+               let localSuccessive = [];
+               do{
+                  let possTypes = findPossTypes({str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes,twoSuccessiveTypes,localSuccessive});
+                  // console.log("possTypes",cloneObj(possTypes),structures.length);
+                  if(possTypes.length == 0){
+                     // console.log("no possTypes",str.length);
+                     end = true;
+                  }else{
+                     let index = getRandomValue(0,possTypes.length - 1);
+                     let newID = possTypes[index];
+                     str.push(newID);
+                     if(str.length > 1 && newID == str[str.length - 2] && !localSuccessive.includes(newID)){
+                        localSuccessive.push(newID);
+                     }
 
-                  if(nbOcc[newID] === undefined){
-                     nbOcc[newID] = 0;
-                  }
-                  nbOcc[newID]++;
-                  if(nbOccType[newID] === undefined){
-                     nbOccType[newID] = 0;
-                  }
-                  nbOccType[newID]++;
+                     if(nbOcc[newID] === undefined){
+                        nbOcc[newID] = 0;
+                     }
+                     nbOcc[newID]++;
+                     if(nbOccType[newID] === undefined){
+                        nbOccType[newID] = 0;
+                     }
+                     nbOccType[newID]++;
 
-                  let maxSameType = structureRules[4].gramTypes[str];
-                  if(nbOcc[newID] >= maxSameType){
-                     removed.push(newID);
-                  }
+                     let maxSameType = structureRules[4].gramTypes[str];
+                     if(nbOcc[newID] >= maxSameType){
+                        removed.push(newID);
+                     }
 
-                  // if(newID == structureRules[1].pos[1]){
-                  //    end = true;
-                  // }
+                     // if(newID == structureRules[1].pos[1]){
+                     //    end = true;
+                     // }
+                  }
+               }while(str.length < maxLength && !end)
+
+               // let lastID = str[str.length - 1];
+               // if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
+               //    str[str.length - 1] = structureRules[1].pos[1];
+               // }
+               let startType = str[0];
+               let endType = str[str.length - 1];
+               if(!startTypes.includes(startType)){
+                  startTypes.push(startType);
                }
-            }while(str.length < maxLength && !end)
+               if(!endTypes.includes(endType)){
+                  endTypes.push(endType);
+               }
 
-            // let lastID = str[str.length - 1];
-            // if(structureRules[0].gramTypes.includes(structureRules[1].pos[1]) && lastID != structureRules[1].pos[1]){
-            //    str[str.length - 1] = structureRules[1].pos[1];
-            // }
-            let startType = str[0];
-            let endType = str[str.length - 1];
-            if(!startTypes.includes(startType)){
-               startTypes.push(startType);
+               if(structureRules[2].dir == 1){  // if reading dir is ltr
+                  str.reverse();
+               }
+
+               let hash = JSON.stringify(str).hashCode();
+
+               if(!inList[hash]){
+                  inList[hash] = true;
+                  structures.push(str);
+                  let succTypes = findSuccessiveTypes(str);
+                  for(let type of succTypes){
+                     if(!twoSuccessiveTypes.includes(type)){
+                        twoSuccessiveTypes.push(type);
+                     }
+                  }
+               }else{
+                  loop++;
+               }
+            }while(structures.length < maxNbStructures && loop < 50);
+
+            if(loop >= 50){
+               console.error("infinite loop : cannot reach max nb structures")
             }
-            if(!endTypes.includes(endType)){
-               endTypes.push(endType);
+
+            missing = false;
+            for(let type of gramTypes){
+               if(!nbOccType[type]){   // if type missing
+                  missing = true;
+                  missingLoop++;
+                  break;
+               }
             }
+         }while(missing && missingLoop < 10)
 
-            if(structureRules[2].dir == 1){  // if reading dir is ltr
-               str.reverse();
-            }
-
-            let hash = JSON.stringify(str).hashCode();
-
-            if(!inList[hash]){
-               inList[hash] = true;
-               structures.push(str);
-            }else{
-               loop++;
-            }
-         }while(structures.length < maxNbStructures && loop < 50);
-
-         if(loop >= 50){
-            console.error("infinite loop : cannot reach max nb structures")
+         if(missingLoop >= 10){
+            console.error("infinite missing loop")
          }
+         startEndLoop++;
+      }while((startTypes.length != nbStart || endTypes.length != nbEnd) && startEndLoop < 20)
 
-         missing = false;
-         for(let type of gramTypes){
-            if(!nbOccType[type]){   // if type missing
-               missing = true;
-               missingLoop++;
-               break;
-            }
-         }
-      }while(missing && missingLoop < 10)
-
-      if(missingLoop >= 10){
-         console.error("infinite missing loop")
+      if(startEndLoop >= 20){
+         console.error("infinite start end loop")
       }
-      startEndLoop++;
-   }while((startTypes.length != nbStart || endTypes.length != nbEnd) && startEndLoop < 20)
+      twoSuccessiveTypesLoop++;
+   }while(twoSuccessiveTypes.length != nbTwoSuccessiveTypes && twoSuccessiveTypesLoop < 10)
 
-   if(startEndLoop >= 20){
-      console.error("infinite start end loop")
+   if(twoSuccessiveTypesLoop >= 10){
+      console.error("successive types loop")
    }
 
    if(checkForErrors){
@@ -1484,6 +1506,7 @@ function initStructures(checkForErrors) {
       }
       let startTypes = [];
       let endTypes = [];
+      let twoSuccessiveTypes = [];
       for(let struc of structures){
          let startType = struc[0];
          let endType = struc[struc.length - 1];
@@ -1493,6 +1516,12 @@ function initStructures(checkForErrors) {
          if(!endTypes.includes(endType)){
             endTypes.push(endType);
          }
+         let succTypes = findSuccessiveTypes(struc);
+         for(let type of succTypes){
+            if(!twoSuccessiveTypes.includes(type)){
+               twoSuccessiveTypes.push(type);
+            }
+         }
       }
       if(startTypes.length < nbStart){
          throw("error nb start")
@@ -1500,11 +1529,16 @@ function initStructures(checkForErrors) {
       if(endTypes.length < nbEnd){
          throw("error nb end")
       }
+      if(twoSuccessiveTypes.length != nbTwoSuccessiveTypes){
+         throw("error nb two successive types")
+      }
+
    }
    // console.log("structures",structures);
 };
 
-function findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes) {
+function findPossTypes(params) {
+   let {str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes,twoSuccessiveTypes,localSuccessive} = params;
    let possTypes = cloneObj(gramTypes);
    let wordIndex = str.length;
    let minLength = 2;
@@ -1553,10 +1587,12 @@ function findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes
 
       // prevent 2 successive same type
       let prevID = str[wordIndex - 1];
-      let indexOf = possTypes.indexOf(prevID);
-      if(indexOf >= 0){
-         possTypes.splice(indexOf,1);
-         // console.log("prevent 2 successive",prevID,cloneObj(possTypes));
+      if((twoSuccessiveTypes.length >= nbTwoSuccessiveTypes && !twoSuccessiveTypes.includes(prevID)) || localSuccessive.includes(prevID)){
+         let indexOf = possTypes.indexOf(prevID);
+         if(indexOf >= 0){
+            possTypes.splice(indexOf,1);
+            // console.log("prevent 2 successive",prevID,cloneObj(possTypes));
+         }
       }
 
       if(wordIndex == maxLength - 1){
@@ -1613,6 +1649,18 @@ function findPossTypes(str,maxLength,removed,nbOcc,nbOccType,startTypes,endTypes
       }
    }
    return possTypes
+};
+
+function findSuccessiveTypes(str) {
+   let succTypes = [];
+   for(let iWord = 1; iWord < str.length; iWord++){
+      let prevType = str[iWord - 1];
+      let currType = str[iWord];
+      if(prevType == currType && !succTypes.includes(currType)){
+         succTypes.push(currType);
+      }
+   }
+   return succTypes
 };
 
 function generateSentence(structure,showInfo) {
@@ -1782,6 +1830,7 @@ function createAlienLanguage(params) {
    // maxNbAttrValues = params.maxNbAttrValues || maxNbAttrValues;
    // minNbAttrValues = params.minNbAttrValues || minNbAttrValues;
    maxNbStructures = params.maxNbStructures || defaultMaxNbStructures;
+   nbTwoSuccessiveTypes = params.nbTwoSuccessiveTypes || defaultNbTwoSuccessiveTypes;
    nbStart = params.nbStart || defaultNbStart;
    nbEnd = params.nbEnd || defaultNbEnd;
 
