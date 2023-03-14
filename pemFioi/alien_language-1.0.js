@@ -96,7 +96,7 @@ const defaultMaxNbAttrPerType = 3;
 const defaultMaxNbWordsInSentence = 10;
 const defaultMinNbWordsInSentence = 2;
 const defaultMaxNbStructures = 5;
-const defaultNbTwoSuccessiveTypes = 1; // nb types with 2 successive words of that type
+const defaultNbTwoSuccessiveTypes = 0; // nb types with 2 successive words of that type
 
 let rng = Math.random; 
 let allGramTypes;
@@ -158,7 +158,7 @@ let dictionaryBuffer;
 let dictionayEntriesHashes;
 
 function initUI() {
-   createAlienLanguage(/*{ maxNbStems: 50 }*/);
+   createAlienLanguage({ /*nbTwoSuccessiveTypes: 1*/ });
 
    createForm();
    initHandlers();
@@ -1386,12 +1386,14 @@ function initStructures(checkForErrors) {
    let startEndLoop = 0;
    let twoSuccessiveTypesLoop = 0;
    let twoSuccessiveTypes;
+   let moreThanTwoSuccessive;
    do{
       do{
          let missingLoop = 0, missing;
          do{
             structures = [];
             twoSuccessiveTypes = [];
+            moreThanTwoSuccessive = false;
             let loop = 0;
             let nbOccType = {};
             startTypes = [];
@@ -1459,11 +1461,14 @@ function initStructures(checkForErrors) {
                if(!inList[hash]){
                   inList[hash] = true;
                   structures.push(str);
-                  let succTypes = findSuccessiveTypes(str);
+                  let { succTypes, moreThanTwo } = findSuccessiveTypes(str);
                   for(let type of succTypes){
                      if(!twoSuccessiveTypes.includes(type)){
                         twoSuccessiveTypes.push(type);
                      }
+                  }
+                  if(moreThanTwo){
+                     moreThanTwoSuccessive = true;
                   }
                }else{
                   loop++;
@@ -1494,12 +1499,12 @@ function initStructures(checkForErrors) {
          console.error("infinite start end loop")
       }
       twoSuccessiveTypesLoop++;
-   }while(twoSuccessiveTypes.length != nbTwoSuccessiveTypes && twoSuccessiveTypesLoop < 10)
+   }while((twoSuccessiveTypes.length != nbTwoSuccessiveTypes || moreThanTwoSuccessive) && twoSuccessiveTypesLoop < 10)
 
    if(twoSuccessiveTypesLoop >= 10){
       console.error("successive types loop")
    }
-
+   // console.log("nbTwoSuccessiveTypes",nbTwoSuccessiveTypes)
    if(checkForErrors){
       if(structures.length < maxNbStructures){
          throw("error nb structures")
@@ -1507,6 +1512,7 @@ function initStructures(checkForErrors) {
       let startTypes = [];
       let endTypes = [];
       let twoSuccessiveTypes = [];
+      let moreThanTwoSuccessive = false;
       for(let struc of structures){
          let startType = struc[0];
          let endType = struc[struc.length - 1];
@@ -1516,11 +1522,14 @@ function initStructures(checkForErrors) {
          if(!endTypes.includes(endType)){
             endTypes.push(endType);
          }
-         let succTypes = findSuccessiveTypes(struc);
+         let { succTypes, moreThanTwo } = findSuccessiveTypes(struc);
          for(let type of succTypes){
             if(!twoSuccessiveTypes.includes(type)){
                twoSuccessiveTypes.push(type);
             }
+         }
+         if(moreThanTwo){
+            moreThanTwoSuccessive = true;
          }
       }
       if(startTypes.length < nbStart){
@@ -1532,7 +1541,9 @@ function initStructures(checkForErrors) {
       if(twoSuccessiveTypes.length != nbTwoSuccessiveTypes){
          throw("error nb two successive types")
       }
-
+      if(moreThanTwoSuccessive){
+         throw("error more than 2 successive")
+      }
    }
    // console.log("structures",structures);
 };
@@ -1653,14 +1664,19 @@ function findPossTypes(params) {
 
 function findSuccessiveTypes(str) {
    let succTypes = [];
+   let moreThanTwo = false;
    for(let iWord = 1; iWord < str.length; iWord++){
       let prevType = str[iWord - 1];
       let currType = str[iWord];
-      if(prevType == currType && !succTypes.includes(currType)){
-         succTypes.push(currType);
+      if(prevType == currType){
+         if(!succTypes.includes(currType)){
+            succTypes.push(currType);
+         }else{
+            moreThanTwo = true;
+         }
       }
    }
-   return succTypes
+   return { succTypes, moreThanTwo }
 };
 
 function generateSentence(structure,showInfo) {
