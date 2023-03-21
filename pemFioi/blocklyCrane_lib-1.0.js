@@ -140,7 +140,7 @@ var getContext = function(display, infos, curLevel) {
          },
          en: {
             label: {
-               left: "déplacer vers la gauche",
+               left: "move to the left",
                right: "move to the right",
                take: "take",
                putDown: "put down",
