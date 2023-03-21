@@ -999,8 +999,8 @@ function generateWordList(dontCreateDictionary) {
    let inList = {};
    let nbSkipDupl = 0;
    let skippedTypes = [];
+   let errorEmpty = false;
    for(let gramType of gramTypes){
-      // console.log(gramType)
       wordList[gramType] = [];
       let dat = gramTypeData[gramType];
       let fixedAttr = dat.attributes.fixed;
@@ -1035,6 +1035,13 @@ function generateWordList(dontCreateDictionary) {
             }
          }
       }
+      if(wordList[gramType].length == 0){
+         console.log("no word in list for type ",gramType,"("+dat.label+")", ", reset language");
+         errorEmpty = true;
+      }
+   }
+   if(errorEmpty){
+      return true
    }
    if(nbSkipDupl > 0){
       console.log("skip "+nbSkipDupl+" duplicates of types :",skippedTypes);
@@ -1910,7 +1917,10 @@ function createAlienLanguage(params) {
       dictionayEntriesHashes = {};
    }
    
-   generateWordList(params.dontCreateDictionary);
+   let errorEmpty = generateWordList(params.dontCreateDictionary);
+   if(errorEmpty){
+      return createAlienLanguage(params)
+   }
 
    initStructureRules();
    initStructures(params.checkForErrors);
