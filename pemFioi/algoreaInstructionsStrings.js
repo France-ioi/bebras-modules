@@ -577,16 +577,22 @@ var algoreaInstructionsStrings = {
                            return "déposer ... poissons"
                         }
                         return "deposer(nbPoissons)"
-                     case "paint":
-                        if(lang != "python"){
-                           return "peindre la case"
-                        }
-                        return "peindreCase()"
                      case "flowers":
                         if(lang != "python"){
                            return "semer une graine"
                         }
                         return "semerGraine()"
+                     case "marbles":
+                        if(lang != "python"){
+                           return "déposer la bille"
+                        }
+                        return "deposerBille()"
+                     case "paint":
+                        if(lang != "python"){
+                           return "peindre la case"
+                        }
+                        return "peindreCase()"
+                     
                   }
                case "forward":
                   if(lang != "python"){
