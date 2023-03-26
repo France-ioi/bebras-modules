@@ -140,7 +140,9 @@ window.platformScrollTo = function (target) {
       if (!target.offset) {
          target = $(target);
       }
-      var offset = target.offset().top;
+      var offset = target.offset();
+      if (!offset) { return; }
+      offset = offset.top - 60; // Scroll a bit above so the target is visible
    }
    window.platform.updateDisplay({ scrollTop: offset });
 }
