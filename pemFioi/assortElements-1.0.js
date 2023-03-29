@@ -9,10 +9,16 @@ function AssortElements(params) {
    init();
 
    function init() {
-      // initZoneIDs();
+      initZoneIDs();
       initElementsObject();
       initDragAndDrop();
       initContainers();
+   };
+
+   function initZoneIDs() {
+      for(let zone of dropZones){
+         zoneIDs.push(zone.id);
+      }
    };
 
    function initElementsObject() {
@@ -30,6 +36,18 @@ function AssortElements(params) {
             }
          },
          actionIfDropped : function(srcCont, srcPos, dstCont, dstPos, dropType) {
+            if(zoneIDs.includes(dstCont)){
+               let currObj = this.getObjects(dstCont);
+               for(var pos = 0; pos <= dstPos; pos++){
+                  if(currObj[pos] == null){
+                     if(srcCont == dstCont){
+                        return DragAndDropSystem.action(dstCont,pos - 1,'replace');
+                     }
+
+                     return DragAndDropSystem.action(dstCont,pos,'replace');
+                  }
+               }
+            }
             return true
          },
          ejected : function(refEl, previousCont, previousPos) {
