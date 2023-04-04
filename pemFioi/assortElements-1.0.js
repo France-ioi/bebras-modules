@@ -1,5 +1,5 @@
 function AssortElements(params) {
-   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback } = params;
+   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback, ordered } = params;
    let zoneIDs = [];
    let elementsObject = {};
    
@@ -36,7 +36,7 @@ function AssortElements(params) {
             }
          },
          actionIfDropped : function(srcCont, srcPos, dstCont, dstPos, dropType) {
-            if(zoneIDs.includes(dstCont)){
+            if(!ordered && zoneIDs.includes(dstCont)){
                let currObj = this.getObjects(dstCont);
                for(var pos = 0; pos <= dstPos; pos++){
                   if(currObj[pos] == null){
@@ -77,6 +77,9 @@ function AssortElements(params) {
 
          let obj = drawElement(elem,0,0);
          self.dragAndDrop.insertObject(id, 0, {ident : id, elements : obj });
+
+         var cont = self.dragAndDrop.getContainer(id);
+         cont.draggableElements[0].component.group.attr("cursor","grab");
       }
       for(let zone of dropZones){
          let id = zone.id;
@@ -94,7 +97,7 @@ function AssortElements(params) {
             heightPlace : h,
             nbPlaces : size,
             direction: 'vertical',
-            dropMode : 'insertBefore',
+            dropMode : ordered ? 'replace' : 'insertBefore',
             align: 'top',
             placeBackgroundArray : null
          });
@@ -113,6 +116,9 @@ function AssortElements(params) {
                let obj = drawElement(elementsObject[elemID],0,0);
                self.dragAndDrop.insertObject(zone.id, iEl, {ident : elemID, elements : obj });
                self.dragAndDrop.removeObject(elemID,0);
+               
+               var cont = self.dragAndDrop.getContainer(id);
+               cont.draggableElements[iEl].component.group.attr("cursor","grab");
             }
          }
       }
