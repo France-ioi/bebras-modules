@@ -10,6 +10,20 @@ var res = {};
 
 var taskResourcesLoaded = false;
 
+function getTextContent(node) {
+   if(!node) { return ''; }
+   var text = '';
+   node.childNodes.forEach(function (child) {
+      if (child.nodeType == 3) {
+         text += child.textContent ? ' ' + child.textContent.trim() : '';
+      } else if (child.nodeType == 1) {
+         var childText = getTextContent(child);
+         text += childText ? ' ' + childText : '';
+      }
+   });
+   return text.trim();
+}
+
 window.implementGetResources = function(task) {
    task.getResources = function(callback)
    {
@@ -38,9 +52,9 @@ window.implementGetResources = function(task) {
       res.sat_modules = [];
       res.files = [];
       if (!res.title) {
-         res.title = $('title').text();
+         res.title = $('title').text() || $('h1').text();
       }
-      
+
       // Resources
       var curDest = 'task';
       var curType = 'javascript';
@@ -168,6 +182,22 @@ window.implementGetResources = function(task) {
            }
         }
       });
+
+      // Text for referencing
+      var content = {};
+      content.title = res.title;
+      content.summary = '';
+      content.level2 = [];
+      content.level3 = [];
+      $('h2').each(function () {
+         content.level2.push($(this).text().trim());
+      });
+      $('h3').each(function () {
+         content.level3.push($(this).text().trim());
+      });
+      content.text = getTextContent($('#task')[0]) || getTextContent($('body')[0]);
+      content.lang = 'default';
+      res.content = [content];
 
       taskResourcesLoaded = true;
 
