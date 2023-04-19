@@ -56,6 +56,9 @@ task.getState = function (success, error) {
 
 task.getMetaData = function (success, error) {
    if (typeof json !== 'undefined') {
+      if (json) {
+         json.disablePlatformProgress = true;
+      }
       success(json);
    } else {
       success({ nbHints: 0 });
