@@ -192,7 +192,7 @@ answer .answer-code {
   color: #4a90e2;
   font-weight: bold;
   cursor: pointer;
-  flex: 0 1 120px;
+  flex: 0 0 120px;
   align-self: center;
   transition: all linear 50ms;
 }
