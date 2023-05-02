@@ -1693,7 +1693,7 @@ exports.adjectives = { // [M-S,F-S]
       [ "pétulant", "e" ],
       [ "phénoménal", "e" ],
       [ "polyvalent", "e" ],
-      [ "pompeux", "pompeuse" ],
+      // [ "pompeux", "pompeuse" ],
       [ "potentiel", "potentielle" ],
       [ "poudreux", "poudreuse" ],
       [ "précautionneux", "précautionneuse" ],
