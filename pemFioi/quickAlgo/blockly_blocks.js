@@ -95,7 +95,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          var msg = this.mainContext.strings.label[type];
          msg = msg ? msg : type;
-         msg = msg.replace(/%\d/g, '_');
+         try {
+            msg = msg.toString();
+         } catch (e) {
+         }
+         if (msg.replace) {
+            // No idea in which case there would be no msg.replace
+            msg = msg.replace(/%\d/g, '_');
+         }
          if(addQuotes) {
             msg = '"' + msg + '"';
          }
