@@ -4,7 +4,8 @@ $(document).ready(function() {
 
     var hints = $('#taskHints > div').toArray().map(elm => {
       return {
-        content: elm.innerHTML.trim()
+        content: elm.innerHTML.trim(),
+        minScore: elm.getAttribute('data-min-score') ? Number(elm.getAttribute('data-min-score')) : undefined
       };
     });
 
