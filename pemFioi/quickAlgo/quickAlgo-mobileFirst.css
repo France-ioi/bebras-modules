@@ -73,16 +73,6 @@ button:disabled {
   order: 1;
   font-size: 12px;
 }
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-  #openEditorMenu {
-    /*align-self: flex-end;*/
-  }
-}
-@media screen and (min-width: 1024px) {
-  #openEditorMenu {
-    /*align-self: flex-end;*/
-  }
-}
 #openEditorMenu::before,
 #openEditorMenu::after {
   content: " ";
@@ -973,7 +963,7 @@ p {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    qq-ms-flex-pack: distribute;
+    -ms-flex-pack: distribute;
     justify-content: space-around;
     padding: 0 10px;
   }
@@ -1157,6 +1147,7 @@ body.fullscreen #taskToolbar {
     box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
     padding: 4px;
     -webkit-user-select: none;
+    user-select: none;
 }
 .blocklyDropDownContent {
     max-height: 300px;
@@ -1173,7 +1164,6 @@ body.fullscreen #taskToolbar {
     border-color: inherit;
 }
 .blocklyDropDownButton {
-    display: inline-block;
     float: left;
     padding: 0;
     margin: 4px;
@@ -1195,7 +1185,6 @@ body.fullscreen #taskToolbar {
     margin-top: 5%
 }
 .blocklyDropDownPlaceholder {
-    display: inline-block;
     float: left;
     padding: 0;
     margin: 4px;
@@ -1923,4 +1912,9 @@ button.showLongIntro .icon {
 }
 #aboutLicenseIcon {
   cursor: pointer;
+}
+
+.fa,
+.fas {
+  font-family: 'Font Awesome 5 Free', Arial, sans-serif;
 }
