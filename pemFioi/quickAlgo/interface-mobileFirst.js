@@ -729,6 +729,9 @@ var quickAlgoInterface = {
     },
 
     initPlaybackControls: function() {
+        if ($('#task .speedControls').length) {
+            return;
+        }
         var speedControls =
             '<div class="speedControls">' +
                 '<div class="playerControls">' +
@@ -747,9 +750,6 @@ var quickAlgoInterface = {
                     '<span class="icon speedFaster" onclick="quickAlgoInterface.playerControls(\'speedFaster\');"><span class="fas fa-running"></span></span>' +
                 '</div>' +
             '</div>';
-        if($('#task .speedControls').length) {
-            return;
-        }
         // place speed controls depending on layout
         // speed controls in taskToolbar on mobiles
         // in intro on portrait tablets
@@ -757,6 +757,14 @@ var quickAlgoInterface = {
 
         $('#mode-player').append(speedControls);
         $('#introGrid').append(speedControls);
+        if (quickAlgoInterface.strings.controls) {
+            $('.speedControls .icon').each(function (el) {
+                var title = quickAlgoInterface.strings.controls[$(this).attr('class').split(' ')[1]];
+                if (title) {
+                    $(this).attr('title', title);
+                }
+            });
+        }
         this.updateControlsDisplay();
     },
 

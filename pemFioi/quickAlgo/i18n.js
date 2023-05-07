@@ -41,6 +41,16 @@ var quickAlgoLanguageStrings = {
          def: "Mot clé pour définir une fonction"
          //list, set, _getitem_, _setitem_, lambda, break, continue, setattr, map, split
       },
+      controls: {
+         backToFirst: 'Réinitialiser',
+         playPause: 'Lecture / Pause',
+         nextStep: 'Pas-à-pas',
+         goToEnd: 'Aller à la fin',
+         displaySpeedSlider: 'Modifier la vitesse',
+         hideSpeedSlider: 'Cacher le contrôle de vitesse',
+         speedSlower: 'Ralentir',
+         speedFaster: 'Accélérer'
+      },
       exerciseTypeAbout: {
          default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> " +
@@ -185,6 +195,16 @@ var quickAlgoLanguageStrings = {
          functions: "Functions",
          read: "Reading",
          print: "Writing",
+      },
+      controls: {
+         backToFirst: 'Reset',
+         playPause: 'Play / Pause',
+         nextStep: 'Step-by-step',
+         goToEnd: 'Go to end',
+         displaySpeedSlider: 'Change speed',
+         hideSpeedSlider: 'Hide speed controls',
+         speedSlower: 'Slow down',
+         speedFaster: 'Speed up'
       },
       exerciseTypeAbout: {
          default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
