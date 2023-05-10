@@ -112,9 +112,15 @@ var getContext = function(display, infos, curLevel) {
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
-               partialSuccess: function(thresh) {
-                  var perc = Math.round(thresh*100);
-                  return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+               partialSuccess: function(thresh,score) {
+                  // console.log(thresh,score)
+                  if(thresh){
+                     var perc = Math.round(thresh*100);
+                     return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+                  }else{
+                     var perc = Math.round(score*100);
+                     return "Vous avez réussi un objectif secondaire mais l'objectif principal n'est pas atteint. Vous avez gagné "+perc+"% du score total."
+                  }
                },
                failureMissing: function(nb) {
                   if(nb == 0){
@@ -2623,6 +2629,7 @@ var robotEndConditions = {
                context.successRate = score;
                // console.log(score);
                var msg = (score < 1) ? window.languageStrings.messages.partialSuccess(null,score) : window.languageStrings.messages.success;
+
                throw(msg);
             }else{
                context.success = false;
@@ -2732,22 +2739,6 @@ var robotEndConditions = {
 
 var robotEndFunctionGenerator = {
 
-};
-
-var computeGrade = function(context, message) {
-   var rate = 0;
-   if (context.success) {
-      rate = 1;
-      if (context.nbMoves > 100) {
-         rate /= 2;
-         message += languageStrings.messages.moreThan100Moves;
-      }
-   }
-   console.log(rate,message)
-   return {
-      successRate: rate,
-      message: message
-   };
 };
 
 if(window.quickAlgoLibraries) {
