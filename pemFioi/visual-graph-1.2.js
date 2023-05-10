@@ -597,7 +597,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var vInfo2 = this.visualGraph.getVertexVisualInfo(vertex2);
       var x1 = vInfo1.x, y1 = vInfo1.y, x2 = vInfo2.x, y2 = vInfo2.y;
       var r = this.circleAttr.r;
-
       if(!vInfo2.tableMode){
          /*
           * We want to draw an edge from the center of one circle toward the center
@@ -641,7 +640,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }else{
          var info = this.graph.getVertexInfo(vertex2);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content,vInfo2.wCorr);
+         var label = (info.label) ? info.label : "";
+         var boxSize = this.getBoxSize(content,vInfo2.wCorr,label);
          var alpha = this.getAngleBetween(x1,y1,x2,y2);
          var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
 
@@ -722,7 +722,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          /* table mode */
          var info = this.graph.getVertexInfo(vertex2);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content,vInfo2.wCorr);
+         var label = (info.label) ? info.label : "";
+         var boxSize = this.getBoxSize(content,vInfo2.wCorr,label);
          if(vertex1 === vertex2){   
             /* loop */
             angleCenter = edgeVisualInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
