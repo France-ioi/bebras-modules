@@ -220,7 +220,7 @@ window.declareTaskResource = declareResource;
 
 var resourcesObjectForRegistration = {};
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
    if (typeof json !== 'undefined') {
       res = json;
    }
