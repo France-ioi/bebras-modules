@@ -43,7 +43,6 @@ task.getHeight = function (success, error) {
    var d = document;
    var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
    success(h);
-   //success(parseInt($("body").outerHeight(true)));
 };
 
 task.unload = function (success, error) {
@@ -108,14 +107,51 @@ task.gradeAnswer = function (answer, answerToken, success, error) {
    }
 }
 
+task.getResources = function() {
+   var args = arguments;
+   // Import installation.js
+   // Note : if they are already imported, this function will already have been overwritten
+   if(!window.modulesPath) {
+      // Search for script tag with src ending with 'static-task.js'
+      var scripts = document.getElementsByTagName('script');
+      for(var iScript = 0; iScript < scripts.length; iScript++) {
+         var script = scripts[iScript];
+         var src = script.getAttribute('src');
+         if(src && src.match(/static-task.js$/)) {
+            window.modulesPath = src.replace(/pemFioi\/static-task.js$/, '');
+            break;
+         }
+      }
+   }
+   function loadInstallationScript() {
+      var script2 = document.createElement('script');
+      script2.setAttribute('type', 'text/javascript');
+      script2.setAttribute('src', window.modulesPath + 'integrationAPI.01/installationAPI.01/pemFioi/installation.js');
+      document.head.appendChild(script2);
+      // Wait for script to be loaded
+      script2.onload = function() {
+         task.getResources.apply(task, args);
+      };
+   };
+   if(window.$) {
+      loadInstallationScript();
+   } else {
+      var script = document.createElement('script');
+      script.setAttribute('type', 'text/javascript');
+      script.setAttribute('src', window.modulesPath + 'ext/jquery/1.7/jquery.min.js');
+      document.head.appendChild(script);
+      script.onload = loadInstallationScript;
+   }
+}
+
 var grader = {
    gradeTask: task.gradeAnswer
 };
 
 function staticTaskPreprocess() {
-   $('body').addClass('static-task');
-   if ($('#task').length == 0) {
-      $('body').attr('id', 'task');
+   document.body.classList.add('static-task');
+   if(!document.getElementById('task')) {
+      document.body.id = 'task';
    }
 };
 
@@ -125,7 +161,7 @@ if (!window.preprocessingFunctions) {
 window.preprocessingFunctions.push(staticTaskPreprocess);
 
 window.taskGetResourcesPost = function (res, callback) {
-   res.task[0].content = $('body').html();
+   res.task[0].content = document.body.innerHTML;
    callback(res);
 }
 
@@ -141,53 +177,50 @@ window.platformScrollTo = function (target) {
       offset = target;
    } else {
       if (!target.offset) {
-         target = $(target);
+         target = document.querySelector(target);
       }
-      var offset = target.offset();
-      if (!offset) { return; }
-      offset = offset.top - 60; // Scroll a bit above so the target is visible
+      var rect = target.getBoundingClientRect();
+      offset = rect.top + window.pageYOffset - 60; // Scroll a bit above so the target is visible
    }
    window.platform.updateDisplay({ scrollTop: offset });
 }
 
-if (window.$) {
-   $(function () {
-      if (window.platform) {
-         platform.initWithTask(task);
-      }
+document.addEventListener('DOMContentLoaded', function() {
+   if (window.platform) {
+      platform.initWithTask(task);
+   }
 
-      staticTaskPreprocess();
+   staticTaskPreprocess();
 
-      // Copy of displayHelper.useFullWidth
-      try {
-         $('#question-iframe', window.parent.document).css('width', '100%');
-      } catch (e) {
+   // Copy of displayHelper.useFullWidth
+   try {
+      var questionIframe = window.parent.document.getElementById('question-iframe');
+      if (questionIframe) {
+         questionIframe.style.width = '100%';
       }
-      $('body').css('width', '');
+   } catch (e) {
+   }
+   document.body.style.width = '';
 
-      // Handle staticTaskOptions
-      var sto = window.staticTaskOptions || {};
-      if (sto.autoValidate) {
-         // Auto-validate with a score after 5s
-         setTimeout(function () {
-            window.staticTaskAnswer = "page_read";
-            try {
-               platform.validate("done");
-            } catch (e) { }
-         }, typeof sto.autoValidate == 'number' ? sto.autoValidate : 5000);
-      }
-      if (sto.addReturnButton && !$('div.return-button').length) {
-         // Add a return button
-         var btnHtml = '<div class="return-button"><button onclick="platform.validate(\'top\');">';
-         btnHtml += typeof sto.addReturnButton == 'string' ? sto.addReturnButton : 'Revenir à la liste des questions';
-         btnHtml += '</button></div>';
-         $(btnHtml).appendTo('body');
-      }
-   });
-} else if (window.platform) {
-   platform.initWithTask(task);
-} else {
-   setTimeout(function () {
-      window.platform.initWithTask(task);
-   }, 100);
-}
+   // Handle staticTaskOptions
+   var sto = window.staticTaskOptions || {};
+   if (sto.autoValidate) {
+      // Auto-validate with a score after 5s
+      setTimeout(function () {
+         window.staticTaskAnswer = "page_read";
+         try {
+            platform.validate("done");
+         } catch (e) { }
+      }, typeof sto.autoValidate == 'number' ? sto.autoValidate : 5000);
+   }
+   if (sto.addReturnButton && !document.querySelector('div.return-button')) {
+      // Add a return button
+      var btnHtml = '<button onclick="platform.validate(\'top\');">';
+      btnHtml += typeof sto.addReturnButton == 'string' ? sto.addReturnButton : 'Revenir à la liste des questions';
+      btnHtml += '</button>';
+      var div = document.createElement('div');
+      div.innerHTML = btnHtml;
+      div.classList.add('return-button');
+      document.body.appendChild(div);
+   }
+});
