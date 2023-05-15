@@ -159,7 +159,7 @@ function GPS(settings) {
          }
       }
       if(callback){
-         callback();
+         callback(draggedData);
       }
    };
    var onMove = function(dx,dy,x,y,ev) {
