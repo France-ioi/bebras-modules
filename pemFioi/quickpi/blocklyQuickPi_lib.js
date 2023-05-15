@@ -3937,7 +3937,9 @@ var getContext = function (display, infos, curLevel) {
             addDefaultBoardSensors();
         }
 
-        context.blocklyHelper.updateSize();
+        if (context.blocklyHelper) {
+            context.blocklyHelper.updateSize();
+        }
 
         context.inUSBConnection = false;
         context.inBTConnection = false;
