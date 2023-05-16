@@ -3563,7 +3563,7 @@ var getContext = function(display, infos, curLevel) {
    return context;
 };
 
-var getRessources = function(subTask) {
+var getResources = function(subTask) {
    var res = [];
    var type = subTask.gridInfos.contextType;
    var typeData = contextParams[type];
