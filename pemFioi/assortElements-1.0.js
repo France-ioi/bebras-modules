@@ -1,5 +1,5 @@
 function AssortElements(params) {
-   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback, ordered } = params;
+   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback, ordered, displayHelper } = params;
    let zoneIDs = [];
    let elementsObject = {};
    
@@ -29,7 +29,8 @@ function AssortElements(params) {
 
    function initDragAndDrop() {
       self.dragAndDrop = new DragAndDropSystem({
-         paper : paper,
+         paper,
+         displayHelper,
          drop : function(srcContId, srcPos, dstContId, dstPos, type) {
             if(dropCallback){
                dropCallback();
