@@ -1,6 +1,7 @@
 
-var imgPath = modulesPath+"img/algorea/";
-var mp3Path = modulesPath+"mp3/";
+// var imgPath = modulesPath+"img/algorea/";
+// var mp3Path = modulesPath+"mp3/";
+var dustUrl = "crane/dust.png";
 
 var getContext = function(display, infos, curLevel) {
    var localLanguageStrings = {
@@ -251,255 +252,18 @@ var getContext = function(display, infos, curLevel) {
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
    function imgUrlWithPrefix(url) {
       return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
-   }
-
-   var contextParams = {
-      none: {
-         hideSaveOrLoad: true,
-         actionDelay: 200,
-         ignoreInvalidMoves: false,
-         checkEndEveryTurn: false,
-         cellSide: 60
-      },
-      default: {
-         cellAttr: {
-            stroke: "grey",
-            "stroke-width": 1,
-            fill: "lightblue"
-         },
-         contAttr: {
-            stroke: "white",
-            "stroke-width": 0,
-            fill: "lightgrey"
-         },
-         contOutlineAttr: {
-            "stroke-width": 3,
-            stroke: "black",
-            fill: "none"
-         },
-         craneAttr: {
-            wheelsPosY: 13, // for line clip
-            wheelsOffsetX: 12.5,
-            wheelsW: 85,
-            wheelsH: 60,
-            clawsAxisPos: 33,
-            clawsPos: 27,
-            clawW: 40,
-            clawH: 33,
-            clawOffset: 5,
-            clutchAngle: 20,
-            craneItemOffset: 10
-         },
-         craneSrc: {
-            rail: imgPath+"crane/rail.png",
-            wheels: imgPath+"crane/wheels.png",
-            line: imgPath+"crane/line.png",
-            leftClaw: imgPath+"crane/left_claw.png",
-            rightClaw: imgPath+"crane/right_claw.png"
-         },
-         itemTypes: {
-            circle: { num: 2, img: imgPath+"card_roundDotted.png", side: 60, isMovable: true, zOrder: 1 },
-            square: { num: 3, img: imgPath+"card_squareQuadrille.png", side: 60, isMovable: true, zOrder: 1},
-            triangle: { num: 4, img: imgPath+"card_triangleStriped.png", side: 60, isMovable: true, zOrder: 1}
-         },
-         checkEndCondition: robotEndConditions.dev
-      },
-      sciFi: {
-         backgroundElements: [
-            // { 
-            //    img: imgPath+"crane/sciFi/background.png",
-            //    width: 1,   // % of total width if relative
-            //    height: 1,
-            //    x: 0,
-            //    y: 0,
-            //    relative: true
-            // },
-            // { 
-            //    img: imgPath+"crane/sciFi/cloud_1.png",
-            //    width: 200*0.7,
-            //    height: 50*0.7,
-            //    x: 0.8,
-            //    y: 0.3
-            // },
-            // { 
-            //    img: imgPath+"crane/sciFi/cloud_2.png",
-            //    width: 225*0.7,
-            //    height: 103*0.7,
-            //    x: -0.1,
-            //    y: 0.1
-            // },
-            // { 
-            //    img: imgPath+"crane/sciFi/cloud_3.png",
-            //    width: 117*0.7,
-            //    height: 41*0.7,
-            //    x: 0.4,
-            //    y: 0.8
-            // },
-         ],
-         cellAttr: {
-            stroke: "#525252",
-            "stroke-width": 0.2,
-            fill: "none"
-         },
-         contAttr: {
-            stroke: "white",
-            "stroke-width": 0,
-            fill: "lightgrey"
-         },
-         contOutlineAttr: {
-            "stroke-width": 3,
-            stroke: "black",
-            fill: "none"
-         },
-         labelFrameAttr: {
-            stroke: "none",
-            fill: "#043565",
-            r: 3
-         },
-         labelAttr: {
-            fill: "white",
-            "font-weight": "bold"
-         },
-         labelSize: 0.3, // % of cellSize
-         labelFrameSize: 0.5,
-         craneAttr: {
-            wheelsPosY: 13, // for line clip
-            wheelsOffsetX: -45,
-            wheelsOffsetY: 2,
-            wheelsW: 120,
-            wheelsH: 42,
-            shaftW: 13,
-            shaftH: 17,
-            shaftOffsetY: 50,
-            shaftOffsetX: 23.5,
-            clawW: 20,
-            clawH: 24,
-            clawsOffsetY: 56,
-            leftClawOffsetX: 11,
-            rightClawOffsetX: 29,
-            leftClawCx: 27,
-            leftClawCy: 60,
-            rightClawCx: 33,
-            rightClawCy: 60,
-            clutchAngle: 30,
-            craneItemOffset: 12
-         },
-         craneSrc: {
-            rail: imgPath+"crane/rail.png",
-            wheels: imgPath+"crane/crane_wheels.png",
-            line: imgPath+"crane/crane_line.png",
-            leftClaw: imgPath+"crane/crane_left_claw_open.png",
-            rightClaw: imgPath+"crane/crane_right_claw_open.png",
-            shaft: imgPath+"crane/crane_shaft.png",
-         },
-         craneZOrder: {
-            wheels: 1,
-            line: 0,
-            leftClaw: 2,
-            rightClaw: 0,
-            shaft: 1,
-            item: 1
-         },
-         itemTypes: {
-            tower_1: { num: 2, 
-               img: imgPath+"crane/sciFi/tower_1.png", 
-               brokenImg: imgPath+"crane/sciFi/tower_1_broken.png",
-               side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
-            tower_2: { num: 3, 
-               img: imgPath+"crane/sciFi/tower_2.png", 
-               brokenImg: imgPath+"crane/sciFi/tower_2_broken.png",
-               side: 60, isMovable: true, zOrder: 1 },
-            tower_3: { num: 4, img: imgPath+"crane/sciFi/tower_3.png", side: 60, isMovable: true, zOrder: 1},
-            tower_4: { num: 5, img: imgPath+"crane/sciFi/tower_4.png", side: 60, isMovable: true, zOrder: 1},
-            tower_5: { num: 6, img: imgPath+"crane/sciFi/tower_5.png", side: 60, isMovable: true, zOrder: 1},
-            tower_6: { num: 7, img: imgPath+"crane/sciFi/tower_6.png", side: 60, isMovable: true, zOrder: 1},
-            tower_7: { num: 8, img: imgPath+"crane/sciFi/tower_7.png", side: 60, isMovable: true, zOrder: 1},
-            tower_8: { num: 9, img: imgPath+"crane/sciFi/tower_8.png", side: 60, isMovable: true, zOrder: 1},
-            tower_9: { num: 10, img: imgPath+"crane/sciFi/tower_9.png", side: 60, isMovable: true, zOrder: 1},
-            tower_10: { num: 11, img: imgPath+"crane/sciFi/tower_10.png", side: 60, isMovable: true, zOrder: 1},
-            tower_11: { num: 12, img: imgPath+"crane/sciFi/tower_11.png", side: 60, isMovable: true, zOrder: 1},
-            tower_12: { num: 13, img: imgPath+"crane/sciFi/tower_12.png", side: 60, isMovable: true, zOrder: 1},
-            crusher: { num: 14, img: imgPath+"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
-            wreckingBall: { num: 15, img: imgPath+"card_roundQuadrille.png", side: 60, isMovable: true, wrecking: true, zOrder: 1}
-         },
-         checkEndCondition: robotEndConditions.dev
-      },
-      numbers: {
-         backgroundElements: [
-
-         ],
-         cellAttr: {
-            stroke: "#525252",
-            "stroke-width": 0.2,
-            fill: "none"
-         },
-         contAttr: {
-            stroke: "white",
-            "stroke-width": 0,
-            fill: "lightgrey"
-         },
-         contOutlineAttr: {
-            "stroke-width": 3,
-            stroke: "black",
-            fill: "none"
-         },
-         labelFrameAttr: {
-            stroke: "none",
-            fill: "#043565",
-            r: 3
-         },
-         labelAttr: {
-            fill: "white",
-            "font-weight": "bold"
-         },
-         labelSize: 0.3, // % of cellSize
-         labelFrameSize: 0.5,
-         craneAttr: {
-            wheelsPosY: 13, // for line clip
-            wheelsOffsetX: -45,
-            wheelsOffsetY: 2,
-            wheelsW: 120,
-            wheelsH: 42,
-            shaftW: 13,
-            shaftH: 17,
-            shaftOffsetY: 50,
-            shaftOffsetX: 23.5,
-            clawW: 20,
-            clawH: 24,
-            clawsOffsetY: 56,
-            leftClawOffsetX: 11,
-            rightClawOffsetX: 29,
-            leftClawCx: 27,
-            leftClawCy: 60,
-            rightClawCx: 33,
-            rightClawCy: 60,
-            clutchAngle: 30,
-            craneItemOffset: 12
-         },
-         craneSrc: {
-            rail: imgPath+"crane/rail.png",
-            wheels: imgPath+"crane/crane_wheels.png",
-            line: imgPath+"crane/crane_line.png",
-            leftClaw: imgPath+"crane/crane_left_claw_open.png",
-            rightClaw: imgPath+"crane/crane_right_claw_open.png",
-            shaft: imgPath+"crane/crane_shaft.png",
-         },
-         craneZOrder: {
-            wheels: 1,
-            line: 0,
-            leftClaw: 2,
-            rightClaw: 0,
-            shaft: 1,
-            item: 1
-         },
-         itemTypes: {
-            crusher: { num: 98, img: imgPath+"crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
-            wreckingBall: { num: 99, img: imgPath+"crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
-            mask: { num: 97, img: imgPath+"crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
-            // mask: { num: 28, img: imgPath+"card_squareStriped.png", side: 80, offsetX: 0, offsetY: 0, isMovable: false, zOrder: 2},
-         },
-         checkEndCondition: robotEndConditions.dev
-      },
+   };
+   function getImgPath(url) {
+      if(modulesPath != undefined){
+         return modulesPath+"img/algorea/"+url
+      }
+      return imgUrlWithPrefix(url)
+   };
+   function getSoundPath(url) {
+      if(modulesPath != undefined){
+         return modulesPath+"mp3/"+url
+      }
+      return imgUrlWithPrefix(url)
    };
 
 	for (var id = 1; id < 50; id++) {
@@ -508,8 +272,8 @@ var getContext = function(display, infos, curLevel) {
 			strId = "0" + id;
 		}
 		contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
-				   img: imgPath+"crane/numbers/" + strId + ".png",
-				   brokenImg: imgPath+"crane/numbers/broken_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
+				   img: /*imgPath+*/"crane/numbers/" + strId + ".png",
+				   brokenImg: /*imgPath+*/"crane/numbers/broken_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
 	};
 	
    if(infos.newBlocks == undefined)
@@ -847,7 +611,7 @@ var getContext = function(display, infos, curLevel) {
       "stroke-width": 3
    };
 
-   var dustSrc = imgPath+"crane/dust.png";
+   var dustSrc = getImgPath(dustUrl);
    var dustW = 80;
    var dustH = 28;
    var dustDuration = 1100;
@@ -993,7 +757,7 @@ var getContext = function(display, infos, curLevel) {
          $("#nbMoves").html(context.nbMoves);
 
          $("#background_music").remove();
-         $("body").append("<audio src="+mp3Path+"background.mp3 autoplay loop id=background_music></audio>");
+         $("body").append("<audio src="+getSoundPath("background.mp3")+" autoplay loop id=background_music></audio>");
          $("html").click(function() {
             if($("#background_music").length > 0){
                $("#background_music")[0].play();
@@ -1476,18 +1240,18 @@ var getContext = function(display, infos, curLevel) {
       var src = infos.craneSrc;
       crane.rail = paper.set();
       for(var iCol = 0; iCol < nbCol; iCol++){
-         crane.rail.push(paper.image(src.rail,0,0,0,0));
+         crane.rail.push(paper.image(getImgPath(src.rail),0,0,0,0));
       }
       paper.setStart();
-      crane.wheels = paper.image(src.wheels,0,0,0,0);
+      crane.wheels = paper.image(getImgPath(src.wheels),0,0,0,0);
       var lineH = nbRows + craneH;
       crane.line = paper.set();
       for(var iRow = 0; iRow < lineH; iRow++){
-         crane.line.push(paper.image(src.line,0,0,0,0));
+         crane.line.push(paper.image(getImgPath(src.line),0,0,0,0));
       }
-      crane.leftClaw = paper.image(src.leftClaw,0,0,0,0);
-      crane.rightClaw = paper.image(src.rightClaw,0,0,0,0);
-      crane.shaft = paper.image(src.shaft,0,0,0,0);
+      crane.leftClaw = paper.image(getImgPath(src.leftClaw),0,0,0,0);
+      crane.rightClaw = paper.image(getImgPath(src.rightClaw),0,0,0,0);
+      crane.shaft = paper.image(getImgPath(src.shaft),0,0,0,0);
       crane.all = paper.setFinish();
 
       if(context.craneContent){
@@ -1887,10 +1651,10 @@ var getContext = function(display, infos, curLevel) {
             var srcObj = item.img;
          }
          if(typeof srcObj != "object"){
-            var src = imgUrlWithPrefix(srcObj);
+            var src = getImgPath(srcObj);
          }else{
             var imgId = item.imgId;
-            var src = imgUrlWithPrefix(srcObj[imgId]);
+            var src = getImgPath(srcObj[imgId]);
          }
          if((infos.customItems) && (item.num < 90)){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
@@ -2395,7 +2159,7 @@ var getContext = function(display, infos, curLevel) {
          }, dustDuration);
 
          // $("#noise").remove();
-         // $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
+         // $("body").append("<audio src='"+getSoundPath("drop.mp3' autoplay id='noise'></audio>");
          // var vol = (context.soundEnabled) ? 1 : 0;
          // $("audio").prop('volume', vol);
       });
@@ -2535,7 +2299,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.addSound = function(name) {
       $("#noise").remove();
-      $("body").append("<audio src='"+mp3Path+name+".mp3' autoplay id='noise'></audio>");
+      $("body").append("<audio src='"+getSoundPath(name)+".mp3' autoplay id='noise'></audio>");
       var vol = (context.soundEnabled) ? 1 : 0;
       $("audio").prop('volume', vol);
    };
@@ -2584,6 +2348,72 @@ var getContext = function(display, infos, curLevel) {
    return context;
 };
 
+var getResources = function(subTask) {
+   var res = [];
+   var type = subTask.gridInfos.contextType;
+   var typeData = contextParams[type];
+
+   if(typeData.craneSrc){
+      for(var key in typeData.craneSrc){
+         res.push({ type: 'image', url: typeData.craneSrc[key] });
+      }
+   }
+
+   if(typeData.itemTypes){
+      for(var key in typeData.itemTypes){
+         var params = typeData.itemTypes[key];
+         if(params.img){
+            res.push({ type: 'image', url: params.img });
+         }
+      }
+   }
+
+   var sounds = ["background","brick_crush","wreckingBall_grab","brick_grab","brick_putDown","crane_stop"];
+   for(var url of sounds){
+      res.push({ type: 'image', url: url+".mp3" });
+   }
+
+   res.push({ type: 'image', url: dustUrl });
+
+   var data = subTask.data;
+   var newUrl = [];
+   // console.log(data)
+   for(var level in data){
+      for(var iLev = 0; iLev < data[level].length; iLev++){
+         var tiles = data[level][iLev].tiles;
+         var customItems = data[level][iLev].customItems;
+         var successAnim = data[level][iLev].successAnim;
+         for(var row of tiles){
+            for(var col of row){
+               if(col > 1){
+                  var url = "assets/png/0"+(col-1)+".png";
+                  if(!newUrl.includes(col)){
+                     res.push({ type: 'image', url });
+                     newUrl.push(url)
+                  }
+               }
+            }
+         }
+
+
+         if(customItems){
+            for(var id in customItems){
+               if(customItems[id].img){
+                  res.push({ type: 'image', url: customItems[id].img });
+               }
+            }
+         }
+
+         if(successAnim && successAnim.img){
+            for(var img of successAnim.img){
+               res.push({ type: 'image', url: img.src });
+            }
+         }
+      }
+   }
+   
+   return res
+};
 
 var robotEndConditions = {
    dev: function(context, lastTurn) {
@@ -2707,6 +2537,255 @@ var robotEndConditions = {
 
 var robotEndFunctionGenerator = {
 
+};
+
+var contextParams = {
+   none: {
+      hideSaveOrLoad: true,
+      actionDelay: 200,
+      ignoreInvalidMoves: false,
+      checkEndEveryTurn: false,
+      cellSide: 60
+   },
+   default: {
+      cellAttr: {
+         stroke: "grey",
+         "stroke-width": 1,
+         fill: "lightblue"
+      },
+      contAttr: {
+         stroke: "white",
+         "stroke-width": 0,
+         fill: "lightgrey"
+      },
+      contOutlineAttr: {
+         "stroke-width": 3,
+         stroke: "black",
+         fill: "none"
+      },
+      craneAttr: {
+         wheelsPosY: 13, // for line clip
+         wheelsOffsetX: 12.5,
+         wheelsW: 85,
+         wheelsH: 60,
+         clawsAxisPos: 33,
+         clawsPos: 27,
+         clawW: 40,
+         clawH: 33,
+         clawOffset: 5,
+         clutchAngle: 20,
+         craneItemOffset: 10
+      },
+      craneSrc: {
+         rail: /*imgPath+*/"crane/rail.png",
+         wheels: /*imgPath+*/"crane/wheels.png",
+         line: /*imgPath+*/"crane/line.png",
+         leftClaw: /*imgPath+*/"crane/left_claw.png",
+         rightClaw: /*imgPath+*/"crane/right_claw.png"
+      },
+      itemTypes: {
+         circle: { num: 2, img: /*imgPath+*/"card_roundDotted.png", side: 60, isMovable: true, zOrder: 1 },
+         square: { num: 3, img: /*imgPath+*/"card_squareQuadrille.png", side: 60, isMovable: true, zOrder: 1},
+         triangle: { num: 4, img: /*imgPath+*/"card_triangleStriped.png", side: 60, isMovable: true, zOrder: 1}
+      },
+      checkEndCondition: robotEndConditions.dev
+   },
+   sciFi: {
+      backgroundElements: [
+         // { 
+         //    img: /*imgPath+*/"crane/sciFi/background.png",
+         //    width: 1,   // % of total width if relative
+         //    height: 1,
+         //    x: 0,
+         //    y: 0,
+         //    relative: true
+         // },
+         // { 
+         //    img: /*imgPath+*/"crane/sciFi/cloud_1.png",
+         //    width: 200*0.7,
+         //    height: 50*0.7,
+         //    x: 0.8,
+         //    y: 0.3
+         // },
+         // { 
+         //    img: /*imgPath+*/"crane/sciFi/cloud_2.png",
+         //    width: 225*0.7,
+         //    height: 103*0.7,
+         //    x: -0.1,
+         //    y: 0.1
+         // },
+         // { 
+         //    img: /*imgPath+*/"crane/sciFi/cloud_3.png",
+         //    width: 117*0.7,
+         //    height: 41*0.7,
+         //    x: 0.4,
+         //    y: 0.8
+         // },
+      ],
+      cellAttr: {
+         stroke: "#525252",
+         "stroke-width": 0.2,
+         fill: "none"
+      },
+      contAttr: {
+         stroke: "white",
+         "stroke-width": 0,
+         fill: "lightgrey"
+      },
+      contOutlineAttr: {
+         "stroke-width": 3,
+         stroke: "black",
+         fill: "none"
+      },
+      labelFrameAttr: {
+         stroke: "none",
+         fill: "#043565",
+         r: 3
+      },
+      labelAttr: {
+         fill: "white",
+         "font-weight": "bold"
+      },
+      labelSize: 0.3, // % of cellSize
+      labelFrameSize: 0.5,
+      craneAttr: {
+         wheelsPosY: 13, // for line clip
+         wheelsOffsetX: -45,
+         wheelsOffsetY: 2,
+         wheelsW: 120,
+         wheelsH: 42,
+         shaftW: 13,
+         shaftH: 17,
+         shaftOffsetY: 50,
+         shaftOffsetX: 23.5,
+         clawW: 20,
+         clawH: 24,
+         clawsOffsetY: 56,
+         leftClawOffsetX: 11,
+         rightClawOffsetX: 29,
+         leftClawCx: 27,
+         leftClawCy: 60,
+         rightClawCx: 33,
+         rightClawCy: 60,
+         clutchAngle: 30,
+         craneItemOffset: 12
+      },
+      craneSrc: {
+         rail: /*imgPath+*/"crane/rail.png",
+         wheels: /*imgPath+*/"crane/crane_wheels.png",
+         line: /*imgPath+*/"crane/crane_line.png",
+         leftClaw: /*imgPath+*/"crane/crane_left_claw_open.png",
+         rightClaw: /*imgPath+*/"crane/crane_right_claw_open.png",
+         shaft: /*imgPath+*/"crane/crane_shaft.png",
+      },
+      craneZOrder: {
+         wheels: 1,
+         line: 0,
+         leftClaw: 2,
+         rightClaw: 0,
+         shaft: 1,
+         item: 1
+      },
+      itemTypes: {
+         tower_1: { num: 2, 
+            img: /*imgPath+*/"crane/sciFi/tower_1.png", 
+            brokenImg: /*imgPath+*/"crane/sciFi/tower_1_broken.png",
+            side: 60, isMovable: true, zOrder: 1, catchOffsetY: 29 },
+         tower_2: { num: 3, 
+            img: /*imgPath+*/"crane/sciFi/tower_2.png", 
+            brokenImg: /*imgPath+*/"crane/sciFi/tower_2_broken.png",
+            side: 60, isMovable: true, zOrder: 1 },
+         tower_3: { num: 4, img: /*imgPath+*/"crane/sciFi/tower_3.png", side: 60, isMovable: true, zOrder: 1},
+         tower_4: { num: 5, img: /*imgPath+*/"crane/sciFi/tower_4.png", side: 60, isMovable: true, zOrder: 1},
+         tower_5: { num: 6, img: /*imgPath+*/"crane/sciFi/tower_5.png", side: 60, isMovable: true, zOrder: 1},
+         tower_6: { num: 7, img: /*imgPath+*/"crane/sciFi/tower_6.png", side: 60, isMovable: true, zOrder: 1},
+         tower_7: { num: 8, img: /*imgPath+*/"crane/sciFi/tower_7.png", side: 60, isMovable: true, zOrder: 1},
+         tower_8: { num: 9, img: /*imgPath+*/"crane/sciFi/tower_8.png", side: 60, isMovable: true, zOrder: 1},
+         tower_9: { num: 10, img: /*imgPath+*/"crane/sciFi/tower_9.png", side: 60, isMovable: true, zOrder: 1},
+         tower_10: { num: 11, img: /*imgPath+*/"crane/sciFi/tower_10.png", side: 60, isMovable: true, zOrder: 1},
+         tower_11: { num: 12, img: /*imgPath+*/"crane/sciFi/tower_11.png", side: 60, isMovable: true, zOrder: 1},
+         tower_12: { num: 13, img: /*imgPath+*/"crane/sciFi/tower_12.png", side: 60, isMovable: true, zOrder: 1},
+         crusher: { num: 14, img: /*imgPath+*/"card_squareStriped.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+         wreckingBall: { num: 15, img: /*imgPath+*/"card_roundQuadrille.png", side: 60, isMovable: true, wrecking: true, zOrder: 1}
+      },
+      checkEndCondition: robotEndConditions.dev
+   },
+   numbers: {
+      backgroundElements: [
+
+      ],
+      cellAttr: {
+         stroke: "#525252",
+         "stroke-width": 0.2,
+         fill: "none"
+      },
+      contAttr: {
+         stroke: "white",
+         "stroke-width": 0,
+         fill: "lightgrey"
+      },
+      contOutlineAttr: {
+         "stroke-width": 3,
+         stroke: "black",
+         fill: "none"
+      },
+      labelFrameAttr: {
+         stroke: "none",
+         fill: "#043565",
+         r: 3
+      },
+      labelAttr: {
+         fill: "white",
+         "font-weight": "bold"
+      },
+      labelSize: 0.3, // % of cellSize
+      labelFrameSize: 0.5,
+      craneAttr: {
+         wheelsPosY: 13, // for line clip
+         wheelsOffsetX: -45,
+         wheelsOffsetY: 2,
+         wheelsW: 120,
+         wheelsH: 42,
+         shaftW: 13,
+         shaftH: 17,
+         shaftOffsetY: 50,
+         shaftOffsetX: 23.5,
+         clawW: 20,
+         clawH: 24,
+         clawsOffsetY: 56,
+         leftClawOffsetX: 11,
+         rightClawOffsetX: 29,
+         leftClawCx: 27,
+         leftClawCy: 60,
+         rightClawCx: 33,
+         rightClawCy: 60,
+         clutchAngle: 30,
+         craneItemOffset: 12
+      },
+      craneSrc: {
+         rail: /*imgPath+*/"crane/rail.png",
+         wheels: /*imgPath+*/"crane/crane_wheels.png",
+         line: /*imgPath+*/"crane/crane_line.png",
+         leftClaw: /*imgPath+*/"crane/crane_left_claw_open.png",
+         rightClaw: /*imgPath+*/"crane/crane_right_claw_open.png",
+         shaft: /*imgPath+*/"crane/crane_shaft.png",
+      },
+      craneZOrder: {
+         wheels: 1,
+         line: 0,
+         leftClaw: 2,
+         rightClaw: 0,
+         shaft: 1,
+         item: 1
+      },
+      itemTypes: {
+         crusher: { num: 98, img: /*imgPath+*/"crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+         wreckingBall: { num: 99, img: /*imgPath+*/"crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
+         mask: { num: 97, img: /*imgPath+*/"crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
+         // mask: { num: 28, img: /*imgPath+*/"card_squareStriped.png", side: 80, offsetX: 0, offsetY: 0, isMovable: false, zOrder: 2},
+      },
+      checkEndCondition: robotEndConditions.dev
+   },
 };
 
 if(window.quickAlgoLibraries) {
