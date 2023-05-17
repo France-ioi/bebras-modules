@@ -974,10 +974,12 @@ window.displayHelper = {
       $('#valider').appendTo($('#displayHelper_validate'));
       if(window.innerWidth >= 1200) {
           $('#task').addClass('largeScreen');
+          $('#solution').addClass('largeScreen');
           $('#displayHelperAnswering').appendTo($('#zone_1'));
       }
       else {
          $('#task').removeClass('largeScreen');
+         $('#solution').removeClass('largeScreen');
          if ($('#showSolutionButton')) {
             $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
          }

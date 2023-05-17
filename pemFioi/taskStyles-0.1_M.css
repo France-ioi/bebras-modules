@@ -357,11 +357,11 @@ h1 .stars {
 }
 
 
-#task {
+#task, #solution {
 	width: 770px;
 	margin: 0 auto;
 }
-#task.largeScreen {
+#task.largeScreen, #solution.largeScreen {
 	width: 1200px;
 }
 #taskContent:after {
