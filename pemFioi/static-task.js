@@ -94,17 +94,9 @@ task.gradeAnswer = function (answer, answerToken, success, error) {
    }
 
    // Auto-validate
-   try {
-      platform.getTaskParams(null, null, function (taskParams) {
-         try {
-            success(taskParams.maxScore ? taskParams.maxScore : 40, "");
-         } catch (e) {
-            success(40, "");
-         }
-      }, function () { });
-   } catch (e) {
-      success(40, "");
-   }
+   addTaskParamsCb(function (taskParams) {
+      success(taskParams.maxScore || 40, '');
+   });
 }
 
 task.getResources = function() {
@@ -185,6 +177,15 @@ window.platformScrollTo = function (target) {
    window.platform.updateDisplay({ scrollTop: offset });
 }
 
+var taskParamsCbs = [];
+function addTaskParamsCb(cb) {
+   if(task.taskParams !== null) {
+      cb(task.taskParams);
+   } else {
+      taskParamsCbs.push(cb);
+   }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
    if (window.platform) {
       platform.initWithTask(task);
@@ -204,6 +205,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
    // Handle staticTaskOptions
    var sto = window.staticTaskOptions || {};
+
+   // Get taskParams
+   if (sto.autoValidate || sto.checkHideTitle) {
+      function execTaskParamsCbs (taskParams) {
+         for (var i = 0; i < taskParamsCbs.length; i++) {
+            taskParamsCbs[i](taskParams);
+         }
+      }
+      task.taskParams = null;
+      try {
+         platform.getTaskParams(null, null, function (taskParams) {
+            task.taskParams = taskParams;
+            execTaskParamsCbs(task.taskParams);
+         }, function () {
+            task.taskParams = {};
+            execTaskParamsCbs(task.taskParams);
+         });
+      } catch (e) {
+         task.taskParams = {};
+         execTaskParamsCbs(task.taskParams);
+      }
+   }
+
    if (sto.autoValidate) {
       // Auto-validate with a score after 5s
       setTimeout(function () {
@@ -222,5 +246,12 @@ document.addEventListener('DOMContentLoaded', function() {
       div.innerHTML = btnHtml;
       div.classList.add('return-button');
       document.body.appendChild(div);
+   }
+   if(sto.checkHideTitle) {
+      addTaskParamsCb(function (taskParams) {
+         if (taskParams.hideTitle) {
+            document.querySelector('h1').style.display = 'none';
+         }
+      });
    }
 });
