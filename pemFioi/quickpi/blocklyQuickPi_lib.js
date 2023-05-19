@@ -271,7 +271,7 @@ var quickPiLocalLanguageStrings = {
             wrongState: "Test échoué : <code>{0}</code> a été dans l'état {1} au lieu de {2} à t={3}ms.",
             wrongStateDrawing: "Test échoué : <code>{0}</code> diffère de {1} pixels par rapport à l'affichage attendu à t={2}ms.",
             wrongStateSensor: "Test échoué : votre programme n'a pas lu l'état de <code>{0}</code> après t={1}ms.",
-            programEnded: "programme terminé.",
+            programEnded: "Programme terminé.",
             piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
             cantConnect: "Impossible de se connecter à l'appareil.",
             wrongVersion: "Votre Raspberry Pi a une version trop ancienne, mettez le à jour.",
