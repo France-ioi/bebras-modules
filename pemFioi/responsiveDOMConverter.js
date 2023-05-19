@@ -26,7 +26,8 @@ function convertDOM() {
    consigne.appendTo("#zone_1");
 
    var taskCont = $("<div id='taskCont'></div>");
-   $("#paper").detach().appendTo(taskCont);
+   $("#zone_2").children().detach().appendTo(taskCont);
+   // $("#paper").detach().appendTo(taskCont);
    taskCont.appendTo("#zone_2");
 
    $("#taskContent").children().detach().appendTo("#task");
