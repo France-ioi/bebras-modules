@@ -1,18 +1,12 @@
 function GPS(settings) {
    self = this;
-   var paper = settings.paper;
-   var paperID = settings.paperID;
-   var attr = settings.attr;
-   var x0 = settings.x0;
-   var y0 = settings.y0;
-   var w = settings.w;
-   var h = settings.h;
-   var scale = settings.scale;
-   var unit = settings.unit;
-   var fixed = settings.fixed;
-   var create = settings.create;
-   var hideTowerLabel = settings.hideTowerLabel;
-   var continuity = settings.continuity;
+   let { paper, paperID, attr, x0, y0, w, h, scale, unit, fixed, create, hideTowerLabel, continuity } = settings;
+   let respScale;
+   if (window.displayHelper) {
+      respScale = window.displayHelper.scaleFactor || 1;
+   }else{
+      respScale = 1;
+   }
 
    this.timeShiftEnabled = settings.timeShiftEnabled;
    this.timeShift = 0;
@@ -115,8 +109,8 @@ function GPS(settings) {
    };
 
    this.mousemove = function(ev) {
-      var xMouse = ev.pageX - $("#"+paperID).offset().left - x0;
-      var yMouse = ev.pageY - $("#"+paperID).offset().top - y0;
+      var xMouse = (ev.pageX - $("#"+paperID).offset().left - x0)/respScale;
+      var yMouse = (ev.pageY - $("#"+paperID).offset().top - y0)/respScale;
       var cursor = "auto";
       for(var id of self.towerID){
          var r = self.towers[id].r;
@@ -132,14 +126,15 @@ function GPS(settings) {
    };
 
    var onStart = function(x,y,ev) {
-      var xMouseGps = x - $("#"+paperID).offset().left - x0;
-      var yMouseGps = y - $("#"+paperID).offset().top - y0;
+      var xMouseGps = (x - $("#"+paperID).offset().left - x0)/respScale;
+      var yMouseGps = (y - $("#"+paperID).offset().top - y0)/respScale;
       var minDist = Infinity;
       draggedData = null;
+      // console.log(xMouseGps,yMouseGps)
       for(var id of self.towerID){
          var towerData = self.towers[id];
          var distFromCenter = Beav.Geometry.distance(xMouseGps,yMouseGps,towerData.x,towerData.y);
-
+         // console.log(id,distFromCenter)
          if(!fixed && distFromCenter <= towerR){
             /* drag center */
             minDist = 0;
@@ -166,8 +161,8 @@ function GPS(settings) {
       if(!draggedData){
          return
       }
-      var xMouseGps = x - $("#"+paperID).offset().left - x0;
-      var yMouseGps = y - $("#"+paperID).offset().top - y0;
+      var xMouseGps = (x - $("#"+paperID).offset().left - x0)/respScale;
+      var yMouseGps = (y - $("#"+paperID).offset().top - y0)/respScale;
       if(draggedData.create){
          if(Beav.Geometry.distance(xMouseGps,yMouseGps,draggedData.x,draggedData.y) < minR){
             return
