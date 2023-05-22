@@ -1,5 +1,9 @@
 $(document).ready(function() {
   if (window.taskData) {
+    if (window.taskData.waitInit) {
+      window.taskData.waitInit();
+    }
+
     var taskInstructionsHtml = $('#taskIntro').html();
 
     var hints = $('#taskHints > div').toArray().map(elm => {
