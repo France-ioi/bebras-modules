@@ -847,13 +847,16 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.getDistanceFromVertex = function(id, xPos, yPos) {
-      // console.log(this.paper,this.visualGraph.paper)
+      // console.log("getDistanceFromVertex",id,xPos,yPos)
       var vertexPos = this.getVertexPosition(id);
       var tableMode = this.visualGraph.getVertexVisualInfo(id).tableMode;
-      // var xDistance = xPos - vertexPos.x;
-      // var yDistance = yPos - vertexPos.y;
-      // var distanceFromCenter = distanceSquared(vertexPos.x,vertexPos.y,xPos,yPos);
-      var distanceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,xPos,yPos);
+
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      var distanceFromCenter = Beav.Geometry.distance(vertexPos.x*scale,vertexPos.y*scale,xPos,yPos);
       if(!tableMode){
          if(distanceFromCenter <= this.circleAttr.r) {
             return 0;
@@ -861,14 +864,14 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          return distanceFromCenter - this.circleAttr.r;
       }else{
          /* table mode */
-         var angleWithCenter = this.getAngleBetween(vertexPos.x,vertexPos.y,xPos,yPos);
+         var angleWithCenter = this.getAngleBetween(vertexPos.x*scale,vertexPos.y*scale,xPos,yPos);
          var info = this.graph.getVertexInfo(id);
          var vInfo = this.visualGraph.getVertexVisualInfo(id);
          var content = (info.content) ? info.content : "";
          var label = (info.label) ? info.label : "";
          var boxSize = this.getBoxSize(content,vInfo.wCorr,label);
-         var surfacePoint = this.getSurfacePointFromAngle(vertexPos.x,vertexPos.y,boxSize.w,boxSize.h,angleWithCenter);
-         var surfaceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,surfacePoint.x,surfacePoint.y);
+         var surfacePoint = this.getSurfacePointFromAngle(vertexPos.x*scale,vertexPos.y*scale,boxSize.w*scale,boxSize.h*scale,angleWithCenter);
+         var surfaceFromCenter = Beav.Geometry.distance(vertexPos.x*scale,vertexPos.y*scale,surfacePoint.x,surfacePoint.y);
          if(distanceFromCenter <= surfaceFromCenter) {
             return 0;
          }
@@ -876,84 +879,26 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.getDistanceFromEdge = function(id, xPos, yPos) {
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      // console.log(scale)
       var vInfo = this.visualGraph.getEdgeVisualInfo(id);
       if(vInfo["radius-ratio"]){    // if curved edge
          var edgeRaph = this.visualGraph.getRaphaelsFromID(id)[0];
          var d = Infinity;
          for(var length = 1; length < edgeRaph.getTotalLength(); length += 2){
             var currPos = edgeRaph.getPointAtLength(length);
-            var currDist = Beav.Geometry.distance(currPos.x,currPos.y,xPos,yPos);
+            var currDist = Beav.Geometry.distance(currPos.x*scale,currPos.y*scale,xPos,yPos);
+            // var currDist = Beav.Geometry.distance(currPos.x,currPos.y,xPos,yPos);
+            // console.log(currDist)
             if(currDist < d){
                d = currDist;
             }
          }
          return d;
-         // var vertices = this.graph.getEdgeVertices(id);
-         // var vertex1Pos = this.visualGraph.getVertexVisualInfo(vertices[0]);
-         // var vertex2Pos = this.visualGraph.getVertexVisualInfo(vertices[1]);
-         // var x1 = vertex1Pos.x;
-         // var y1 = vertex1Pos.y;
-         // var x2 = vertex2Pos.x;
-         // var y2 = vertex2Pos.y;
-         // if(!vertex2Pos.tableMode){
-         //    if(vertices[0] === vertices[1]){    // if loop
-         //       var R = vInfo["radius-ratio"]*this.circleAttr.r;
-         //       var angle = vInfo["angle"] || 0;
-         //       var xc = x1 + R*Math.cos(angle*Math.PI/180);
-         //       var yc = y1 - R*Math.sin(angle*Math.PI/180);
-         //    }else{
-         //       var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
-         //       var R = vInfo["radius-ratio"]*D;
-         //       var s = vInfo.sweep || 0;
-         //       var l = vInfo["large-arc"] || 0;
-         //       var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
-         //       var xc = cPos.x;
-         //       var yc = cPos.y;
-         //    }
-         //    // var distFromCenter = Math.sqrt(Math.pow((xPos - xc),2) + Math.pow((yPos - yc),2));
-         //    // return Math.abs(distFromCenter - R); 
-         // }else{
-         //    /* table mode */
-         //    var info = this.graph.getVertexInfo(vertices[0]);
-         //    var content = (info.content) ? info.content : "";
-         //    var boxSize = this.getBoxSize(content,vertex1Pos.wCorr);
-         //    if(vertices[0] === vertices[1]){    
-         //       /* loop */
-         //       angleCenter = vInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
-         //       var angleCorr = (angleCenter*Math.PI/180)%(2*Math.PI);
-         //       angleCorr = this.bindAngle(angleCorr);
-         //       R = (vInfo["radius-ratio"]) ? vInfo["radius-ratio"]*this.circleAttr.r : 1.5*this.circleAttr.r;
-         //       var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
-         //       var surfPos = this.getSurfacePointFromAngle(x1,y1,boxSize.w,boxSize.h,Math.PI - angleCorr);
-         //       /* loop center stays at R/2 from box surface */
-         //       if(angleCorr <= beta && angleCorr > -beta){
-         //          /* right side */
-         //          var xc = surfPos.x + R/2;
-         //          var yc = surfPos.y;
-         //       }else if(angleCorr <= Math.PI + beta && angleCorr > Math.PI - beta){
-         //          /* left side */
-         //          var xc = surfPos.x - R/2;
-         //          var yc = surfPos.y;
-         //       }else if(angleCorr > beta && angleCorr <= Math.PI - beta){
-         //          /* top */
-         //          var xc = surfPos.x;
-         //          var yc = surfPos.y - R/2;
-         //       }else if(angleCorr > Math.PI + beta || angleCorr <= - beta){
-         //          /* bottom */
-         //          var xc = surfPos.x;
-         //          var yc = surfPos.y + R/2;
-         //       }
-         //    }else{
-         //       var param = this.getEdgeParam(id);
-
-         //       var cPos = this.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
-         //       var xc = cPos.x;
-         //       var yc = cPos.y;
-         //       var R = param.R;
-         //    }
-         // }
-         // var distFromCenter = Math.sqrt(distanceSquared(xc,yc,xPos,yPos));
-         // return Math.abs(distFromCenter - R); 
       }else{
          var edgePath = this.visualGraph.getRaphaelsFromID(id)[0].attrs.path;
          var x1, y1, x2, y2;
@@ -983,7 +928,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             x2 = parseInt(parts[4]);
             y2 = parseInt(parts[5]);
          }
-         return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2));
+         return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1*scale, y1*scale, x2*scale, y2*scale));
       }
    };
 
