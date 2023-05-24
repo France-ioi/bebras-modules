@@ -275,11 +275,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return code;
       },
 
-      getCode: function(language, codeWorkspace, noReportValue) {
+      getCode: function(language, codeWorkspace, noReportValue, noConstraintCheck) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(!this.checkConstraints(codeWorkspace)) {
+         if(!this.checkConstraints(codeWorkspace) && !noConstraintCheck) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }
