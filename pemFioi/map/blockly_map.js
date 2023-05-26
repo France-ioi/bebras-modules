@@ -74,7 +74,7 @@ var getContext = function(display, infos) {
         if(!context.display) return
         if(!map) {
             var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
-            map = new Map(options);
+            map = new MapItem(options);
             logger = new Logger({
                 parent: $('#gridContainer')
             });

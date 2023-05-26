@@ -86,7 +86,7 @@ var getContext = function(display, infos) {
                 display: display
             }, infos.mapConfig);
             
-            map = new Map(options);
+            map = new MapItem(options);
         }
         if(!logger) {
             logger = new Logger({
