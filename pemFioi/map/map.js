@@ -4,7 +4,7 @@ if(typeof(Number.prototype.toRad) === "undefined") {
     }
 }
 
-function Map(options) {
+function MapItem(options) {
 
 
     var defaults = {
@@ -417,7 +417,7 @@ function Map(options) {
 
 // data
 
-Map.prototype.cities = [
+MapItem.prototype.cities = [
     { name: "Dunkerque", lat: 51.069360, lng: 2.376571 },
     { name: "Calais", lat: 50.979622, lng: 1.855583 },
     { name: "Lille", lat: 50.650582, lng: 3.056121 },
@@ -476,7 +476,7 @@ Map.prototype.cities = [
 ];
 
 
-Map.prototype.neighbors = [
+MapItem.prototype.neighbors = [
     ["Brest", "Lorient"],
     ["Brest", "Rennes"],
     ["Lorient", "Rennes"],
