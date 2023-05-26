@@ -1,4 +1,4 @@
-function Map(options) {
+function MapItem(options) {
     
     var defaults = {
         parent: document.body,
