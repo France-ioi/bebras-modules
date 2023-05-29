@@ -102,6 +102,10 @@ var importableModules = function () {
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
+      'codecast7.3_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.3/index.css", id: "codecast7.3_css"},
+      'codecast7.3_js': {src: modulesPath+"/ext/codecast/7.3/index.js", id: "codecast7.3_js"},
+      'codecast7.3_loader': {src: modulesPath+"/ext/codecast/7.3/codecast-loader.js", id: "codecast7.3_loader"},
+
       'simple_draw': {src: modulesPath+"/pemFioi/javascool/simple_draw.js", id: "simple_draw"},
       'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"},
 
@@ -223,7 +227,8 @@ var bundledModules = function () {
       {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
       {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
       {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
-      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
+      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
+      {name: 'codecast-7.3', included: ['codecast7.3_css', 'codecast7.3_js', 'codecast7.3_loader']}
    ];
 };
 
