@@ -257,11 +257,41 @@ var QueryString = function () {
 }();
 
 
-function getBundles(modulesList) {
-   // Check modulesList for modules which are already bundled together
+function bundlesToModules(modulesList) {
+   // Check modulesList for bundles, replace them with their modules
 
-   // For now, only do it if useBundles is true
-   if(!window.useBundles) { return modulesList; }
+   if(typeof bundledModules == 'function') {
+      bundledModules = bundledModules();
+   }
+
+   var bundlesByName = {};
+   for(var iBundle in bundledModules) {
+      var curBundle = bundledModules[iBundle];
+      bundlesByName[curBundle.name] = curBundle;
+   }
+
+   var newList = [];
+   var includedModules = {};
+   function addModule(module) {
+      if(includedModules[module]) { return; }
+      newList.push(module);
+      includedModules[module] = true;
+   }
+   for(var iModule in modulesList) {
+      var curModule = modulesList[iModule];
+      if(bundlesByName[curModule]) {
+         for(var iSub in bundlesByName[curModule].included) {
+            addModule(bundlesByName[curModule].included[iSub]);
+         }
+      } else {
+         addModule(curModule);
+      }
+   }
+   return newList;
+}
+
+function modulesToBundles(modulesList) {
+   // Check modulesList for modules that can be replaced with bundles
 
    if(typeof bundledModules == 'function') {
       bundledModules = bundledModules();
@@ -297,7 +327,16 @@ function importModules(modulesList) {
    if(typeof importableModules == 'function') {
       importableModules = importableModules();
    };
-   modulesList = getBundles(modulesList);
+
+   // If useBundles is True, we'll try to use bundles instead of the
+   // corresponding modules. Otherwise, we do the opposite and translate
+   // bundles into a list of modules.
+   if(window.useBundles) {
+      modulesList = modulesToBundles(modulesList);
+   } else {
+      modulesList = bundlesToModules(modulesList);
+   }
+
    var modulesStr = '';
    for(var iMod in modulesList) {
       var moduleName = modulesList[iMod];
