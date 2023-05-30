@@ -664,7 +664,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
    function eventHandler(xPos, yPos, event) {
       // Check if vertex was clicked
-      // console.log("fuzzyClick "+id,paper)
+      // console.log("fuzzyClick "+id)
       var vertex = self.getFuzzyVertex(xPos, yPos);
       // console.log(vertex)
       if(vertex !== null) {
@@ -944,7 +944,7 @@ function VertexDragAndConnect(settings) {
          }
          self.selectionParent = null;
          if(self.onEdgeSelect) {
-            // console.log("vertexDragAndConnect")
+            // console.log("onEdgeSelect vertexDragAndConnect")
             self.onEdgeSelect(id);
          }
       }else if(elementType === "edgeLabel"){
@@ -996,6 +996,13 @@ function VertexDragAndConnect(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      dx = dx/scale;
+      dy = dy/scale;
       if(!self.dragEnabled || dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
          return;
       }
@@ -1218,7 +1225,6 @@ function ArcDragger(settings) {
          }     
          self.isOnLabel = false;
       }else if(self.onEdgeSelect){
-         // console.log("arcDragger")
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
          self.onEdgeSelect(self.elementID,info.selected);
@@ -1418,7 +1424,7 @@ function GraphDragger(settings) {
    };
 
    function onFuzzyClick(elementType, id, x, y, event){
-      console.log(self.dragEnabled,self.scaleEnabled)
+      // console.log(self.dragEnabled,self.scaleEnabled)
       if(!self.dragEnabled && !self.scaleEnabled){
          return
       }
