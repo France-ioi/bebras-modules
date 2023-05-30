@@ -1105,10 +1105,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
 
    this.isOnEdgeLabel = function(edgeID,x,y) {
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
       var edgeInfo = this.graph.getEdgeInfo(edgeID);
       if(!edgeInfo.label || edgeInfo.label.length === 0){
          return false;
       }
+      x = x/scale;
+      y = y/scale;
       var labelPos = this.getLabelPos(edgeID);
       var fontSize = this.edgeLabelAttr["font-size"] || 15;  
       var labelH = fontSize;
