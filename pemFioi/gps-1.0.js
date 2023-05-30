@@ -109,8 +109,9 @@ function GPS(settings) {
       }else{
          respScale = 1;
       }
-      var xMouse = (ev.pageX - $("#"+paperID).offset().left - x0);
-      var yMouse = (ev.pageY - $("#"+paperID).offset().top - y0);
+      var xMouse = (ev.pageX - $("#"+paperID).offset().left - x0*respScale);
+      var yMouse = (ev.pageY - $("#"+paperID).offset().top - y0*respScale);
+      // console.log(xMouse,yMouse)
       var cursor = "auto";
       for(var id of self.towerID){
          var r = self.towers[id].r*respScale;
@@ -126,8 +127,8 @@ function GPS(settings) {
    };
 
    var onStart = function(x,y,ev) {
-      var xMouseGps = (x - $("#"+paperID).offset().left - x0)/respScale;
-      var yMouseGps = (y - $("#"+paperID).offset().top - y0)/respScale;
+      var xMouseGps = (x - $("#"+paperID).offset().left - x0*respScale)/respScale;
+      var yMouseGps = (y - $("#"+paperID).offset().top - y0*respScale)/respScale;
       var minDist = Infinity;
       draggedData = null;
       // console.log(xMouseGps,yMouseGps)
@@ -161,8 +162,8 @@ function GPS(settings) {
       if(!draggedData){
          return
       }
-      var xMouseGps = (x - $("#"+paperID).offset().left - x0)/respScale;
-      var yMouseGps = (y - $("#"+paperID).offset().top - y0)/respScale;
+      var xMouseGps = (x - $("#"+paperID).offset().left - x0*respScale)/respScale;
+      var yMouseGps = (y - $("#"+paperID).offset().top - y0*respScale)/respScale;
       if(draggedData.create){
          if(Beav.Geometry.distance(xMouseGps,yMouseGps,draggedData.x,draggedData.y) < minR){
             return
