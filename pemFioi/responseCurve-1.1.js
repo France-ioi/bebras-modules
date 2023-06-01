@@ -21,6 +21,7 @@ function ResponseCurve(settings) {
    var dragOverlaySize = 30;
    var nameIndex = 2;
    var useBezier = settings.useBezier;
+   var scaleResp = 1;
 
    this.setUpdateCurveCallback = function(fct) {
       updateCurveCallback = fct;
@@ -112,8 +113,13 @@ function ResponseCurve(settings) {
    };
 
     function clickCurve(ev) {
-      var xMouse = ev.pageX - $("#"+paperID).offset().left;
-      var yMouse = ev.pageY - $("#"+paperID).offset().top;
+      if (window.displayHelper) {
+         scaleResp = window.displayHelper.scaleFactor || 1;
+      }else{
+         scaleResp = 1;
+      }
+      var xMouse = (ev.pageX - $("#"+paperID).offset().left)/scaleResp;
+      var yMouse = (ev.pageY - $("#"+paperID).offset().top)/scaleResp;
       var pos = getClosestCurvePointPos(xMouse,yMouse);
       insertPoint(pos.x,pos.y);
       updateCurve("click curve");
@@ -219,6 +225,11 @@ function ResponseCurve(settings) {
 
    var onStart = function(name) {
       return function(x,y,ev) {
+         if (window.displayHelper) {
+            scaleResp = window.displayHelper.scaleFactor || 1;
+         }else{
+            scaleResp = 1;
+         }
          draggedID = name;
          var index = getIndexFromName(name);
          startPos = pointPos[index];
@@ -227,8 +238,8 @@ function ResponseCurve(settings) {
    };
    var onMove = function(dx,dy,x,y,ev) {
       var id = getIndexFromName(draggedID);
-      var xMouse = x - $("#"+paperID).offset().left;
-      var yMouse = y - $("#"+paperID).offset().top;
+      var xMouse = (x - $("#"+paperID).offset().left)/scaleResp;
+      var yMouse = (y - $("#"+paperID).offset().top)/scaleResp;
 
       var xMin = (id) ? pointPos[id - 1].x + dragOverlaySize/2 : x0;
       var xMax = (id < points.length - 1) ? pointPos[id + 1].x - dragOverlaySize/2 : x0 + w;
