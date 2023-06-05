@@ -238,7 +238,9 @@ var getContext = function(display, infos, curLevel) {
 
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
+    var displayed_element = null;
     var ready = false;
+    var innerState = {};
 
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
     context.conceptList = [
@@ -300,6 +302,7 @@ var getContext = function(display, infos, curLevel) {
 
 
     var wrapper;
+    var tables_cache = [null];
 
     context.reset = function(taskInfos) {
         if(wrapper) {
@@ -365,7 +368,29 @@ var getContext = function(display, infos, curLevel) {
         });
     }
 
+    context.getInnerState = function() {
+        innerState.tables_cache = tables_cache.map(function (table) {
+            return null !== table ? table.params() : null;
+        });
+        innerState.displayed_element = displayed_element;
 
+        return innerState;
+    };
+
+    context.implementsInnerState = function () {
+        return true;
+    }
+
+    context.reloadInnerState = function(data) {
+        innerState = data;
+        tables_cache = data.tables_cache.map(function (params) {
+            return null !== params ? new Table(params) : null;
+        });
+        displayed_element = data.displayed_element;
+        if (displayed_element && 'table' === displayed_element.elementType) {
+            db_helper.displayTable(new Table(displayed_element.table), context.display);
+        }
+    };
 
 
     context.setScale = function(scale) {}
@@ -414,7 +439,6 @@ var getContext = function(display, infos, curLevel) {
     }
 
 
-    var tables_cache = [null];
     function saveTable(table) {
         tables_cache.push(table);
         return tables_cache.length - 1;
@@ -536,6 +560,7 @@ var getContext = function(display, infos, curLevel) {
                 table = loadTable(table);
             }
             db_helper.displayTable(table, context.display);
+            displayed_element = {elementType: 'table', table: table.params()};
             context.waitDelay(callback);
         },
 
@@ -575,6 +600,7 @@ var getContext = function(display, infos, curLevel) {
             });
             var table = Table(res);
             db_helper.displayTable(table, context.display);
+            displayed_element = {elementType: 'table', table: table.params()};
             context.waitDelay(callback);
         },
 
