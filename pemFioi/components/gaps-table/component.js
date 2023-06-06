@@ -451,13 +451,34 @@ function GapsTable(params) {
     }        
     wrapper.prepend(toolbar);
 
+    var scaleResp = 1;
+    var dragData = {};
     toolbar.find('.value').each(function(i) {
         var el = $(this), text = el.text();
         el.draggable({
             scope: uid,
             revert: 'invalid',
             revertDuration: 200,
-            zIndex: 100
+            zIndex: 100,
+            start: function(ev){
+                if (window.displayHelper) {
+                    scaleResp = window.displayHelper.scaleFactor || 1;
+                }else{
+                    scaleResp = 1;
+                }
+                dragData = { startX: ev.pageX, startY: ev.pageY }
+                // console.log("start",ev.pageX,ev.pageY)
+            },
+            drag: function(ev){
+                if(scaleResp != 1){
+                    var dx = (ev.pageX - dragData.startX)/scaleResp;
+                    var dy = (ev.pageY - dragData.startY)/scaleResp;
+                    el.css({position:"relative",left:dx+"px",top:dy+"px"});
+                }
+                // console.log(el.css("left"))
+                /* doesn't work */
+            },
+            // stop: function(){console.log("stop")},
         });
     });
 
