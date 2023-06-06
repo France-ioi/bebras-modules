@@ -99,41 +99,9 @@ task.gradeAnswer = function (answer, answerToken, success, error) {
    });
 }
 
-task.getResources = function() {
-   var args = arguments;
-   // Import installation.js
-   // Note : if they are already imported, this function will already have been overwritten
-   if(!window.modulesPath) {
-      // Search for script tag with src ending with 'static-task.js'
-      var scripts = document.getElementsByTagName('script');
-      for(var iScript = 0; iScript < scripts.length; iScript++) {
-         var script = scripts[iScript];
-         var src = script.getAttribute('src');
-         if(src && src.match(/static-task.js$/)) {
-            window.modulesPath = src.replace(/pemFioi\/static-task.js$/, '');
-            break;
-         }
-      }
-   }
-   function loadInstallationScript() {
-      var script2 = document.createElement('script');
-      script2.setAttribute('type', 'text/javascript');
-      script2.setAttribute('src', window.modulesPath + 'integrationAPI.01/installationAPI.01/pemFioi/installation.js');
-      document.head.appendChild(script2);
-      // Wait for script to be loaded
-      script2.onload = function() {
-         task.getResources.apply(task, args);
-      };
-   };
-   if(window.$) {
-      loadInstallationScript();
-   } else {
-      var script = document.createElement('script');
-      script.setAttribute('type', 'text/javascript');
-      script.setAttribute('src', window.modulesPath + 'ext/jquery/1.7/jquery.min.js');
-      document.head.appendChild(script);
-      script.onload = loadInstallationScript;
-   }
+task.getResources = function(success, error) {
+   // Shouldn't be called unless installation.js is loaded
+   error();
 }
 
 var grader = {
