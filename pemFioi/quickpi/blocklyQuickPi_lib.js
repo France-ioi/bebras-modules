@@ -2884,6 +2884,79 @@ var getContext = function (display, infos, curLevel) {
 
     var paper;
     context.offLineMode = true;
+    context.timeLineStates = [];
+    var innerState = {};
+
+    var getSensorFullState = function (sensor) {
+        return {
+            state: sensor.state,
+            screenDrawing: sensor.screenDrawing,
+            lastDrawnTime: sensor.lastDrawnTime,
+            lastDrawnState: sensor.lastDrawnState,
+            callsInTimeSlot: sensor.callsInTimeSlot,
+            lastTimeIncrease: sensor.lastTimeIncrease,
+            removed: sensor.removed,
+            quickStore: sensor.quickStore,
+        };
+    }
+
+    var reloadSensorFullState = function (sensor, save) {
+        sensor.state = save.state;
+        sensor.screenDrawing = save.screenDrawing;
+        sensor.lastDrawnTime = save.lastDrawnTime;
+        sensor.lastDrawnState = save.lastDrawnState;
+        sensor.callsInTimeSlot = save.callsInTimeSlot;
+        sensor.lastTimeIncrease = save.lastTimeIncrease;
+        sensor.removed = save.removed;
+        sensor.quickStore = save.quickStore;
+    };
+
+    context.getInnerState = function() {
+        var savedSensors = {};
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var sensor = infos.quickPiSensors[i];
+            savedSensors[sensor.name] = getSensorFullState(sensor);
+        }
+
+        innerState.sensors = savedSensors;
+        innerState.timeLineStates = context.timeLineStates.map(function (timeLineState) {
+            var timeLineElement = Object.assign({}, timeLineState);
+            timeLineElement.sensorName = timeLineElement.sensor.name;
+            delete timeLineElement.sensor;
+
+            return timeLineElement;
+        });
+        innerState.currentTime = context.currentTime;
+
+        return innerState;
+    };
+
+    context.implementsInnerState = function () {
+        return true;
+    }
+
+    context.reloadInnerState = function(data) {
+        innerState = data;
+
+        for (var name in data.sensors) {
+            var sensor = findSensorByName(name);
+            var savedSensor = data.sensors[name];
+            reloadSensorFullState(sensor, savedSensor);
+        }
+
+        context.timeLineStates = [];
+        for (var i = 0; i < data.timeLineStates.length; i++) {
+            var newTimeLineState = Object.assign({}, data.timeLineStates[i]);
+            newTimeLineState.sensor = findSensorByName(newTimeLineState.sensorName);
+            context.timeLineStates.push(newTimeLineState);
+        }
+
+        context.currentTime = data.currentTime;
+    }
+
+    context.redrawDisplay = function () {
+        context.resetDisplay();
+    }
 
     context.onExecutionEnd = function () {
         if (context.autoGrading)
@@ -3179,14 +3252,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = infos.quickPiSensors[iSensor];
             if (context.sensorsSaved[sensor.name] && !context.autoGrading) {
                 var save = context.sensorsSaved[sensor.name];
-                sensor.state = save.state;
-                sensor.screenDrawing = save.screenDrawing;
-                sensor.lastDrawnTime = save.lastDrawnTime;
-                sensor.lastDrawnState = save.lastDrawnState;
-                sensor.callsInTimeSlot = save.callsInTimeSlot;
-                sensor.lastTimeIncrease = save.lastTimeIncrease;
-                sensor.removed = save.removed;
-                sensor.quickStore = save.quickStore;
+                reloadSensorFullState(sensor, save);
             } else {
                 sensor.state = null;
                 sensor.screenDrawing = null;
@@ -5510,14 +5576,14 @@ var getContext = function (display, infos, curLevel) {
 
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type, skipsave = false, expectedState = null) {
+        if (!skipsave) {
+            storeTimeLineState(sensor, state, startTime, endTime, type);
+        }
+
         if (paper == undefined ||
             !context.display ||
             !context.autoGrading)
             return;
-
-        if (!skipsave) {
-            storeTimeLineState(sensor, state, startTime, endTime, type);
-        }
 
         var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
