@@ -2969,7 +2969,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
-        if (!context.display && !context.autoGrading) {
+        if (!context.display && !context.autoGrading && !context.forceGradingWithoutDisplay) {
             context.success = true;
             throw (strings.messages.manualTestSuccess);
         }
