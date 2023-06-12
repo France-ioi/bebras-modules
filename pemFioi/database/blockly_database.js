@@ -238,7 +238,10 @@ var getContext = function(display, infos, curLevel) {
 
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
+    var displayed_element = null;
+    var current_histogram = null;
     var ready = false;
+    var innerState = {};
 
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
     context.conceptList = [
@@ -300,6 +303,7 @@ var getContext = function(display, infos, curLevel) {
 
 
     var wrapper;
+    var tables_cache = [null];
 
     context.reset = function(taskInfos) {
         if(wrapper) {
@@ -365,7 +369,57 @@ var getContext = function(display, infos, curLevel) {
         });
     }
 
+    context.getInnerState = function() {
+        innerState.tables_cache = tables_cache.map(function (table) {
+            return null !== table ? table.params() : null;
+        });
+        innerState.displayed_element = displayed_element;
+        innerState.current_histogram = current_histogram;
 
+        return innerState;
+    };
+
+    context.implementsInnerState = function () {
+        return true;
+    }
+
+    context.reloadInnerState = function(data) {
+        innerState = data;
+        tables_cache = data.tables_cache.map(function (params) {
+            return null !== params ? new Table(params) : null;
+        });
+        displayed_element = data.displayed_element;
+        current_histogram = data.current_histogram;
+        if (displayed_element && 'table' === displayed_element.elementType) {
+            db_helper.displayTable(new Table(displayed_element.table), context.display);
+        } else if (displayed_element && 'histogram' === displayed_element.elementType) {
+            db_helper.initHistogram(displayed_element.histogram.records_amount, displayed_element.histogram.max_value, context.display);
+            for (var i = 0; i < displayed_element.histogram.records_amount; i++) {
+                db_helper.setHistogramBar(i, displayed_element.histogram.values[i].label, displayed_element.histogram.values[i].value, context.display);
+            }
+        } else if (displayed_element && 'table_on_map' === displayed_element.elementType) {
+            db_helper.displayTableOnMap(
+                new Table(displayed_element.table),
+                context.display
+            );
+        } else if (displayed_element && 'table_on_graph' === displayed_element.elementType) {
+            db_helper.displayTableOnGraph(
+                new Table(displayed_element.table),
+                displayed_element.minY,
+                displayed_element.maxY,
+                displayed_element.type,
+                context.display
+            );
+        } else if (displayed_element && 'tables_on_graph' === displayed_element.elementType) {
+            db_helper.displayTableOnGraph(
+                new Table(displayed_element.table),
+                displayed_element.minX,
+                displayed_element.maxX,
+                displayed_element.minY,
+                displayed_element.maxY
+            );
+        }
+    };
 
 
     context.setScale = function(scale) {}
@@ -414,7 +468,6 @@ var getContext = function(display, infos, curLevel) {
     }
 
 
-    var tables_cache = [null];
     function saveTable(table) {
         tables_cache.push(table);
         return tables_cache.length - 1;
@@ -536,6 +589,7 @@ var getContext = function(display, infos, curLevel) {
                 table = loadTable(table);
             }
             db_helper.displayTable(table, context.display);
+            displayed_element = {elementType: 'table', table: table.params()};
             context.waitDelay(callback);
         },
 
@@ -575,6 +629,7 @@ var getContext = function(display, infos, curLevel) {
             });
             var table = Table(res);
             db_helper.displayTable(table, context.display);
+            displayed_element = {elementType: 'table', table: table.params()};
             context.waitDelay(callback);
         },
 
@@ -583,6 +638,7 @@ var getContext = function(display, infos, curLevel) {
                 loadTable(table).selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
                 context.display
             );
+            displayed_element = {elementType: 'table_on_map', table: loadTable(table).selectColumns([nameColumn, longitudeColumn, latitudeColumn]).params()};
             context.waitDelay(callback);
         },
 
@@ -602,6 +658,7 @@ var getContext = function(display, infos, curLevel) {
                 table.selectColumns([nameColumn]),
                 minY,maxY,type,context.display
             );
+            displayed_element = {elementType: 'table_on_graph', table: table.selectColumns([nameColumn]).params(), minY: minY, maxY: maxY, type: type};
             context.waitDelay(callback);
         },
 
@@ -617,18 +674,27 @@ var getContext = function(display, infos, curLevel) {
                 table.selectColumns([nameColumn1,nameColumn2]),
                 minX, maxX, minY, maxY
             );
+            displayed_element = {elementType: 'tables_on_graph', table: table.selectColumns([nameColumn1,nameColumn2]).params(), minX: minX, maxX: maxX, minY: minY, maxY: maxY};
             context.waitDelay(callback);
         },
 
 
         // Histogram
         initHistogram: function(records_amount, max_value, callback) {
-            db_helper.initHistogram(records_amount, max_value, context.display);            
+            db_helper.initHistogram(records_amount, max_value, context.display);
+            var values = [];
+            for (var i = 0; i < records_amount; i++) {
+                values.push({label: '', value: 0});
+            }
+            current_histogram = {records_amount: records_amount, max_value: max_value, values: values};
+            displayed_element = {elementType: 'histogram', histogram: current_histogram};
             context.waitDelay(callback);
         },
 
         setHistogramBar: function(record_idx, label, value, callback) {
-            db_helper.setHistogramBar(record_idx, label, value, context.display);            
+            db_helper.setHistogramBar(record_idx, label, value, context.display);
+            current_histogram.values[record_idx] = {label: label, value: value};
+            displayed_element = {elementType: 'histogram', histogram: current_histogram};
             context.waitDelay(callback);
         }
     }
