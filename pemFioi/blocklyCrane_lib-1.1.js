@@ -61,7 +61,8 @@ var getContext = function(display, infos, curLevel) {
 
                up: "monter",
                down: "descendre",
-               readBlock: "lire brique"
+               readBlock: "lire brique",
+               dieValue: "valeur du dé"
 
             },
             code: {
@@ -85,7 +86,8 @@ var getContext = function(display, infos, curLevel) {
 
                up: "monter",
                down: "descendre",
-               readBlock: "lireBrique"
+               readBlock: "lireBrique",
+               dieValue: "valeurDé"
 
             },
             description: {
@@ -109,7 +111,8 @@ var getContext = function(display, infos, curLevel) {
 
                up: "@() Déplace l'outil' d'une case vers le haut.",
                down: "@() Déplace l'outil' d'une case vers le bas.",           
-               readBlock: "@() Retourne le numéro du type."
+               readBlock: "@() Retourne le numéro du type.",
+               dieValue: "@() Retourne la valeur du dé."
             },
             messages: {
                yLimit: function(up) {
@@ -374,8 +377,12 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "take" },
       func: function(callback) {
          if(this.cranePosY > -1){
-            this.moveCraneY(-1,function() {
-               context.take(callback);
+            // because take as a callback of shiftCraneY doesn't work
+            // this.moveUpAndTake(callback);
+            this.moveCraneY(-1, function () {
+               context.executeWhenReady(function () {
+                  context.take(callback);
+               });
             });
          }else{
             this.take(callback);
@@ -759,6 +766,7 @@ var getContext = function(display, infos, curLevel) {
          context.initCranePos = gridInfos.initCranePos || 0;
          context.initCranePosY = (gridInfos.initCranePosY != undefined) ? gridInfos.initCranePosY : -1;
          context.initTool = gridInfos.initTool || 0;
+         context.initDieValue = gridInfos.initDieValue || null;
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
          context.broken = gridInfos.broken || [];
@@ -772,6 +780,9 @@ var getContext = function(display, infos, curLevel) {
       context.cranePosY = context.initCranePosY || 0;
       context.craneContent = null;
       context.tool = context.initTool || 0; // 0: crane, 1: sensor
+
+      context.rng = new RandomGenerator(0);
+      context.dieValue = context.initDieValue || null;
       
       context.items = [];
       context.multicell_items = [];
@@ -1072,12 +1083,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.getDieValue = function() {
-      for(var item of items){
-         if(item.isDie){
-            return item.value
-         }
-      }
-      return 0
+      return context.dieValue
    };
 
    context.isTopBlockBroken = function() {
@@ -1411,7 +1417,9 @@ var getContext = function(display, infos, curLevel) {
       item.nbStates = 1;
       item.zOrder = 0;
       for(var property in infos.itemTypes[item.type]) {
-         item[property] = infos.itemTypes[item.type][property];
+         if(!item[property]){
+            item[property] = infos.itemTypes[item.type][property];
+         }
       }
       if(initItem.type == "mask" && infos.windowMaskSrc){
          item.img = infos.windowMaskSrc;
@@ -1421,11 +1429,10 @@ var getContext = function(display, infos, curLevel) {
          item.offsetX = 0;
       }
       if(item.type == "die"){
-         item.rng = new RandomGenerator(0);
-         if(!item.val){
-            item.val = item.rng.nextInt(1,6);
+         // item.rng = new RandomGenerator(0);
+         if(!context.dieValue){
+            context.dieValue = context.rng.nextInt(1,6);
          }
-         // console.log(item.val)
       }
 
       if(context.display && redisplay) {
@@ -1780,7 +1787,7 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(item.customDisplay !== undefined) {
-         item.customDisplay(item);
+         item.customDisplay(item,context);
       }
       if((infos.customItems) && (item.num < 90)){
          Object.assign(item,context.customItems[item.num]);
@@ -2123,6 +2130,31 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
+   // context.moveUpAndTake = function(callback) {
+   //    if(!context.display){
+   //       this.cranePosY = -1;
+   //       context.take(callback);
+   //    }else{
+   //       var currY = context.cranePosY;
+   //       var delayUp = infos.actionDelay*Math.abs(currY + 1);
+   //       var currPos = context.cranePos;
+   //       var topBlock = context.findTopBlock(currPos);
+   //       var delayTake = 0;
+   //       if(!topBlock || topBlock.num == 1){
+            
+   //       }else if(!topBlock.isMovable && topBlock.num != 1){
+
+   //       }else{
+   //          delayTake += infos.actionDelay*(topBlock.row + 2);
+   //       }
+   //       this.moveCraneY(-1);
+   //       this.delayFactory.createTimeout("moveUpAndTake_" + Math.random(), function() {
+   //          context.take();
+   //       }, delayUp);
+   //       context.waitDelay(callback,null,delayUp + delayTake);
+   //    }
+   // };
+
    context.putDown = function(callback) {
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
@@ -2395,7 +2427,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function rollDie(item) {
-      item.val = item.rng.nextInt(1,6);
+      context.dieValue = context.rng.nextInt(1,6);
       redisplayItem(item);
    };
 
@@ -3032,9 +3064,9 @@ var robotEndFunctionGenerator = {
             crusher: { num: 98, img: "crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
             wreckingBall: { num: 99, img: "crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
             mask: { num: 97, img: "crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
-            die: { num: 96, side: 60, isMovable: true, isDie: true, value: null, zOrder: 1, customDisplay: function(obj) {
-               obj.img = "crane/die/0"+obj.val+".png";
-               // console.log(obj.val) 
+            die: { num: 96, side: 60, isMovable: true, isDie: true, value: null, zOrder: 1, customDisplay: function(obj,context) {
+               obj.img = "crane/die/0"+context.dieValue+".png";
+               // console.log(obj.value) 
             }},
          },
          checkEndCondition: robotEndConditions.dev,
