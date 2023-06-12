@@ -383,6 +383,7 @@ var getContext = function(display, infos, curLevel) {
                context.executeWhenReady(function () {
                   context.take(callback);
                });
+               });
             });
          }else{
             this.take(callback);
