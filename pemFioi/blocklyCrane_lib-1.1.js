@@ -374,8 +374,10 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "take" },
       func: function(callback) {
          if(this.cranePosY > -1){
-            this.moveCraneY(-1,function() {
-               context.take(callback);
+            this.moveCraneY(-1, function () {
+               context.executeWhenReady(function () {
+                  context.take(callback);
+               });
             });
          }else{
             this.take(callback);
