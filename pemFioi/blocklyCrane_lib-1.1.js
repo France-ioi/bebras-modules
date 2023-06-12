@@ -380,7 +380,7 @@ var getContext = function(display, infos, curLevel) {
             // because take as a callback of shiftCraneY doesn't work
             // this.moveUpAndTake(callback);
             this.moveCraneY(-1, function () {
-               context.executeCallWhenReady('robot', 'take');
+               context.executeCallWhenReady('take');
                callback();
             });
          }else{
