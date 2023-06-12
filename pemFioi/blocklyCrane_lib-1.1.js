@@ -57,7 +57,11 @@ var getContext = function(display, infos, curLevel) {
                carriedBlock: "brique transportée",
                topBlockBroken: "brique du dessus est cassée",
                carriedBlockBroken: "brique transportée est cassée",  
-               onMarker: "sur le marqueur %1"
+               onMarker: "sur le marqueur %1",
+
+               up: "monter",
+               down: "descendre",
+               readBlock: "lire brique"
 
             },
             code: {
@@ -77,7 +81,11 @@ var getContext = function(display, infos, curLevel) {
                carriedBlock: "briqueTransportee",
                topBlockBroken: "briqueDuDessusCassee",
                carriedBlockBroken: "briqueTransporteeCassee",                
-               onMarker: "surMarqueur"
+               onMarker: "surMarqueur",
+
+               up: "monter",
+               down: "descendre",
+               readBlock: "lireBrique"
 
             },
             description: {
@@ -90,26 +98,37 @@ var getContext = function(display, infos, curLevel) {
                placeMarker: "@(nom) Place un marqueur portant ce nom à la position actuelle de la grue, ou y déplace le marqueur de ce nom s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
                onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
-			   expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
+			      expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
                expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
                topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
                blockAt: "@(ligne, colonne) Retourne le numéro du type de brique se trouvant dans la grille à la ligne et à la colonne indiquées.",
                brokenBlockAt: "@(ligne, colonne) Retourne True si la brique se trouvant à la ligne et à la colonne indiquées est cassée, et False sinon.",
                carriedBlock: "@() Retourne le numéro du type de la brique actuellement transportée par la grue.",
                topBlockBroken: "@() Retourne True si la brique se trouvant au sommet de la colonne où se trouve la grue est cassée, et False sinon.",
-               carriedBlockBroken: "@() Retourne True si la brique actuellement transportée par la grue est cassée, et False sinon.",            
+               carriedBlockBroken: "@() Retourne True si la brique actuellement transportée par la grue est cassée, et False sinon.", 
+
+               up: "@() Déplace l'outil' d'une case vers le haut.",
+               down: "@() Déplace l'outil' d'une case vers le bas.",           
+               readBlock: "@() Retourne le numéro du type."
             },
             messages: {
+               yLimit: function(up) {
+                  var str = "L'outil ne peut pas "
+                  str += (up) ? "monter plus haut." : "descendre plus bas.";
+                  return str
+               },
                outside: "La grue ne peut pas aller plus loin dans cette direction !",
                success: "Bravo, vous avez réussi !",
                failure: "Vous n'avez pas atteint l'objectif",
                nothingToTake: "Il n'y a pas de bloc dans cette colonne !",
                notMovable: "Ce bloc ne peut pas être déplacé",
                holdingBlock: "La grue ne peut pas prendre plus d'un bloc en même temps",
+               holdingBlock_sensor: "Vous ne pouvez pas utiliser le capteur pendant que la grue porte un bloc",
                emptyCrane: "La grue ne porte pas de bloc",
                cannotDrop: "Vous ne pouvez pas déposer de bloc dans cette colonne",
                notWrecking: "Vous ne pouvez pas lâcher ce bloc",
                wrongCoordinates: "Les coordonnées sont invalides",
+               impossibleToRead: "Impossible de lire une brique à cette position",
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
@@ -354,7 +373,13 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "take" },
       func: function(callback) {
-         this.take(callback);
+         if(this.cranePosY > -1){
+            this.moveCraneY(-1,function() {
+               context.take(callback);
+            });
+         }else{
+            this.take(callback);
+         } 
       }
    });
 
@@ -529,6 +554,42 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "up",
+      type: "actions",
+      block: { name: "up" },
+      func: function(callback) {
+         this.shiftCraneY(-1,callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "down",
+      type: "actions",
+      block: { name: "down" },
+      func: function(callback) {
+         this.shiftCraneY(1,callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "readBlock",
+      type: "sensors",
+      block: { name: "readBlock", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getBlockType());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "dieValue",
+      type: "sensors",
+      block: { name: "dieValue", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getDieValue());
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -576,6 +637,8 @@ var getContext = function(display, infos, curLevel) {
       wheelsH,
       shaftW, shaftH,
       shaftOffsetY, shaftOffsetX,
+      sensorW, sensorH,
+      sensorOffsetY, sensorOffsetX,
       clawW, clawH, 
       clawsOffsetY,
       leftClawOffsetX, rightClawOffsetX,
@@ -694,6 +757,8 @@ var getContext = function(display, infos, curLevel) {
          context.nbRowsCont =  context.container.length;
          context.nbColCont =  (context.nbRowsCont > 0) ? context.container[0].length : 0;
          context.initCranePos = gridInfos.initCranePos || 0;
+         context.initCranePosY = (gridInfos.initCranePosY != undefined) ? gridInfos.initCranePosY : -1;
+         context.initTool = gridInfos.initTool || 0;
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
          context.broken = gridInfos.broken || [];
@@ -704,7 +769,9 @@ var getContext = function(display, infos, curLevel) {
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
+      context.cranePosY = context.initCranePosY || 0;
       context.craneContent = null;
+      context.tool = context.initTool || 0; // 0: crane, 1: sensor
       
       context.items = [];
       context.multicell_items = [];
@@ -979,6 +1046,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
       var id = (items.length == 0) ? 0 : items[0].id;
+      console.log(id)
       return id
    };
 
@@ -990,6 +1058,26 @@ var getContext = function(display, infos, curLevel) {
       // console.log(this.craneContent.num);
       var id = this.craneContent.id
       return id
+   };
+
+    context.getBlockType = function() {
+      context.tool = 1;
+      updateTool();
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      if(row > -1){
+         return this.getBlockAt(row + 1,col + 1)
+      }
+      throw(strings.messages.impossibleToRead)
+   };
+
+   context.getDieValue = function() {
+      for(var item of items){
+         if(item.isDie){
+            return item.value
+         }
+      }
+      return 0
    };
 
    context.isTopBlockBroken = function() {
@@ -1098,6 +1186,10 @@ var getContext = function(display, infos, curLevel) {
       var cranePos = context.cranePos;
       var nbRowsCont = context.nbRowsCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
+      var cranePosY = context.cranePosY;
+
+      var craneOpacity = 1 - context.tool;
+      var sensorOpacity = context.tool;
 
       var x = infos.leftMargin*scale + w*cranePos;
       var xWheels = x + wheelsOffsetX*scale;
@@ -1106,7 +1198,7 @@ var getContext = function(display, infos, curLevel) {
       var lineH = nbRows + craneH;
       var y0Line = y;
       var yLineClip1 = y + wheelsPosY*scale;
-      var yLineClip2 = y + (shaftOffsetY + 2)*scale;
+      var yLineClip2 = y + (shaftOffsetY + 2)*scale + (cranePosY + 1)*cSide*scale;
       var hClip = yLineClip2 - yLineClip1;
       var lineClip = [x,yLineClip1,w,hClip];
 
@@ -1122,9 +1214,12 @@ var getContext = function(display, infos, curLevel) {
       var cxRight = x + rightClawCx*scale;
       var cyRight = y + rightClawCy*scale;
 
+      var xSensor = x + sensorOffsetX*scale;
+      var ySensor = y + sensorOffsetY*scale + (cranePosY + 1)*cSide*scale;
+
       return { x, y, w, h, xWheels, yWheels, y0Line, lineClip, 
          xShaft, yShaft, yClaws, xLeftClaw, xRightClaw, 
-         cxLeft, cyLeft, cxRight, cyRight }
+         cxLeft, cyLeft, cxRight, cyRight, xSensor, ySensor, craneOpacity, sensorOpacity }
    };
 
    function setCraneAttr(attr) {
@@ -1141,19 +1236,29 @@ var getContext = function(display, infos, curLevel) {
          x: attr.xShaft, 
          y: attr.yShaft, 
          width: shaftW*scale, 
-         height: shaftH*scale 
+         height: shaftH*scale,
+         opacity: attr.craneOpacity
       })
       crane.leftClaw.attr({ 
          x: attr.xLeftClaw, 
          y: attr.yClaws, 
          width: clawW*scale, 
-         height: clawH*scale 
+         height: clawH*scale,
+         opacity: attr.craneOpacity
       });
       crane.rightClaw.attr({ 
          x: attr.xRightClaw, 
          y: attr.yClaws, 
          width: clawW*scale, 
-         height: clawH*scale 
+         height: clawH*scale,
+         opacity: attr.craneOpacity
+      });
+      crane.sensor.attr({ 
+         x: attr.xSensor, 
+         y: attr.ySensor, 
+         width: sensorW*scale, 
+         height: sensorH*scale,
+         opacity: attr.sensorOpacity
       });
 
       if(context.craneContent){
@@ -1175,6 +1280,23 @@ var getContext = function(display, infos, curLevel) {
       // crane.wheels.toFront();
       // crane.leftClaw.toFront();
       resetCraneZOrder();
+   };
+
+   function updateTool() {
+      var craneOpacity = 1 - context.tool;
+      var sensorOpacity = context.tool;
+      crane.shaft.attr({
+         opacity: craneOpacity
+      })
+      crane.leftClaw.attr({ 
+         opacity: craneOpacity
+      });
+      crane.rightClaw.attr({ 
+         opacity: craneOpacity
+      });
+      crane.sensor.attr({ 
+         opacity: sensorOpacity
+      });
    };
    
    var resetBoard = function() {
@@ -1245,6 +1367,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function resetCrane() {
+      // console.log("resetCrane")
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
@@ -1264,6 +1387,7 @@ var getContext = function(display, infos, curLevel) {
       crane.leftClaw = paper.image(getImgPath(src.leftClaw),0,0,0,0);
       crane.rightClaw = paper.image(getImgPath(src.rightClaw),0,0,0,0);
       crane.shaft = paper.image(getImgPath(src.shaft),0,0,0,0);
+      crane.sensor = paper.image(getImgPath(src.sensor),0,0,0,0);
       crane.all = paper.setFinish();
 
       if(context.craneContent){
@@ -1295,6 +1419,13 @@ var getContext = function(display, infos, curLevel) {
          item.height = context.nbRows*60;
          item.offsetY = 0;
          item.offsetX = 0;
+      }
+      if(item.type == "die"){
+         item.rng = new RandomGenerator(0);
+         if(!item.val){
+            item.val = item.rng.nextInt(1,6);
+         }
+         // console.log(item.val)
       }
 
       if(context.display && redisplay) {
@@ -1676,7 +1807,6 @@ var getContext = function(display, infos, curLevel) {
          var w = item.width || item.side;
          var h = item.height || item.side;
          item.element = paper.image(src, x, y, w * scale, h * scale);
-
          if(item.target && !item.targetImg){
             item.element.attr("opacity",0.3);
          }
@@ -1868,10 +1998,10 @@ var getContext = function(display, infos, curLevel) {
       return selected;
    };
    
-   context.isOn = function(filter) {
-      var item = context.getRobot();
-      return context.hasOn(item.row, item.col, filter);
-   };
+   // context.isOn = function(filter) {
+   //    var item = context.getRobot();
+   //    return context.hasOn(item.row, item.col, filter);
+   // };
    
    context.isInFront = function(filter) {
       var coords = context.coordsInFront();
@@ -1896,8 +2026,21 @@ var getContext = function(display, infos, curLevel) {
       }else if(ttg == false){
          context.waitDelay(callback);
       }else{
-         // console.log(context.cranePos + dir/4)
          context.moveCrane(context.cranePos + dir/2)
+         throw ttg;
+      }
+   };
+
+   context.shiftCraneY = function(dir,callback) {
+      var newPosY = context.cranePosY + dir;
+      var ttg = context.tryToGoY(newPosY);
+      if(ttg === true){
+         context.tool = 1;
+         context.moveCraneY(newPosY, callback);
+      }else if(ttg == false){
+         context.waitDelay(callback);
+      }else{
+         // context.moveCraneY(context.cranePosY + dir/2)
          throw ttg;
       }
    };
@@ -1924,8 +2067,13 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.take = function(callback) {
+      // console.log("take",context.cranePosY)
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
+      }
+      context.tool = 0;
+      if(context.display){
+         updateTool();
       }
       var currPos = context.cranePos;
       var topBlock = context.findTopBlock(currPos);
@@ -2021,7 +2169,7 @@ var getContext = function(display, infos, curLevel) {
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
       }
-      if(!context.craneContent.wrecking){
+      if(!context.craneContent.wrecking && !context.craneContent.isDie){
          throw(context.strings.messages.notWrecking);
       }
 
@@ -2029,7 +2177,7 @@ var getContext = function(display, infos, curLevel) {
 
       var currPos = context.cranePos;
       var topBlock = context.findTopBlock(currPos);
-      var newRow = (topBlock.num == 1) ? topBlock.row - 1 : topBlock.row;
+      var newRow = (topBlock.num == 1 || context.craneContent.isDie) ? topBlock.row - 1 : topBlock.row;
       var newCol = currPos;
       context.craneContent.row = newRow;
       context.craneContent.col = newCol;
@@ -2048,7 +2196,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       if(!context.display || !context.animate || infos.actionDelay == 0){
-         if(topBlock.num > 1){
+         if(topBlock.num > 1 && !context.craneContent.isDie){
             context.destroy(topBlock);
          }
       }
@@ -2212,7 +2360,7 @@ var getContext = function(display, infos, curLevel) {
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
-         if(topBlock && topBlock.num > 1){
+         if(topBlock && topBlock.num > 1 && !item.isDie){
             context.destroy(topBlock);
             var soundName = "wreckingBall_destroy";
          }else{
@@ -2232,6 +2380,10 @@ var getContext = function(display, infos, curLevel) {
             }
          }, dustDuration);
          context.addSound(soundName);
+
+         if(item.isDie){
+            rollDie(item);
+         }
          // if(callback){
          //    context.waitDelay(callback);
          // }
@@ -2240,6 +2392,11 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
       context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+   };
+
+   function rollDie(item) {
+      item.val = item.rng.nextInt(1,6);
+      redisplayItem(item);
    };
 
    context.tryToGo = function(col) {
@@ -2253,6 +2410,22 @@ var getContext = function(display, infos, curLevel) {
          if(infos.ignoreInvalidMoves)
             return false;
          return strings.messages.outside;
+      }
+      return true;
+   };
+
+   context.tryToGoY = function(row) {
+      // Returns whether the crane can move to row
+      // true : yes, false : no but move ignored, string : no and throw error
+      // var nbRowsCont = context.nbRowsCont;
+      if(context.craneContent){
+         return context.strings.messages.holdingBlock_sensor;
+      }
+
+      if(row < -1 || row >= context.nbRows) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         return strings.messages.yLimit(row < -1);
       }
       return true;
    };
@@ -2278,6 +2451,7 @@ var getContext = function(display, infos, curLevel) {
                });
                var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },delay);
                var animShaft = new Raphael.animation({ x: craneAttr.xShaft },delay);
+               var animSensor = new Raphael.animation({ x: craneAttr.xSensor },delay);
                var angle = (context.craneContent) ? clutchAngle : 0;
                var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
                var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },delay);
@@ -2285,6 +2459,7 @@ var getContext = function(display, infos, curLevel) {
                context.raphaelFactory.animate("animCrane_wheels_" + Math.random(), crane.wheels, anim);
                context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
                context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.shaft, animShaft);
+               context.raphaelFactory.animate("animCrane_sensor_" + Math.random(), crane.sensor, animSensor);
                context.raphaelFactory.animate("animCrane_leftClaw_" + Math.random(), crane.leftClaw, animLeftClaw);
                context.raphaelFactory.animate("animCrane_rightClaw_" + Math.random(), crane.rightClaw, animRightClaw);
                if(context.craneContent){
@@ -2292,6 +2467,40 @@ var getContext = function(display, infos, curLevel) {
                   var animItem = new Raphael.animation({ x: craneAttr.x + item.offsetX },delay);
                   context.raphaelFactory.animate("animCrane_item_" + Math.random(), item.element, animItem);
                }
+            } else {
+               context.delayFactory.createTimeout("moveCrane_" + Math.random(), function() {
+                  setCraneAttr(craneAttr);
+               }, delay / 2);
+            }
+         } else {
+            setCraneAttr(craneAttr);
+         }
+         $("#nbMoves").html(context.nbMoves);
+      }
+      
+      // context.advanceTime(1);
+      if(callback){
+         context.waitDelay(callback, null, delay);
+      }
+   };
+
+   context.moveCraneY = function(newRow, callback) {
+      var animate = (context.cranePosY != newRow);
+      
+      var oldPos = context.cranePosY;
+      context.cranePosY = newRow;
+      
+      if(context.display) {
+         var craneAttr = getCraneAttr();
+         if(infos.actionDelay > 0) {
+            updateTool();
+            var delay = infos.actionDelay*Math.abs(newRow - oldPos);
+            if(animate && context.animate) {
+               var animLine = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+               var animSensor = new Raphael.animation({ y: craneAttr.ySensor },delay);
+              
+               context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
+               context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.sensor, animSensor);
             } else {
                context.delayFactory.createTimeout("moveCrane_" + Math.random(), function() {
                   setCraneAttr(craneAttr);
@@ -2611,7 +2820,8 @@ var robotEndFunctionGenerator = {
             wheels: /*imgPath+*/"crane/wheels.png",
             line: /*imgPath+*/"crane/line.png",
             leftClaw: /*imgPath+*/"crane/left_claw.png",
-            rightClaw: /*imgPath+*/"crane/right_claw.png"
+            rightClaw: /*imgPath+*/"crane/right_claw.png",
+            sensor: /*imgPath+*/"crane/sensor.png"
          },
          itemTypes: {
             circle: { num: 2, img: /*imgPath+*/"card_roundDotted.png", side: 60, isMovable: true, zOrder: 1 },
@@ -2708,6 +2918,7 @@ var robotEndFunctionGenerator = {
             leftClaw: /*imgPath+*/"crane/crane_left_claw_open.png",
             rightClaw: /*imgPath+*/"crane/crane_right_claw_open.png",
             shaft: /*imgPath+*/"crane/crane_shaft.png",
+            sensor: /*imgPath+*/"crane/sensor.png"
          },
          craneZOrder: {
             wheels: 1,
@@ -2715,7 +2926,8 @@ var robotEndFunctionGenerator = {
             leftClaw: 2,
             rightClaw: 0,
             shaft: 1,
-            item: 1
+            item: 1,
+            sensor: 1
          },
          itemTypes: {
             tower_1: { num: 2, 
@@ -2792,15 +3004,20 @@ var robotEndFunctionGenerator = {
             rightClawCx: 33,
             rightClawCy: 60,
             clutchAngle: 30,
-            craneItemOffset: 12
+            craneItemOffset: 12,
+            sensorW: 30,
+            sensorH: 30,
+            sensorOffsetX: 15,
+            sensorOffsetY: 47
          },
          craneSrc: {
-            rail: /*imgPath+*/"crane/rail.png",
-            wheels: /*imgPath+*/"crane/crane_wheels.png",
-            line: /*imgPath+*/"crane/crane_line.png",
-            leftClaw: /*imgPath+*/"crane/crane_left_claw_open.png",
-            rightClaw: /*imgPath+*/"crane/crane_right_claw_open.png",
-            shaft: /*imgPath+*/"crane/crane_shaft.png",
+            rail: "crane/rail.png",
+            wheels: "crane/crane_wheels.png",
+            line: "crane/crane_line.png",
+            leftClaw: "crane/crane_left_claw_open.png",
+            rightClaw: "crane/crane_right_claw_open.png",
+            shaft: "crane/crane_shaft.png",
+            sensor: "crane/sensor.png"
          },
          craneZOrder: {
             wheels: 1,
@@ -2808,13 +3025,17 @@ var robotEndFunctionGenerator = {
             leftClaw: 2,
             rightClaw: 0,
             shaft: 1,
-            item: 1
+            item: 1,
+            sensor: 1
          },
          itemTypes: {
-            crusher: { num: 98, img: /*imgPath+*/"crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
-            wreckingBall: { num: 99, img: /*imgPath+*/"crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
-            mask: { num: 97, img: /*imgPath+*/"crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
-            // mask: { num: 28, img: /*imgPath+*/"card_squareStriped.png", side: 80, offsetX: 0, offsetY: 0, isMovable: false, zOrder: 2},
+            crusher: { num: 98, img: "crane/crusher.png", side: 60, isMovable: true, crusher: true, zOrder: 1},
+            wreckingBall: { num: 99, img: "crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
+            mask: { num: 97, img: "crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
+            die: { num: 96, side: 60, isMovable: true, isDie: true, value: null, zOrder: 1, customDisplay: function(obj) {
+               obj.img = "crane/die/0"+obj.val+".png";
+               // console.log(obj.val) 
+            }},
          },
          checkEndCondition: robotEndConditions.dev,
          computeGrade: computeGrade
