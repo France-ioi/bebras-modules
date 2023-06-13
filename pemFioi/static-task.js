@@ -43,6 +43,13 @@ task.getHeight = function (success, error) {
    var d = document;
    var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight) + 2;
    success(h);
+
+   // Disable scroll if we are in a properly-sized iframe
+   if(window.top !== window.self && (h - window.innerHeight) < 10) {
+      document.body.style.overflowX = 'hidden';
+   } else {
+      document.body.style.overflowX = '';
+   }
 };
 
 task.unload = function (success, error) {
@@ -170,13 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
    } catch (e) {
    }
    document.body.style.width = '';
-
-   // Disable scroll if we are in a properly-sized iframe
-   task.getHeight(function (height) {
-      if(window.top !== window.self && (height - window.innerHeight) < 10) {
-         document.body.style.overflowX = 'hidden';
-      }
-   });
 
    // Handle staticTaskOptions
    var sto = window.staticTaskOptions || {};
