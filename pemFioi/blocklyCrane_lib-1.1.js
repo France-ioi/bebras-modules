@@ -1059,7 +1059,10 @@ var getContext = function(display, infos, curLevel) {
       }
       var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
       var id = (items.length == 0) ? 0 : items[0].id;
-      console.log(id)
+      if(id === undefined){
+         // because only num < 50 (custom blocks) have id
+         id = items[0].num;
+      }
       return id
    };
 
