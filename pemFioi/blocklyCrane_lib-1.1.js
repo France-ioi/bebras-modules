@@ -765,6 +765,7 @@ var getContext = function(display, infos, curLevel) {
          context.initCranePos = gridInfos.initCranePos || 0;
          context.initCranePosY = (gridInfos.initCranePosY != undefined) ? gridInfos.initCranePosY : -1;
          context.initTool = gridInfos.initTool || 0;
+         context.dieValues = gridInfos.dieValues || null;
          context.initDieValue = gridInfos.initDieValue || null;
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
@@ -781,7 +782,9 @@ var getContext = function(display, infos, curLevel) {
       context.tool = context.initTool || 0; // 0: crane, 1: sensor
 
       context.rng = new RandomGenerator(0);
+      // context.dieValues = context.initDieValues || null;
       context.dieValue = context.initDieValue || null;
+      context.rollDieIndex = 0;
       
       context.items = [];
       context.multicell_items = [];
@@ -1082,14 +1085,19 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.getDieValue = function() {
-      return context.dieValue
+      if(context.dieValues){
+         var currIndex = this.rollDieIndex%(this.dieValues.length);
+         var val = this.dieValues[currIndex];
+      }else{
+         var val = this.dieValue;
+      }
+      return val
    };
 
    context.isTopBlockBroken = function() {
       // console.log("isTopBlockBroken")
       var col = this.cranePos;
       var topBlock = this.findTopBlock(col);
-      // console.log("[yo]",topBlock)
       if(!topBlock){
          return 0
       }
@@ -1428,8 +1436,7 @@ var getContext = function(display, infos, curLevel) {
          item.offsetX = 0;
       }
       if(item.type == "die"){
-         // item.rng = new RandomGenerator(0);
-         if(!context.dieValue){
+         if(!context.dieValue && !context.dieValues){
             context.dieValue = context.rng.nextInt(1,6);
          }
       }
@@ -2426,7 +2433,11 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function rollDie(item) {
-      context.dieValue = context.rng.nextInt(1,6);
+      if(context.dieValues){
+         context.rollDieIndex++;
+      }else{
+         context.dieValue = context.rng.nextInt(1,6);
+      }
       redisplayItem(item);
    };
 
@@ -3064,7 +3075,8 @@ var robotEndFunctionGenerator = {
             wreckingBall: { num: 99, img: "crane/wrecking_ball.png", side: 60, isMovable: true, wrecking: true, zOrder: 1},
             mask: { num: 97, img: "crane/sciFi/cloud_mask.png", side: 90, offsetX: -15, offsetY: -15, isMask: true, zOrder: 2},
             die: { num: 96, side: 60, isMovable: true, isDie: true, value: null, zOrder: 1, customDisplay: function(obj,context) {
-               obj.img = "crane/die/0"+context.dieValue+".png";
+               var val = context.getDieValue();
+               obj.img = "crane/die/0"+val+".png";
                // console.log(obj.value) 
             }},
          },
