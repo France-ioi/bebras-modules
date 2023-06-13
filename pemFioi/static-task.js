@@ -41,7 +41,7 @@ task.getHeight = function (success, error) {
    // infinite loop with the platform of height increase, try changing your
    // doctype to <!doctype html>
    var d = document;
-   var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
+   var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight) + 2;
    success(h);
 };
 
@@ -170,6 +170,13 @@ document.addEventListener('DOMContentLoaded', function() {
    } catch (e) {
    }
    document.body.style.width = '';
+
+   // Disable scroll if we are in a properly-sized iframe
+   task.getHeight(function (height) {
+      if(window.top !== window.self && (height - window.innerHeight) < 10) {
+         document.body.style.overflowX = 'hidden';
+      }
+   });
 
    // Handle staticTaskOptions
    var sto = window.staticTaskOptions || {};
