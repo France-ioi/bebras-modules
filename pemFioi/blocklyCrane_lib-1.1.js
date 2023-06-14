@@ -717,7 +717,7 @@ var getContext = function(display, infos, curLevel) {
    var dustDuration = 1100;
    var dust;
 
-   var takeAnimDelay = 0.5*infos.actionDelay;
+   var takeAnimDelay = 0.5*infos.actionDelay*10;
 
    var paper;
 
@@ -2168,7 +2168,7 @@ var getContext = function(display, infos, curLevel) {
          context.items.splice(withdrawable.index, 1);
          context.craneContent = withdrawable;
       }
-      takeAnimDelay = 0.5*infos.actionDelay*10;
+      takeAnimDelay = 0.5*infos.actionDelay;
       return topBlock
    };
 
@@ -2184,6 +2184,7 @@ var getContext = function(display, infos, curLevel) {
    context.takeAnimDown = function(topBlock,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(topBlock.row + 1);
+      console.log(takeAnimDelay)
       var aDelay = infos.actionDelay;
       var itemAttr = itemAttributes(topBlock);
       maskToFront();
@@ -2271,7 +2272,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 1) + infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 2) + 2*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -2287,7 +2288,7 @@ var getContext = function(display, infos, curLevel) {
             topBlock.element.attr("y",currY);
             var tempItem = putDownIntro();
             context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
-            //    // context.putDownAnimUp(topBlock.row);
+               context.putDownAnimUp(topBlock.row);
             });
          });
       })
@@ -2351,7 +2352,7 @@ var getContext = function(display, infos, curLevel) {
          throw(context.strings.messages.cannotDrop);
       }
 
-      takeAnimDelay = 0.5*infos.actionDelay*10;
+      takeAnimDelay = 0.5*infos.actionDelay;
       var newRow = topBlock.row - 1;
       var newCol = currPos;
       context.craneContent.row = newRow;
@@ -2424,6 +2425,7 @@ var getContext = function(display, infos, curLevel) {
    context.putDownAnimUp = function(row,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(row + 1);
+      console.log(takeAnimDelay)
       maskToFront();
 
       var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
@@ -2463,6 +2465,9 @@ var getContext = function(display, infos, curLevel) {
          if(context.animate && infos.actionDelay > 0){
             context.dropAnim(tempItem,topBlock,callback);
          }else{
+            if(tempItem.isDie){
+               rollDie(tempItem);
+            }
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
