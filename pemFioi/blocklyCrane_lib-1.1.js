@@ -717,7 +717,7 @@ var getContext = function(display, infos, curLevel) {
    var dustDuration = 1100;
    var dust;
 
-   var takeAnimDelay = 0.5*infos.actionDelay*10;
+   var takeAnimDelay = 0.5*infos.actionDelay;
 
    var paper;
 
@@ -2114,6 +2114,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.take = function(callback) {
       var topBlock = takeIntro();
+      takeAnimDelay = 0.5*infos.actionDelay;
       
       if(context.display) {
          resetCraneZOrder();
@@ -2168,7 +2169,6 @@ var getContext = function(display, infos, curLevel) {
          context.items.splice(withdrawable.index, 1);
          context.craneContent = withdrawable;
       }
-      takeAnimDelay = 0.5*infos.actionDelay;
       return topBlock
    };
 
@@ -2184,7 +2184,7 @@ var getContext = function(display, infos, curLevel) {
    context.takeAnimDown = function(topBlock,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(topBlock.row + 1);
-      console.log(takeAnimDelay)
+      // console.log(takeAnimDelay)
       var aDelay = infos.actionDelay;
       var itemAttr = itemAttributes(topBlock);
       maskToFront();
@@ -2247,6 +2247,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.takeAndFlip = function(callback) {
       var topBlock = takeIntro();
+      takeAnimDelay = 0.5*infos.actionDelay*10;
       if(topBlock != 1){
          topBlock.hidden = !topBlock.hidden;
       }
@@ -2272,7 +2273,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 2) + 2*infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 2 + 2) + 2*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -2283,15 +2284,51 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          context.takeAnimUp(topBlock,topBlock.row - 1,function() {
-            var currY = topBlock.element.attr("y");
-            redisplayItem(topBlock);
-            topBlock.element.attr("y",currY);
-            var tempItem = putDownIntro();
-            context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
-               context.putDownAnimUp(topBlock.row);
-            });
+            // var currY = topBlock.element.attr("y");
+            // redisplayItem(topBlock);
+            // topBlock.element.attr("y",currY);
+            context.flipAnim(topBlock, function() {
+               var tempItem = putDownIntro();
+               context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
+                  context.putDownAnimUp(topBlock.row);
+               });
+            })
+            
          });
       })
+   };
+
+   context.flipAnim = function(item,callback) {
+      var craneAttr = getCraneAttr();
+      var itemAttr = itemAttributes(item);
+      var w = itemAttr.width;
+      var h = itemAttr.height;
+      var x = itemAttr.x;
+      var y = item.element.attr("y");
+
+      var cSide = infos.cellSide;
+      var deltaY = (item.row)*cSide*scale;
+
+      var cyLeftDown = craneAttr.cyLeft + deltaY;
+      var cyRightDown = craneAttr.cyRight + deltaY;
+      var cx = x + w/2;
+      var delay = takeAnimDelay;
+      var anim1 = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay,function(){
+         redisplayItem(item,true);
+         item.element.attr({ y, transform: ["S",0,1,cx,y] });
+         resetCraneZOrder();
+
+         context.raphaelFactory.animate("animFlip2_" + Math.random(), item.element, anim2);
+         context.raphaelFactory.animate("animFlip2_clawR" + Math.random(), crane.rightClaw, anim2ClawR);
+         context.raphaelFactory.animate("animFlip2_clawL" + Math.random(), crane.leftClaw, anim2ClawL);
+      });
+      var anim2 = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay,callback);
+      var anim2ClawR = new Raphael.animation({ "transform": ["R",clutchAngle,craneAttr.cxRight,cyRightDown,"S",1,1,cx,y] },delay);
+      var anim2ClawL = new Raphael.animation({ "transform": ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown,"S",1,1,cx,y] },delay);
+
+      context.raphaelFactory.animate("animFlip1_item" + Math.random(), item.element, anim1);
+      context.raphaelFactory.animate("animFlip1_clawR" + Math.random(), crane.rightClaw, anim1);
+      context.raphaelFactory.animate("animFlip1_clawL" + Math.random(), crane.leftClaw, anim1);
    };
 
    // context.moveUpAndTake = function(callback) {
@@ -2321,6 +2358,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.putDown = function(callback) {
       var tempItem = putDownIntro();
+      takeAnimDelay = 0.5*infos.actionDelay;
       if(context.display) {
          if(context.animate && infos.actionDelay > 0){
             context.putDownAnim(tempItem,-1);
@@ -2352,7 +2390,6 @@ var getContext = function(display, infos, curLevel) {
          throw(context.strings.messages.cannotDrop);
       }
 
-      takeAnimDelay = 0.5*infos.actionDelay;
       var newRow = topBlock.row - 1;
       var newCol = currPos;
       context.craneContent.row = newRow;
@@ -2425,7 +2462,7 @@ var getContext = function(display, infos, curLevel) {
    context.putDownAnimUp = function(row,callback) {
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(row + 1);
-      console.log(takeAnimDelay)
+      // console.log(takeAnimDelay)
       maskToFront();
 
       var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
@@ -2472,6 +2509,8 @@ var getContext = function(display, infos, curLevel) {
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
          }
+      }else{
+         rollDie(tempItem);
       }
       if(!context.display || !context.animate || infos.actionDelay == 0){
          if(topBlock.num > 1 && !context.craneContent.isDie){
