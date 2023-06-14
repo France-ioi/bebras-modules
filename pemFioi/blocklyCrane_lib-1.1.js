@@ -62,7 +62,8 @@ var getContext = function(display, infos, curLevel) {
                up: "monter",
                down: "descendre",
                readBlock: "lire brique",
-               dieValue: "valeur du dé"
+               dieValue: "valeur du dé",
+               flip: "retourner"
 
             },
             code: {
@@ -87,7 +88,8 @@ var getContext = function(display, infos, curLevel) {
                up: "monter",
                down: "descendre",
                readBlock: "lireBrique",
-               dieValue: "valeurDé"
+               dieValue: "valeurDe",
+               flip: "retourner"
 
             },
             description: {
@@ -112,7 +114,8 @@ var getContext = function(display, infos, curLevel) {
                up: "@() Déplace l'outil' d'une case vers le haut.",
                down: "@() Déplace l'outil' d'une case vers le bas.",           
                readBlock: "@() Retourne le numéro du type.",
-               dieValue: "@() Retourne la valeur du dé."
+               dieValue: "@() Retourne la valeur du dé.",
+               flip: "@() Retourne la brique se trouvant sous la grue."
             },
             messages: {
                yLimit: function(up) {
@@ -305,8 +308,9 @@ var getContext = function(display, infos, curLevel) {
 			strId = "0" + id;
 		}
 		contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
-				   img: /*imgPath+*/"crane/numbers/" + strId + ".png",
-				   brokenImg: /*imgPath+*/"crane/numbers/broken_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
+				   img: "crane/numbers/" + strId + ".png",
+               brokenImg: "crane/numbers/broken_" + strId + ".png",
+				   hiddenImg: "crane/numbers/hidden_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
 	};
 	
    if(infos.newBlocks == undefined)
@@ -596,6 +600,22 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "flip",
+      type: "actions",
+      block: { name: "flip" },
+      func: function(callback) {
+         if(this.cranePosY > -1){
+            this.moveCraneY(-1, function () {
+               context.executeCallWhenReady('takeAndFlip');
+               callback();
+            });
+         }else{
+            this.takeAndFlip(callback);
+         } 
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -769,7 +789,9 @@ var getContext = function(display, infos, curLevel) {
          context.initDieValue = gridInfos.initDieValue || null;
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
+         context.targetHidden = context.scoring[0].hidden || [];
          context.broken = gridInfos.broken || [];
+         context.hidden = gridInfos.hidden || [];
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
          context.customItems = gridInfos.customItems || {};
@@ -1467,6 +1489,7 @@ var getContext = function(display, infos, curLevel) {
             var itemTypeNum = itemData.num;
 
             var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
+            var hidden = (context.hidden.length > 0) ? (context.hidden[iRow][iCol] == 1) : false;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
@@ -1474,12 +1497,13 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[itemTypeNum],
                   imgId: itemData.imgId,
                   deco: itemData.deco, 
-                  broken
+                  broken, hidden
                }, false);
             }
             var targetData = context.getItemData(context.target[iRow][iCol]);
+            var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
             var targetNum = targetData.num;
-            // console.log("[yo]",targetData)
+
             if(itemTypeByNum[targetNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
@@ -1487,6 +1511,7 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[targetNum],
                   imgId: targetData.imgId,
                   deco: targetData.deco, 
+                  hidden: targetHidden,
                   target: true
                }, false);
             }
@@ -1806,6 +1831,8 @@ var getContext = function(display, infos, curLevel) {
             var srcObj = item.targetImg;
          }else if(item.broken && item.brokenImg){
             var srcObj = item.brokenImg;
+         }else if(item.hidden && item.hiddenImg){
+            var srcObj = item.hiddenImg;
          }else{
             var srcObj = item.img;
          }
@@ -1980,7 +2007,10 @@ var getContext = function(display, infos, curLevel) {
       for(var type in infos.itemTypes) {
          var item = infos.itemTypes[type];
          if(item.num == num){
-            return item.id
+            if(item.id != undefined){
+               return item.id
+            }
+            return item.num
          }
       }
       return null
@@ -2083,7 +2113,32 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.take = function(callback) {
-      // console.log("take",context.cranePosY)
+      var topBlock = takeIntro();
+      
+      if(context.display) {
+         resetCraneZOrder();
+         if(context.animate && infos.actionDelay > 0){
+            context.takeAnim(topBlock);
+            if(topBlock.num == 1){
+               throw(context.strings.messages.nothingToTake);
+            }
+         }else{
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
+            if(topBlock.num == 1){
+               throw(context.strings.messages.nothingToTake);
+            }
+         }
+      }
+
+      // context.advanceTime(1);
+      if(callback){
+         var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
+         context.waitDelay(callback,null,delay);
+      }
+   };
+
+   function takeIntro() {
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
       }
@@ -2113,13 +2168,91 @@ var getContext = function(display, infos, curLevel) {
          context.items.splice(withdrawable.index, 1);
          context.craneContent = withdrawable;
       }
+      takeAnimDelay = 0.5*infos.actionDelay*10;
+      return topBlock
+   };
 
-      takeAnimDelay = 0.5*infos.actionDelay;
-      
+   context.takeAnim = function(topBlock) {
+      this.takeAnimDown(topBlock,function() {
+         if(topBlock.num == 1){
+            return
+         }
+         context.takeAnimUp(topBlock,-1);
+      })
+   };
+
+   context.takeAnimDown = function(topBlock,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = takeAnimDelay*(topBlock.row + 1);
+      var aDelay = infos.actionDelay;
+      var itemAttr = itemAttributes(topBlock);
+      maskToFront();
+
+      var catchOffsetY = topBlock.catchOffsetY || 0;
+      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
+      var deltaY = yClawDown - craneAttr.yClaws;
+      var yShaftDown = craneAttr.yShaft + deltaY;
+      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
+      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
+      var cyLeftDown = craneAttr.cyLeft + deltaY;
+      var cyRightDown = craneAttr.cyRight + deltaY;
+
+      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
+      var animClawDown = new Raphael.animation({ y: yClawDown },delay);
+      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
+         var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
+         context.addSound(soundName);
+         context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
+         context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
+         
+      });
+      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },aDelay);
+      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },aDelay,callback);
+
+      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
+      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
+      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
+   };
+
+   context.takeAnimUp = function(topBlock,newRow,callback) {
+      /* newRow is relative to default crane pos (-1) */
+      var craneAttr = getCraneAttr();
+      var delay = takeAnimDelay*(topBlock.row - newRow);
+      var cSide = infos.cellSide;
+
+      var catchOffsetY = topBlock.catchOffsetY || 0;
+
+      var deltaY = (newRow + 1)*cSide*scale;
+      var newItemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY + markerH)*scale + deltaY;
+      var newLineClip = Beav.Object.clone(craneAttr.lineClip);
+      newLineClip[3] = craneAttr.lineClip[3] + deltaY;
+      var newYShaft = craneAttr.yShaft + deltaY;
+      var newYClaws = craneAttr.yClaws + deltaY;
+      var newCyRight = craneAttr.cyRight + deltaY;
+      var newCyLeft = craneAttr.cyLeft + deltaY;
+
+      var animLineUp = new Raphael.animation({ "clip-rect": newLineClip },delay);
+      var animShaftUp = new Raphael.animation({ y: newYShaft },delay);
+      var animRightClawUp = new Raphael.animation({ y: newYClaws, transform: ["R",clutchAngle,craneAttr.cxRight,newCyRight] },delay);
+      var animLeftClawUp = new Raphael.animation({ y: newYClaws, transform: ["R",-clutchAngle,craneAttr.cxLeft,newCyLeft] },delay);
+      var animItemUp = new Raphael.animation({ y: newItemY },delay,callback);
+      context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+      context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
+      context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
+      context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
+      context.raphaelFactory.animate("animCrane_item_up" + Math.random(), topBlock.element, animItemUp);
+   };
+
+   context.takeAndFlip = function(callback) {
+      var topBlock = takeIntro();
+      if(topBlock != 1){
+         topBlock.hidden = !topBlock.hidden;
+      }
       if(context.display) {
          resetCraneZOrder();
          if(context.animate && infos.actionDelay > 0){
-            context.takeAnim(topBlock,callback);
+            context.takeAndFlipAnim(topBlock);
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
             }
@@ -2129,14 +2262,35 @@ var getContext = function(display, infos, curLevel) {
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
             }
+            putDownIntro();
+            redisplayItem(topBlock);
          }
+      }else{
+         putDownIntro();
       }
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 1) + infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
+   };
+
+   context.takeAndFlipAnim = function(topBlock) {
+      this.takeAnimDown(topBlock,function() {
+         if(topBlock.num == 1){
+            return
+         }
+         context.takeAnimUp(topBlock,topBlock.row - 1,function() {
+            var currY = topBlock.element.attr("y");
+            redisplayItem(topBlock);
+            topBlock.element.attr("y",currY);
+            var tempItem = putDownIntro();
+            context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
+            //    // context.putDownAnimUp(topBlock.row);
+            });
+         });
+      })
    };
 
    // context.moveUpAndTake = function(callback) {
@@ -2165,6 +2319,27 @@ var getContext = function(display, infos, curLevel) {
    // };
 
    context.putDown = function(callback) {
+      var tempItem = putDownIntro();
+      if(context.display) {
+         if(context.animate && infos.actionDelay > 0){
+            context.putDownAnim(tempItem,-1);
+         }else{
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
+            redisplayItem(tempItem,false);
+         }
+      }
+      if(!context.display || !context.animate || infos.actionDelay == 0){
+         context.crush();
+      }
+
+      if(callback){
+         var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelay;
+         context.waitDelay(callback, null, delay);
+      }
+   };
+
+   function putDownIntro() {
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
       }
@@ -2176,7 +2351,7 @@ var getContext = function(display, infos, curLevel) {
          throw(context.strings.messages.cannotDrop);
       }
 
-      takeAnimDelay = 0.5*infos.actionDelay;
+      takeAnimDelay = 0.5*infos.actionDelay*10;
       var newRow = topBlock.row - 1;
       var newCol = currPos;
       context.craneContent.row = newRow;
@@ -2185,24 +2360,81 @@ var getContext = function(display, infos, curLevel) {
       context.items.push(tempItem);
       context.setIndexes();
       context.craneContent = undefined;
-      
-      if(context.display) {
-         if(context.animate && infos.actionDelay > 0){
-            context.putDownAnim(tempItem,callback);
-         }else{
-            var craneAttr = getCraneAttr();
-            setCraneAttr(craneAttr);
-            redisplayItem(tempItem,false);
-         }
-      }
-      if(!context.display || !context.animate || infos.actionDelay == 0){
-         context.crush();
-      }
+      return tempItem
+   };
 
-      if(callback/* && (!context.display || !context.animate)*/){
-         var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelay;
-         context.waitDelay(callback, null, delay);
-      }
+   context.putDownAnim = function(item,currRow) {
+      this.putDownAnimDown(item,currRow, function() {
+         context.putDownAnimUp(item.row);
+      });
+   };
+
+   context.putDownAnimDown = function(item,currRow,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = takeAnimDelay*(item.row - currRow);
+      var cSide = infos.cellSide;
+      var itemAttr = itemAttributes(item);
+      maskToFront();
+
+      var catchOffsetY = item.catchOffsetY || 0;
+      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
+      var deltaY = yClawDown - craneAttr.yClaws;
+      var yShaftDown = craneAttr.yShaft + deltaY;
+      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
+      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
+      var cyLeftDown = craneAttr.cyLeft + deltaY;
+      var cyRightDown = craneAttr.cyRight + deltaY;
+      var dustY = itemAttr.y + itemAttr.height - dustH*scale/2;
+      var dustX = itemAttr.x + (itemAttr.width - dustW*scale)/2;
+
+      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
+      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay);
+      var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },delay);
+      var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },delay);
+      var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
+         context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
+         context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
+         context.addSound("brick_putDown");
+         context.crush();
+         if(dust){
+            dust.remove();
+            dust = null;
+            context.delayFactory.destroy("removeDust");
+         }
+         dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
+         $("#dust_pix").attr("src",dustSrc);
+         context.delayFactory.createTimeout("removeDust", function() {
+            if(dust){
+               dust.remove();
+               dust = null;
+            }
+         }, dustDuration);
+
+      });
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,callback);
+
+      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
+      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
+      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
+      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
+      context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+   };
+
+   context.putDownAnimUp = function(row,callback) {
+      var craneAttr = getCraneAttr();
+      var delay = takeAnimDelay*(row + 1);
+      maskToFront();
+
+      var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
+      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
+      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,callback);
+
+      context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
+      context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
+      context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
+      context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
    };
 
    context.drop = function(callback) {
@@ -2268,125 +2500,6 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       }
-   };
-
-   context.takeAnim = function(topBlock,callback) {
-      var craneAttr = getCraneAttr();
-      var delay = takeAnimDelay*(topBlock.row + 1);
-      var aDelay = infos.actionDelay;
-      var itemAttr = itemAttributes(topBlock);
-      maskToFront();
-
-      var catchOffsetY = topBlock.catchOffsetY || 0;
-      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
-      var deltaY = yClawDown - craneAttr.yClaws;
-      var yShaftDown = craneAttr.yShaft + deltaY;
-      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
-      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
-      var cyLeftDown = craneAttr.cyLeft + deltaY;
-      var cyRightDown = craneAttr.cyRight + deltaY;
-      var itemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY + markerH)*scale;
-
-      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
-      var animClawDown = new Raphael.animation({ y: yClawDown },delay);
-      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay,function() {
-         var soundName = (topBlock.type == "wreckingBall") ? "wreckingBall_grab" : "brick_grab";
-         context.addSound(soundName);
-         context.raphaelFactory.animate("animCrane_close_rightClaw_" + Math.random(), crane.rightClaw, animCloseRightClaw);
-         context.raphaelFactory.animate("animCrane_close_leftClaw_" + Math.random(), crane.leftClaw, animCloseLeftClaw);
-         
-      });
-      var animCloseRightClaw = new Raphael.animation({ transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },aDelay);
-      var animCloseLeftClaw = new Raphael.animation({ transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },aDelay,function() {
-         if(topBlock.num == 1){
-            return
-         }
-         context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
-         context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
-         context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
-         context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
-         context.raphaelFactory.animate("animCrane_item_up" + Math.random(), topBlock.element, animItemUp);
-      });
-      var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
-      var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
-      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",clutchAngle,craneAttr.cxRight,craneAttr.cyRight] },delay);
-      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws, transform: ["R",-clutchAngle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
-      var animItemUp = new Raphael.animation({ y: itemY },delay);
-      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
-      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animClawDown);
-      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animClawDown);
-      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
-   };
-
-   context.putDownAnim = function(item,callback) {
-      var craneAttr = getCraneAttr();
-      var delay = takeAnimDelay*(item.row + 1);
-      var itemAttr = itemAttributes(item);
-      maskToFront();
-
-      var catchOffsetY = item.catchOffsetY || 0;
-      var yClawDown = itemAttr.y - craneItemOffset*scale + catchOffsetY*scale;
-      var deltaY = yClawDown - craneAttr.yClaws;
-      var yShaftDown = craneAttr.yShaft + deltaY;
-      var lineClipDown = Beav.Object.clone(craneAttr.lineClip);
-      lineClipDown[3] = craneAttr.lineClip[3] + deltaY;
-      var cyLeftDown = craneAttr.cyLeft + deltaY;
-      var cyRightDown = craneAttr.cyRight + deltaY;
-      var dustY = itemAttr.y + itemAttr.height - dustH*scale/2;
-      var dustX = itemAttr.x + (itemAttr.width - dustW*scale)/2;
-      // var itemY = (infos.topMargin + clawsPos + craneItemOffset + topBlock.offsetY)*scale;
-
-      var animLineDown = new Raphael.animation({ "clip-rect": lineClipDown },delay);
-      var animShaftDown = new Raphael.animation({ y: yShaftDown },delay);
-      var animRightClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",clutchAngle,craneAttr.cxRight,cyRightDown] },delay);
-      var animLeftClawDown = new Raphael.animation({ y: yClawDown, transform: ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown] },delay);
-      var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,function() {
-         context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
-         context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
-         context.addSound("brick_putDown");
-         context.crush();
-         if(dust){
-            dust.remove();
-            dust = null;
-            context.delayFactory.destroy("removeDust");
-         }
-         dust = paper.image(dustSrc,dustX,dustY,dustW*scale,dustH*scale);
-         $("#dust_pix").attr("src",dustSrc);
-         context.delayFactory.createTimeout("removeDust", function() {
-            if(dust){
-               dust.remove();
-               dust = null;
-            }
-         }, dustDuration);
-
-         // $("#noise").remove();
-         // $("body").append("<audio src='"+mp3Path+"drop.mp3' autoplay id='noise'></audio>");
-         // var vol = (context.soundEnabled) ? 1 : 0;
-         // $("audio").prop('volume', vol);
-      });
-      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
-      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,function() {
-         // context.addSound("line_up");
-         context.raphaelFactory.animate("animCrane_line_up_" + Math.random(), crane.line, animLineUp);
-         context.raphaelFactory.animate("animCrane_shaft_up_" + Math.random(), crane.shaft, animShaftUp);
-         context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
-         context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
-      });
-      var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
-      var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft },delay);
-      var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay);
-      var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws },delay,function() {
-         // if(callback){
-         //    context.waitDelay(callback);
-         // }
-      });
-
-      // context.addSound("line_down");
-      context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
-      context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
-      context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
-      context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
-      context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
    };
 
    context.dropAnim = function(item,topBlock,callback) {
