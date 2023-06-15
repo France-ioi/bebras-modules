@@ -166,6 +166,7 @@ var getContext = function(display, infos, curLevel) {
                   var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
                   return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
                },
+               failureHiddenBlock: "Le bloc encadré en rouge est tourné du mauvais côté.",
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
             startingBlockName: "Programme du robot"
@@ -2246,8 +2247,12 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.takeAndFlip = function(callback) {
+      // if(context.display){
+      //    var craneAttr = getCraneAttr();
+      //    setCraneAttr(craneAttr);
+      // }
       var topBlock = takeIntro();
-      takeAnimDelay = 0.5*infos.actionDelay*10;
+      takeAnimDelay = infos.actionDelay;
       if(topBlock != 1){
          topBlock.hidden = !topBlock.hidden;
       }
@@ -2273,7 +2278,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1 + 2 + 2) + 2*infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 2) + 4*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -2284,16 +2289,12 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          context.takeAnimUp(topBlock,topBlock.row - 1,function() {
-            // var currY = topBlock.element.attr("y");
-            // redisplayItem(topBlock);
-            // topBlock.element.attr("y",currY);
             context.flipAnim(topBlock, function() {
                var tempItem = putDownIntro();
                context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
                   context.putDownAnimUp(topBlock.row);
                });
-            })
-            
+            })     
          });
       })
    };
@@ -2312,7 +2313,7 @@ var getContext = function(display, infos, curLevel) {
       var cyLeftDown = craneAttr.cyLeft + deltaY;
       var cyRightDown = craneAttr.cyRight + deltaY;
       var cx = x + w/2;
-      var delay = takeAnimDelay;
+      var delay = infos.actionDelay;
       var anim1 = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay,function(){
          redisplayItem(item,true);
          item.element.attr({ y, transform: ["S",0,1,cx,y] });
@@ -2883,72 +2884,15 @@ var robotEndConditions = {
       var tar = context.scoring[iTarget].target;
       var sco = context.scoring[iTarget].score;
       var sub = context.scoring[iTarget].subset;
+      var hid = context.scoring[iTarget].hidden;
       var til = context.tiles;
       var bro = context.broken;
       
-      var nbRequired = 0;
-      var nbWellPlaced = 0;
-      for(var iRow = 0; iRow < tar.length; iRow++){
-         for(var iCol = 0; iCol < tar[iRow].length; iCol++){
-            if(sub && sub.length > 0 && !sub[iRow][iCol]){
-               continue
-            }
-            var tarData = context.getItemData(tar[iRow][iCol]);
-            var numTar = tarData.num;
-            var idTar = tarData.imgId;
+      var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-            var tilData = context.getItemData(til[iRow][iCol]);
-            var numTil = tilData.num;
-            var idTil = tilData.imgId;
-            
-            var numBro = (bro.length > 0) ? bro[iRow][iCol] : 0;
-            
-            var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
-            var gridCol = iCol + context.nbColCont;
-            
-            if(numTar != 1 && (numTil != numTar || numBro == 1)){
-               nbRequired++;
-               var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
-               if(items.length > 0 && items[0].num == numTar && !items[0].broken){
-                  nbWellPlaced++;
-               }
-            }
-         }
-      }
-      var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
-      for(var iRow = 0; iRow < tar.length; iRow++){
-         for(var iCol = 0; iCol < tar[iRow].length; iCol++){
-            if(sub && sub.length > 0 && !sub[iRow][iCol]){
-               continue
-            }
-            var tarData = context.getItemData(tar[iRow][iCol]);
-            var numTar = tarData.num;
-            var idTar = tarData.imgId;
-            var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
-            var gridCol = iCol + context.nbColCont;
-            if(numTar != 1){
-               var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
-               var itemPos = context.getItemsPos(numTar,idTar); // *
-               if(context.craneContent && context.craneContent.num == numTar){
-                  itemPos.push({ row: "crane", col: context.cranePos });
-               }
-               if(items.length == 0){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
-                  errorMsg += window.languageStrings.messages.failureMissing(itemPos.length);
-                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
-               }
-               if(items[0].num != numTar || items[0].imgId != idTar){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
-                  errorMsg += window.languageStrings.messages.failureWrongBlock(itemPos.length);
-                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
-               }
-               if(items[0].broken){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
-                  errorMsg += window.languageStrings.messages.failureBrokenBlock(itemPos.length);
-                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
-               }
-            }
-         }
+      var error = checkForErrors(context,tar,sub,hid,nbWellPlaced,nbRequired);
+      if(error){
+         return error
       }
 
       for(var iRow = 0; iRow < tar.length; iRow++){
@@ -2973,6 +2917,85 @@ var robotEndConditions = {
       }
       return { success: true, msg: window.languageStrings.messages.success }
    },
+};
+
+function checkWellPlaced(context,tar,sub,til,bro) {
+   var nbRequired = 0;
+   var nbWellPlaced = 0;
+   for(var iRow = 0; iRow < tar.length; iRow++){
+      for(var iCol = 0; iCol < tar[iRow].length; iCol++){
+         if(sub && sub.length > 0 && !sub[iRow][iCol]){
+            continue
+         }
+         var tarData = context.getItemData(tar[iRow][iCol]);
+         var numTar = tarData.num;
+         var idTar = tarData.imgId;
+
+         var tilData = context.getItemData(til[iRow][iCol]);
+         var numTil = tilData.num;
+         var idTil = tilData.imgId;
+         
+         var numBro = (bro.length > 0) ? bro[iRow][iCol] : 0;
+         
+         var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
+         var gridCol = iCol + context.nbColCont;
+         
+         if(numTar != 1 && (numTil != numTar || numBro == 1)){
+            nbRequired++;
+            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+            if(items.length > 0 && items[0].num == numTar && !items[0].broken){
+               nbWellPlaced++;
+            }
+         }
+      }
+   }
+   return { nbRequired, nbWellPlaced }
+};
+
+function checkForErrors(context,tar,sub,hid,nbWellPlaced,nbRequired) {
+   var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
+   for(var iRow = 0; iRow < tar.length; iRow++){
+      for(var iCol = 0; iCol < tar[iRow].length; iCol++){
+         if(sub && sub.length > 0 && !sub[iRow][iCol]){
+            continue
+         }
+         var tarData = context.getItemData(tar[iRow][iCol]);
+         var numTar = tarData.num;
+         var idTar = tarData.imgId;
+         var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
+         var gridCol = iCol + context.nbColCont;
+         if(numTar != 1){
+            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+            var itemPos = context.getItemsPos(numTar,idTar); // *
+            if(context.craneContent && context.craneContent.num == numTar){
+               itemPos.push({ row: "crane", col: context.cranePos });
+            }
+            if(items.length == 0){
+               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+               errorMsg += window.languageStrings.messages.failureMissing(itemPos.length);
+               return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+            }
+            if(items[0].num != numTar || items[0].imgId != idTar){
+               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+               errorMsg += window.languageStrings.messages.failureWrongBlock(itemPos.length);
+               return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+            }
+            if(items[0].broken){
+               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+               errorMsg += window.languageStrings.messages.failureBrokenBlock(itemPos.length);
+               return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+            }
+            if(hid && hid.length > 0){
+               if((hid[iRow][iCol] && !items[0].hidden) || (!hid[iRow][iCol] && items[0].hidden)){
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureHiddenBlock;
+                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+               }
+            }
+         }
+      }
+   }
+   return false
 };
 
 
@@ -3035,35 +3058,7 @@ var robotEndFunctionGenerator = {
       },
       sciFi: {
          backgroundElements: [
-            // { 
-            //    img: /*imgPath+*/"crane/sciFi/background.png",
-            //    width: 1,   // % of total width if relative
-            //    height: 1,
-            //    x: 0,
-            //    y: 0,
-            //    relative: true
-            // },
-            // { 
-            //    img: /*imgPath+*/"crane/sciFi/cloud_1.png",
-            //    width: 200*0.7,
-            //    height: 50*0.7,
-            //    x: 0.8,
-            //    y: 0.3
-            // },
-            // { 
-            //    img: /*imgPath+*/"crane/sciFi/cloud_2.png",
-            //    width: 225*0.7,
-            //    height: 103*0.7,
-            //    x: -0.1,
-            //    y: 0.1
-            // },
-            // { 
-            //    img: /*imgPath+*/"crane/sciFi/cloud_3.png",
-            //    width: 117*0.7,
-            //    height: 41*0.7,
-            //    x: 0.4,
-            //    y: 0.8
-            // },
+
          ],
          cellAttr: {
             stroke: "#525252",
