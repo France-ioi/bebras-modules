@@ -139,6 +139,7 @@ var getContext = function(display, infos, curLevel) {
                notWrecking: "Vous ne pouvez pas lâcher ce bloc",
                wrongCoordinates: "Les coordonnées sont invalides",
                impossibleToRead: "Impossible de lire une brique à cette position",
+               impossibleToReadInTheDark: "Impossible de lire une brique dans l'obscurité",
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
@@ -1123,6 +1124,9 @@ var getContext = function(display, infos, curLevel) {
          // because only num < 50 (custom blocks) have id
          id = items[0].num;
       }
+      if(items.length > 0 && items[0].dark){
+         throw(strings.messages.impossibleToReadInTheDark)
+      }
       return id
    };
 
@@ -1438,8 +1442,6 @@ var getContext = function(display, infos, curLevel) {
             contLabels[iCol] = paper.text(0, 0, String.fromCharCode(iCol + 65));
          }
       }
-      // context.cells = cells;
-      // updateDarkness();
 
       $("#dust_pix").remove();
       $("body").append("<img src="+dustSrc+" style='width:1px;' id='dust_pix' />");
@@ -2089,6 +2091,7 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       }
+      resetCraneZOrder();
    };
    
    context.advanceTime = function(epsilon) {
