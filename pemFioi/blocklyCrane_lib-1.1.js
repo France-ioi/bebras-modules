@@ -2,6 +2,7 @@
 // var imgPath = modulesPath+"img/algorea/";
 // var mp3Path = modulesPath+"mp3/";
 var dustUrl = "crane/dust.png";
+var spotlightUrl = "crane/spotlight.png";
 
 var getContext = function(display, infos, curLevel) {
    var localLanguageStrings = {
@@ -48,6 +49,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "lâcher",
                colHeight: "hauteur de la colonne",
                placeMarker: "placer le marqueur",             
+               placeSpotlight: "placer le projecteur",             
                goToMarker: "aller au marqueur",
                expectedBlock: "brique attendue",
                expectedBlockAt: "brique attendue ligne %1 colonne %2",
@@ -74,6 +76,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "lacher",
                colHeight: "hauteurColonne",
                placeMarker: "placerMarqueur",
+               placeSpotlight: "placerProjecteur",
                goToMarker: "allerAuMarqueur",
                expectedBlock: "briqueAttendue",
                expectedBlockAt: "briqueAttendueA",
@@ -100,6 +103,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "@() Lâche le boulet de démolition porté par la grue.",
                colHeight: "@() Retourne le nombre de briques se trouvant dans la colonne sous la grue.",
                placeMarker: "@(nom) Place un marqueur portant ce nom à la position actuelle de la grue, ou y déplace le marqueur de ce nom s'il existe déjà.",             
+               placeSpotlight: "@() Place le projecteur à la position actuelle de la grue, ou y déplace le projecteur s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
                onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
 			      expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
@@ -617,6 +621,23 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "placeSpotlight",
+      type: "actions",
+      block: { name: "placeSpotlight" },
+      func: function(callback) {
+         if(this.cranePosY > -1){
+            this.moveCraneY(-1, function () {
+               context.executeCallWhenReady('placeSpotlight');
+               callback();
+            });
+         }else{
+            this.placeSpotlight();
+            this.waitDelay(callback);
+         } 
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -711,12 +732,17 @@ var getContext = function(display, infos, curLevel) {
       stroke: "yellow",
       "stroke-width": 3
    };
+   var darkCellAttr = {
+      fill: "black",
+      opacity: 0.5
+   };
 
    var dustSrc = getImgPath(dustUrl);
    var dustW = 80;
    var dustH = 28;
    var dustDuration = 1100;
    var dust;
+   var spotlightSrc = getImgPath(spotlightUrl);
 
    var takeAnimDelay = 0.5*infos.actionDelay;
 
@@ -793,6 +819,7 @@ var getContext = function(display, infos, curLevel) {
          context.targetHidden = context.scoring[0].hidden || [];
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
+         context.dark = gridInfos.dark || [];
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
          context.customItems = gridInfos.customItems || {};
@@ -805,13 +832,13 @@ var getContext = function(display, infos, curLevel) {
       context.tool = context.initTool || 0; // 0: crane, 1: sensor
 
       context.rng = new RandomGenerator(0);
-      // context.dieValues = context.initDieValues || null;
       context.dieValue = context.initDieValue || null;
       context.rollDieIndex = 0;
       
       context.items = [];
       context.multicell_items = [];
       context.markers = [];
+      context.spotlight = null;
 
 
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
@@ -950,17 +977,17 @@ var getContext = function(display, infos, curLevel) {
       
       for(var pos of cellPos){
          var { row, col } = pos;
-         if(row == "crane"){
-            var item = context.craneContent;
-            var craneAttr = getCraneAttr();
-            var y = craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale;
-            if(item.catchOffsetY){
-               y -= item.catchOffsetY*scale;
-            }
-            var x = craneAttr.x;
-         }else{
+         // if(row == "crane"){
+         //    var item = context.craneContent;
+         //    var craneAttr = getCraneAttr();
+         //    var y = craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale;
+         //    if(item.catchOffsetY){
+         //       y -= item.catchOffsetY*scale;
+         //    }
+         //    var x = craneAttr.x;
+         // }else{
             var { x, y } = context.getCellCoord(row,col);
-         }
+         // }
          var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(attr);
          context.highlights.push({ row, col, obj });
       }
@@ -1007,8 +1034,18 @@ var getContext = function(display, infos, curLevel) {
    context.getCellCoord = function(row,col) {
       var scale = context.scale;
       var cSide = infos.cellSide;
-      var x = (cSide * col + infos.leftMargin) * scale;
-      var y = (cSide * (craneH + row) + infos.topMargin + markerH) * scale;
+      if(row != "crane"){
+         var y = (cSide * (craneH + row) + infos.topMargin + markerH) * scale;
+         var x = (cSide * col + infos.leftMargin) * scale;
+      }else{
+         var item = context.craneContent;
+         var craneAttr = getCraneAttr();
+         var y = craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale;
+         if(item.catchOffsetY){
+            y -= item.catchOffsetY*scale;
+         }
+         var x = craneAttr.x;
+      }
       return { x, y }
    };
 
@@ -1312,6 +1349,8 @@ var getContext = function(display, infos, curLevel) {
             newY -= item.catchOffsetY*scale;
          }
          elem.attr({ x, y: newY });
+         if(item.darkElement)
+            item.darkElement.attr({ x, y: newY, opacity: 0 });
       }else{
          crane.leftClaw.transform("");
          crane.rightClaw.transform("");
@@ -1400,6 +1439,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       // context.cells = cells;
+      // updateDarkness();
 
       $("#dust_pix").remove();
       $("body").append("<img src="+dustSrc+" style='width:1px;' id='dust_pix' />");
@@ -1491,6 +1531,7 @@ var getContext = function(display, infos, curLevel) {
 
             var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
             var hidden = (context.hidden.length > 0) ? (context.hidden[iRow][iCol] == 1) : false;
+            var dark = (context.dark.length > 0) ? (context.dark[iRow][iCol] == 1) : false;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
@@ -1498,7 +1539,7 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[itemTypeNum],
                   imgId: itemData.imgId,
                   deco: itemData.deco, 
-                  broken, hidden
+                  broken, hidden, dark
                }, false);
             }
             var targetData = context.getItemData(context.target[iRow][iCol]);
@@ -1513,7 +1554,7 @@ var getContext = function(display, infos, curLevel) {
                   imgId: targetData.imgId,
                   deco: targetData.deco, 
                   hidden: targetHidden,
-                  target: true
+                  target: true, dark
                }, false);
             }
          }
@@ -1621,8 +1662,12 @@ var getContext = function(display, infos, curLevel) {
          return 0;
       });
       for(var iItem = 0;iItem < cellItems.length;iItem++) {
-         if(cellItems[iItem].element)
+         if(cellItems[iItem].element){
             cellItems[iItem].element.toFront();
+         }
+         if(cellItems[iItem].darkElement){
+            cellItems[iItem].darkElement.toFront();
+         }
       }
    }; 
 
@@ -1632,7 +1677,7 @@ var getContext = function(display, infos, curLevel) {
       for(var elemName in infos.craneZOrder) {
          var val = infos.craneZOrder[elemName];
          if(context.craneContent && elemName == "item"){
-            var obj = context.craneContent.element;
+            var obj = (context.craneContent.darkElement) ? paper.set(context.craneContent.element,context.craneContent.darkElement) : context.craneContent.element;
          }else{
             var obj = crane[elemName];
          }
@@ -1760,6 +1805,8 @@ var getContext = function(display, infos, curLevel) {
       // console.log("updateScale")
       redisplayAllItems();    
       redisplayMarkers();  
+      redisplaySpotlight();  
+      updateDarkness();
 
       /* crane */
       var w = cSide*scale, h = w;
@@ -1779,7 +1826,8 @@ var getContext = function(display, infos, curLevel) {
             var { row, col, obj } = dat;
             var width = cSide*scale, height = w;
             var { x, y } = this.getCellCoord(row,col);
-            obj.attr({ x, y, width, height });
+            // console.log(row,col)
+            obj.attr({ x, y, width, height }).toFront();
          }
       }
 
@@ -1805,6 +1853,9 @@ var getContext = function(display, infos, curLevel) {
       
       if(item.element !== undefined) {
          item.element.remove();
+      }
+      if(item.darkElement !== undefined) {
+         item.darkElement.remove();
       }
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
@@ -1843,7 +1894,7 @@ var getContext = function(display, infos, curLevel) {
             var imgId = item.imgId;
             var src = getImgPath(srcObj[imgId]);
          }
-         if((infos.customItems) && (item.num < 90)){
+         if((infos.customItems) && (item.num < 90) && !defaultPath){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
             var newSrc = "assets/png/"+fileName;
             src = newSrc;
@@ -1852,8 +1903,26 @@ var getContext = function(display, infos, curLevel) {
          var h = item.height || item.side;
          item.element = paper.image(src, x, y, w * scale, h * scale);
          if(item.target && !item.targetImg){
-            item.element.attr("opacity",0.3);
+            var op = (item.dark) ? 0 : 0.3;
+            item.element.attr("opacity",op);
          }
+         if(!item.target){
+            if(infos.darkImgPath && infos.darkImgPath[item.num]){
+               var darkSrcObj = (item.hidden && infos.darkImgPath[item.num].hidden) ? infos.darkImgPath[item.num].hidden : infos.darkImgPath[item.num].img;
+            }else{
+               var darkSrcObj = "crane/dark_default.png";
+               var defaultPath = true;
+            }
+            var src = getImgPath(darkSrcObj);
+            if((infos.customItems) && (item.num < 90) && !defaultPath){
+               var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
+               var newSrc = "assets/png/"+fileName;
+               src = newSrc;
+            }
+            var op = (item.dark) ? 1 : 0;
+            item.darkElement = paper.image(src, x, y, w * scale, h * scale).attr("opacity",op);
+         }
+
       }else if(item.value !== undefined) {
          var fontColor = item.fontColor;
          if(fontColor === undefined) { fontColor = "black"; }
@@ -1878,16 +1947,20 @@ var getContext = function(display, infos, curLevel) {
       else if(item.color !== undefined) {
          item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
       }
-      if(item.element !== undefined)
+      
+      if(item.element !== undefined){
          item.element.attr(itemAttributes(item));
+         if(item.darkElement)
+            item.darkElement.attr(itemAttributes(item));
+      }
+
       if(resetZOrder)
          resetItemsZOrder(item.row, item.col);
    };
    
    var redisplayAllItems = function() {
-      // console.log("redisplayAllItems")
       if(context.display !== true)
-         return;
+         return
       for(var iItem = 0;iItem < context.items.length;iItem++) {
          var item = context.items[iItem];
          redisplayItem(item, false,"redisplayAllItems");
@@ -1917,6 +1990,8 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var redisplayMarkers = function() {
+      if(context.display !== true)
+         return
       // console.log("[crane] redisplayMarkers")
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
@@ -1959,6 +2034,59 @@ var getContext = function(display, infos, curLevel) {
       if(backgroundObj){
          for(var iElem = backgroundObj.length - 1; iElem >= 0; iElem--){
             backgroundObj[iElem].toBack();
+         }
+      }
+   };
+
+   var redisplaySpotlight = function(resetZOrder) {
+      if(context.display !== true)
+         return
+      if(!context.spotlight)
+         return
+      var { element, col } = context.spotlight;
+      if(element){
+         element.remove();
+      }
+      var cSide = infos.cellSide;
+      var w = cSide*scale, h = w;
+      var x0 = infos.leftMargin*scale;
+      var y0 = infos.topMargin*scale;
+      var x = x0 + col*w;
+      var y = y0 + (markerH + 18)*scale;
+      var spotlightH = (craneH + 0.5)*h;
+      context.spotlight.element = paper.image(spotlightSrc,x,y,w,spotlightH);
+      if(backgroundObj){
+         for(var iElem = backgroundObj.length - 1; iElem >= 0; iElem--){
+            backgroundObj[iElem].toBack();
+         }
+      }
+      if(resetZOrder){
+         resetCraneZOrder();
+      }
+      updateDarkness();
+   };
+
+   function updateDarkness() {
+      if(context.display !== true){
+         return
+      }
+      if(context.dark.length == 0){
+         return
+      }
+      let { nbCols, nbRows, dark, spotlight } = context;
+      for(let row = 0; row < nbRows; row++){
+         for(let col = 0; col < nbCols; col++){
+            let val = (spotlight && spotlight.col == col) ? 0 : dark[row][col];
+            if(val){
+               cells[row][col].attr(darkCellAttr);
+            }else{
+               cells[row][col].attr("fill","none");
+            }
+            let items = context.getItemsOn(row,col);
+            for(let item of items){
+               item.dark = (val == 1 && (!spotlight || spotlight.col != col));
+               redisplayItem(item);
+            }
          }
       }
    };
@@ -2244,15 +2372,20 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_rightClaw_up" + Math.random(), crane.rightClaw, animRightClawUp);
       context.raphaelFactory.animate("animCrane_leftClaw_up" + Math.random(), crane.leftClaw, animLeftClawUp);
       context.raphaelFactory.animate("animCrane_item_up" + Math.random(), topBlock.element, animItemUp);
+
+      if(topBlock.darkElement){
+         var op = (topBlock.dark && newRow > -1) ? 1 : 0;
+         var animDark = new Raphael.animation({ y: newItemY, opacity: op },delay,function() {
+            if(newRow == -1)
+               topBlock.dark = 0;
+         });
+         context.raphaelFactory.animate("animCrane_dark" + Math.random(), topBlock.darkElement, animDark);
+      }
    };
 
    context.takeAndFlip = function(callback) {
-      // if(context.display){
-      //    var craneAttr = getCraneAttr();
-      //    setCraneAttr(craneAttr);
-      // }
       var topBlock = takeIntro();
-      takeAnimDelay = infos.actionDelay;
+      takeAnimDelay = infos.actionDelay*0.5;
       if(topBlock != 1){
          topBlock.hidden = !topBlock.hidden;
       }
@@ -2278,7 +2411,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 2) + 4*infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 2 + 2) + 4*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -2290,7 +2423,7 @@ var getContext = function(display, infos, curLevel) {
          }
          context.takeAnimUp(topBlock,topBlock.row - 1,function() {
             context.flipAnim(topBlock, function() {
-               var tempItem = putDownIntro();
+               var { tempItem } = putDownIntro();
                context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
                   context.putDownAnimUp(topBlock.row);
                });
@@ -2317,48 +2450,28 @@ var getContext = function(display, infos, curLevel) {
       var anim1 = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay,function(){
          redisplayItem(item,true);
          item.element.attr({ y, transform: ["S",0,1,cx,y] });
+         item.darkElement.attr({ y, transform: ["S",0,1,cx,y] });
          resetCraneZOrder();
 
          context.raphaelFactory.animate("animFlip2_" + Math.random(), item.element, anim2);
+         context.raphaelFactory.animate("animFlip2_dark_" + Math.random(), item.darkElement, anim2Dark);
          context.raphaelFactory.animate("animFlip2_clawR" + Math.random(), crane.rightClaw, anim2ClawR);
          context.raphaelFactory.animate("animFlip2_clawL" + Math.random(), crane.leftClaw, anim2ClawL);
       });
+      var anim1Dark = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay);
       var anim2 = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay,callback);
+      var anim2Dark = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay);
       var anim2ClawR = new Raphael.animation({ "transform": ["R",clutchAngle,craneAttr.cxRight,cyRightDown,"S",1,1,cx,y] },delay);
       var anim2ClawL = new Raphael.animation({ "transform": ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown,"S",1,1,cx,y] },delay);
 
       context.raphaelFactory.animate("animFlip1_item" + Math.random(), item.element, anim1);
+      context.raphaelFactory.animate("animFlip1_dark_item" + Math.random(), item.darkElement, anim1Dark);
       context.raphaelFactory.animate("animFlip1_clawR" + Math.random(), crane.rightClaw, anim1);
       context.raphaelFactory.animate("animFlip1_clawL" + Math.random(), crane.leftClaw, anim1);
    };
 
-   // context.moveUpAndTake = function(callback) {
-   //    if(!context.display){
-   //       this.cranePosY = -1;
-   //       context.take(callback);
-   //    }else{
-   //       var currY = context.cranePosY;
-   //       var delayUp = infos.actionDelay*Math.abs(currY + 1);
-   //       var currPos = context.cranePos;
-   //       var topBlock = context.findTopBlock(currPos);
-   //       var delayTake = 0;
-   //       if(!topBlock || topBlock.num == 1){
-            
-   //       }else if(!topBlock.isMovable && topBlock.num != 1){
-
-   //       }else{
-   //          delayTake += infos.actionDelay*(topBlock.row + 2);
-   //       }
-   //       this.moveCraneY(-1);
-   //       this.delayFactory.createTimeout("moveUpAndTake_" + Math.random(), function() {
-   //          context.take();
-   //       }, delayUp);
-   //       context.waitDelay(callback,null,delayUp + delayTake);
-   //    }
-   // };
-
    context.putDown = function(callback) {
-      var tempItem = putDownIntro();
+      var { tempItem } = putDownIntro();
       takeAnimDelay = 0.5*infos.actionDelay;
       if(context.display) {
          if(context.animate && infos.actionDelay > 0){
@@ -2379,19 +2492,26 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function putDownIntro() {
+   function putDownIntro(drop) {
       if(context.craneContent == undefined){
          throw(context.strings.messages.emptyCrane);
+      }
+      if(drop && !context.craneContent.wrecking && !context.craneContent.isDie){
+         throw(context.strings.messages.notWrecking);
       }
 
       var currPos = context.cranePos;
       var topBlock = context.findTopBlock(currPos);
-      // console.log(topBlock)
+
       if(!topBlock || topBlock.row == 0){
          throw(context.strings.messages.cannotDrop);
       }
 
-      var newRow = topBlock.row - 1;
+      if(drop){
+         var newRow = (topBlock.num == 1 || context.craneContent.isDie) ? topBlock.row - 1 : topBlock.row;
+      }else{
+         var newRow = topBlock.row - 1;
+      }
       var newCol = currPos;
       context.craneContent.row = newRow;
       context.craneContent.col = newCol;
@@ -2399,7 +2519,14 @@ var getContext = function(display, infos, curLevel) {
       context.items.push(tempItem);
       context.setIndexes();
       context.craneContent = undefined;
-      return tempItem
+
+      if(context.dark.length > 0 && context.dark[newRow][newCol]){
+         tempItem.dark = 1;
+      }else{
+         tempItem.dark = 0;
+      }
+      
+      return { tempItem, topBlock }
    };
 
    context.putDownAnim = function(item,currRow) {
@@ -2458,6 +2585,14 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_rightClaw_down" + Math.random(), crane.rightClaw, animRightClawDown);
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+
+      if(context.dark.length > 0){
+         var { row, col } = item;
+         if(context.dark[row][col] && item.darkElement){
+            var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay);
+            context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
+         }
+      }
    };
 
    context.putDownAnimUp = function(row,callback) {
@@ -2478,27 +2613,8 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.drop = function(callback) {
-      // console.log("drop",context.craneContent)
-      if(context.craneContent == undefined){
-         throw(context.strings.messages.emptyCrane);
-      }
-      if(!context.craneContent.wrecking && !context.craneContent.isDie){
-         throw(context.strings.messages.notWrecking);
-      }
+      var { tempItem, topBlock } = putDownIntro(true);
 
-      takeAnimDelay = 0.5*infos.actionDelay;
-
-      var currPos = context.cranePos;
-      var topBlock = context.findTopBlock(currPos);
-      var newRow = (topBlock.num == 1 || context.craneContent.isDie) ? topBlock.row - 1 : topBlock.row;
-      var newCol = currPos;
-      context.craneContent.row = newRow;
-      context.craneContent.col = newCol;
-      var tempItem = context.craneContent;
-      context.items.push(tempItem);
-      context.setIndexes();
-      context.craneContent = undefined;
-      
       if(context.display) {
          if(context.animate && infos.actionDelay > 0){
             context.dropAnim(tempItem,topBlock,callback);
@@ -2514,12 +2630,13 @@ var getContext = function(display, infos, curLevel) {
          rollDie(tempItem);
       }
       if(!context.display || !context.animate || infos.actionDelay == 0){
-         if(topBlock.num > 1 && !context.craneContent.isDie){
+         if(topBlock.num > 1 && !tempItem.isDie){
             context.destroy(topBlock);
          }
       }
 
-      if(callback/* && (!context.display || !context.animate)*/){
+
+      if(callback){
          var delay = 2*takeAnimDelay*(tempItem.row + 1);
          context.waitDelay(callback,null,delay);
       }
@@ -2581,16 +2698,27 @@ var getContext = function(display, infos, curLevel) {
          context.addSound(soundName);
 
          if(item.isDie){
+            var { row, col } = item;
+            if(context.dark[row][col]){
+               item.dark = 1;
+            }
             rollDie(item);
          }
-         // if(callback){
-         //    context.waitDelay(callback);
-         // }
       });
       // context.addSound("wreckingBall_fall");
       context.raphaelFactory.animate("animCrane_open_rightClaw_" + Math.random(), crane.rightClaw, animOpenRightClaw);
       context.raphaelFactory.animate("animCrane_open_leftClaw_" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
+
+      if(context.dark.length > 0){
+         var { row, col } = item;
+         if(context.dark[row][col] && item.darkElement){
+            var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay,"<",function() {
+               item.dark = 1;
+            });
+            context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
+         }
+      }
    };
 
    function rollDie(item) {
@@ -2669,6 +2797,9 @@ var getContext = function(display, infos, curLevel) {
                   var item = context.craneContent;
                   var animItem = new Raphael.animation({ x: craneAttr.x + item.offsetX },delay);
                   context.raphaelFactory.animate("animCrane_item_" + Math.random(), item.element, animItem);
+                  if(item.darkElement){
+                     context.raphaelFactory.animate("animCrane_dark_item_" + Math.random(), item.darkElement, animItem);
+                  }
                }
             } else {
                context.delayFactory.createTimeout("moveCrane_" + Math.random(), function() {
@@ -2729,9 +2860,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.placeMarker = function(value) {
-      // if(isNaN(value) || value < 1 || value > 9){
-      //    throw(strings.messages.wrongMarkerNumber);
-      // }
+
       var col = this.cranePos;
       var alreadyExist = false;
       for(var iMark = 0; iMark < this.markers.length; iMark++){
@@ -2749,12 +2878,27 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
+   context.placeSpotlight = function() {
+      var col = this.cranePos;
+
+      if(this.spotlight){
+         this.spotlight.col = col;
+      }else{
+         this.spotlight = { col }
+      }
+      if(context.display) {
+         redisplaySpotlight(true);
+      }
+   };
+
    context.destroy = function(item) {
       context.setIndexes();
       context.items.splice(item.index, 1);
 
       if(context.display) {
          item.element.remove();
+         if(item.darkElement)
+           item.darkElement.remove();
       }
    };
    
@@ -2805,6 +2949,7 @@ var getResources = function(subTask) {
    }
 
    res.push({ type: 'image', url: dustUrl });
+   res.push({ type: 'image', url: spotlightUrl });
 
    var data = subTask.data;
    var newUrl = [];
