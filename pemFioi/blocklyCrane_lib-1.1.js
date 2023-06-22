@@ -66,7 +66,8 @@ var getContext = function(display, infos, curLevel) {
                down: "descendre",
                readBlock: "lire brique",
                dieValue: "valeur du dé",
-               flip: "retourner"
+               flip: "retourner",
+               topBlockSide: "sens de la brique du dessus"
 
             },
             code: {
@@ -94,7 +95,8 @@ var getContext = function(display, infos, curLevel) {
                down: "descendre",
                readBlock: "lireBrique",
                dieValue: "valeurDe",
-               flip: "retourner"
+               flip: "retourner",
+               topBlockSide: "sensBriqueDuDessus"
 
             },
             description: {
@@ -122,7 +124,9 @@ var getContext = function(display, infos, curLevel) {
                down: "@() Déplace l'outil' d'une case vers le bas.",           
                readBlock: "@() Retourne le numéro du type.",
                dieValue: "@() Retourne la valeur du dé.",
-               flip: "@() Retourne la brique se trouvant sous la grue."
+               flip: "@() Retourne la brique se trouvant sous la grue.",
+               topBlockSide: "@() Retourne le sens de la brique se trouvant au sommet de la colonne où se trouve la grue."
+
             },
             messages: {
                yLimit: function(up) {
@@ -654,6 +658,15 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "topBlockSide",
+      type: "sensors",
+      block: { name: "topBlockSide", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getTopBlockSide());
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1155,7 +1168,7 @@ var getContext = function(display, infos, curLevel) {
       return id
    };
 
-    context.getBlockType = function() {
+   context.getBlockType = function() {
       context.tool = 1;
       updateTool();
       var col = this.cranePos;
@@ -1174,6 +1187,15 @@ var getContext = function(display, infos, curLevel) {
          var val = this.dieValue;
       }
       return val
+   };
+
+   context.getTopBlockSide = function() {
+      var col = this.cranePos;
+      var topBlock = this.findTopBlock(col);
+      if(!topBlock){
+         return 0
+      }
+      return (topBlock.hidden) ? 2 : 1
    };
 
    context.isTopBlockBroken = function() {
