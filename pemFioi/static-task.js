@@ -234,11 +234,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.addEventListener('load', function() {
    // Lazy load images
-   var lazyElements = document.querySelectorAll('[lazysrc]');
-   for(var i = 0; i < lazyElements.length; i++) {
-      const lazyElement = lazyElements[i];
-      lazyElement.src = lazyElement.getAttribute('lazysrc');
-      lazyElement.removeAttribute('lazysrc');
-   }
+   setTimeout(function () {
+      var lazyElements = document.querySelectorAll('[lazysrc]');
+      for(var i = 0; i < lazyElements.length; i++) {
+         const lazyElement = lazyElements[i];
+         lazyElement.src = lazyElement.getAttribute('lazysrc');
+         lazyElement.removeAttribute('lazysrc');
+      }
+   }, 10);
 });
 
