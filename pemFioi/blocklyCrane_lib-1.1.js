@@ -318,7 +318,7 @@ var getContext = function(display, infos, curLevel) {
       return imgUrlWithPrefix(url)
    };
 
-	for (var id = 1; id < 50; id++) {
+	for (var id = 1; id < 90; id++) {
 		var strId = "" + id;
 		if (id < 10) {
 			strId = "0" + id;
@@ -849,6 +849,7 @@ var getContext = function(display, infos, curLevel) {
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
          context.dark = gridInfos.dark || [];
+         context.faceItems = gridInfos.faceItems || [];
          context.mask = gridInfos.mask || [];
          context.initMarkers = gridInfos.initMarkers || [];
          context.customItems = gridInfos.customItems || {};
@@ -1380,7 +1381,6 @@ var getContext = function(display, infos, curLevel) {
 
       if(context.craneContent){
          var item = context.craneContent;
-         // console.log(item)
          var angle = clutchAngle;
          crane.leftClaw.transform(["R",-angle,attr.cxLeft,attr.cyLeft]);
          crane.rightClaw.transform(["R",angle,attr.cxRight,attr.cyRight]);
@@ -1392,6 +1392,8 @@ var getContext = function(display, infos, curLevel) {
          elem.attr({ x, y: newY });
          if(item.darkElement)
             item.darkElement.attr({ x, y: newY, opacity: 0 });
+         if(item.faceItemElement)
+            item.faceItemElement.attr({ x, y: newY, opacity: 1 });
       }else{
          crane.leftClaw.transform("");
          crane.rightClaw.transform("");
@@ -1402,6 +1404,9 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function updateTool() {
+      if(!context.display){
+         return
+      }
       var craneOpacity = 1 - context.tool;
       var sensorOpacity = context.tool;
       crane.shaft.attr({
@@ -1571,6 +1576,7 @@ var getContext = function(display, infos, curLevel) {
             var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
             var hidden = (context.hidden.length > 0) ? (context.hidden[iRow][iCol] == 1) : false;
             var dark = (context.dark.length > 0) ? (context.dark[iRow][iCol] == 1) : false;
+            var faceItem = (context.faceItems.length > 0) ? context.faceItems[iRow][iCol] : 0;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
@@ -1578,7 +1584,7 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[itemTypeNum],
                   imgId: itemData.imgId,
                   deco: itemData.deco, 
-                  broken, hidden, dark
+                  broken, hidden, dark, faceItem
                }, false);
             }
             var targetData = context.getItemData(context.target[iRow][iCol]);
@@ -1704,6 +1710,9 @@ var getContext = function(display, infos, curLevel) {
          if(cellItems[iItem].element){
             cellItems[iItem].element.toFront();
          }
+         if(cellItems[iItem].faceItemElement){
+            cellItems[iItem].faceItemElement.toFront();
+         }
          if(cellItems[iItem].darkElement){
             cellItems[iItem].darkElement.toFront();
          }
@@ -1716,7 +1725,14 @@ var getContext = function(display, infos, curLevel) {
       for(var elemName in infos.craneZOrder) {
          var val = infos.craneZOrder[elemName];
          if(context.craneContent && elemName == "item"){
-            var obj = (context.craneContent.darkElement) ? paper.set(context.craneContent.element,context.craneContent.darkElement) : context.craneContent.element;
+            var obj = paper.set();
+            if(context.craneContent.darkElement){
+               obj.push(context.craneContent.darkElement);
+            }
+            if(context.craneContent.faceItemElement){
+               obj.push(context.craneContent.faceItemElement);
+            }
+            // var obj = (context.craneContent.darkElement) ? paper.set(context.craneContent.element,context.craneContent.darkElement) : context.craneContent.element;
          }else{
             var obj = crane[elemName];
          }
@@ -1896,6 +1912,10 @@ var getContext = function(display, infos, curLevel) {
       if(item.darkElement !== undefined) {
          item.darkElement.remove();
       }
+      if(item.faceItemElement !== undefined) {
+         item.faceItemElement.remove();
+      }
+
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
@@ -1917,6 +1937,7 @@ var getContext = function(display, infos, curLevel) {
       if((infos.customItems) && (item.num < 90)){
          Object.assign(item,context.customItems[item.num]);
       }
+      // console.log(item)
       if(item.img) {
          if(item.target && item.targetImg){
             var srcObj = item.targetImg;
@@ -1982,15 +2003,19 @@ var getContext = function(display, infos, curLevel) {
                "font-weight": "bold"
             });
          }
-      }
-      else if(item.color !== undefined) {
+      }else if(item.color !== undefined) {
          item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
+      }
+      if(item.faceItem){
+         addFaceItem(item);
       }
       
       if(item.element !== undefined){
-         item.element.attr(itemAttributes(item));
-         if(item.darkElement)
-            item.darkElement.attr(itemAttributes(item));
+         // item.element.attr(itemAttributes(item));
+         // if(item.darkElement)
+         //    item.darkElement.attr(itemAttributes(item));
+         // if(item.faceItemElement)
+         //    item.faceItemElement.attr(itemAttributes(item));
       }
 
       if(resetZOrder)
@@ -2026,6 +2051,21 @@ var getContext = function(display, infos, curLevel) {
          cellItems.push(item);
       }
       sortCellItems(cellItems);
+   };
+
+   function addFaceItem(item) {
+      var cSide = infos.cellSide * scale;
+      var x0 = infos.leftMargin*scale;
+      var x = x0 + cSide * item.col;
+      var y0 = infos.topMargin*scale + cSide * craneH;
+      var y = y0 + cSide * item.row;
+
+      var id = item.faceItem;
+      var strId = (Number(id) < 10) ? "0" + id : id;
+      var src = "assets/png/item_"+strId+".png";
+      var op = (item.dark) ? 0 : 1;
+
+      item.faceItemElement = paper.image(src,x,y,cSide,cSide).attr("opacity",op);
    };
 
    var redisplayMarkers = function() {
@@ -2421,6 +2461,11 @@ var getContext = function(display, infos, curLevel) {
          });
          context.raphaelFactory.animate("animCrane_dark" + Math.random(), topBlock.darkElement, animDark);
       }
+      if(topBlock.faceItemElement){
+         var op = (topBlock.dark && newRow > -1) ? 0 : 1;
+         var animFaceItem = new Raphael.animation({ y: newItemY, opacity: op },delay);
+         context.raphaelFactory.animate("animCrane_face_item" + Math.random(), topBlock.faceItemElement, animFaceItem);
+      }
    };
 
    context.takeAndFlip = function(callback) {
@@ -2490,13 +2535,19 @@ var getContext = function(display, infos, curLevel) {
       var anim1 = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay,function(){
          redisplayItem(item,true);
          item.element.attr({ y, transform: ["S",0,1,cx,y] });
-         item.darkElement.attr({ y, transform: ["S",0,1,cx,y] });
+         if(item.darkElement)
+            item.darkElement.attr({ y, transform: ["S",0,1,cx,y] });
+         if(item.faceItemElement)
+            item.faceItemElement.attr({ y, transform: ["S",0,1,cx,y] });
          resetCraneZOrder();
 
          context.raphaelFactory.animate("animFlip2_" + Math.random(), item.element, anim2);
-         context.raphaelFactory.animate("animFlip2_dark_" + Math.random(), item.darkElement, anim2Dark);
          context.raphaelFactory.animate("animFlip2_clawR" + Math.random(), crane.rightClaw, anim2ClawR);
          context.raphaelFactory.animate("animFlip2_clawL" + Math.random(), crane.leftClaw, anim2ClawL);
+         if(item.darkElement)
+            context.raphaelFactory.animate("animFlip2_dark_" + Math.random(), item.darkElement, anim2Dark);
+         if(item.faceItemElement)
+            context.raphaelFactory.animate("animFlip2_face_item" + Math.random(), item.faceItemElement, anim2Dark);
       });
       var anim1Dark = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay);
       var anim2 = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay,callback);
@@ -2505,9 +2556,12 @@ var getContext = function(display, infos, curLevel) {
       var anim2ClawL = new Raphael.animation({ "transform": ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown,"S",1,1,cx,y] },delay);
 
       context.raphaelFactory.animate("animFlip1_item" + Math.random(), item.element, anim1);
-      context.raphaelFactory.animate("animFlip1_dark_item" + Math.random(), item.darkElement, anim1Dark);
       context.raphaelFactory.animate("animFlip1_clawR" + Math.random(), crane.rightClaw, anim1);
       context.raphaelFactory.animate("animFlip1_clawL" + Math.random(), crane.leftClaw, anim1);
+      if(item.darkElement)
+         context.raphaelFactory.animate("animFlip1_dark_item" + Math.random(), item.darkElement, anim1Dark);
+      if(item.faceItemElement)
+         context.raphaelFactory.animate("animFlip1_face_item" + Math.random(), item.faceItemElement, anim1Dark);
    };
 
    context.putDown = function(callback) {
@@ -2561,7 +2615,7 @@ var getContext = function(display, infos, curLevel) {
       context.craneContent = undefined;
 
       if(context.dark.length > 0 && context.dark[newRow][newCol]){
-         tempItem.dark = 1;
+         tempItem.dark = (context.spotlight && context.spotlight.col == newCol) ? 0 : 1;
       }else{
          tempItem.dark = 0;
       }
@@ -2626,12 +2680,17 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
 
-      if(context.dark.length > 0){
-         var { row, col } = item;
-         if(context.dark[row][col] && item.darkElement){
+      var { row, col } = item;
+      // if(context.dark.length > 0){
+         if(item.dark){
             var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay);
             context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
          }
+      // }
+      if(item.faceItemElement){
+         var op = (item.dark) ? 0 : 1;
+         var animFaceItem = new Raphael.animation({ y: itemAttr.y, opacity: op },delay);
+         context.raphaelFactory.animate("animCrane_face_item" + Math.random(), item.faceItemElement, animFaceItem);
       }
    };
 
@@ -2815,10 +2874,6 @@ var getContext = function(display, infos, curLevel) {
             if(animate && context.animate) {
                var anim = new Raphael.animation({ x: craneAttr.xWheels },delay,function() {
                   context.addSound("crane_stop");
-                  if(callback){
-                     // context.callCallback(callback);
-                     // context.waitDelay(callback);
-                  }
                });
                var animLine = new Raphael.animation({ x: craneAttr.x, "clip-rect": craneAttr.lineClip },delay);
                var animShaft = new Raphael.animation({ x: craneAttr.xShaft },delay);
@@ -2839,6 +2894,9 @@ var getContext = function(display, infos, curLevel) {
                   context.raphaelFactory.animate("animCrane_item_" + Math.random(), item.element, animItem);
                   if(item.darkElement){
                      context.raphaelFactory.animate("animCrane_dark_item_" + Math.random(), item.darkElement, animItem);
+                  }
+                  if(item.faceItemElement){
+                     context.raphaelFactory.animate("animCrane_face_item_" + Math.random(), item.faceItemElement, animItem);
                   }
                }
             } else {
