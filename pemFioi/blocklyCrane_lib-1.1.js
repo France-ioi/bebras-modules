@@ -1076,6 +1076,7 @@ var getContext = function(display, infos, curLevel) {
          }
          var x = craneAttr.x;
       }
+
       return { x, y }
    };
 
@@ -1926,7 +1927,7 @@ var getContext = function(display, infos, curLevel) {
       var x0 = infos.leftMargin*scale;
       var x = x0 + (infos.cellSide * item.col + item.offsetX)* scale;
       var y0 = (infos.topMargin + infos.cellSide * craneH)*scale;
-      var y = y0 + (infos.cellSide * item.row + /*(item.side - infos.cellSide) +*/ item.offsetY) * scale;
+      var y = y0 + (infos.cellSide * item.row + /*(item.side - infos.cellSide) +*/ item.offsetY + markerH) * scale;
       if(context.nbRows < nbRowsCont){
          y += infos.cellSide*(nbRowsCont - context.nbRows) * scale;
       }
@@ -2797,10 +2798,6 @@ var getContext = function(display, infos, curLevel) {
          context.addSound(soundName);
 
          if(item.isDie){
-            var { row, col } = item;
-            if(context.dark[row][col]){
-               item.dark = 1;
-            }
             rollDie(item);
          }
       });
