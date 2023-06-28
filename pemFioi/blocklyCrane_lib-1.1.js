@@ -49,6 +49,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "lâcher",
                colHeight: "hauteur de la colonne",
                craneColumn: "colonne de la grue",
+               craneRow: "ligne de la grue",
                placeMarker: "placer le marqueur",             
                placeSpotlight: "placer le projecteur",             
                goToMarker: "aller au marqueur",
@@ -80,6 +81,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "lacher",
                colHeight: "hauteurColonne",
                craneColumn: "colonneGrue",
+               craneRow: "ligneGrue",
                placeMarker: "placerMarqueur",
                placeSpotlight: "placerProjecteur",
                goToMarker: "allerAuMarqueur",
@@ -111,6 +113,7 @@ var getContext = function(display, infos, curLevel) {
                drop: "@() Lâche le boulet de démolition porté par la grue.",
                colHeight: "@() Retourne le nombre de briques se trouvant dans la colonne sous la grue.",
                craneColumn: "@() Retourne le numéro de la colonne de la grue",
+               craneRow: "@() Retourne le numéro de la ligne de la grue",
                placeMarker: "@(nom) Place un marqueur portant ce nom à la position actuelle de la grue, ou y déplace le marqueur de ce nom s'il existe déjà.",             
                placeSpotlight: "@() Place le projecteur à la position actuelle de la grue, ou y déplace le projecteur s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
@@ -452,6 +455,15 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "craneColumn", yieldsValue: 'int' },
       func: function(callback) {
          this.callCallback(callback, this.cranePos + 1);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "craneRow",
+      type: "sensors",
+      block: { name: "craneRow", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.nbRows - this.cranePosY);
       }
    });
 
