@@ -163,6 +163,7 @@ var getContext = function(display, infos, curLevel) {
                emptyCraneFaceItem: "La grue ne porte pas d'objet qui puisse être attaché",
                alreadyHaveFaceItem: "Cette brique a déjà un objet attaché",
                cannotAttachHidden: "Impossible d'attacher un objet sur la face cachée d'une brique",
+               cannotAttach: "Impossible d'attacher un objet sur cette brique",
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
@@ -1354,7 +1355,7 @@ var getContext = function(display, infos, curLevel) {
       var sensorOpacity = context.tool;
 
       let faceItemOffsetY = (context.craneContent && context.craneContent.type == "faceItem") ? (craneFaceItemOffsetY - detachDeltaY)*scale : 0;
-      let yCorr = (cranePosY == -1 && context.craneContent) ? -craneFaceItemOffsetY*scale : 0; 
+      let yCorr = (cranePosY == -1 && context.craneContent && context.craneContent.type == "faceItem") ? -craneFaceItemOffsetY*scale : 0; 
 
       var x = infos.leftMargin*scale + w*cranePos;
       var xWheels = x + wheelsOffsetX*scale;
@@ -1441,7 +1442,7 @@ var getContext = function(display, infos, curLevel) {
          if(item.catchOffsetY){
             newY -= item.catchOffsetY*scale;
          }
-         elem.attr({ x, y: newY });
+         elem.attr({ x, y: newY, opacity: 1 });
          if(item.darkElement)
             item.darkElement.attr({ x, y: newY, opacity: 0 });
          if(item.faceItemElement){
@@ -2625,7 +2626,7 @@ var getContext = function(display, infos, curLevel) {
    context.putDown = function(callback) {
       var { tempItem } = putDownIntro();
       takeAnimDelay = 0.5*infos.actionDelay;
-      console.log("putDown",tempItem.dark)
+      // console.log("putDown",tempItem.dark)
       if(context.display) {
          if(context.animate && infos.actionDelay > 0){
             context.putDownAnim(tempItem,-1);
@@ -2652,7 +2653,7 @@ var getContext = function(display, infos, curLevel) {
       if(context.craneContent.type == "faceItem"){
          throw(context.strings.messages.notFaceItem);
       }
-      if(drop && !context.craneContent.wrecking && !context.craneContent.isDie){
+      if(drop && !context.craneContent.wrecking && !context.craneContent.isDie && !infos.dropAllBlocks){
          throw(context.strings.messages.notWrecking);
       }
 
@@ -2664,7 +2665,7 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(drop){
-         var newRow = (topBlock.num == 1 || context.craneContent.isDie) ? topBlock.row - 1 : topBlock.row;
+         var newRow = (topBlock.num == 1 || !context.craneContent.wrecking) ? topBlock.row - 1 : topBlock.row;
       }else{
          var newRow = topBlock.row - 1;
       }
@@ -2745,13 +2746,11 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
 
-      var { row, col } = item;
-      // if(context.dark.length > 0){
-         if(item.dark){
-            var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay);
-            context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
-         }
-      // }
+      // var { row, col } = item;
+      if(item.dark){
+         var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay);
+         context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
+      }
       if(item.faceItemElement){
          var op = (item.dark || item.hidden) ? 0 : 1;
          var animFaceItem = new Raphael.animation({ y: itemAttr.y, opacity: op },delay);
@@ -2794,7 +2793,7 @@ var getContext = function(display, infos, curLevel) {
          rollDie(tempItem);
       }
       if(!context.display || !context.animate || infos.actionDelay == 0){
-         if(topBlock.num > 1 && !tempItem.isDie){
+         if(topBlock.num > 1 && tempItem.wrecking){
             context.destroy(topBlock);
          }
       }
@@ -2840,7 +2839,7 @@ var getContext = function(display, infos, curLevel) {
       var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
       var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
-         if(topBlock && topBlock.num > 1 && !item.isDie){
+         if(topBlock && topBlock.num > 1 && item.wrecking){
             context.destroy(topBlock);
             var soundName = "wreckingBall_destroy";
          }else{
@@ -2879,6 +2878,12 @@ var getContext = function(display, infos, curLevel) {
             context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
          }
       }
+      if(item.faceItemElement){
+         var opacity = (item.dark || item.hidden) ? 0 : 1;
+         var animFaceItem = new Raphael.animation({ y: itemAttr.y, opacity },delay,"<");
+         context.raphaelFactory.animate("animCrane_face_item" + Math.random(), item.faceItemElement, animFaceItem);
+      }
+
    };
 
    function rollDie(item) {
@@ -2952,6 +2957,7 @@ var getContext = function(display, infos, curLevel) {
          // context.raphaelFactory.animate("animCrane_rightClaw_up2" + Math.random(), crane.rightClaw, animRightClawUp2);
          // context.raphaelFactory.animate("animCrane_leftClaw_up2" + Math.random(), crane.leftClaw, animLeftClawUp2);
          // context.raphaelFactory.animate("animItem" + Math.random(), context.craneContent.element, animItem);
+         context.craneContent.element.attr("opacity",1);
          context.delayFactory.createTimeout("setCraneAttr", function() {
             setCraneAttr(craneAttr);
          }, delay*0.2);
@@ -2980,24 +2986,30 @@ var getContext = function(display, infos, curLevel) {
          throw(context.strings.messages.emptyCell);
       }
       let item = items[0];
-      if(item.faceItem){
-         throw(context.strings.messages.alreadyHaveFaceItem);
+      if(item.isDie || item.wrecking){
+         throw(context.strings.messages.cannotAttach);
       }
       if(item.hidden){
          throw(context.strings.messages.cannotAttachHidden);
       }
+      if(item.faceItem){
+         throw(context.strings.messages.alreadyHaveFaceItem);
+      }
+      
       // context.craneContent = { type: "faceItem", id: item.faceItem, element: item.faceItemElement, offsetY: 32, offsetX: 0 }
       item.faceItem = context.craneContent.id;
       item.faceItemElement = context.craneContent.element;
       context.craneContent = null;
       
       if(context.display) {
+         // context.tool = 1;
          if(context.animate && infos.actionDelay > 0){
             context.attachAnim(item);
          }else{
             redisplayItem(item);
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
+            // updateTool();
          }
       }
 
@@ -3018,12 +3030,13 @@ var getContext = function(display, infos, curLevel) {
       lineClip[3] = craneAttr.lineClip[3] + offsetY;
       var cSide = infos.cellSide;
       var itemAttr = itemAttributes(item);
+      var opacity = (item.dark) ? 0 : 1;
 
       crane.line.attr("clip-rect",lineClip);
       crane.shaft.attr("y", craneAttr.yShaft + offsetY);
       crane.rightClaw.attr({ y: craneAttr.yClaws + offsetY, transform: ["R",clutchAngle,craneAttr.cxRight,craneAttr.cyRight + offsetY] });
       crane.leftClaw.attr({ y: craneAttr.yClaws + offsetY, transform: ["R",-clutchAngle,craneAttr.cxLeft,craneAttr.cyLeft + offsetY] });
-      item.faceItemElement.attr("y",itemAttr.y);
+      item.faceItemElement.attr({ y: itemAttr.y, opacity });
 
       context.delayFactory.createTimeout("setCraneAttr", function() {
          context.raphaelFactory.animate("animCrane_rightClaw_open" + Math.random(), crane.rightClaw, animOpenRightClaw);
@@ -3039,7 +3052,7 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animCrane_leftClawdown" + Math.random(), crane.leftClaw, animClaws);
       });
 
-      var animLineDown = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
+      var animLineDown = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay/*,updateTool*/);
       var animShaftDown = new Raphael.animation({ y: craneAttr.yShaft },delay);
       var animClaws = new Raphael.animation({ y: craneAttr.yClaws },delay);
    };
