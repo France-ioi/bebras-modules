@@ -66,6 +66,7 @@ var getContext = function(display, infos, curLevel) {
                up: "monter",
                down: "descendre",
                readBlock: "lire brique",
+               readFaceItem: "lire type attaché",
                dieValue: "valeur du dé",
                flip: "retourner",
                topBlockSide: "sens de la brique du dessus",
@@ -98,6 +99,7 @@ var getContext = function(display, infos, curLevel) {
                up: "monter",
                down: "descendre",
                readBlock: "lireBrique",
+               readFaceItem: "lireTypeAttache",
                dieValue: "valeurDe",
                flip: "retourner",
                topBlockSide: "sensBriqueDuDessus",
@@ -711,6 +713,15 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "readFaceItem",
+      type: "sensors",
+      block: { name: "readFaceItem", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.readFaceItem());
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1245,6 +1256,24 @@ var getContext = function(display, infos, curLevel) {
          return 0
       }
       return (topBlock.hidden) ? 2 : 1
+   };
+
+   context.readFaceItem = function() {
+      context.tool = 1;
+      updateTool();
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      if(row > -1){
+         var items = this.getItemsOn(row, col, obj => !obj.target);
+         if(items.length == 0){
+            // throw(strings.messages.emptyCell)
+            return 0
+         }
+         // console.log(items[0].faceItem)
+         return items[0].faceItem || 0
+      }
+      // throw(strings.messages.impossibleToRead)
+      return 0
    };
 
    context.isTopBlockBroken = function() {
