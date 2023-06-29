@@ -196,6 +196,8 @@ var getContext = function(display, infos, curLevel) {
                   return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
                },
                failureHiddenBlock: "Le bloc encadré en rouge est tourné du mauvais côté.",
+               failureWrongFaceItem: "Le bloc encadré en rouge n'a pas l'objet de façade attendu.",
+               failureFaceItem: "Le bloc encadré en rouge ne devrait pas avoir d'objet de façade.",
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
             startingBlockName: "Programme du robot"
@@ -890,6 +892,7 @@ var getContext = function(display, infos, curLevel) {
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
          context.targetHidden = context.scoring[0].hidden || [];
+         context.targetFaceItems = context.scoring[0].faceItems || [];
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
          context.dark = gridInfos.dark || [];
@@ -1642,6 +1645,7 @@ var getContext = function(display, infos, curLevel) {
             }
             var targetData = context.getItemData(context.target[iRow][iCol]);
             var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
+            var targetFaceItem = (context.targetFaceItems.length > 0) ? context.targetFaceItems[iRow][iCol] : 0;
             var targetNum = targetData.num;
 
             if(itemTypeByNum[targetNum] != undefined) {
@@ -1652,6 +1656,7 @@ var getContext = function(display, infos, curLevel) {
                   imgId: targetData.imgId,
                   deco: targetData.deco, 
                   hidden: targetHidden,
+                  faceItem: targetFaceItem,
                   target: true, dark
                }, false);
             }
@@ -2061,10 +2066,12 @@ var getContext = function(display, infos, curLevel) {
       }
       if(item.faceItem){
          // addFaceItem(item);
+         // if(item.target)
+         //    console.log(item.faceItem,item.id)
          item.faceItemElement = addFaceItem(item);
       }
       if(item.type == "faceItem"){
-         /* if item = faceItem in craneContent */
+         /* faceItem in craneContent */
          item.element = addFaceItem({ row: context.cranePosY, col: context.cranePos, faceItem: item.id });
       }
 
@@ -2113,7 +2120,14 @@ var getContext = function(display, infos, curLevel) {
       var id = item.faceItem;
       var strId = (Number(id) < 10) ? "0" + id : id;
       var src = "assets/png/item_"+strId+".png";
-      var op = (item.dark || item.hidden) ? 0 : 1;
+      var op = 1;
+      if(item.target){
+         op = 0.3;
+      }
+      if(item.dark || item.hidden){
+         op = 0;
+      }
+
 
       // item.faceItemElement = paper.image(src,x,y,cSide,cSide).attr("opacity",op);
       return paper.image(src,x,y,cSide,cSide).attr("opacity",op);
@@ -3375,12 +3389,13 @@ var robotEndConditions = {
       var sco = context.scoring[iTarget].score;
       var sub = context.scoring[iTarget].subset;
       var hid = context.scoring[iTarget].hidden;
+      var fac = context.scoring[iTarget].faceItems;
       var til = context.tiles;
       var bro = context.broken;
       
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-      var error = checkForErrors(context,tar,sub,hid,nbWellPlaced,nbRequired);
+      var error = checkForErrors({context,tar,sub,hid,fac,nbWellPlaced,nbRequired});
       if(error){
          return error
       }
@@ -3442,7 +3457,8 @@ function checkWellPlaced(context,tar,sub,til,bro) {
    return { nbRequired, nbWellPlaced }
 };
 
-function checkForErrors(context,tar,sub,hid,nbWellPlaced,nbRequired) {
+function checkForErrors(params) {
+   var { context, tar, sub, hid, fac, nbWellPlaced, nbRequired } = params;
    var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
    for(var iRow = 0; iRow < tar.length; iRow++){
       for(var iCol = 0; iCol < tar[iRow].length; iCol++){
@@ -3479,6 +3495,18 @@ function checkForErrors(context,tar,sub,hid,nbWellPlaced,nbRequired) {
                if((hid[iRow][iCol] && !items[0].hidden) || (!hid[iRow][iCol] && items[0].hidden)){
                   var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                   errorMsg += window.languageStrings.messages.failureHiddenBlock;
+                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+               }
+            }
+            if(fac && fac.length > 0){
+               if(fac[iRow][iCol] && items[0].faceItem != fac[iRow][iCol]){
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureWrongFaceItem;
+                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+               }
+               if(!fac[iRow][iCol] && items[0].faceItem){
+                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+                  errorMsg += window.languageStrings.messages.failureFaceItem;
                   return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
                }
             }
