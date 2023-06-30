@@ -73,7 +73,8 @@ var getContext = function(display, infos, curLevel) {
                topBlockSide: "sens de la brique du dessus",
                detach: "détacher objet",
                attach: "attacher objet",
-               drawShape: "dessiner forme"
+               drawShape: "dessiner forme",
+               displayMessage: "afficher message"
 
             },
             code: {
@@ -108,7 +109,8 @@ var getContext = function(display, infos, curLevel) {
                topBlockSide: "sensBriqueDuDessus",
                detach: "detacherObjet",
                attach: "attacherObjet",
-               drawShape: "dessinerForme"
+               drawShape: "dessinerForme",
+               displayMessage: "afficherMessage"
 
             },
             description: {
@@ -143,7 +145,8 @@ var getContext = function(display, infos, curLevel) {
                topBlockSide: "@() Retourne le sens de la brique se trouvant au sommet de la colonne où se trouve la grue.",
                detach: "@() Détache l'objet de la brique sur la case où se trouve la grue.",
                attach: "@() Attache l'objet à la brique sur la case où se trouve la grue.",
-               drawShape: "@(forme, couleur) Dessine une forme sur la brique de la case où se trouve la grue."
+               drawShape: "@(forme, couleur) Dessine une forme sur la brique de la case où se trouve la grue.",
+               displayMessage: "@(texte) Affiche un message à l'écran."
 
             },
             messages: {
@@ -760,6 +763,21 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "displayMessage",
+      type: "actions",
+      block: { name: "displayMessage", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": "message" },
+            ]
+         }
+      },
+      func: function(value,callback) {
+         this.callCallback(callback, this.displayMessage(value));
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -966,6 +984,8 @@ var getContext = function(display, infos, curLevel) {
       context.multicell_items = [];
       context.markers = [];
       context.spotlight = null;
+      context.message = null;
+      context.messageElement = null;
 
 
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
@@ -1888,6 +1908,10 @@ var getContext = function(display, infos, curLevel) {
          elem.push({ zOrder: val, element: obj });
       }
       sortCellItems(elem);
+
+      if(context.messageElement){
+         context.messageElement.toFront();
+      }
    };
    
    context.updateScale = function() {
@@ -2011,6 +2035,7 @@ var getContext = function(display, infos, curLevel) {
       redisplayMarkers();  
       redisplaySpotlight();  
       updateDarkness();
+      updateMessage();
 
       /* crane */
       var w = cSide*scale, h = w;
@@ -2475,6 +2500,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.shiftCrane = function(dir,callback) {
+      this.displayMessage("");
       var newPos = context.cranePos + dir;
       var ttg = context.tryToGo(newPos);
       if(ttg === true){
@@ -2488,6 +2514,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.shiftCraneY = function(dir,callback) {
+      this.displayMessage("");
       var newPosY = context.cranePosY + dir;
       var ttg = context.tryToGoY(newPosY);
       if(ttg === true){
@@ -2503,6 +2530,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.goToMarker = function(value,callback) {
+      this.displayMessage("");
       var newCol;
       for(var iMark = 0; iMark < this.markers.length; iMark++){
          if(this.markers[iMark].name == value){
@@ -2524,6 +2552,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.take = function(callback) {
+      this.displayMessage("");
       var topBlock = takeIntro();
       takeAnimDelay = 0.5*infos.actionDelay;
       
@@ -2680,6 +2709,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.flip = function(callback) {
+      this.displayMessage("");
       var topBlock = takeIntro();
       // console.log("takeAndFlip",topBlock.dark)
       takeAnimDelay = infos.actionDelay*0.5;
@@ -2779,6 +2809,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.putDown = function(callback) {
+      this.displayMessage("");
       var { tempItem } = putDownIntro();
       takeAnimDelay = 0.5*infos.actionDelay;
       // console.log("putDown",tempItem.dark)
@@ -2931,6 +2962,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.drop = function(callback) {
+      this.displayMessage("");
       var { tempItem, topBlock } = putDownIntro(true);
 
       if(context.display) {
@@ -3051,6 +3083,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.detach = function(callback) {
+      this.displayMessage("");
       if(context.display)
          resetCraneZOrder();
       context.tool = 0;
@@ -3131,6 +3164,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.attach = function(callback) {
+      this.displayMessage("");
       if(!context.craneContent || context.craneContent.type != "faceItem"){
          throw(context.strings.messages.emptyCraneFaceItem);
       }
@@ -3360,7 +3394,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.placeMarker = function(value) {
-
+      this.displayMessage("");
       var col = this.cranePos;
       var alreadyExist = false;
       for(var iMark = 0; iMark < this.markers.length; iMark++){
@@ -3379,6 +3413,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.placeSpotlight = function() {
+      this.displayMessage("");
       var col = this.cranePos;
 
       if(this.spotlight){
@@ -3392,6 +3427,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.drawShape = function(value) {
+      this.displayMessage("");
       console.log(value)
       // var col = this.cranePos;
       // var alreadyExist = false;
@@ -3408,6 +3444,48 @@ var getContext = function(display, infos, curLevel) {
       // if(context.display) {
       //    redisplayMarkers();
       // }
+   };
+
+   context.displayMessage = function(str) {
+      context.message = str;
+      updateMessage();
+      // console.log(str)
+   };
+
+   function updateMessage() {
+      if(!context.display){
+         return
+      }
+      if(context.messageElement){
+         context.messageElement.remove();
+      }
+      let msg = context.message;
+      if(!msg){
+         return
+      }
+      let a = infos.messageAttr;
+      let x0 = infos.leftMargin*scale;
+      let y0 = infos.topMargin*scale;
+      let cSide = infos.cellSide*scale;
+      let { nbRows, nbCols } = context;
+
+      let cx = x0 + nbCols*cSide/2;
+      let cy = y0 + markerH*scale;
+
+      let text = paper.text(cx,cy,msg).attr(a.text);
+      let bbox = text.getBBox();
+      let { x, y, width, height } = bbox;
+      let marginX = 20;
+      let marginY = 10;
+      let xRect = x - marginX;
+      let yRect = cy;
+      let w = width + 2*marginX;
+      let h = height + 2*marginY;
+      let rect = paper.rect(xRect,yRect,w,h).attr(a.rect);
+      cy += h/2;
+      text.attr("y",cy).toFront();
+
+      context.messageElement = paper.set(rect,text);
    };
 
    context.destroy = function(item) {
@@ -3856,6 +3934,18 @@ var robotEndFunctionGenerator = {
          labelAttr: {
             fill: "white",
             "font-weight": "bold"
+         },
+         messageAttr: {
+            rect: {
+               stroke: "black",
+               "stroke-width": 1,
+               fill: "white",
+               r: 5
+            },
+            text: {
+               "font-size": 16,
+               fill: "black"
+            }
          },
          labelSize: 0.3, // % of cellSize
          labelFrameSize: 0.5,
