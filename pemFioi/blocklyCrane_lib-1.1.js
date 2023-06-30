@@ -1228,6 +1228,8 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.getExpectedBlockInCell = function() {
+      context.tool = 1;
+      updateTool();
       var nbRowsCont = this.nbRowsCont;
       var nbColCont = this.nbColCont;
       var nbCol = this.nbCols + nbColCont;
@@ -1238,8 +1240,10 @@ var getContext = function(display, infos, curLevel) {
          throw(strings.messages.wrongCoordinates);
       }
       var tar = this.target[row][col];
-      var num = (tar > 1) ? tar : 0;
-      return this.getItemId(num)
+      if(tar > 1){
+         return this.getItemId(tar)
+      }
+      return 0
    };
 
    context.getTopBlock = function() {
