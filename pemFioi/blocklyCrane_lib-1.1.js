@@ -55,6 +55,7 @@ var getContext = function(display, infos, curLevel) {
                goToMarker: "aller au marqueur",
                expectedBlock: "brique attendue",
                expectedBlockAt: "brique attendue ligne %1 colonne %2",
+               expectedBlockInCell: "brique attendue dans cette case",
                topBlock: "brique du dessus",
                blockAt: "brique ligne %1 colonne %2",
                brokenBlockAt: "brique cassée ligne %1 colonne %2",
@@ -72,6 +73,7 @@ var getContext = function(display, infos, curLevel) {
                topBlockSide: "sens de la brique du dessus",
                detach: "détacher objet",
                attach: "attacher objet",
+               drawShape: "dessiner forme"
 
             },
             code: {
@@ -88,6 +90,7 @@ var getContext = function(display, infos, curLevel) {
                goToMarker: "allerAuMarqueur",
                expectedBlock: "briqueAttendue",
                expectedBlockAt: "briqueAttendueA",
+               expectedBlockInCell: "briqueAttendueDansCase",
                topBlock: "briqueDuDessus",           
                blockAt: "briqueA",
                brokenBlockAt: "briqueCasseeA",
@@ -105,6 +108,7 @@ var getContext = function(display, infos, curLevel) {
                topBlockSide: "sensBriqueDuDessus",
                detach: "detacherObjet",
                attach: "attacherObjet",
+               drawShape: "dessinerForme"
 
             },
             description: {
@@ -122,6 +126,7 @@ var getContext = function(display, infos, curLevel) {
                onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
 			      expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
                expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
+               expectedBlockInCell: "@() Retourne le numéro du type de brique qu'il faut placer dans la case où se trouve le capteur.",
                topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
                blockAt: "@(ligne, colonne) Retourne le numéro du type de brique se trouvant dans la grille à la ligne et à la colonne indiquées.",
                brokenBlockAt: "@(ligne, colonne) Retourne True si la brique se trouvant à la ligne et à la colonne indiquées est cassée, et False sinon.",
@@ -129,14 +134,16 @@ var getContext = function(display, infos, curLevel) {
                topBlockBroken: "@() Retourne True si la brique se trouvant au sommet de la colonne où se trouve la grue est cassée, et False sinon.",
                carriedBlockBroken: "@() Retourne True si la brique actuellement transportée par la grue est cassée, et False sinon.", 
 
-               up: "@() Déplace l'outil' d'une case vers le haut.",
-               down: "@() Déplace l'outil' d'une case vers le bas.",           
+               up: "@() Déplace l'outil d'une case vers le haut.",
+               down: "@() Déplace l'outil d'une case vers le bas.",           
                readBlock: "@() Retourne le numéro du type.",
+               readFaceItem: "@() Retourne le numéro de l'objet de façade.",
                dieValue: "@() Retourne la valeur du dé.",
                flip: "@() Retourne la brique se trouvant sous la grue.",
                topBlockSide: "@() Retourne le sens de la brique se trouvant au sommet de la colonne où se trouve la grue.",
                detach: "@() Détache l'objet de la brique sur la case où se trouve la grue.",
-               attach: "@() Attache l'objet à la brique sur la case où se trouve la grue."
+               attach: "@() Attache l'objet à la brique sur la case où se trouve la grue.",
+               drawShape: "@(forme, couleur) Dessine une forme sur la brique de la case où se trouve la grue."
 
             },
             messages: {
@@ -499,6 +506,15 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "expectedBlockInCell",
+      type: "sensors",
+      block: { name: "expectedBlockInCell", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.getExpectedBlockInCell());
+      }
+   });
+
+   infos.newBlocks.push({
       name: "topBlock",
       type: "sensors",
       block: { name: "topBlock", yieldsValue: 'int' },
@@ -722,6 +738,28 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "drawShape",
+      type: "actions",
+      block: {
+         name: "drawShape", params: [null], countAs: 2,
+         blocklyJson: {
+            "args0": [{
+               "type": "field_dropdown", "name": "PARAM_0", "options": [
+                  ["rond", 0], ["carré", 1], ["étoile", 2], ["triangle", 3], ["losange", 4],  ]
+            },
+            {
+               "type": "field_dropdown", "name": "PARAM_1", "options": [
+                  ["rouge", 0], ["vert", 1], ["bleu", 2], ["jaune", 3], ["noir", 4], ["blanc", 5]]
+            }]
+         }
+      },
+      func: function(value, callback) {
+         this.drawShape(value);
+         this.waitDelay(callback);
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -906,6 +944,7 @@ var getContext = function(display, infos, curLevel) {
          context.targetFaceItems = context.scoring[0].faceItems || [];
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
+         context.shapes = gridInfos.shapes;
          context.dark = gridInfos.dark || [];
          context.faceItems = gridInfos.faceItems || [];
          context.mask = gridInfos.mask || [];
@@ -1184,6 +1223,21 @@ var getContext = function(display, infos, curLevel) {
       }
       var tar = this.target[row - 1][col - 1];
       // console.log( (tar > 1) ? tar : 0)
+      var num = (tar > 1) ? tar : 0;
+      return this.getItemId(num)
+   };
+
+   context.getExpectedBlockInCell = function() {
+      var nbRowsCont = this.nbRowsCont;
+      var nbColCont = this.nbColCont;
+      var nbCol = this.nbCols + nbColCont;
+      var nbRows = Math.max(this.nbRows,nbRowsCont);
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      if(row < 0 || row >= nbRows || col < 0 || col >= nbCol){
+         throw(strings.messages.wrongCoordinates);
+      }
+      var tar = this.target[row][col];
       var num = (tar > 1) ? tar : 0;
       return this.getItemId(num)
    };
@@ -1662,6 +1716,7 @@ var getContext = function(display, infos, curLevel) {
             var hidden = (context.hidden.length > 0) ? (context.hidden[iRow][iCol] == 1) : false;
             var dark = (context.dark.length > 0) ? (context.dark[iRow][iCol] == 1) : false;
             var faceItem = (context.faceItems.length > 0) ? context.faceItems[iRow][iCol] : 0;
+            var shape = (context.shapes) ? context.shapes[iRow][iCol] : 0;
             if(itemTypeByNum[itemTypeNum] != undefined) {
                resetItem({
                   row: iRow + rowShift,
@@ -1669,7 +1724,7 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[itemTypeNum],
                   imgId: itemData.imgId,
                   deco: itemData.deco, 
-                  broken, hidden, dark, faceItem
+                  broken, hidden, dark, faceItem, shape
                }, false);
             }
             var targetData = context.getItemData(context.target[iRow][iCol]);
@@ -1799,6 +1854,9 @@ var getContext = function(display, infos, curLevel) {
          }
          if(cellItems[iItem].faceItemElement){
             cellItems[iItem].faceItemElement.toFront();
+         }
+         if(cellItems[iItem].shapeElement){
+            cellItems[iItem].shapeElement.toFront();
          }
          if(cellItems[iItem].darkElement){
             cellItems[iItem].darkElement.toFront();
@@ -2002,6 +2060,9 @@ var getContext = function(display, infos, curLevel) {
       if(item.faceItemElement) {
          item.faceItemElement.remove();
       }
+      if(item.shapeElement) {
+         item.shapeElement.remove();
+      }
 
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
@@ -2094,10 +2155,10 @@ var getContext = function(display, infos, curLevel) {
          item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
       }
       if(item.faceItem){
-         // addFaceItem(item);
-         // if(item.target)
-         //    console.log(item.faceItem,item.id)
          item.faceItemElement = addFaceItem(item);
+      }
+      if(item.shape){
+         item.shapeElement = addShape(item);
       }
       if(item.type == "faceItem"){
          /* faceItem in craneContent */
@@ -2157,9 +2218,51 @@ var getContext = function(display, infos, curLevel) {
          op = 0;
       }
 
-
-      // item.faceItemElement = paper.image(src,x,y,cSide,cSide).attr("opacity",op);
       return paper.image(src,x,y,cSide,cSide).attr("opacity",op);
+   };
+
+   function addShape(item) {
+      var cSide = infos.cellSide * scale;
+      var x0 = infos.leftMargin*scale;
+      var x = x0 + cSide * item.col;
+      var y0 = infos.topMargin*scale + cSide * craneH;
+      var y = y0 + cSide * item.row;
+      var margin = 5;
+      var r = cSide/5;
+      var cx = x + cSide - r - margin;
+      var cy = y + r + margin;
+
+      var shapeID = item.shape[0];
+      var colorID = item.shape[1];
+      var shapeStr = ["circle","square","star","triangle","diamond"];
+      var colors = ["red","green","blue","yellow","black","white"];
+
+      var op = 1;
+      if(item.target){
+         op = 0.3;
+      }
+      if(item.dark || item.hidden){
+         op = 0;
+      }
+      var attr = {
+         stroke: "none",
+         fill: colors[colorID],
+         opacity: op
+      };
+      var shape;
+      switch(shapeID){
+      case 0: 
+         shape = paper.circle(cx,cy,r);
+         break
+      case 1:
+         var w = 2*r, h = w;
+         shape = paper.rect(cx - w/2,cy - h/2,w,h);
+         break
+      default:
+         shape = getShape(paper,shapeStr[shapeID],cx,cy,{radius: r});
+      }
+      
+      return shape.attr(attr)
    };
 
    var redisplayMarkers = function() {
@@ -2522,7 +2625,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.takeAnimUp = function(topBlock,newRow,callback) {
-      /* newRow is relative to default crane pos (-1) */
+      /* default crane row = -1 */
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(topBlock.row - newRow);
       var cSide = infos.cellSide;
@@ -2551,10 +2654,7 @@ var getContext = function(display, infos, curLevel) {
 
       if(topBlock.darkElement){
          var op = (topBlock.dark && newRow > -1) ? 1 : 0;
-         var animDark = new Raphael.animation({ y: newItemY, opacity: op },delay,function() {
-            // if(newRow == -1)
-               // topBlock.dark = false;
-         });
+         var animDark = new Raphael.animation({ y: newItemY, opacity: op },delay);
          context.raphaelFactory.animate("animCrane_dark" + Math.random(), topBlock.darkElement, animDark);
       }
       if(topBlock.faceItemElement){
@@ -2564,6 +2664,14 @@ var getContext = function(display, infos, curLevel) {
             var animFaceItem = new Raphael.animation({ y: newItemY },delay);
          }
          context.raphaelFactory.animate("animCrane_face_item" + Math.random(), topBlock.faceItemElement, animFaceItem);
+      }
+      if(topBlock.shapeElement){
+         if(topBlock.dark && newRow == -1 && !topBlock.hidden){
+            var animShape = new Raphael.animation({ transform: ["T",0,deltaY], opacity: 1 },delay);
+         }else{
+            var animShape = new Raphael.animation({ transform: ["T",0,deltaY] },delay);
+         }
+         context.raphaelFactory.animate("animCrane_shape" + Math.random(), topBlock.shapeElement, animShape);
       }
    };
 
@@ -3277,6 +3385,25 @@ var getContext = function(display, infos, curLevel) {
       if(context.display) {
          redisplaySpotlight(true);
       }
+   };
+
+   context.drawShape = function(value) {
+      console.log(value)
+      // var col = this.cranePos;
+      // var alreadyExist = false;
+      // for(var iMark = 0; iMark < this.markers.length; iMark++){
+      //    var marker = this.markers[iMark];
+      //    if(marker.name == value){
+      //       marker.col = col;
+      //       alreadyExist = true;
+      //    }
+      // }
+      // if(!alreadyExist){
+      //    this.markers.push({ name: value, col });
+      // }
+      // if(context.display) {
+      //    redisplayMarkers();
+      // }
    };
 
    context.destroy = function(item) {
