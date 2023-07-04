@@ -75,6 +75,8 @@ var getContext = function(display, infos, curLevel) {
                attach: "attacher objet",
                drawShape: "dessiner forme",
                eraseShape: "effacer forme",
+               readShape: "lire forme",
+               readColor: "lire couleur",
                displayMessage: "afficher message"
 
             },
@@ -112,6 +114,8 @@ var getContext = function(display, infos, curLevel) {
                attach: "attacherObjet",
                drawShape: "dessinerForme",
                eraseShape: "effacerForme",
+               readShape: "lireForme",
+               readColor: "lireCouleur",
                displayMessage: "afficherMessage"
 
             },
@@ -149,6 +153,8 @@ var getContext = function(display, infos, curLevel) {
                attach: "@() Attache l'objet à la brique sur la case où se trouve la grue.",
                drawShape: "@(forme, couleur) Dessine une forme sur la brique de la case où se trouve la grue.",
                eraseShape: "@() Efface la forme sur la brique de la case où se trouve la grue.",
+               readShape: "@() Retourne le type de la forme dessinée sur la brique de la case où se trouve la grue.",
+               readColor: "@() Retourne la couleur de la forme dessinée sur la brique de la case où se trouve la grue.",
                displayMessage: "@(texte) Affiche un message à l'écran."
 
             },
@@ -173,13 +179,20 @@ var getContext = function(display, infos, curLevel) {
                impossibleToRead: "Impossible de lire une brique à cette position",
                impossibleToReadInTheDark: "Impossible de lire une brique dans l'obscurité",
                emptyCell: "Il n'y a pas de brique dans cette case !",
+               
                noFaceItem: "Il n'y a pas d'objet à détacher sur cette brique",
-               noShape: "Il n'y a pas de forme à effacer sur cette brique",
                cannotDetachHidden: "Il n'y a pas d'objet à détacher",
                emptyCraneFaceItem: "La grue ne porte pas d'objet qui puisse être attaché",
                alreadyHaveFaceItem: "Cette brique a déjà un objet attaché",
                cannotAttachHidden: "Impossible d'attacher un objet sur la face cachée d'une brique",
                cannotAttach: "Impossible d'attacher un objet sur cette brique",
+
+               noShape: "Il n'y a pas de forme à effacer sur cette brique",
+               alreadyHasShape: "Il y a déjà une forme sur cette brique",
+               cannotDrawHidden: "Impossible de dessiner une forme sur la face cachée d'une brique",
+               unknownShape: "Forme inconnue",
+               unknownColor: "Couleur inconnue",
+
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
                },
@@ -214,7 +227,11 @@ var getContext = function(display, infos, curLevel) {
                failureHiddenBlock: "Le bloc encadré en rouge est tourné du mauvais côté.",
                failureWrongFaceItem: "Le bloc encadré en rouge n'a pas l'objet de façade attendu.",
                failureFaceItem: "Le bloc encadré en rouge ne devrait pas avoir d'objet de façade.",
-               failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
+               failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide",
+               failureNoShape: "Il manque la forme dessinée sur le bloc encadré en rouge.",
+               failureWrongShape: "La forme dessinée sur le bloc encadré en rouge n'est pas la bonne.",
+               failureWrongColor: "La forme dessinée sur le bloc encadré en rouge n'a pas la bonne couleur.",
+               failureShape: "Le bloc encadré en rouge ne devrait pas avoir de forme dessinée.",
             },
             startingBlockName: "Programme du robot"
          },
@@ -599,7 +616,7 @@ var getContext = function(display, infos, curLevel) {
       name: "placeMarker",
       type: "actions",
       block: {
-         name: "placeMarker", params: [null], countAs: 2,
+         name: "placeMarker", params: [null], 
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -617,7 +634,7 @@ var getContext = function(display, infos, curLevel) {
       name: "goToMarker", 
       type: "actions",
       block: {
-         name: "goToMarker", params: [null], countAs: 2,
+         name: "goToMarker", params: [null], 
       blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -743,11 +760,11 @@ var getContext = function(display, infos, curLevel) {
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
-                  ["rond", 0], ["carré", 1], ["étoile", 2], ["triangle", 3], ["losange", 4],  ]
+                  ["rond", "rond"], ["carré", "carré"], ["étoile", "étoile"], ["triangle", "triangle"], ["losange", "losange"],  ]
             },
             {
                "type": "field_dropdown", "name": "PARAM_1", "options": [
-                  ["rouge", 0], ["vert", 1], ["bleu", 2], ["jaune", 3], ["noir", 4], ["blanc", 5]]
+                  ["rouge", "rouge"], ["vert", "vert"], ["bleu", "bleu"], ["jaune", "jaune"], ["noir", "noir"], ["blanc", "blanc"]]
             }]
          }
       },
@@ -764,6 +781,24 @@ var getContext = function(display, infos, curLevel) {
       func: function(callback) {
          this.eraseShape();
          this.waitDelay(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "readShape",
+      type: "sensors",
+      block: { name: "readShape", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.readShape());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "readColor",
+      type: "sensors",
+      block: { name: "readColor", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, this.readColor());
       }
    });
 
@@ -964,6 +999,7 @@ var getContext = function(display, infos, curLevel) {
          context.target = context.scoring[0].target || [];
          context.targetHidden = context.scoring[0].hidden || [];
          context.targetFaceItems = context.scoring[0].faceItems || [];
+         context.targetShapes = context.scoring[0].shapes || [];
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
          context.shapes = gridInfos.shapes;
@@ -1355,6 +1391,42 @@ var getContext = function(display, infos, curLevel) {
          return items[0].faceItem || 0
       }
       // throw(strings.messages.impossibleToRead)
+      return 0
+   };
+
+   context.readShape = function() {
+      context.tool = 1;
+      updateTool();
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      if(row > -1){
+         var items = this.getItemsOn(row, col, obj => !obj.target);
+         if(items.length == 0){
+            return 0
+         }
+         var item = items[0];
+         if(item.shape && item.shape.length > 0){
+            return item.shape[0] + 1
+         }
+      }
+      return 0
+   };
+
+   context.readColor = function() {
+      context.tool = 1;
+      updateTool();
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      if(row > -1){
+         var items = this.getItemsOn(row, col, obj => !obj.target);
+         if(items.length == 0){
+            return 0
+         }
+         var item = items[0];
+         if(item.shape && item.shape.length > 0){
+            return item.shape[1] + 1
+         }
+      }
       return 0
    };
 
@@ -1766,6 +1838,7 @@ var getContext = function(display, infos, curLevel) {
             var targetData = context.getItemData(context.target[iRow][iCol]);
             var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
             var targetFaceItem = (context.targetFaceItems.length > 0) ? context.targetFaceItems[iRow][iCol] : 0;
+            var targetShape = (context.targetShapes.length > 0) ? context.targetShapes[iRow][iCol] : 0;
             var targetNum = targetData.num;
 
             if(itemTypeByNum[targetNum] != undefined) {
@@ -1777,6 +1850,7 @@ var getContext = function(display, infos, curLevel) {
                   deco: targetData.deco, 
                   hidden: targetHidden,
                   faceItem: targetFaceItem,
+                  shape: targetShape,
                   target: true, dark
                }, false);
             }
@@ -2248,7 +2322,7 @@ var getContext = function(display, infos, curLevel) {
       var cSide = infos.cellSide * scale;
       var x0 = infos.leftMargin*scale;
       var x = x0 + cSide * item.col;
-      var y0 = infos.topMargin*scale + cSide * craneH;
+      var y0 = infos.topMargin*scale + cSide * craneH + markerH * scale;
       var y = y0 + cSide * item.row;
 
       var id = item.faceItem;
@@ -3483,24 +3557,43 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.drawShape = function(value1,value2) {
+   context.drawShape = function(shape,color) {
       this.displayMessage("");
-      console.log(value1,value2)
-      // var col = this.cranePos;
-      // var alreadyExist = false;
-      // for(var iMark = 0; iMark < this.markers.length; iMark++){
-      //    var marker = this.markers[iMark];
-      //    if(marker.name == value){
-      //       marker.col = col;
-      //       alreadyExist = true;
-      //    }
-      // }
-      // if(!alreadyExist){
-      //    this.markers.push({ name: value, col });
-      // }
-      // if(context.display) {
-      //    redisplayMarkers();
-      // }
+
+      let row = context.cranePosY;
+      let col = context.cranePos;
+      let items = this.getItemsOn(row,col, obj => !obj.target);
+      if(row < 0){
+         throw(strings.messages.wrongCoordinates)
+      }
+      if(items.length == 0){
+         throw(strings.messages.emptyCell)
+      }
+      let item = items[0];
+      if(item.shape){
+         throw(strings.messages.alreadyHasShape)
+      }
+      if(item.hidden){
+         throw(strings.messages.alreadyHasShape)
+      }
+
+      let shapeStrID = {"circle": 0, "rond": 0, "square": 1, "carré": 1, "carre": 1,"star": 2, "étoile": 2, "etoile": 2, "triangle": 3, "diamond": 4, "losange": 4 };
+      let colorStrID = { "red": 0, "rouge": 0, "green": 1, "vert": 1, "blue": 2, "bleu": 2, "yellow": 3, "jaune": 3, "black": 4, "noir": 4, "white": 5, "blanc": 5 };
+      if(!shapeStrID.hasOwnProperty(shape)){
+         throw(strings.messages.unknownShape)
+      }
+      if(!colorStrID.hasOwnProperty(color)){
+         throw(strings.messages.unknownColor)
+      }
+
+      let shapeID = shapeStrID[shape];
+      let colorID = colorStrID[color];
+      item.shape = [shapeID,colorID];
+
+      if(context.display){
+         item.shapeElement = addShape(item);
+         resetCraneZOrder();
+      }
    };
 
    context.eraseShape = function() {
@@ -3710,12 +3803,13 @@ var robotEndConditions = {
       var sub = context.scoring[iTarget].subset;
       var hid = context.scoring[iTarget].hidden;
       var fac = context.scoring[iTarget].faceItems;
+      var sha = context.scoring[iTarget].shapes;
       var til = context.tiles;
       var bro = context.broken;
       
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-      var error = checkForErrors({context,tar,sub,hid,fac,nbWellPlaced,nbRequired});
+      var error = checkForErrors({context,tar,sub,hid,fac,sha,nbWellPlaced,nbRequired});
       if(error){
          return error
       }
@@ -3778,7 +3872,7 @@ function checkWellPlaced(context,tar,sub,til,bro) {
 };
 
 function checkForErrors(params) {
-   var { context, tar, sub, hid, fac, nbWellPlaced, nbRequired } = params;
+   var { context, tar, sub, hid, fac, sha, nbWellPlaced, nbRequired } = params;
    var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
    for(var iRow = 0; iRow < tar.length; iRow++){
       for(var iCol = 0; iCol < tar[iRow].length; iCol++){
@@ -3790,6 +3884,7 @@ function checkForErrors(params) {
          var idTar = tarData.imgId;
          var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
          var gridCol = iCol + context.nbColCont;
+         var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
          if(numTar != 1){
             var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
             var itemPos = context.getItemsPos(numTar,idTar); // *
@@ -3797,36 +3892,51 @@ function checkForErrors(params) {
                itemPos.push({ row: "crane", col: context.cranePos });
             }
             if(items.length == 0){
-               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                errorMsg += window.languageStrings.messages.failureMissing(itemPos.length);
                return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
             }
             if(items[0].num != numTar || items[0].imgId != idTar){
-               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                errorMsg += window.languageStrings.messages.failureWrongBlock(itemPos.length);
                return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
             }
             if(items[0].broken){
-               var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                errorMsg += window.languageStrings.messages.failureBrokenBlock(itemPos.length);
                return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
             }
             if(hid && hid.length > 0){
                if((hid[iRow][iCol] && !items[0].hidden) || (!hid[iRow][iCol] && items[0].hidden)){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                   errorMsg += window.languageStrings.messages.failureHiddenBlock;
                   return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
                }
             }
             if(fac && fac.length > 0){
                if(fac[iRow][iCol] && items[0].faceItem != fac[iRow][iCol]){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                   errorMsg += window.languageStrings.messages.failureWrongFaceItem;
                   return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
                }
                if(!fac[iRow][iCol] && items[0].faceItem){
-                  var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
                   errorMsg += window.languageStrings.messages.failureFaceItem;
+                  return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+               }
+            }
+            if(sha && sha.length > 0){
+               if(sha[iRow][iCol]){
+                  if(!items[0].shape){
+                     errorMsg += window.languageStrings.messages.failureNoShape;
+                     return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+                  }
+                  var shape = sha[iRow][iCol][0];
+                  var color = sha[iRow][iCol][1];
+                  if(items[0].shape[0] != shape){
+                     errorMsg += window.languageStrings.messages.failureWrongShape;
+                     return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+                  }
+                  if(items[0].shape[1] != color){
+                     errorMsg += window.languageStrings.messages.failureWrongColor;
+                     return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
+                  }
+               }else if(items[0].shape){
+                  errorMsg += window.languageStrings.messages.failureShape;
                   return { success: false, msg: errorMsg, highlights: [[{row:gridRow,col:gridCol}], itemPos] }
                }
             }
