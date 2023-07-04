@@ -74,6 +74,7 @@ var getContext = function(display, infos, curLevel) {
                detach: "détacher objet",
                attach: "attacher objet",
                drawShape: "dessiner forme",
+               eraseShape: "effacer forme",
                displayMessage: "afficher message"
 
             },
@@ -110,6 +111,7 @@ var getContext = function(display, infos, curLevel) {
                detach: "detacherObjet",
                attach: "attacherObjet",
                drawShape: "dessinerForme",
+               eraseShape: "effacerForme",
                displayMessage: "afficherMessage"
 
             },
@@ -146,6 +148,7 @@ var getContext = function(display, infos, curLevel) {
                detach: "@() Détache l'objet de la brique sur la case où se trouve la grue.",
                attach: "@() Attache l'objet à la brique sur la case où se trouve la grue.",
                drawShape: "@(forme, couleur) Dessine une forme sur la brique de la case où se trouve la grue.",
+               eraseShape: "@() Efface la forme sur la brique de la case où se trouve la grue.",
                displayMessage: "@(texte) Affiche un message à l'écran."
 
             },
@@ -170,7 +173,8 @@ var getContext = function(display, infos, curLevel) {
                impossibleToRead: "Impossible de lire une brique à cette position",
                impossibleToReadInTheDark: "Impossible de lire une brique dans l'obscurité",
                emptyCell: "Il n'y a pas de brique dans cette case !",
-               noFaceItem: "Il n'y a pas d'objet à détacher sur cette case",
+               noFaceItem: "Il n'y a pas d'objet à détacher sur cette brique",
+               noShape: "Il n'y a pas de forme à effacer sur cette brique",
                cannotDetachHidden: "Il n'y a pas d'objet à détacher",
                emptyCraneFaceItem: "La grue ne porte pas d'objet qui puisse être attaché",
                alreadyHaveFaceItem: "Cette brique a déjà un objet attaché",
@@ -393,16 +397,6 @@ var getContext = function(display, infos, curLevel) {
    if(infos.contextType != undefined) {
       loadContext(infos.contextType);
    }
-   
-   // infos.newBlocks.push({
-   //    name: "wait",
-   //    type: "actions",
-   //    block: { name: "wait" },
-   //    func: function(callback) {
-   //       this.advanceTime(1);
-   //       this.waitDelay(callback);
-   //    }
-   // });
    
    infos.newBlocks.push({
       name: "left",
@@ -745,7 +739,7 @@ var getContext = function(display, infos, curLevel) {
       name: "drawShape",
       type: "actions",
       block: {
-         name: "drawShape", params: [null], countAs: 2,
+         name: "drawShape", params: [null,null],
          blocklyJson: {
             "args0": [{
                "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -757,8 +751,18 @@ var getContext = function(display, infos, curLevel) {
             }]
          }
       },
-      func: function(value, callback) {
-         this.drawShape(value);
+      func: function(value1, value2, callback) {
+         this.drawShape(value1,value2);
+         this.waitDelay(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "eraseShape",
+      type: "actions",
+      block: { name: "eraseShape" },
+      func: function(callback) {
+         this.eraseShape();
          this.waitDelay(callback);
       }
    });
@@ -1559,6 +1563,14 @@ var getContext = function(display, infos, curLevel) {
             var opacity = (item.hidden) ? 0 : 1;
             item.faceItemElement.attr({ x, y: newY, opacity });
          }
+         if(item.shapeElement){
+            var itemAttr = itemAttributes(item);
+            var dy = newY - itemAttr.y; 
+            var dx = x - itemAttr.x; 
+            var op = (item.hidden) ? 0 : 1;
+            item.shapeElement.remove();
+            item.shapeElement = addShape(item).attr("opacity",op);
+         }
       }else{
          crane.leftClaw.transform("");
          crane.rightClaw.transform("");
@@ -1900,6 +1912,9 @@ var getContext = function(display, infos, curLevel) {
             }
             if(context.craneContent.faceItemElement){
                obj.push(context.craneContent.faceItemElement);
+            }
+            if(context.craneContent.shapeElement){
+               obj.push(context.craneContent.shapeElement);
             }
             // var obj = (context.craneContent.darkElement) ? paper.set(context.craneContent.element,context.craneContent.darkElement) : context.craneContent.element;
          }else{
@@ -2252,10 +2267,8 @@ var getContext = function(display, infos, curLevel) {
 
    function addShape(item) {
       var cSide = infos.cellSide * scale;
-      var x0 = infos.leftMargin*scale;
-      var x = x0 + cSide * item.col;
-      var y0 = infos.topMargin*scale + cSide * craneH;
-      var y = y0 + cSide * item.row;
+      var x = item.element.attr("x");
+      var y = item.element.attr("y");
       var margin = 5;
       var r = cSide/5;
       var cx = x + cSide - r - margin;
@@ -2297,7 +2310,6 @@ var getContext = function(display, infos, curLevel) {
    var redisplayMarkers = function() {
       if(context.display !== true)
          return
-      // console.log("[crane] redisplayMarkers")
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
@@ -2326,7 +2338,6 @@ var getContext = function(display, infos, curLevel) {
          var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
          var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
          marker.element = paper.set(rect,text,pole,bRect);
-         // console.log("[yo]",iMark,col,name,marker.element)
 
          for(var jMark = 0; jMark < context.markers.length; jMark++){
             if(iMark != jMark && col == context.markers[jMark].col){
@@ -2574,7 +2585,8 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 1) + 2*infos.actionDelay; // additional actionDelay to prevent bug with shape anim
+         // var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -2699,10 +2711,19 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animCrane_face_item" + Math.random(), topBlock.faceItemElement, animFaceItem);
       }
       if(topBlock.shapeElement){
+         var itemAttr = itemAttributes(topBlock);
+         var dy = newItemY - itemAttr.y; 
+         var transform = "...t,0,"+dy;
          if(topBlock.dark && newRow == -1 && !topBlock.hidden){
-            var animShape = new Raphael.animation({ transform: ["T",0,deltaY], opacity: 1 },delay);
+            var animShape = new Raphael.animation({ transform, opacity: 1 },delay, function() {
+               // topBlock.shapeElement.remove();
+               // topBlock.shapeElement = addShape(topBlock);
+            });
          }else{
-            var animShape = new Raphael.animation({ transform: ["T",0,deltaY] },delay);
+            var animShape = new Raphael.animation({ transform },delay, function() {
+               // topBlock.shapeElement.remove();
+               // topBlock.shapeElement = addShape(topBlock);
+            });
          }
          context.raphaelFactory.animate("animCrane_shape" + Math.random(), topBlock.shapeElement, animShape);
       }
@@ -2774,6 +2795,12 @@ var getContext = function(display, infos, curLevel) {
       var cyRightDown = craneAttr.cyRight + deltaY;
       var cx = x + w/2;
       var delay = infos.actionDelay;
+
+      var deltaY = (item.row)*cSide*scale;
+      var newItemY = (infos.topMargin + clawsOffsetY + craneItemOffset /*- catchOffsetY*/ + item.offsetY + markerH)*scale + deltaY;
+      var dyShape = newItemY - itemAttr.y;
+      
+
       var anim1 = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay,function(){
          redisplayItem(item,true);
          item.element.attr({ y, transform: ["S",0,1,cx,y] });
@@ -2782,6 +2809,10 @@ var getContext = function(display, infos, curLevel) {
          if(item.faceItemElement){
             var opacity = (item.hidden || item.dark) ? 0 : 1;
             item.faceItemElement.attr({ y, transform: ["S",0,1,cx,y], opacity });
+         }
+         if(item.shapeElement){
+            var opacity = (item.hidden || item.dark) ? 0 : 1;
+            item.shapeElement.attr({ transform: "s,0,1,"+cx+","+y+"t,0,"+dyShape, opacity });
          }
          resetCraneZOrder();
 
@@ -2792,10 +2823,13 @@ var getContext = function(display, infos, curLevel) {
             context.raphaelFactory.animate("animFlip2_dark_" + Math.random(), item.darkElement, anim2Dark);
          if(item.faceItemElement)
             context.raphaelFactory.animate("animFlip2_face_item" + Math.random(), item.faceItemElement, anim2Dark);
+         if(item.shapeElement)
+            context.raphaelFactory.animate("animFlip2_shape" + Math.random(), item.shapeElement, anim2Shape);
       });
-      var anim1Dark = new Raphael.animation({ "transform": ["S",0,1,cx,y] },delay);
+      var anim1Dark = new Raphael.animation({ "transform": "...s,0,1,"+cx+","+y },delay);
       var anim2 = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay,callback);
       var anim2Dark = new Raphael.animation({ "transform": ["S",1,1,cx,y] },delay);
+      var anim2Shape = new Raphael.animation({ "transform": "s,1,1t,0,"+dyShape },delay);
       var anim2ClawR = new Raphael.animation({ "transform": ["R",clutchAngle,craneAttr.cxRight,cyRightDown,"S",1,1,cx,y] },delay);
       var anim2ClawL = new Raphael.animation({ "transform": ["R",-clutchAngle,craneAttr.cxLeft,cyLeftDown,"S",1,1,cx,y] },delay);
 
@@ -2806,6 +2840,8 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animFlip1_dark_item" + Math.random(), item.darkElement, anim1Dark);
       if(item.faceItemElement)
          context.raphaelFactory.animate("animFlip1_face_item" + Math.random(), item.faceItemElement, anim1Dark);
+      if(item.shapeElement)
+         context.raphaelFactory.animate("animFlip1_shape" + Math.random(), item.shapeElement, anim1Dark);
    };
 
    context.putDown = function(callback) {
@@ -2932,7 +2968,6 @@ var getContext = function(display, infos, curLevel) {
       context.raphaelFactory.animate("animCrane_leftClaw_down_" + Math.random(), crane.leftClaw, animLeftClawDown);
       context.raphaelFactory.animate("animCrane_item_down" + Math.random(), item.element, animItemDown);
 
-      // var { row, col } = item;
       if(item.dark){
          var animDark = new Raphael.animation({ y: itemAttr.y, opacity: 1 },delay);
          context.raphaelFactory.animate("animCrane_dark" + Math.random(), item.darkElement, animDark);
@@ -2941,6 +2976,15 @@ var getContext = function(display, infos, curLevel) {
          var op = (item.dark || item.hidden) ? 0 : 1;
          var animFaceItem = new Raphael.animation({ y: itemAttr.y, opacity: op },delay);
          context.raphaelFactory.animate("animCrane_face_item" + Math.random(), item.faceItemElement, animFaceItem);
+      }
+      if(item.shapeElement){
+         var dy = itemAttr.y - item.element.attr("y");
+         var op = (item.dark || item.hidden) ? 0 : 1;
+         var animShape = new Raphael.animation({ transform: "...t,0,"+dy , opacity: op },delay, function() {
+            item.shapeElement.remove();
+            item.shapeElement = addShape(item);
+         });
+         context.raphaelFactory.animate("animCrane_shape" + Math.random(), item.shapeElement, animShape);
       }
    };
 
@@ -3069,6 +3113,12 @@ var getContext = function(display, infos, curLevel) {
          var opacity = (item.dark || item.hidden) ? 0 : 1;
          var animFaceItem = new Raphael.animation({ y: itemAttr.y, opacity },delay,"<");
          context.raphaelFactory.animate("animCrane_face_item" + Math.random(), item.faceItemElement, animFaceItem);
+      }
+      if(item.shapeElement){
+         var dy = itemAttr.y - (craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale);
+         var op = (item.dark || item.hidden) ? 0 : 1;
+         var animShape = new Raphael.animation({ transform: "...t,0,"+dy , opacity: op },delay,"<");
+         context.raphaelFactory.animate("animCrane_shape" + Math.random(), item.shapeElement, animShape);
       }
 
    };
@@ -3299,7 +3349,6 @@ var getContext = function(display, infos, curLevel) {
                var angle = (context.craneContent) ? clutchAngle : 0;
                var animLeftClaw = new Raphael.animation({ x: craneAttr.xLeftClaw, transform: ["R",-angle,craneAttr.cxLeft,craneAttr.cyLeft] },delay);
                var animRightClaw = new Raphael.animation({ x: craneAttr.xRightClaw, transform: ["R",angle,craneAttr.cxRight,craneAttr.cyRight] },delay);
-               // context.addSound("crane_move");     
                context.raphaelFactory.animate("animCrane_wheels_" + Math.random(), crane.wheels, anim);
                context.raphaelFactory.animate("animCrane_line_" + Math.random(), crane.line, animLine);
                context.raphaelFactory.animate("animCrane_shaft_" + Math.random(), crane.shaft, animShaft);
@@ -3316,6 +3365,14 @@ var getContext = function(display, infos, curLevel) {
                   if(item.faceItemElement){
                      context.raphaelFactory.animate("animCrane_face_item_" + Math.random(), item.faceItemElement, animItem);
                   }
+                  if(item.shapeElement){
+                     var dx = (newCol - oldPos)*infos.cellSide*scale;
+                     var animShape = new Raphael.animation({ transform: "...t,"+dx+",0" },delay,function() {
+                        // item.shapeElement.remove();
+                        // item.shapeElement = addShape(item);
+                     });
+                     context.raphaelFactory.animate("animCrane_shape_" + Math.random(), item.shapeElement, animShape);
+                  }
                }
             } else {
                context.delayFactory.createTimeout("moveCrane_" + Math.random(), function() {
@@ -3330,7 +3387,7 @@ var getContext = function(display, infos, curLevel) {
       
       // context.advanceTime(1);
       if(callback){
-         context.waitDelay(callback, null, delay);
+         context.waitDelay(callback, null, delay + infos.actionDelay); // additional actionDelay to prevent bug with shape anim
       }
    };
 
@@ -3426,9 +3483,9 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.drawShape = function(value) {
+   context.drawShape = function(value1,value2) {
       this.displayMessage("");
-      console.log(value)
+      console.log(value1,value2)
       // var col = this.cranePos;
       // var alreadyExist = false;
       // for(var iMark = 0; iMark < this.markers.length; iMark++){
@@ -3444,6 +3501,27 @@ var getContext = function(display, infos, curLevel) {
       // if(context.display) {
       //    redisplayMarkers();
       // }
+   };
+
+   context.eraseShape = function() {
+      let row = context.cranePosY;
+      let col = context.cranePos;
+      let items = this.getItemsOn(row,col, obj => !obj.target);
+      if(row < 0){
+         throw(strings.messages.wrongCoordinates)
+      }
+      if(items.length == 0){
+         throw(strings.messages.emptyCell)
+      }
+      let item = items[0];
+      if(!item.shape){
+         throw(strings.messages.noShape)
+      }
+      item.shape = null;
+      if(this.display && item.shapeElement){
+         item.shapeElement.remove();
+         item.shapeElement = null;
+      }
    };
 
    context.displayMessage = function(str) {
@@ -3496,6 +3574,10 @@ var getContext = function(display, infos, curLevel) {
          item.element.remove();
          if(item.darkElement)
            item.darkElement.remove();
+         if(item.faceItemElement)
+           item.faceItemElement.remove();
+         if(item.shapeElement)
+           item.shapeElement.remove();
       }
    };
    
