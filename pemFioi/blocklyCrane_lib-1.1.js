@@ -1026,6 +1026,7 @@ var getContext = function(display, infos, curLevel) {
       context.spotlight = null;
       context.message = null;
       context.messageElement = null;
+      context.overlay = (infos.overlay) ? Beav.Object.clone(infos.overlay) : null;
 
 
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
@@ -1164,17 +1165,7 @@ var getContext = function(display, infos, curLevel) {
       
       for(var pos of cellPos){
          var { row, col } = pos;
-         // if(row == "crane"){
-         //    var item = context.craneContent;
-         //    var craneAttr = getCraneAttr();
-         //    var y = craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale;
-         //    if(item.catchOffsetY){
-         //       y -= item.catchOffsetY*scale;
-         //    }
-         //    var x = craneAttr.x;
-         // }else{
-            var { x, y } = context.getCellCoord(row,col);
-         // }
+         var { x, y } = context.getCellCoord(row,col);
          var obj = p.rect(x,y,cSide*scale,cSide*scale).attr(attr);
          context.highlights.push({ row, col, obj });
       }
@@ -1972,6 +1963,7 @@ var getContext = function(display, infos, curLevel) {
             cellItems[iItem].darkElement.toFront();
          }
       }
+
    }; 
 
    var resetCraneZOrder = function() {
@@ -2000,6 +1992,18 @@ var getContext = function(display, infos, curLevel) {
 
       if(context.messageElement){
          context.messageElement.toFront();
+      }
+   };
+
+   function resetAnimZOrder() {
+      resetCraneZOrder();
+      overlayToFront();
+   };
+
+   function overlayToFront() {
+      let ov = context.overlay;
+      if(ov && ov.element){
+         ov.element.toFront();
       }
    };
    
@@ -2137,6 +2141,10 @@ var getContext = function(display, infos, curLevel) {
       }
       var craneAttr = getCraneAttr();
       setCraneAttr(craneAttr);
+
+      /* overlay */
+      updateOverlay();
+
 
       /* highlights */
       if(this.highlights.length > 0){
@@ -2642,7 +2650,9 @@ var getContext = function(display, infos, curLevel) {
       takeAnimDelay = 0.5*infos.actionDelay;
       
       if(context.display) {
-         resetCraneZOrder();
+         // resetCraneZOrder();
+         // updateOverlay();
+         resetAnimZOrder();
          if(context.animate && infos.actionDelay > 0){
             context.takeAnim(topBlock);
             if(topBlock.num == 1){
@@ -2812,7 +2822,7 @@ var getContext = function(display, infos, curLevel) {
          topBlock.hidden = !topBlock.hidden;
       }
       if(context.display) {
-         resetCraneZOrder();
+         resetAnimZOrder();
          if(context.animate && infos.actionDelay > 0){
             context.takeAndFlipAnim(topBlock);
             if(topBlock.num == 1){
@@ -2888,7 +2898,7 @@ var getContext = function(display, infos, curLevel) {
             var opacity = (item.hidden || item.dark) ? 0 : 1;
             item.shapeElement.attr({ transform: "s,0,1,"+cx+","+y+"t,0,"+dyShape, opacity });
          }
-         resetCraneZOrder();
+         resetAnimZOrder();
 
          context.raphaelFactory.animate("animFlip2_" + Math.random(), item.element, anim2);
          context.raphaelFactory.animate("animFlip2_clawR" + Math.random(), crane.rightClaw, anim2ClawR);
@@ -2930,6 +2940,7 @@ var getContext = function(display, infos, curLevel) {
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
+            resetAnimZOrder();
          }
       }
       if(!context.display || !context.animate || infos.actionDelay == 0){
@@ -3057,6 +3068,7 @@ var getContext = function(display, infos, curLevel) {
          var animShape = new Raphael.animation({ transform: "...t,0,"+dy , opacity: op },delay, function() {
             item.shapeElement.remove();
             item.shapeElement = addShape(item);
+            overlayToFront();
          });
          context.raphaelFactory.animate("animCrane_shape" + Math.random(), item.shapeElement, animShape);
       }
@@ -3192,7 +3204,11 @@ var getContext = function(display, infos, curLevel) {
          var dy = itemAttr.y - (craneAttr.yClaws + (craneItemOffset + item.offsetY)*scale);
          var op = (item.dark || item.hidden) ? 0 : 1;
          var animShape = new Raphael.animation({ transform: "...t,0,"+dy , opacity: op },delay,"<");
-         context.raphaelFactory.animate("animCrane_shape" + Math.random(), item.shapeElement, animShape);
+         context.raphaelFactory.animate("animCrane_shape" + Math.random(), item.shapeElement, animShape, function() {
+            item.shapeElement.remove();
+            item.shapeElement = addShape(item);
+            overlayToFront();
+         });
       }
 
    };
@@ -3209,7 +3225,7 @@ var getContext = function(display, infos, curLevel) {
    context.detach = function(callback) {
       this.displayMessage("");
       if(context.display)
-         resetCraneZOrder();
+         resetAnimZOrder();
       context.tool = 0;
       updateTool();
       let row = context.cranePosY;
@@ -3257,7 +3273,7 @@ var getContext = function(display, infos, curLevel) {
       var animShaftUp = new Raphael.animation({ y: craneAttr.yShaft + deltaY },delay);
       var animRightClawUp = new Raphael.animation({ y: craneAttr.yClaws + deltaY },delay);
       var animLeftClawUp = new Raphael.animation({ y: craneAttr.yClaws + deltaY },delay,function() {
-         resetCraneZOrder();
+         resetAnimZOrder();
          context.raphaelFactory.animate("animCrane_rightClaw_close" + Math.random(), crane.rightClaw, animCloseRightClaw);
          context.raphaelFactory.animate("animCrane_leftClaw_close" + Math.random(), crane.leftClaw, animCloseLeftClaw);
       });
@@ -3272,6 +3288,7 @@ var getContext = function(display, infos, curLevel) {
          context.craneContent.element.attr("opacity",1);
          context.delayFactory.createTimeout("setCraneAttr", function() {
             setCraneAttr(craneAttr);
+            overlayToFront();
          }, delay*0.2);
       });
 
@@ -3592,7 +3609,7 @@ var getContext = function(display, infos, curLevel) {
 
       if(context.display){
          item.shapeElement = addShape(item);
-         resetCraneZOrder();
+         resetAnimZOrder();
       }
    };
 
@@ -3657,6 +3674,23 @@ var getContext = function(display, infos, curLevel) {
       text.attr("y",cy).toFront();
 
       context.messageElement = paper.set(rect,text);
+   };
+
+   function updateOverlay() {
+      if(!context.display || !context.overlay){
+         return
+      }
+      let ov = context.overlay;
+      let pos1 = ov.pos[0];
+      let pos2 = ov.pos[1];
+      let { x, y } = context.getCellCoord(pos1[1],pos1[0]);
+      let coord2 = context.getCellCoord(pos2[1],pos2[0]);
+      let width = coord2.x - x;
+      let height = coord2.y - y;
+      if(ov.element){
+         ov.element.remove();
+      }
+      ov.element = paper.image(ov.src,x,y,width,height).toFront();
    };
 
    context.destroy = function(item) {
