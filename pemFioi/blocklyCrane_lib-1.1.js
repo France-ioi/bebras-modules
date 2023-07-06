@@ -1009,6 +1009,7 @@ var getContext = function(display, infos, curLevel) {
          context.initMarkers = gridInfos.initMarkers || [];
          context.customItems = gridInfos.customItems || {};
          context.successAnim = gridInfos.successAnim || {};
+         context.overlay = (gridInfos.overlay) ? Beav.Object.clone(gridInfos.overlay) : null;
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
@@ -1026,7 +1027,6 @@ var getContext = function(display, infos, curLevel) {
       context.spotlight = null;
       context.message = null;
       context.messageElement = null;
-      context.overlay = (infos.overlay) ? Beav.Object.clone(infos.overlay) : null;
 
 
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
@@ -3763,20 +3763,66 @@ var getResources = function(subTask) {
    for(var level in data){
       for(var iLev = 0; iLev < data[level].length; iLev++){
          var tiles = data[level][iLev].tiles;
+         var broken = data[level][iLev].broken;
+         var hidden = data[level][iLev].hidden;
+         var dark = data[level][iLev].dark;
+         var faceItems = data[level][iLev].faceItems;
          var customItems = data[level][iLev].customItems;
          var successAnim = data[level][iLev].successAnim;
-         for(var row of tiles){
-            for(var col of row){
-               if(col > 1){
-                  var url = "assets/png/0"+(col-1)+".png";
-                  if(!newUrl.includes(col)){
-                     res.push({ type: 'image', url });
-                     newUrl.push(url)
+         var overlay = data[level][iLev].overlay;
+         var nbRows = tiles.length;
+         var nbCol = tiles[0].length;
+         for(var row = 0; row < nbRows; row++){
+            for(var col = 0; col < nbCol; col++){
+               var id = tiles[row][col];
+               if(id > 1 && id < 90){
+                  var strId = "" + (id - 1);
+                  if (id <= 10) {
+                     strId = "0" + strId;
+                  }
+                  var urlStr = "assets/png/"+strId+".png";
+                  var urls = [urlStr];
+                  var urlH = "assets/png/hidden_"+strId+".png";
+                  urls.push(urlH);
+                  if(dark && dark.length > 0){
+                     if(infos.darkImgPath && infos.darkImgPath[id] && infos.darkImgPath[id].img){
+                        urls.push(infos.darkImgPath[id].img);
+                     }else{
+                        urls.push("crane/dark_default.png");
+                     }
+                    if(infos.darkImgPath && infos.darkImgPath[id] && infos.darkImgPath[id].hidden){
+                        urls.push(infos.darkImgPath[id].hidden);
+                     }
+                  }
+                  if(broken && broken.length > 0 && broken[row][col]){
+                     var urlB = "assets/png/broken_0"+(col-1)+".png";
+                     urls.push(urlB);
+                  }
+
+                  for(var url of urls){
+                     if(!newUrl.includes(url)){
+                        res.push({ type: 'image', url });
+                        newUrl.push(url);
+                     }
+                  }
+               }
+
+               if(faceItems && faceItems.length > 0){
+                  var faceItemID = faceItems[row][col];
+                  if(faceItemID > 0){
+                     var strId = "" + faceItemID;
+                     if (faceItemID < 10) {
+                        strId = "0" + strId;
+                     }
+                     var url = "assets/item_"+strId;
+                     if(!newUrl.includes(url)){
+                        res.push({ type: 'image', url });
+                        newUrl.push(url);
+                     }
                   }
                }
             }
          }
-
 
          if(customItems){
             for(var id in customItems){
@@ -3790,6 +3836,10 @@ var getResources = function(subTask) {
             for(var img of successAnim.img){
                res.push({ type: 'image', url: img.src });
             }
+         }
+
+         if(overlay){
+            res.push({ type: 'image', url: overlay.src });
          }
       }
    }
