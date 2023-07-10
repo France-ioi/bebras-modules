@@ -420,6 +420,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "left" },
       func: function(callback) {
+         this.updateRunningState();
          this.shiftCrane(-1,callback);
       }
    });
@@ -429,6 +430,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "right" },
       func: function(callback) {
+         this.updateRunningState();
          this.shiftCrane(1,callback);
       }
    });
@@ -438,6 +440,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "take" },
       func: function(callback) {
+         this.updateRunningState();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('take');
@@ -454,6 +457,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "putDown" },
       func: function(callback) {
+         this.updateRunningState();
          this.putDown(callback);
       }
    });
@@ -463,6 +467,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "drop" },
       func: function(callback) {
+         this.updateRunningState();
          this.drop(callback);
       }
    });
@@ -472,6 +477,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "colHeight", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getColHeight());
       }
    });
@@ -481,6 +487,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "craneColumn", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.cranePos + 1);
       }
    });
@@ -490,6 +497,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "craneRow", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.nbRows - this.cranePosY);
       }
    });
@@ -499,6 +507,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "expectedBlock", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getExpectedBlock());
       }
    });
@@ -515,6 +524,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getExpectedBlockAt(row,col));
       }
    });
@@ -524,6 +534,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "expectedBlockInCell", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getExpectedBlockInCell());
       }
    });
@@ -533,6 +544,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlock", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getTopBlock());
       }
    });
@@ -542,6 +554,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlockBroken", yieldsValue: true },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.isTopBlockBroken());
       }
    });
@@ -558,6 +571,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getBlockAt(row,col));
       }
    });
@@ -574,6 +588,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.isBlockAtBroken(row,col));
       }
    });
@@ -583,6 +598,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "carriedBlock", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getCarriedBlock());
       }
    });
@@ -592,6 +608,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "carriedBlockBroken", yieldsValue: true },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.isCarriedBlockBroken());
       }
    });
@@ -608,6 +625,7 @@ var getContext = function(display, infos, curLevel) {
             }]
          } },
       func: function(value,callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.isOnMarker(value));
       }
    });
@@ -625,6 +643,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value, callback) {
+         this.updateRunningState();
          this.placeMarker(value);
          this.waitDelay(callback);
       }
@@ -643,6 +662,7 @@ var getContext = function(display, infos, curLevel) {
          },
       },
       func: function(value, callback) {
+         this.updateRunningState();
          this.goToMarker(value,callback);
       }
    });
@@ -652,6 +672,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "up" },
       func: function(callback) {
+         this.updateRunningState();
          this.shiftCraneY(-1,callback);
       }
    });
@@ -661,6 +682,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "down" },
       func: function(callback) {
+         this.updateRunningState();
          this.shiftCraneY(1,callback);
       }
    });
@@ -670,6 +692,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readBlock", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getBlockType());
       }
    });
@@ -679,6 +702,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "dieValue", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getDieValue());
       }
    });
@@ -688,6 +712,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "flip" },
       func: function(callback) {
+         this.updateRunningState();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('flip');
@@ -704,6 +729,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "placeSpotlight" },
       func: function(callback) {
+         this.updateRunningState();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('placeSpotlight');
@@ -721,6 +747,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlockSide", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.getTopBlockSide());
       }
    });
@@ -730,6 +757,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "detach" },
       func: function(callback) {
+         this.updateRunningState();
          this.detach(callback);
       }
    });
@@ -739,6 +767,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "attach" },
       func: function(callback) {
+         this.updateRunningState();
          this.attach(callback);
       }
    });
@@ -748,6 +777,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readFaceItem", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.readFaceItem());
       }
    });
@@ -769,6 +799,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value1, value2, callback) {
+         this.updateRunningState();
          this.drawShape(value1,value2);
          this.waitDelay(callback);
       }
@@ -779,6 +810,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "eraseShape" },
       func: function(callback) {
+         this.updateRunningState();
          this.eraseShape();
          this.waitDelay(callback);
       }
@@ -789,6 +821,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readShape", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.readShape());
       }
    });
@@ -798,6 +831,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readColor", yieldsValue: 'int' },
       func: function(callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.readColor());
       }
    });
@@ -813,6 +847,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value,callback) {
+         this.updateRunningState();
          this.callCallback(callback, this.displayMessage(value));
       }
    });
@@ -854,6 +889,7 @@ var getContext = function(display, infos, curLevel) {
    var contOutline;
    var backgroundObj;
    var dust;
+   // var hideGrid;
 
    var crane = {};
    var craneH = 1.5; // as rows
@@ -917,6 +953,10 @@ var getContext = function(display, infos, curLevel) {
       fill: "black",
       opacity: 0.5
    };
+   // var hideGridAttr = {
+   //    stroke: "none",
+   //    fill: "black"
+   // };
 
    var dustSrc = getImgPath(dustUrl);
    var dustW = 80;
@@ -1010,12 +1050,14 @@ var getContext = function(display, infos, curLevel) {
          context.customItems = gridInfos.customItems || {};
          context.successAnim = gridInfos.successAnim || {};
          context.overlay = (gridInfos.overlay) ? Beav.Object.clone(gridInfos.overlay) : null;
+         context.initState = gridInfos.initState;
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
       context.cranePos = context.initCranePos;
       context.cranePosY = context.initCranePosY || 0;
       context.craneContent = null;
       context.tool = context.initTool || 0; // 0: crane, 1: sensor
+      context.programIsRunning = false;
 
       context.rng = new RandomGenerator(0);
       context.dieValue = context.initDieValue || null;
@@ -1102,7 +1144,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.redrawDisplay = function() {
-      // console.log("[crane] redrawDisplay")
+      // console.log("redrawDisplay")
       if(context.display) {
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
@@ -1117,6 +1159,16 @@ var getContext = function(display, infos, curLevel) {
          $("#nbMoves").html(context.nbMoves);
       }
    }
+
+   context.updateRunningState = function() {
+      if(!this.programIsRunning){
+         this.programIsRunning = true;
+         // resetItems();
+         // this.updateScale();
+         redisplayEverything();
+         // console.log(this.programIsRunning)
+      }
+   };
 
    context.getInnerState = function() {
       return {
@@ -1722,6 +1774,9 @@ var getContext = function(display, infos, curLevel) {
             contLabels[iCol] = paper.text(0, 0, String.fromCharCode(iCol + 65));
          }
       }
+      // if(infos.hideGrid){
+      //    hideGrid = paper.rect(0,0,0,0).attr(hideGridAttr);
+      // }
 
       $("#dust_pix").remove();
       $("body").append("<img src="+dustSrc+" style='width:1px;' id='dust_pix' />");
@@ -1806,6 +1861,14 @@ var getContext = function(display, infos, curLevel) {
       var nbRowsCont = context.nbRowsCont;
       var nbColCont = context.nbColCont;
       var rowShift = (context.nbRows >= nbRowsCont) ? 0 : (nbRowsCont - context.nbRows);
+      
+      // var til = context.tiles; 
+      // var tar = context.target;
+      var ini = context.initState; 
+      // if(!context.programIsRunning && ini){
+      //    til = ini.tiles || til;
+      // }
+
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var itemData = context.getItemData(context.tiles[iRow][iCol]);
@@ -1823,9 +1886,10 @@ var getContext = function(display, infos, curLevel) {
                   type: itemTypeByNum[itemTypeNum],
                   imgId: itemData.imgId,
                   deco: itemData.deco, 
-                  broken, hidden, dark, faceItem, shape
+                  broken, hidden, dark, faceItem, shape, ini
                }, false);
             }
+
             var targetData = context.getItemData(context.target[iRow][iCol]);
             var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
             var targetFaceItem = (context.targetFaceItems.length > 0) ? context.targetFaceItems[iRow][iCol] : 0;
@@ -1842,7 +1906,7 @@ var getContext = function(display, infos, curLevel) {
                   hidden: targetHidden,
                   faceItem: targetFaceItem,
                   shape: targetShape,
-                  target: true, dark
+                  target: true, dark, ini
                }, false);
             }
          }
@@ -1871,7 +1935,7 @@ var getContext = function(display, infos, curLevel) {
          resetItem({
             row: rowShift,
             col: 0,
-            type: "mask"
+            type: "mask", ini
          }, false);
       }else{
          for(var iRow = 0; iRow < context.mask.length;iRow++) {
@@ -1880,7 +1944,7 @@ var getContext = function(display, infos, curLevel) {
                   resetItem({
                      row: iRow + rowShift,
                      col: iCol,
-                     type: "mask"
+                     type: "mask", ini
                   }, false);
                }
             }
@@ -1905,7 +1969,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(context.display){
-         redisplayAllItems();
+         // redisplayAllItems();
       }
    };
 
@@ -2124,6 +2188,61 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       // console.log("updateScale")
+      redisplayEverything();
+      // redisplayAllItems();    
+      // redisplayMarkers();  
+      // redisplaySpotlight();  
+      // updateDarkness();
+      // updateMessage();
+
+      // /* crane */
+      // var w = cSide*scale, h = w;
+      // var y = (infos.topMargin + markerH)*scale;
+      // for(var iCol = 0; iCol < nbCol; iCol++){
+      //    var x = (cSide*iCol + infos.leftMargin)*scale;
+      //    crane.rail[iCol].attr({ x, y, 
+      //       width: w, height: h
+      //    });
+      // }
+      // var craneAttr = getCraneAttr();
+      // setCraneAttr(craneAttr);
+
+      // /* overlay */
+      // updateOverlay();
+
+
+      // /* highlights */
+      // if(this.highlights.length > 0){
+      //    for(var dat of this.highlights){
+      //       var { row, col, obj } = dat;
+      //       var width = cSide*scale, height = w;
+      //       var { x, y } = this.getCellCoord(row,col);
+      //       // console.log(row,col)
+      //       obj.attr({ x, y, width, height }).toFront();
+      //    }
+      // }
+
+      // /* success anims */
+      // if(this.successAnimObj.length > 0){
+      //    for(var dat of this.successAnimObj){
+      //       var { row, col, width, height, obj } = dat;
+      //       var w = cSide*width*scale, h = cSide*height*scale;
+      //       var { x, y } = this.getCellCoord(row,col);
+      //       obj.attr({ x, y, width: w, height: h });
+      //       // console.log("[yo",x,y,w,h)
+      //    }
+      // }
+   };
+
+   function redisplayEverything() {
+      if(!context.display) {
+         return;
+      }
+      var nbRowsCont = context.nbRowsCont;
+      var nbColCont = context.nbColCont;
+      var nbCol = context.nbCols + nbColCont;
+      var nbRows = Math.max(context.nbRows,nbRowsCont);
+      var cSide = infos.cellSide;
       redisplayAllItems();    
       redisplayMarkers();  
       redisplaySpotlight();  
@@ -2147,24 +2266,22 @@ var getContext = function(display, infos, curLevel) {
 
 
       /* highlights */
-      if(this.highlights.length > 0){
-         for(var dat of this.highlights){
+      if(context.highlights.length > 0){
+         for(var dat of context.highlights){
             var { row, col, obj } = dat;
             var width = cSide*scale, height = w;
-            var { x, y } = this.getCellCoord(row,col);
-            // console.log(row,col)
+            var { x, y } = context.getCellCoord(row,col);
             obj.attr({ x, y, width, height }).toFront();
          }
       }
 
       /* success anims */
-      if(this.successAnimObj.length > 0){
-         for(var dat of this.successAnimObj){
+      if(context.successAnimObj.length > 0){
+         for(var dat of context.successAnimObj){
             var { row, col, width, height, obj } = dat;
             var w = cSide*width*scale, h = cSide*height*scale;
-            var { x, y } = this.getCellCoord(row,col);
+            var { x, y } = context.getCellCoord(row,col);
             obj.attr({ x, y, width: w, height: h });
-            // console.log("[yo",x,y,w,h)
          }
       }
    };
@@ -2188,6 +2305,10 @@ var getContext = function(display, infos, curLevel) {
       }
       if(item.shapeElement) {
          item.shapeElement.remove();
+      }
+
+      if(!context.programIsRunning && item.ini && item.ini.hideTarget && item.target){
+         return
       }
 
       var nbRowsCont = context.nbRowsCont;
@@ -2594,6 +2715,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.shiftCrane = function(dir,callback) {
       this.displayMessage("");
+      // this.updateRunningState();
       var newPos = context.cranePos + dir;
       var ttg = context.tryToGo(newPos);
       if(ttg === true){
@@ -2608,6 +2730,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.shiftCraneY = function(dir,callback) {
       this.displayMessage("");
+      // this.updateRunningState();
       var newPosY = context.cranePosY + dir;
       var ttg = context.tryToGoY(newPosY);
       if(ttg === true){
@@ -3105,6 +3228,7 @@ var getContext = function(display, infos, curLevel) {
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
             redisplayItem(tempItem,false);
+            resetAnimZOrder();
          }
       }else{
          rollDie(tempItem);
