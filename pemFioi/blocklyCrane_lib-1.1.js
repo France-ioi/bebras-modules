@@ -232,6 +232,7 @@ var getContext = function(display, infos, curLevel) {
                failureWrongShape: "La forme dessinée sur le bloc encadré en rouge n'est pas la bonne.",
                failureWrongColor: "La forme dessinée sur le bloc encadré en rouge n'a pas la bonne couleur.",
                failureShape: "Le bloc encadré en rouge ne devrait pas avoir de forme dessinée.",
+               failureWrongCranePos: "La position finale de la grue n'est pas celle attendue."
             },
             startingBlockName: "Programme du robot"
          },
@@ -1040,6 +1041,7 @@ var getContext = function(display, infos, curLevel) {
          context.targetHidden = context.scoring[0].hidden || [];
          context.targetFaceItems = context.scoring[0].faceItems || [];
          context.targetShapes = context.scoring[0].shapes || [];
+         context.targetCranePos = context.scoring[0].cranePos;
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
          context.shapes = gridInfos.shapes;
@@ -1571,17 +1573,22 @@ var getContext = function(display, infos, curLevel) {
       return ret;
    };
 
-   function getCraneAttr() {
+   function getCraneAttr(target) {
       var cSide = infos.cellSide;
       var w = cSide*scale, h = w;
       var y = (infos.topMargin + markerH)*scale;
-      var cranePos = context.cranePos;
+      var cranePos = (target) ? context.targetCranePos : context.cranePos;
       var nbRowsCont = context.nbRowsCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
       var cranePosY = context.cranePosY;
 
-      var craneOpacity = 1 - context.tool;
-      var sensorOpacity = context.tool;
+      if(target){
+         var craneOpacity = 0.3;
+         var sensorOpacity = 0;
+      }else{
+         var craneOpacity = 1 - context.tool;
+         var sensorOpacity = context.tool;
+      }
 
       let faceItemOffsetY = (context.craneContent && context.craneContent.type == "faceItem") ? (craneFaceItemOffsetY - detachDeltaY)*scale : 0;
       let yCorr = (cranePosY == -1 && context.craneContent && context.craneContent.type == "faceItem") ? -craneFaceItemOffsetY*scale : 0; 
@@ -1617,46 +1624,67 @@ var getContext = function(display, infos, curLevel) {
          cxLeft, cyLeft, cxRight, cyRight, xSensor, ySensor, craneOpacity, sensorOpacity }
    };
 
-   function setCraneAttr(attr) {
+   function setCraneAttr(attr,target) {
       var cSide = infos.cellSide;
       var x = attr.x, y = attr.y;
       var width = attr.w, height = attr.h;
-      crane.wheels.attr({ x: attr.xWheels, y: attr.yWheels, width: wheelsW*scale, height: wheelsH*scale });
-      for(var iRow = 0; iRow < crane.line.length; iRow++){
+      var obj = (target) ? crane.target : crane;
+
+      obj.wheels.attr({ 
+         x: attr.xWheels, 
+         y: attr.yWheels, 
+         width: wheelsW*scale, 
+         height: wheelsH*scale,
+         opacity: (target) ? 0.3 : 1 
+      });
+      for(var iRow = 0; iRow < obj.line.length; iRow++){
          var yLine = attr.y0Line + iRow*cSide*scale;
-         crane.line[iRow].attr({x, y: yLine, width, height });
+         obj.line[iRow].attr({x, y: yLine, width, height });
       }
-      crane.line.attr("clip-rect",attr.lineClip);
-      crane.shaft.attr({
+      obj.line.attr("clip-rect",attr.lineClip);
+      if(target){
+         obj.line.attr("opacity", 0.3);
+      }
+      obj.shaft.attr({
          x: attr.xShaft, 
          y: attr.yShaft, 
          width: shaftW*scale, 
          height: shaftH*scale,
          opacity: attr.craneOpacity
       })
-      crane.leftClaw.attr({ 
+      obj.leftClaw.attr({ 
          x: attr.xLeftClaw, 
          y: attr.yClaws, 
          width: clawW*scale, 
          height: clawH*scale,
          opacity: attr.craneOpacity
       });
-      crane.rightClaw.attr({ 
+      obj.rightClaw.attr({ 
          x: attr.xRightClaw, 
          y: attr.yClaws, 
          width: clawW*scale, 
          height: clawH*scale,
          opacity: attr.craneOpacity
       });
-      crane.sensor.attr({ 
-         x: attr.xSensor, 
-         y: attr.ySensor, 
-         width: sensorW*scale, 
-         height: sensorH*scale,
-         opacity: attr.sensorOpacity
-      });
+      if(!target){
+         obj.sensor.attr({ 
+            x: attr.xSensor, 
+            y: attr.ySensor, 
+            width: sensorW*scale, 
+            height: sensorH*scale,
+            opacity: attr.sensorOpacity
+         });
+      }else{
+         var ini = context.initState;
+         if(!context.programIsRunning && ini && ini.hideTarget){
+            crane.target.all.hide();
+         }else{
+            crane.target.all.show();
+         }
+         return
+      }
 
-      if(context.craneContent){
+      if(!target && context.craneContent){
          var item = context.craneContent;
          var angle = clutchAngle;
          crane.leftClaw.transform(["R",-angle,attr.cxLeft,attr.cyLeft]);
@@ -1789,6 +1817,7 @@ var getContext = function(display, infos, curLevel) {
       var nbCol = context.nbCols + nbColCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
       var src = infos.craneSrc;
+
       crane.rail = paper.set();
       for(var iCol = 0; iCol < nbCol; iCol++){
          crane.rail.push(paper.image(getImgPath(src.rail),0,0,0,0));
@@ -1809,6 +1838,17 @@ var getContext = function(display, infos, curLevel) {
       if(context.craneContent){
          redisplayItem(context.craneContent)
       }
+
+      if(context.targetCranePos != undefined){
+         crane.target = {};
+         crane.target.wheels = crane.wheels.clone();
+         crane.target.line = crane.line.clone();
+         crane.target.leftClaw = crane.leftClaw.clone();
+         crane.target.rightClaw = crane.rightClaw.clone();
+         crane.target.shaft = crane.shaft.clone();
+         crane.target.all = paper.set(crane.target.wheels,crane.target.line,crane.target.leftClaw,crane.target.rightClaw,crane.target.shaft);
+      }
+      
       resetCraneZOrder();
    };
    
@@ -2032,6 +2072,9 @@ var getContext = function(display, infos, curLevel) {
 
    var resetCraneZOrder = function() {
       // console.log("resetZOrder")
+      if(crane.target){
+         crane.target.wheels.toFront();
+      }
       var elem = [];
       for(var elemName in infos.craneZOrder) {
          var val = infos.craneZOrder[elemName];
@@ -2189,49 +2232,6 @@ var getContext = function(display, infos, curLevel) {
       }
       // console.log("updateScale")
       redisplayEverything();
-      // redisplayAllItems();    
-      // redisplayMarkers();  
-      // redisplaySpotlight();  
-      // updateDarkness();
-      // updateMessage();
-
-      // /* crane */
-      // var w = cSide*scale, h = w;
-      // var y = (infos.topMargin + markerH)*scale;
-      // for(var iCol = 0; iCol < nbCol; iCol++){
-      //    var x = (cSide*iCol + infos.leftMargin)*scale;
-      //    crane.rail[iCol].attr({ x, y, 
-      //       width: w, height: h
-      //    });
-      // }
-      // var craneAttr = getCraneAttr();
-      // setCraneAttr(craneAttr);
-
-      // /* overlay */
-      // updateOverlay();
-
-
-      // /* highlights */
-      // if(this.highlights.length > 0){
-      //    for(var dat of this.highlights){
-      //       var { row, col, obj } = dat;
-      //       var width = cSide*scale, height = w;
-      //       var { x, y } = this.getCellCoord(row,col);
-      //       // console.log(row,col)
-      //       obj.attr({ x, y, width, height }).toFront();
-      //    }
-      // }
-
-      // /* success anims */
-      // if(this.successAnimObj.length > 0){
-      //    for(var dat of this.successAnimObj){
-      //       var { row, col, width, height, obj } = dat;
-      //       var w = cSide*width*scale, h = cSide*height*scale;
-      //       var { x, y } = this.getCellCoord(row,col);
-      //       obj.attr({ x, y, width: w, height: h });
-      //       // console.log("[yo",x,y,w,h)
-      //    }
-      // }
    };
 
    function redisplayEverything() {
@@ -2260,6 +2260,10 @@ var getContext = function(display, infos, curLevel) {
       }
       var craneAttr = getCraneAttr();
       setCraneAttr(craneAttr);
+      if(crane.target){
+         var tCraneAttr = getCraneAttr(true);
+         setCraneAttr(tCraneAttr,true);
+      }
 
       /* overlay */
       updateOverlay();
@@ -4012,12 +4016,13 @@ var robotEndConditions = {
       var hid = context.scoring[iTarget].hidden;
       var fac = context.scoring[iTarget].faceItems;
       var sha = context.scoring[iTarget].shapes;
+      var cra = context.scoring[iTarget].cranePos;
       var til = context.tiles;
       var bro = context.broken;
       
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-      var error = checkForErrors({context,tar,sub,hid,fac,sha,nbWellPlaced,nbRequired});
+      var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,nbWellPlaced,nbRequired});
       if(error){
          return error
       }
@@ -4080,8 +4085,10 @@ function checkWellPlaced(context,tar,sub,til,bro) {
 };
 
 function checkForErrors(params) {
-   var { context, tar, sub, hid, fac, sha, nbWellPlaced, nbRequired } = params;
+   var { context, tar, sub, hid, fac, sha, cra, nbWellPlaced, nbRequired } = params;
    var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
+   var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
+
    for(var iRow = 0; iRow < tar.length; iRow++){
       for(var iCol = 0; iCol < tar[iRow].length; iCol++){
          if(sub && sub.length > 0 && !sub[iRow][iCol]){
@@ -4092,7 +4099,6 @@ function checkForErrors(params) {
          var idTar = tarData.imgId;
          var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
          var gridCol = iCol + context.nbColCont;
-         var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
          if(numTar != 1){
             var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
             var itemPos = context.getItemsPos(numTar,idTar); // *
@@ -4150,6 +4156,10 @@ function checkForErrors(params) {
             }
          }
       }
+   }
+   if(cra != undefined && context.cranePos != cra){
+      errorMsg += window.languageStrings.messages.failureWrongCranePos;
+      return { success: false, msg: errorMsg }
    }
    return false
 };
