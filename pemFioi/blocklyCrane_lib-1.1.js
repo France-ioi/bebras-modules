@@ -4177,7 +4177,7 @@ function checkForErrors(params) {
       errorMsg += window.languageStrings.messages.failureWrongCranePos;
       return { success: false, msg: errorMsg }
    }
-   if(mar.length > 0){
+   if(mar && mar.length > 0){
       for(var tMarker of mar){
          var found = false;
          for(var marker of context.markers){
