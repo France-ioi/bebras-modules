@@ -232,7 +232,10 @@ var getContext = function(display, infos, curLevel) {
                failureWrongShape: "La forme dessinée sur le bloc encadré en rouge n'est pas la bonne.",
                failureWrongColor: "La forme dessinée sur le bloc encadré en rouge n'a pas la bonne couleur.",
                failureShape: "Le bloc encadré en rouge ne devrait pas avoir de forme dessinée.",
-               failureWrongCranePos: "La position finale de la grue n'est pas celle attendue."
+               failureWrongCranePos: "La position finale de la grue n'est pas celle attendue.",
+               failureMissingMarker: function(col) {
+                  return "Il manque un marqueur à la colonne "+col+"."
+               }
             },
             startingBlockName: "Programme du robot"
          },
@@ -1036,12 +1039,15 @@ var getContext = function(display, infos, curLevel) {
          context.initTool = gridInfos.initTool || 0;
          context.dieValues = gridInfos.dieValues || null;
          context.initDieValue = gridInfos.initDieValue || null;
+         
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
          context.targetHidden = context.scoring[0].hidden || [];
          context.targetFaceItems = context.scoring[0].faceItems || [];
          context.targetShapes = context.scoring[0].shapes || [];
          context.targetCranePos = context.scoring[0].cranePos;
+         context.targetMarkers = context.scoring[0].markers || [];
+
          context.broken = gridInfos.broken || [];
          context.hidden = gridInfos.hidden || [];
          context.shapes = gridInfos.shapes;
@@ -1073,6 +1079,9 @@ var getContext = function(display, infos, curLevel) {
       context.messageElement = null;
 
 
+      for(var iMark = 0; iMark < context.targetMarkers.length; iMark++){
+         context.markers.push(Object.assign({ target: true },context.targetMarkers[iMark]));
+      }
       for(var iMark = 0; iMark < context.initMarkers.length; iMark++){
          context.markers.push(Beav.Object.clone(context.initMarkers[iMark]));
       }
@@ -2532,7 +2541,7 @@ var getContext = function(display, infos, curLevel) {
       for(var iMark = 0; iMark < context.markers.length; iMark++){
          var marker = context.markers[iMark];
          var col = marker.col;
-         var name = marker.name;
+         var name = marker.name || "X";
          var x = x0 + (cSide * (col + 0.5))* scale;
          var xRect = x - (mSide/2)*scale;
          var yLine1 = y0 + mSide*scale - 2;
@@ -2543,11 +2552,17 @@ var getContext = function(display, infos, curLevel) {
          var rect = paper.rect(xRect,y0,mSide*scale,mSide*scale).attr(attr.rect);
          var text = paper.text(x,yText,name).attr(attr.text).attr(textFontSize);
          var pole = paper.path(["M",x,yLine1,"V",yLine2]).attr(attr.pole).toBack();
-         var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
-         marker.element = paper.set(rect,text,pole,bRect);
+         if(!marker.target){
+            var bRect = paper.rect(xRect + 3,y0 - 3,mSide*scale,mSide*scale).attr(attr.backRect).toBack().hide();
+            marker.element = paper.set(rect,text,pole,bRect);
+         }else{
+            var ini = context.initState;
+            var op = (!context.programIsRunning && ini && ini.hideTarget) ? 0 : 0.3;
+            marker.element = paper.set(rect,text,pole).attr("opacity",op);
+         }
 
          for(var jMark = 0; jMark < context.markers.length; jMark++){
-            if(iMark != jMark && col == context.markers[jMark].col){
+            if(iMark != jMark && col == context.markers[jMark].col && !context.markers[iMark].target && !context.markers[jMark].target){
                marker.element[3].show();
                break;
             }
@@ -4017,12 +4032,13 @@ var robotEndConditions = {
       var fac = context.scoring[iTarget].faceItems;
       var sha = context.scoring[iTarget].shapes;
       var cra = context.scoring[iTarget].cranePos;
+      var mar = context.scoring[iTarget].markers;
       var til = context.tiles;
       var bro = context.broken;
       
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-      var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,nbWellPlaced,nbRequired});
+      var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,mar,nbWellPlaced,nbRequired});
       if(error){
          return error
       }
@@ -4085,7 +4101,7 @@ function checkWellPlaced(context,tar,sub,til,bro) {
 };
 
 function checkForErrors(params) {
-   var { context, tar, sub, hid, fac, sha, cra, nbWellPlaced, nbRequired } = params;
+   var { context, tar, sub, hid, fac, sha, cra, mar, nbWellPlaced, nbRequired } = params;
    var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
    var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
 
@@ -4160,6 +4176,24 @@ function checkForErrors(params) {
    if(cra != undefined && context.cranePos != cra){
       errorMsg += window.languageStrings.messages.failureWrongCranePos;
       return { success: false, msg: errorMsg }
+   }
+   if(mar.length > 0){
+      for(var tMarker of mar){
+         var found = false;
+         for(var marker of context.markers){
+            if(marker.target){
+               continue;
+            }
+            if(marker.col == tMarker.col){
+               found = true;
+               break;
+            }
+         }
+         if(!found){
+            errorMsg += window.languageStrings.messages.failureMissingMarker(tMarker.col + 1);
+            return { success: false, msg: errorMsg }
+         }
+      }  
    }
    return false
 };
