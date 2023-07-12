@@ -1174,10 +1174,7 @@ var getContext = function(display, infos, curLevel) {
    context.updateRunningState = function() {
       if(!this.programIsRunning){
          this.programIsRunning = true;
-         // resetItems();
-         // this.updateScale();
          redisplayEverything();
-         // console.log(this.programIsRunning)
       }
    };
 
@@ -1378,7 +1375,7 @@ var getContext = function(display, infos, curLevel) {
       if(row < 1 || row > nbRows || col < 1 || col > nbCol){
          throw(strings.messages.wrongCoordinates);
       }
-      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
+      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target && !obj.ini);
       var id = (items.length == 0) ? 0 : items[0].id;
       if(id === undefined){
          // because only num < 50 (custom blocks) have id
@@ -1436,7 +1433,7 @@ var getContext = function(display, infos, curLevel) {
       var col = this.cranePos;
       var row = this.cranePosY;
       if(row > -1){
-         var items = this.getItemsOn(row, col, obj => !obj.target);
+         var items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
          if(items.length == 0){
             // throw(strings.messages.emptyCell)
             return 0
@@ -1454,7 +1451,7 @@ var getContext = function(display, infos, curLevel) {
       var col = this.cranePos;
       var row = this.cranePosY;
       if(row > -1){
-         var items = this.getItemsOn(row, col, obj => !obj.target);
+         var items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
          if(items.length == 0){
             return 0
          }
@@ -1472,7 +1469,7 @@ var getContext = function(display, infos, curLevel) {
       var col = this.cranePos;
       var row = this.cranePosY;
       if(row > -1){
-         var items = this.getItemsOn(row, col, obj => !obj.target);
+         var items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
          if(items.length == 0){
             return 0
          }
@@ -1510,7 +1507,7 @@ var getContext = function(display, infos, curLevel) {
       if(row < 1 || row > nbRows || col < 1 || col > nbCol){
          throw(strings.messages.wrongCoordinates);
       }
-      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target);
+      var items = this.getItemsOn(row - 1, col - 1, obj => !obj.target && !obj.ini);
       var broken = (items.length == 0) ? false : (items[0].broken === true);
       
       return broken
@@ -1914,49 +1911,56 @@ var getContext = function(display, infos, curLevel) {
       // var til = context.tiles; 
       // var tar = context.target;
       var ini = context.initState; 
-      // if(!context.programIsRunning && ini){
-      //    til = ini.tiles || til;
-      // }
+      var nbStates = (ini) ? 2 : 1;
+      for(var state = 0; state < nbStates; state++){
+         var dat = (state == 0) ? context : ini;
+         for(var iRow = 0; iRow < context.nbRows; iRow++) {
+            for(var iCol = 0; iCol < context.nbCols; iCol++) {
+               if(!dat.tiles || dat.tiles.length == 0){
+                  continue
+               }
+               var itemData = context.getItemData(dat.tiles[iRow][iCol]);
+               var itemTypeNum = itemData.num;
 
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            var itemData = context.getItemData(context.tiles[iRow][iCol]);
-            var itemTypeNum = itemData.num;
+               var broken = (dat.broken && dat.broken.length > 0) ? (dat.broken[iRow][iCol] == 1) : false;
+               var hidden = (dat.hidden && dat.hidden.length > 0) ? (dat.hidden[iRow][iCol] == 1) : false;
+               var dark = (dat.dark && dat.dark.length > 0) ? (dat.dark[iRow][iCol] == 1) : false;
+               var faceItem = (dat.faceItems && dat.faceItems.length > 0) ? dat.faceItems[iRow][iCol] : 0;
+               var shape = (dat.shapes) ? dat.shapes[iRow][iCol] : 0;
+               if(itemTypeByNum[itemTypeNum] != undefined) {
+                  resetItem({
+                     row: iRow + rowShift,
+                     col: iCol + nbColCont,
+                     type: itemTypeByNum[itemTypeNum],
+                     imgId: itemData.imgId,
+                     deco: itemData.deco, 
+                     broken, hidden, dark, faceItem, shape,
+                     ini: state
+                  }, false);
+               }
+               if(state > 0){
+                  continue
+               }
 
-            var broken = (context.broken.length > 0) ? (context.broken[iRow][iCol] == 1) : false;
-            var hidden = (context.hidden.length > 0) ? (context.hidden[iRow][iCol] == 1) : false;
-            var dark = (context.dark.length > 0) ? (context.dark[iRow][iCol] == 1) : false;
-            var faceItem = (context.faceItems.length > 0) ? context.faceItems[iRow][iCol] : 0;
-            var shape = (context.shapes) ? context.shapes[iRow][iCol] : 0;
-            if(itemTypeByNum[itemTypeNum] != undefined) {
-               resetItem({
-                  row: iRow + rowShift,
-                  col: iCol + nbColCont,
-                  type: itemTypeByNum[itemTypeNum],
-                  imgId: itemData.imgId,
-                  deco: itemData.deco, 
-                  broken, hidden, dark, faceItem, shape, ini
-               }, false);
-            }
+               var targetData = context.getItemData(context.target[iRow][iCol]);
+               var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
+               var targetFaceItem = (context.targetFaceItems.length > 0) ? context.targetFaceItems[iRow][iCol] : 0;
+               var targetShape = (context.targetShapes.length > 0) ? context.targetShapes[iRow][iCol] : 0;
+               var targetNum = targetData.num;
 
-            var targetData = context.getItemData(context.target[iRow][iCol]);
-            var targetHidden = (context.targetHidden.length > 0) ? context.targetHidden[iRow][iCol] : 0;
-            var targetFaceItem = (context.targetFaceItems.length > 0) ? context.targetFaceItems[iRow][iCol] : 0;
-            var targetShape = (context.targetShapes.length > 0) ? context.targetShapes[iRow][iCol] : 0;
-            var targetNum = targetData.num;
-
-            if(itemTypeByNum[targetNum] != undefined) {
-               resetItem({
-                  row: iRow + rowShift,
-                  col: iCol + nbColCont,
-                  type: itemTypeByNum[targetNum],
-                  imgId: targetData.imgId,
-                  deco: targetData.deco, 
-                  hidden: targetHidden,
-                  faceItem: targetFaceItem,
-                  shape: targetShape,
-                  target: true, dark, ini
-               }, false);
+               if(itemTypeByNum[targetNum] != undefined) {
+                  resetItem({
+                     row: iRow + rowShift,
+                     col: iCol + nbColCont,
+                     type: itemTypeByNum[targetNum],
+                     imgId: targetData.imgId,
+                     deco: targetData.deco, 
+                     hidden: targetHidden,
+                     faceItem: targetFaceItem,
+                     shape: targetShape,
+                     target: true, dark
+                  }, false);
+               }
             }
          }
       }
@@ -1993,7 +1997,7 @@ var getContext = function(display, infos, curLevel) {
                   resetItem({
                      row: iRow + rowShift,
                      col: iCol,
-                     type: "mask", ini
+                     type: "mask"
                   }, false);
                }
             }
@@ -2011,14 +2015,10 @@ var getContext = function(display, infos, curLevel) {
             col: context.initCranePos,
             type: itemTypeByNum[context.initCraneContent]
          }, false);
-         var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target);
+         var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target && !obj.ini);
          context.setIndexes();
          context.items.splice(it[0].index, 1);
          context.craneContent = it[0];
-      }
-      
-      if(context.display){
-         // redisplayAllItems();
       }
    };
 
@@ -2320,7 +2320,15 @@ var getContext = function(display, infos, curLevel) {
          item.shapeElement.remove();
       }
 
-      if(!context.programIsRunning && item.ini && item.ini.hideTarget && item.target){
+      var ini = context.initState; 
+      var run = context.programIsRunning;
+      if(!run && ini && ini.hideTarget && item.target){
+         return
+      }
+      if(!run && ini && ini.tiles && !item.ini){
+         return
+      }
+      if(run && item.ini){
          return
       }
 
@@ -2608,13 +2616,16 @@ var getContext = function(display, infos, curLevel) {
       if(context.display !== true){
          return
       }
-      if(context.dark.length == 0){
-         return
-      }
-      let { nbCols, nbRows, dark, spotlight } = context;
+      let ini = context.initState;
+      let dat = (!context.programIsRunning && ini && ini.dark) ? ini : context;
+      // if(dat.dark.length == 0){
+      //    return
+      // }
+      let { nbCols, nbRows } = context;
+      let { dark, spotlight } = dat;
       for(let row = 0; row < nbRows; row++){
          for(let col = 0; col < nbCols; col++){
-            let val = (spotlight && spotlight.col == col) ? 0 : dark[row][col];
+            let val = ((spotlight && spotlight.col == col) || dark.length == 0) ? 0 : dark[row][col];
             if(val){
                cells[row][col].attr(darkCellAttr);
             }else{
@@ -2702,7 +2713,7 @@ var getContext = function(display, infos, curLevel) {
       var selected = [];
       for(var id in context.items) {
          var item = context.items[id];
-         if(item.num == num && item.imgId == imgId && !item.target && !item.broken) {
+         if(item.num == num && item.imgId == imgId && !item.target && !item.broken && !item.ini) {
             let { row, col} = item;
             if(context.target[row][col] != num){
                selected.push({ row, col });
@@ -2839,7 +2850,7 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(topBlock.num != 1){
-         var withdrawables = context.getItemsOn(topBlock.row, topBlock.col, obj=>!obj.target && !obj.isMask );
+         var withdrawables = context.getItemsOn(topBlock.row, topBlock.col, obj=>!obj.target && !obj.isMask && !obj.ini);
 
          var withdrawable = withdrawables[0];
 
@@ -3373,7 +3384,7 @@ var getContext = function(display, infos, curLevel) {
       updateTool();
       let row = context.cranePosY;
       let col = context.cranePos;
-      let items = this.getItemsOn(row, col, obj => !obj.target);
+      let items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
       if(items.length == 0){
          throw(context.strings.messages.emptyCell);
       }
@@ -3454,7 +3465,7 @@ var getContext = function(display, infos, curLevel) {
       }
       let row = context.cranePosY;
       let col = context.cranePos;
-      let items = this.getItemsOn(row, col, obj => !obj.target);
+      let items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
       if(items.length == 0){
          throw(context.strings.messages.emptyCell);
       }
@@ -3722,7 +3733,7 @@ var getContext = function(display, infos, curLevel) {
 
       let row = context.cranePosY;
       let col = context.cranePos;
-      let items = this.getItemsOn(row,col, obj => !obj.target);
+      let items = this.getItemsOn(row,col, obj => !obj.target && !obj.ini);
       if(row < 0){
          throw(strings.messages.wrongCoordinates)
       }
@@ -3759,7 +3770,7 @@ var getContext = function(display, infos, curLevel) {
    context.eraseShape = function() {
       let row = context.cranePosY;
       let col = context.cranePos;
-      let items = this.getItemsOn(row,col, obj => !obj.target);
+      let items = this.getItemsOn(row,col, obj => !obj.target && !obj.ini);
       if(row < 0){
          throw(strings.messages.wrongCoordinates)
       }
@@ -3821,6 +3832,9 @@ var getContext = function(display, infos, curLevel) {
 
    function updateOverlay() {
       if(!context.display || !context.overlay){
+         return
+      }
+      if(!context.programIsRunning && context.initState){
          return
       }
       let ov = context.overlay;
@@ -4052,7 +4066,7 @@ var robotEndConditions = {
             var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
             var gridCol = iCol + context.nbColCont;
             if(id == 1){
-               var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+               var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask && !it.ini);
                if(items.length > 0){
                   for(var item of items){
                      if(!item.wrecking){
@@ -4090,7 +4104,7 @@ function checkWellPlaced(context,tar,sub,til,bro) {
          
          if(numTar != 1 && (numTil != numTar || numBro == 1)){
             nbRequired++;
-            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask && !it.ini);
             if(items.length > 0 && items[0].num == numTar && !items[0].broken){
                nbWellPlaced++;
             }
@@ -4116,7 +4130,7 @@ function checkForErrors(params) {
          var gridRow = (context.nbRowsCont < context.nbRows) ? iRow : iRow + (context.nbRowsCont - context.nbRows);
          var gridCol = iCol + context.nbColCont;
          if(numTar != 1){
-            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask);
+            var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask && !it.ini);
             var itemPos = context.getItemsPos(numTar,idTar); // *
             if(context.craneContent && context.craneContent.num == numTar){
                itemPos.push({ row: "crane", col: context.cranePos });
