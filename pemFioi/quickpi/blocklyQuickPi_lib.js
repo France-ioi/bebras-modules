@@ -2884,6 +2884,87 @@ var getContext = function (display, infos, curLevel) {
 
     var paper;
     context.offLineMode = true;
+    context.timeLineStates = [];
+    var innerState = {};
+
+    var getSensorFullState = function (sensor) {
+        return {
+            state: sensor.state,
+            screenDrawing: sensor.screenDrawing,
+            lastDrawnTime: sensor.lastDrawnTime,
+            lastDrawnState: sensor.lastDrawnState,
+            callsInTimeSlot: sensor.callsInTimeSlot,
+            lastTimeIncrease: sensor.lastTimeIncrease,
+            removed: sensor.removed,
+            quickStore: sensor.quickStore,
+        };
+    }
+
+    var reloadSensorFullState = function (sensor, save) {
+        sensor.state = save.state;
+        sensor.screenDrawing = save.screenDrawing;
+        sensor.lastDrawnTime = save.lastDrawnTime;
+        sensor.lastDrawnState = save.lastDrawnState;
+        sensor.callsInTimeSlot = save.callsInTimeSlot;
+        sensor.lastTimeIncrease = save.lastTimeIncrease;
+        sensor.removed = save.removed;
+        sensor.quickStore = save.quickStore;
+    };
+
+    context.getInnerState = function() {
+        var savedSensors = {};
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var sensor = infos.quickPiSensors[i];
+            var savedSensor = getSensorFullState(sensor);
+            savedSensors[sensor.name] = savedSensor;
+        }
+
+        innerState.sensors = savedSensors;
+        innerState.timeLineStates = context.timeLineStates.map(function (timeLineState) {
+            var timeLineElement = Object.assign({}, timeLineState);
+            timeLineElement.sensorName = timeLineElement.sensor.name;
+            delete timeLineElement.sensor;
+
+            return timeLineElement;
+        });
+        innerState.currentTime = context.currentTime;
+
+        return innerState;
+    };
+
+    context.implementsInnerState = function () {
+        return true;
+    }
+
+    context.reloadInnerState = function(data) {
+        innerState = data;
+
+        for (var name in data.sensors) {
+            var sensor = findSensorByName(name);
+            var savedSensor = data.sensors[name];
+            context.sensorsSaved[name] = savedSensor;
+            reloadSensorFullState(sensor, savedSensor);
+        }
+
+        context.timeLineStates = [];
+        for (var i = 0; i < data.timeLineStates.length; i++) {
+            var newTimeLineState = Object.assign({}, data.timeLineStates[i]);
+            newTimeLineState.sensor = findSensorByName(newTimeLineState.sensorName);
+            context.timeLineStates.push(newTimeLineState);
+        }
+
+        context.currentTime = data.currentTime;
+    }
+    
+    context.getEventListeners = function () {
+        return {
+            'quickpi/changeSensorState': 'changeSensorState',
+        };
+    }
+
+    context.redrawDisplay = function () {
+        context.resetDisplay();
+    }
 
     context.onExecutionEnd = function () {
         if (context.autoGrading)
@@ -2896,7 +2977,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
-        if (!context.display && !context.autoGrading) {
+        if (!context.display && !context.autoGrading && !context.forceGradingWithoutDisplay) {
             context.success = true;
             throw (strings.messages.manualTestSuccess);
         }
@@ -3179,14 +3260,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = infos.quickPiSensors[iSensor];
             if (context.sensorsSaved[sensor.name] && !context.autoGrading) {
                 var save = context.sensorsSaved[sensor.name];
-                sensor.state = save.state;
-                sensor.screenDrawing = save.screenDrawing;
-                sensor.lastDrawnTime = save.lastDrawnTime;
-                sensor.lastDrawnState = save.lastDrawnState;
-                sensor.callsInTimeSlot = save.callsInTimeSlot;
-                sensor.lastTimeIncrease = save.lastTimeIncrease;
-                sensor.removed = save.removed;
-                sensor.quickStore = save.quickStore;
+                reloadSensorFullState(sensor, save);
             } else {
                 sensor.state = null;
                 sensor.screenDrawing = null;
@@ -3879,10 +3953,7 @@ var getContext = function (display, infos, curLevel) {
         if (!hasIntroControls) {
             $('#taskIntro').append("<div id=\"introControls\"></div>");
         }
-        if (introControls === null) {
-            introControls = piUi + $('#introControls').html();
-        }
-        $('#introControls').html(introControls);
+        $('#introControls').html(piUi);
         $('#taskIntro').addClass('piui');
 
         $('#grid').html("<div id=\"virtualSensors\" style=\"height: 100%; width: 100%;\">"
@@ -4607,6 +4678,13 @@ var getContext = function (display, infos, curLevel) {
             }
         }
     };
+
+    function warnClientSensorStateChanged(sensor) {
+        if (context.dispatchContextEvent) {
+            var sensorStateCopy = JSON.parse(JSON.stringify(sensor.state));
+            context.dispatchContextEvent({type: 'quickpi/changeSensorState', payload: [sensor.name, sensorStateCopy], onlyLog: true});
+        }
+    }
 
     function addDefaultBoardSensors() {
         var board = getCurrentBoard();
@@ -5510,14 +5588,14 @@ var getContext = function (display, infos, curLevel) {
 
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type, skipsave = false, expectedState = null) {
+        if (!skipsave) {
+            storeTimeLineState(sensor, state, startTime, endTime, type);
+        }
+
         if (paper == undefined ||
             !context.display ||
             !context.autoGrading)
             return;
-
-        if (!skipsave) {
-            storeTimeLineState(sensor, state, startTime, endTime, type);
-        }
 
         var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
@@ -6097,6 +6175,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state += step;
             }
 
+            warnClientSensorStateChanged(sensor);
             drawSensor(sensor, true);
         });
 
@@ -6128,6 +6207,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state -= step;
             }
 
+            warnClientSensorStateChanged(sensor);
             drawSensor(sensor, true);
         });
 
@@ -6174,6 +6254,7 @@ var getContext = function (display, infos, curLevel) {
                 } else {
                     sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
                 }
+                warnClientSensorStateChanged(sensor);
                 drawSensor(sensor, true);
             },
             function (x, y, event) {
@@ -6245,6 +6326,7 @@ var getContext = function (display, infos, curLevel) {
                 var percentage = 1 - ((newy - sensor.sliders[0].sliderdata.insiderecty) / sensor.sliders[0].sliderdata.scale);
 
                 sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                warnClientSensorStateChanged(sensor);
                 drawSensor(sensor, true);
 
                 actuallydragged++;
@@ -6369,6 +6451,8 @@ var getContext = function (display, infos, curLevel) {
         "</div>";
 
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
+        saveSensorStateIfNotRunning(sensor);
+
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
 
@@ -6482,6 +6566,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.focusrect.click(function () {
                         if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
                             sensor.state = !sensor.state;
+                            warnClientSensorStateChanged(sensor);
                             drawSensor(sensor);
                         } else {
                             actuatorsInRunningModeError();
@@ -6604,6 +6689,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.focusrect.click(function () {
                         if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
                             sensor.state = !sensor.state;
+                            warnClientSensorStateChanged(sensor);
                             drawSensor(sensor);
                         } else {
                             actuatorsInRunningModeError();
@@ -6718,6 +6804,7 @@ var getContext = function (display, infos, curLevel) {
                 sensor.focusrect.node.onmousedown = function () {
                     if (context.offLineMode) {
                         sensor.state = true;
+                        warnClientSensorStateChanged(sensor);
                         drawSensor(sensor);
                     } else
                         sensorInConnectedModeError();
@@ -6728,6 +6815,7 @@ var getContext = function (display, infos, curLevel) {
                     if (context.offLineMode) {
                         sensor.state = false;
                         sensor.wasPressed = true;
+                        warnClientSensorStateChanged(sensor);
                         drawSensor(sensor);
 
                         if (sensor.onPressed)
@@ -7306,6 +7394,7 @@ var getContext = function (display, infos, curLevel) {
                         function(dx, dy, x, y, event) {
                             sensor.state[0] = Math.max(-125, Math.min(125, sensor.old_state[0] + dy));
                             sensor.state[1] = Math.max(-125, Math.min(125, sensor.old_state[1] - dx));
+                            warnClientSensorStateChanged(sensor);
                             drawSensor(sensor, true)
                         },
                         function() {
@@ -7515,6 +7604,7 @@ var getContext = function (display, infos, curLevel) {
                                 window.displayHelper.popupMessageShown = false;
         
                                 sensor.state = !sensor.state;
+                                warnClientSensorStateChanged(sensor);
                                 drawSensor(sensor);
                             };
                         } else {
@@ -7662,6 +7752,7 @@ var getContext = function (display, infos, curLevel) {
                         window.displayHelper.popupMessageShown = false;
 
                         sensor.state = !sensor.state;
+                        warnClientSensorStateChanged(sensor);
                         drawSensor(sensor);
                     };
 
@@ -8047,6 +8138,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state[3] = true;
                  }
 
+                 warnClientSensorStateChanged(sensor);
                  drawSensor(sensor);
             }
 
@@ -8057,6 +8149,7 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 sensor.state = [false, false, false, false, false];
+                warnClientSensorStateChanged(sensor);
                 drawSensor(sensor);
             }
 
@@ -8187,6 +8280,10 @@ var getContext = function (display, infos, curLevel) {
             sensor.focusrect.toFront();
         }
 
+        saveSensorStateIfNotRunning(sensor);
+    }
+
+    function saveSensorStateIfNotRunning(sensor) {
         // save the sensor if we are not running
         if (!(context.runner && context.runner.isRunning())) {
             if (_findFirst(sensorDefinitions, function(globalSensor) {
@@ -8446,7 +8543,7 @@ var getContext = function (display, infos, curLevel) {
         var state = null;
 
         var sensor = findSensorByName(name);
-        if (!context.display || context.autoGrading) {
+        if ((!context.display && !context.forceGradingWithoutDisplay) || context.autoGrading) {
             var stateTime = context.getSensorExpectedState(name);
 
             if (stateTime != null) {
@@ -8514,6 +8611,12 @@ var getContext = function (display, infos, curLevel) {
         return retval;
     };
 
+    context.quickpi.changeSensorState = function (sensorName, sensorState, callback) {
+        var sensor = findSensorByName(sensorName);
+        sensor.state = sensorState;
+        drawSensor(sensor);
+        callback();
+    }
 
     /***** Functions *****/
     /* Here we define each function of the library.
