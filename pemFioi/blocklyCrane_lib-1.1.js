@@ -1067,7 +1067,7 @@ var getContext = function(display, infos, curLevel) {
       context.tool = context.initTool || 0; // 0: crane, 1: sensor
       context.programIsRunning = false;
 
-      context.rng = new RandomGenerator(0);
+      // context.rng = new RandomGenerator(0);
       context.dieValue = context.initDieValue || null;
       context.rollDieIndex = 0;
       
@@ -1886,7 +1886,8 @@ var getContext = function(display, infos, curLevel) {
       }
       if(item.type == "die"){
          if(!context.dieValue && !context.dieValues){
-            context.dieValue = context.rng.nextInt(1,6);
+            // context.dieValue = context.rng.nextInt(1,6);
+            context.dieValue = 1;
          }
       }
 
@@ -3371,7 +3372,8 @@ var getContext = function(display, infos, curLevel) {
       if(context.dieValues){
          context.rollDieIndex++;
       }else{
-         context.dieValue = context.rng.nextInt(1,6);
+         // context.dieValue = context.rng.nextInt(1,6);
+         context.dieValue = 1;
       }
       redisplayItem(item);
    };
