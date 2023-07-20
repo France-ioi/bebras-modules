@@ -1350,6 +1350,10 @@ var getContext = function(display, infos, curLevel) {
       if(row < 0 || row >= nbRows || col < 0 || col >= nbCol){
          throw(strings.messages.wrongCoordinates);
       }
+      var items = this.getItemsOn(row, col, obj => obj.target && !obj.ini);
+      if(items.length > 0 && items[0].dark){
+         throw(strings.messages.impossibleToReadInTheDark)
+      }
       var tar = this.target[row][col];
       if(tar > 1){
          return this.getItemId(tar)
