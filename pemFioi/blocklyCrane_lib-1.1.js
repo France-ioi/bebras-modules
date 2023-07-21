@@ -77,7 +77,8 @@ var getContext = function(display, infos, curLevel) {
                eraseShape: "effacer forme",
                readShape: "lire forme",
                readColor: "lire couleur",
-               displayMessage: "afficher message"
+               displayMessage: "afficher message",
+               conjure: "faire apparaître brique",
 
             },
             code: {
@@ -116,7 +117,8 @@ var getContext = function(display, infos, curLevel) {
                eraseShape: "effacerForme",
                readShape: "lireForme",
                readColor: "lireCouleur",
-               displayMessage: "afficherMessage"
+               displayMessage: "afficherMessage",
+               conjure: "faireApparaitre",
 
             },
             description: {
@@ -155,7 +157,8 @@ var getContext = function(display, infos, curLevel) {
                eraseShape: "@() Efface la forme sur la brique de la case où se trouve la grue.",
                readShape: "@() Retourne le type de la forme dessinée sur la brique de la case où se trouve la grue.",
                readColor: "@() Retourne la couleur de la forme dessinée sur la brique de la case où se trouve la grue.",
-               displayMessage: "@(texte) Affiche un message à l'écran."
+               displayMessage: "@(texte) Affiche un message à l'écran.",
+               conjure: "@(type) Fait apparaître dans la grue une brique du type indiqué.",
 
             },
             messages: {
@@ -192,6 +195,7 @@ var getContext = function(display, infos, curLevel) {
                cannotDrawHidden: "Impossible de dessiner une forme sur la face cachée d'une brique",
                unknownShape: "Forme inconnue",
                unknownColor: "Couleur inconnue",
+               notConjurable: "Impossible de faire apparaître une brique de ce type", 
 
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
@@ -856,6 +860,23 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "conjure",
+      type: "actions",
+      block: { name: "conjure", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(type,callback) {
+         this.updateRunningState();
+         this.conjure(type);
+         this.waitDelay(callback);
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1039,6 +1060,7 @@ var getContext = function(display, infos, curLevel) {
          context.initTool = gridInfos.initTool || 0;
          context.dieValues = gridInfos.dieValues || null;
          context.initDieValue = gridInfos.initDieValue || null;
+         context.conjureItems = gridInfos.conjureItems || [];
          
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
@@ -1876,6 +1898,7 @@ var getContext = function(display, infos, curLevel) {
       item.offsetY = 0;
       item.nbStates = 1;
       item.zOrder = 0;
+      // console.log(item.type)
       for(var property in infos.itemTypes[item.type]) {
          if(!item[property]){
             item[property] = infos.itemTypes[item.type][property];
@@ -2014,17 +2037,17 @@ var getContext = function(display, infos, curLevel) {
       }
 
       /** crane content **/
-      if(context.initCraneContent != undefined){
-         resetItem({
-            row: 0,
-            col: context.initCranePos,
-            type: itemTypeByNum[context.initCraneContent]
-         }, false);
-         var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target && !obj.ini);
-         context.setIndexes();
-         context.items.splice(it[0].index, 1);
-         context.craneContent = it[0];
-      }
+      // if(context.initCraneContent != undefined){
+      //    resetItem({
+      //       row: 0,
+      //       col: context.initCranePos,
+      //       type: itemTypeByNum[context.initCraneContent]
+      //    }, false);
+      //    var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target && !obj.ini);
+      //    context.setIndexes();
+      //    context.items.splice(it[0].index, 1);
+      //    context.craneContent = it[0];
+      // }
    };
 
    context.getItemData = function(val) {
@@ -3545,9 +3568,7 @@ var getContext = function(display, infos, curLevel) {
       var animLineDown = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay/*,updateTool*/);
       var animShaftDown = new Raphael.animation({ y: craneAttr.yShaft },delay);
       var animClaws = new Raphael.animation({ y: craneAttr.yClaws },delay);
-   };
-
-   
+   };  
 
    context.tryToGo = function(col) {
       // Returns whether the crane can move to col
@@ -3798,6 +3819,39 @@ var getContext = function(display, infos, curLevel) {
       context.message = str;
       updateMessage();
       // console.log(str)
+   };
+
+   context.conjure = function(id) {
+      if(!this.conjureItems.includes(Number(id))){
+         throw(strings.messages.notConjurable)
+      }
+      if(this.craneContent){
+         throw(strings.messages.holdingBlock)
+      }
+      var itemTypeById = {};
+      for(var type in infos.itemTypes) {
+         var itemType = infos.itemTypes[type];
+         if(itemType.id != undefined) {
+            itemTypeById[itemType.id] = type;
+         }
+      }
+      var itemData = this.getItemData(id + 1);
+      resetItem({
+         row: 0,
+         col: this.cranePos,
+         type: itemTypeById[id],
+         imgId: itemData.imgId,
+         conjuration: true    // dev
+      }, true);
+      var it = context.getItemsOn(0,context.cranePos, obj => !obj.target && !obj.ini);
+      this.setIndexes();
+      this.items.splice(it[0].index, 1);
+      this.craneContent = it[0];
+      if(this.display){
+         var craneAttr = getCraneAttr();
+         setCraneAttr(craneAttr);
+         updateOverlay();
+      }
    };
 
    function updateMessage() {
@@ -4137,7 +4191,7 @@ function checkForErrors(params) {
          var gridCol = iCol + context.nbColCont;
          if(numTar != 1){
             var items = context.getItemsOn(gridRow,gridCol,it => !it.target && !it.isMask && !it.ini);
-            var itemPos = context.getItemsPos(numTar,idTar); // *
+            var itemPos = context.getItemsPos(numTar,idTar); 
             if(context.craneContent && context.craneContent.num == numTar){
                itemPos.push({ row: "crane", col: context.cranePos });
             }
@@ -4215,6 +4269,7 @@ function checkForErrors(params) {
          }
       }  
    }
+
    return false
 };
 
