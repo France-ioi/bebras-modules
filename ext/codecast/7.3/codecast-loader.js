@@ -9,7 +9,15 @@ $(document).ready(function() {
     var hints = $('#taskHints > div').toArray().map(elm => {
       return {
         content: elm.innerHTML.trim(),
-        minScore: elm.getAttribute('data-min-score') ? Number(elm.getAttribute('data-min-score')) : undefined
+        minScore: elm.getAttribute('data-min-score') ? Number(elm.getAttribute('data-min-score')) : undefined,
+        id: elm.getAttribute('data-id') ? elm.getAttribute('data-id') : undefined,
+        question: elm.hasAttribute('data-question'),
+        previousHintId: elm.getAttribute('data-previous-hint-id') ? elm.getAttribute('data-previous-hint-id') : undefined,
+        nextHintId: elm.getAttribute('data-next-hint-id') ? elm.getAttribute('data-next-hint-id') : undefined,
+        yesHintId: elm.getAttribute('data-yes-hint-id') ? elm.getAttribute('data-yes-hint-id') : undefined,
+        noHintId: elm.getAttribute('data-no-hint-id') ? elm.getAttribute('data-no-hint-id') : undefined,
+        disablePrevious: elm.hasAttribute('data-disable-previous'),
+        disableNext: elm.hasAttribute('data-disable-next')
       };
     });
 
