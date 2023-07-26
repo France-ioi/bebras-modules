@@ -79,6 +79,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lire couleur",
                displayMessage: "afficher message",
                conjure: "faire apparaître brique",
+               // blockInCell: "brique dans case",
 
             },
             code: {
@@ -119,6 +120,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lireCouleur",
                displayMessage: "afficherMessage",
                conjure: "faireApparaitre",
+               // blockInCell: "briqueDansCase",
 
             },
             description: {
@@ -159,6 +161,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "@() Retourne la couleur de la forme dessinée sur la brique de la case où se trouve la grue.",
                displayMessage: "@(texte) Affiche un message à l'écran.",
                conjure: "@(type) Fait apparaître dans la grue une brique du type indiqué.",
+               // blockInCell: "@() Retourne le type de la brique dans la case ou se trouve la grue.",
 
             },
             messages: {
@@ -873,10 +876,27 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(type,callback) {
          this.updateRunningState();
-         this.conjure(type);
-         this.waitDelay(callback);
+         if(this.cranePosY > -1){
+            this.moveCraneY(-1, function () {
+               context.executeCallWhenReady('conjure',[type]);
+               callback();
+            });
+         }else{
+            this.conjure(type);
+            this.waitDelay(callback);
+         } 
       }
    });
+
+   // infos.newBlocks.push({
+   //    name: "blockInCell",
+   //    type: "sensors",
+   //    block: { name: "blockInCell", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       this.updateRunningState();
+   //       this.callCallback(callback, this.getBlockInCell());
+   //    }
+   // });
 
    var context = quickAlgoContext(display, infos);
    context.robot = {};
