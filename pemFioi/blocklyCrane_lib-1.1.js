@@ -856,7 +856,8 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(value,callback) {
          this.updateRunningState();
-         this.callCallback(callback, this.displayMessage(value));
+         this.displayMessage(value);
+         this.waitDelay(callback,null,1000);
       }
    });
 
@@ -1377,6 +1378,7 @@ var getContext = function(display, infos, curLevel) {
          throw(strings.messages.impossibleToReadInTheDark)
       }
       var tar = this.target[row][col];
+      // console.log(tar,this.getItemId(tar))
       if(tar > 1){
          return this.getItemId(tar)
       }
@@ -3828,6 +3830,8 @@ var getContext = function(display, infos, curLevel) {
       if(this.craneContent){
          throw(strings.messages.holdingBlock)
       }
+      context.tool = 0;
+      updateTool();
       var itemTypeById = {};
       for(var type in infos.itemTypes) {
          var itemType = infos.itemTypes[type];
