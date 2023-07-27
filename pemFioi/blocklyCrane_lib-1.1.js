@@ -894,7 +894,6 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "destroyFaceItem" },
       func: function(callback) {
          this.destroyFaceItem(callback);
-         // this.waitDelay(callback);
       }
    });
 
@@ -2799,6 +2798,13 @@ var getContext = function(display, infos, curLevel) {
       var newPos = context.cranePos + dir;
       var ttg = context.tryToGo(newPos);
       if(ttg === true){
+         if(this.cranePosY > -1 && !context.craneContent){
+            context.tool = 1;
+         }else{
+            context.tool = 0;
+         }
+         updateTool();
+         
          context.moveCrane(newPos, callback);
       }else if(ttg == false){
          context.waitDelay(callback);
@@ -2814,8 +2820,11 @@ var getContext = function(display, infos, curLevel) {
       var newPosY = context.cranePosY + dir;
       var ttg = context.tryToGoY(newPosY);
       if(ttg === true){
-         if(!context.craneContent)
+         if(!context.craneContent){
             context.tool = 1;
+         }else{
+            context.tool = 0;
+         }
          context.moveCraneY(newPosY, callback);
       }else if(ttg == false){
          context.waitDelay(callback);
@@ -3421,7 +3430,6 @@ var getContext = function(display, infos, curLevel) {
       if(context.dieValues){
          context.rollDieIndex++;
       }else{
-         // context.dieValue = context.rng.nextInt(1,6);
          context.dieValue = 1;
       }
       redisplayItem(item);
