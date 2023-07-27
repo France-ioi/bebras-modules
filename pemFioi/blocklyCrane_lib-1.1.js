@@ -79,7 +79,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lire couleur",
                displayMessage: "afficher message",
                conjure: "faire apparaître brique",
-               // blockInCell: "brique dans case",
+               destroyFaceItem: "détruire objet",
 
             },
             code: {
@@ -120,7 +120,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lireCouleur",
                displayMessage: "afficherMessage",
                conjure: "faireApparaitre",
-               // blockInCell: "briqueDansCase",
+               destroyFaceItem: "detruireObjet",
 
             },
             description: {
@@ -161,7 +161,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "@() Retourne la couleur de la forme dessinée sur la brique de la case où se trouve la grue.",
                displayMessage: "@(texte) Affiche un message à l'écran.",
                conjure: "@(type) Fait apparaître dans la grue une brique du type indiqué.",
-               // blockInCell: "@() Retourne le type de la brique dans la case ou se trouve la grue.",
+               destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
             },
             messages: {
@@ -888,15 +888,15 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-   // infos.newBlocks.push({
-   //    name: "blockInCell",
-   //    type: "sensors",
-   //    block: { name: "blockInCell", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       this.updateRunningState();
-   //       this.callCallback(callback, this.getBlockInCell());
-   //    }
-   // });
+   infos.newBlocks.push({
+      name: "destroyFaceItem",
+      type: "actions",
+      block: { name: "destroyFaceItem" },
+      func: function(callback) {
+         this.destroyFaceItem(callback);
+         // this.waitDelay(callback);
+      }
+   });
 
    var context = quickAlgoContext(display, infos);
    context.robot = {};
@@ -3587,6 +3587,60 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animCrane_leftClawdown" + Math.random(), crane.leftClaw, animClaws);
       });
 
+      var animLineDown = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay/*,updateTool*/);
+      var animShaftDown = new Raphael.animation({ y: craneAttr.yShaft },delay);
+      var animClaws = new Raphael.animation({ y: craneAttr.yClaws },delay);
+   };  
+
+   context.destroyFaceItem = function(callback) {
+      this.displayMessage("");
+
+      let tempItem = this.craneContent;
+      this.craneContent = null;
+      if(this.display){
+         resetAnimZOrder();
+         if(this.animate && infos.actionDelay > 0){
+            this.destroyFaceItemAnim(tempItem);
+         }else{
+            tempItem.element.remove()
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
+         }
+      }
+
+      if(callback){
+         var delay = 2*infos.actionDelay;
+         context.waitDelay(callback,null,delay);
+      }
+   };
+
+   context.destroyFaceItemAnim = function(tempItem) {
+      var craneAttr = getCraneAttr();
+      var delay = infos.actionDelay;
+      var deltaY = detachDeltaY*scale;
+
+      var offsetY = craneFaceItemOffsetY*scale;
+
+      var lineClip = Beav.Object.clone(craneAttr.lineClip);
+      lineClip[3] = craneAttr.lineClip[3] + offsetY;
+      var cSide = infos.cellSide;
+
+      crane.line.attr("clip-rect",lineClip);
+      crane.shaft.attr("y", craneAttr.yShaft + offsetY);
+      crane.rightClaw.attr({ y: craneAttr.yClaws + offsetY, transform: ["R",clutchAngle,craneAttr.cxRight,craneAttr.cyRight + offsetY] });
+      crane.leftClaw.attr({ y: craneAttr.yClaws + offsetY, transform: ["R",-clutchAngle,craneAttr.cxLeft,craneAttr.cyLeft + offsetY] });
+      tempItem.element.remove();
+
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight + offsetY] },delay);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft + offsetY] },delay,function() {
+         resetAnimZOrder();
+         context.raphaelFactory.animate("animCrane_line_down" + Math.random(), crane.line, animLineDown);
+         context.raphaelFactory.animate("animCrane_shaft_down" + Math.random(), crane.shaft, animShaftDown);
+         context.raphaelFactory.animate("animCrane_rightClawdown" + Math.random(), crane.rightClaw, animClaws);
+         context.raphaelFactory.animate("animCrane_leftClawdown" + Math.random(), crane.leftClaw, animClaws);
+      });
+      context.raphaelFactory.animate("animCrane_rightClaw_open" + Math.random(), crane.rightClaw, animOpenRightClaw);
+      context.raphaelFactory.animate("animCrane_leftClaw_open" + Math.random(), crane.leftClaw, animOpenLeftClaw);
       var animLineDown = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay/*,updateTool*/);
       var animShaftDown = new Raphael.animation({ y: craneAttr.yShaft },delay);
       var animClaws = new Raphael.animation({ y: craneAttr.yClaws },delay);
