@@ -17,7 +17,8 @@ $(document).ready(function() {
         yesHintId: elm.getAttribute('data-yes-hint-id') ? elm.getAttribute('data-yes-hint-id') : undefined,
         noHintId: elm.getAttribute('data-no-hint-id') ? elm.getAttribute('data-no-hint-id') : undefined,
         disablePrevious: elm.hasAttribute('data-disable-previous'),
-        disableNext: elm.hasAttribute('data-disable-next')
+        disableNext: elm.hasAttribute('data-disable-next'),
+        immediate: elm.hasAttribute('data-immediate')
       };
     });
 
