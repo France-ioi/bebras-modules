@@ -30,6 +30,13 @@ $(document).ready(function() {
       additionalOptions.language = window.stringsLanguage;
     }
 
+    // Merge metadata into task data
+    if (window.PEMTaskMetaData && window.taskData) {
+      if (window.PEMTaskMetaData.supportedLanguages) {
+        window.taskData.supportedLanguages = window.PEMTaskMetaData.supportedLanguages.join(',');
+      }
+    }
+
     var codecastParameters = $.extend(true, {
       start: 'task',
       showStepper: true,
