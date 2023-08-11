@@ -354,20 +354,22 @@ var chooseView = (function () {
       isDouble: false,
       lastShownViews: {},
 
-      init: function(views) {
+      init: function(views, showViews) {
          if (! $("#choose-view").length)
             $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
          $("#choose-view").html("");
          // Display buttons to select task view or solution view
-         /*
-         for(var viewName in views) {
+
+        if (showViews) {
+          for(var viewName in views) {
             if (!views[viewName].requires) {
-               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
-               $("#choose-view").append(btn);
-               btn.click(this.selectFactory(viewName));
+              var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
+              $("#choose-view").append(btn);
+              btn.click(this.selectFactory(viewName));
             }
-         }
-         */
+          }
+        }
+
          $("#grade").remove();
          var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + getLanguageString('gradeAnswer') + '</button></center>');
          // display grader button only if dev mode by adding URL hash 'dev'
@@ -387,8 +389,8 @@ var chooseView = (function () {
          })
       },
 
-      reinit: function(views) {
-         this.init(views);
+      reinit: function(views, showViews) {
+         this.init(views, showViews);
          var newShownViews = {};
          for(var viewName in this.lastShownViews) {
             if(!this.lastShownViews[viewName]) { continue; }
@@ -464,7 +466,7 @@ $(document).ready(function() {
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
             if(data.views) {
-               chooseView.reinit(data.views);
+               chooseView.reinit(data.views, taskMetaData.showViews);
             }
             if (success) {success();}
          };
@@ -485,7 +487,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions, "supportsTabs": taskMetaData.showViews};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
@@ -535,7 +537,7 @@ $(document).ready(function() {
              function() {
                 platform.trigger('load', [loadedViews]);
                 task.getViews(function(views) {
-                    chooseView.init(views);
+                    chooseView.init(views, taskMetaData.showViews);
                 });
                 task.showViews(shownViews, function() {
                     chooseView.update(shownViews);
@@ -583,7 +585,7 @@ $(document).ready(function() {
 
          addEvent('resize', window, function() {
             task.getViews(function(views) {
-               chooseView.reinit(views);
+               chooseView.reinit(views, taskMetaData.showViews);
             });
          });
       };
