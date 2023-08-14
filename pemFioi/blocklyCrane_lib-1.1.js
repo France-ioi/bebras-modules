@@ -79,6 +79,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lire couleur",
                displayMessage: "afficher message",
                conjure: "faire apparaître brique",
+               conjureFaceItem: "faire apparaître objet",
                destroyFaceItem: "détruire objet",
 
             },
@@ -120,6 +121,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "lireCouleur",
                displayMessage: "afficherMessage",
                conjure: "faireApparaitre",
+               conjureFaceItem: "faireApparaitreObjet",
                destroyFaceItem: "detruireObjet",
 
             },
@@ -161,6 +163,7 @@ var getContext = function(display, infos, curLevel) {
                readColor: "@() Retourne la couleur de la forme dessinée sur la brique de la case où se trouve la grue.",
                displayMessage: "@(texte) Affiche un message à l'écran.",
                conjure: "@(type) Fait apparaître dans la grue une brique du type indiqué.",
+               conjureFaceItem: "@(type) Fait apparaître dans la grue un objet de façade du type indiqué.",
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
             },
@@ -199,6 +202,7 @@ var getContext = function(display, infos, curLevel) {
                unknownShape: "Forme inconnue",
                unknownColor: "Couleur inconnue",
                notConjurable: "Impossible de faire apparaître une brique de ce type", 
+               notConjurableFaceItem: "Impossible de faire apparaître un objet de façade de ce type", 
 
                noMarker: function(num) {
                   return "Le marqueur n°"+num+" n'existe pas"
@@ -889,6 +893,30 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "conjureFaceItem",
+      type: "actions",
+      block: { name: "conjureFaceItem", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(type,callback) {
+         this.updateRunningState();
+         // if(this.cranePosY > -1){
+         //    this.moveCraneY(-1, function () {
+         //       context.executeCallWhenReady('conjure',[type]);
+         //       callback();
+         //    });
+         // }else{
+            this.conjureFaceItem(type);
+            this.waitDelay(callback);
+         // } 
+      }
+   });
+
+   infos.newBlocks.push({
       name: "destroyFaceItem",
       type: "actions",
       block: { name: "destroyFaceItem" },
@@ -1081,6 +1109,7 @@ var getContext = function(display, infos, curLevel) {
          context.dieValues = gridInfos.dieValues || null;
          context.initDieValue = gridInfos.initDieValue || null;
          context.conjureItems = gridInfos.conjureItems || [];
+         context.conjureFaceItems = gridInfos.conjureFaceItems || [];
          
          context.scoring = gridInfos.scoring || [ { target: gridInfos.target, score: 1 } ]
          context.target = context.scoring[0].target || [];
@@ -3934,6 +3963,27 @@ var getContext = function(display, infos, curLevel) {
       this.items.splice(it[0].index, 1);
       this.craneContent = it[0];
       if(this.display){
+         var craneAttr = getCraneAttr();
+         setCraneAttr(craneAttr);
+         updateOverlay();
+      }
+   };
+
+   context.conjureFaceItem = function(id) {
+      if(!this.conjureFaceItems.includes(Number(id))){
+         throw(strings.messages.notConjurableFaceItem)
+      }
+      if(this.craneContent){
+         throw(strings.messages.holdingBlock)
+      }
+      
+      this.displayMessage("");
+      context.tool = 0;
+      updateTool();
+      
+      if(this.display){
+         var element = addFaceItem({ faceItem: id, col: this.cranePos, row: this.cranePosY })
+         this.craneContent = { type: "faceItem", id, element, offsetY: 32, offsetX: 0 };
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
          updateOverlay();
