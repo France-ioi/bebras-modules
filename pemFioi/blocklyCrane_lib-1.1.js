@@ -2453,6 +2453,9 @@ var getContext = function(display, infos, curLevel) {
             var newSrc = "assets/png/"+fileName;
             src = newSrc;
          }
+         if(item.crusher && infos.crusherImgPath){
+            src = infos.crusherImgPath;
+         }
          var w = item.width || item.side;
          var h = item.height || item.side;
          item.element = paper.image(src, x, y, w * scale, h * scale);
