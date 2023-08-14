@@ -488,7 +488,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions, "supportsTabs": taskMetaData.showViews};
+            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions, "supportsTabs": true};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
@@ -537,12 +537,13 @@ $(document).ready(function() {
              loadedViews,
              function() {
                 platform.trigger('load', [loadedViews]);
-                task.getViews(function(views) {
-                    chooseView.init(views, taskMetaData.showViews);
-                });
-                task.showViews(shownViews, function() {
-                    chooseView.update(shownViews);
-                    platform.trigger('showViews', [{"task": true}]);
+                task.getViews(function(views, showViews) {
+                    chooseView.init(views, showViews);
+
+                    task.showViews(shownViews, function() {
+                        chooseView.update(shownViews);
+                        platform.trigger('showViews', [shownViews]);
+                    });
                 });
                 if ($("#solution").length) {
                   $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
@@ -585,8 +586,8 @@ $(document).ready(function() {
          }
 
          addEvent('resize', window, function() {
-            task.getViews(function(views) {
-               chooseView.reinit(views, taskMetaData.showViews);
+            task.getViews(function(views, showViews) {
+               chooseView.reinit(views, showViews);
             });
          });
       };
