@@ -355,8 +355,9 @@ var chooseView = (function () {
       lastShownViews: {},
 
       init: function(views, showViews) {
-         if (! $("#choose-view").length)
-            $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
+         if (! $("#choose-view").length) {
+             $(document.body).prepend('<div id="choose-view"></div>');
+         }
          $("#choose-view").html("");
          // Display buttons to select task view or solution view
 
