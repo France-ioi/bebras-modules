@@ -169,7 +169,7 @@ var getContext = function(display, infos, curLevel) {
                col: "colonneRobot() retourne le numéro de la colonne du robot",
                turnAround: "demiTour() fait faire demi-tour au robot",
                east: "est() déplace le robot d'une case vers l'est",
-               west: "ouest() déplace le robot d'une case vers l'oest",
+               west: "ouest() déplace le robot d'une case vers l'ouest",
                north: "nord() déplace le robot d'une case vers le nord",
                south: "sud() déplace le robot d'une case vers le sud",
             },
