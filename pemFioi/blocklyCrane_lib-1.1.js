@@ -1122,6 +1122,7 @@ var getContext = function(display, infos, curLevel) {
          context.customItems = gridInfos.customItems || {};
          context.successAnim = gridInfos.successAnim || {};
          context.overlay = (gridInfos.overlay) ? Beav.Object.clone(gridInfos.overlay) : null;
+         context.underlay = (gridInfos.underlay) ? Beav.Object.clone(gridInfos.underlay) : null;
          context.initState = gridInfos.initState;
       }
       context.partialSuccessEnabled = (infos.partialSuccessEnabled == undefined) ? true : infos.partialSuccessEnabled;
@@ -1891,23 +1892,35 @@ var getContext = function(display, infos, curLevel) {
       var nbColCont = context.nbColCont;
       var nbCol = context.nbCols + nbColCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
-      var src = infos.craneSrc;
 
+      // var src = (infos.craneImgPath) ?  Object.assign(Beav.Object.clone(infos.craneSrc),infos.craneImgPath) : infos.craneSrc;
+      var src = infos.craneSrc;
+      var path = {};
+      for(var key in src){
+         path[key] = (infos.craneImgPath && infos.craneImgPath[key]) ? infos.craneImgPath[key] : getImgPath(src[key]);
+      }
       crane.rail = paper.set();
       for(var iCol = 0; iCol < nbCol; iCol++){
-         crane.rail.push(paper.image(getImgPath(src.rail),0,0,0,0));
+         // crane.rail.push(paper.image(getImgPath(src.rail),0,0,0,0));
+         crane.rail.push(paper.image(path.rail,0,0,0,0));
       }
       paper.setStart();
-      crane.wheels = paper.image(getImgPath(src.wheels),0,0,0,0);
+      // crane.wheels = paper.image(getImgPath(src.wheels),0,0,0,0);
+      crane.wheels = paper.image(path.wheels,0,0,0,0);
       var lineH = nbRows + craneH;
       crane.line = paper.set();
       for(var iRow = 0; iRow < lineH; iRow++){
-         crane.line.push(paper.image(getImgPath(src.line),0,0,0,0));
+         // crane.line.push(paper.image(getImgPath(src.line),0,0,0,0));
+         crane.line.push(paper.image(path.line,0,0,0,0));
       }
-      crane.leftClaw = paper.image(getImgPath(src.leftClaw),0,0,0,0);
-      crane.rightClaw = paper.image(getImgPath(src.rightClaw),0,0,0,0);
-      crane.shaft = paper.image(getImgPath(src.shaft),0,0,0,0);
-      crane.sensor = paper.image(getImgPath(src.sensor),0,0,0,0);
+      // crane.leftClaw = paper.image(getImgPath(src.leftClaw),0,0,0,0);
+      // crane.rightClaw = paper.image(getImgPath(src.rightClaw),0,0,0,0);
+      // crane.shaft = paper.image(getImgPath(src.shaft),0,0,0,0);
+      // crane.sensor = paper.image(getImgPath(src.sensor),0,0,0,0);
+      crane.leftClaw = paper.image(path.leftClaw,0,0,0,0);
+      crane.rightClaw = paper.image(path.rightClaw,0,0,0,0);
+      crane.shaft = paper.image(path.shaft,0,0,0,0);
+      crane.sensor = paper.image(path.sensor,0,0,0,0);
       crane.all = paper.setFinish();
 
       if(context.craneContent){
@@ -2323,6 +2336,10 @@ var getContext = function(display, infos, curLevel) {
       var nbCol = context.nbCols + nbColCont;
       var nbRows = Math.max(context.nbRows,nbRowsCont);
       var cSide = infos.cellSide;
+      
+      /* underlay */
+      updateUnderlay();
+
       redisplayAllItems();    
       redisplayMarkers();  
       redisplaySpotlight();  
@@ -4024,6 +4041,26 @@ var getContext = function(display, infos, curLevel) {
       context.messageElement = paper.set(rect,text);
    };
 
+   function updateUnderlay() {
+      if(!context.display || !context.underlay){
+         return
+      }
+      if(!context.programIsRunning && context.initState){
+         return
+      }
+      let un = context.underlay;
+      let pos1 = un.pos[0];
+      let pos2 = un.pos[1];
+      let { x, y } = context.getCellCoord(pos1[1],pos1[0]);
+      let coord2 = context.getCellCoord(pos2[1],pos2[0]);
+      let width = coord2.x - x;
+      let height = coord2.y - y;
+      if(un.element){
+         un.element.remove();
+      }
+      un.element = paper.image(un.src,x,y,width,height).toFront();
+   };
+
    function updateOverlay() {
       if(!context.display || !context.overlay){
          return
@@ -4091,6 +4128,12 @@ var getResources = function(subTask) {
       }
    }
 
+   if(infos.craneImgPath){
+      for(var key in infos.craneImgPath){
+         res.push({ type: 'image', url: infos.craneImgPath[key] });
+      }
+   }
+
    if(typeData.itemTypes){
       for(var key in typeData.itemTypes){
          var params = typeData.itemTypes[key];
@@ -4121,6 +4164,7 @@ var getResources = function(subTask) {
          var customItems = data[level][iLev].customItems;
          var successAnim = data[level][iLev].successAnim;
          var overlay = data[level][iLev].overlay;
+         var underlay = data[level][iLev].underlay;
          var nbRows = tiles.length;
          var nbCol = tiles[0].length;
          for(var row = 0; row < nbRows; row++){
@@ -4191,6 +4235,9 @@ var getResources = function(subTask) {
 
          if(overlay){
             res.push({ type: 'image', url: overlay.src });
+         }
+         if(underlay){
+            res.push({ type: 'image', url: underlay.src });
          }
       }
    }
