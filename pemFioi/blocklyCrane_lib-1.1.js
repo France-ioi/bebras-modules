@@ -904,15 +904,8 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(type,callback) {
          this.updateRunningState();
-         // if(this.cranePosY > -1){
-         //    this.moveCraneY(-1, function () {
-         //       context.executeCallWhenReady('conjure',[type]);
-         //       callback();
-         //    });
-         // }else{
-            this.conjureFaceItem(type);
-            this.waitDelay(callback);
-         // } 
+         this.conjureFaceItem(type);
+         this.waitDelay(callback);
       }
    });
 
@@ -3990,6 +3983,8 @@ var getContext = function(display, infos, curLevel) {
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
          updateOverlay();
+      }else{
+         this.craneContent = { type: "faceItem", id, offsetY: 32, offsetX: 0 };
       }
    };
 
