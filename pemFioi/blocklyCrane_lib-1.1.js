@@ -35,6 +35,12 @@ var getContext = function(display, infos, curLevel) {
         code: {},
         messages: {},
         description: {}
+      },
+      nl: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
       }
    };
    
@@ -353,6 +359,133 @@ var getContext = function(display, infos, curLevel) {
                failureUnwanted: "La case encadrée en rouge contient un bloc alors qu'elle devrait être vide"
             },
             startingBlockName: "Program of the robot"
+         },
+         nl: {
+            label: {
+               left: 'naar links verplaatsen',
+               right: 'naar rechts verplaatsen',
+               take: 'nemen',
+               putDown: 'neerzetten',
+               drop: 'loslaten',
+               colHeight: 'hoogte van de kolom',
+               placeMarker: 'de marker plaatsen',
+               goToMarker: 'naar de marker gaan',
+               expectedBlock: 'baksteen verwacht',
+               expectedBlockAt: 'verwachte baksteen rij %1 kolom %2',
+               topBlock: 'bovenste baksteen',
+               blockAt: 'baksteen rij %1 kolom %2',
+               brokenBlockAt: 'gebroken baksteen rij %1 kolom %2',
+               carriedBlock: 'vervoerde baksteen',
+               topBlockBroken: 'bovenste baksteen is gebroken',
+               carriedBlockBroken: 'vervoerde baksteen is gebroken',
+               onMarker: 'op de marker %1',
+               up: 'naar boven gaan',
+               down: 'naar beneden gaan',
+               readBlock: 'lezen baksteen',
+               dieValue: 'waarde van de dobbelsteen',
+               flip: 'terugkeren'
+            },
+            code: {
+               left: 'links',
+               right: 'rechts',
+               take: 'nemen',
+               putDown: 'neerzetten',
+               drop: 'loslaten',
+               colHeight: 'hoogteKolom',
+               placeMarker: 'plaatsMarker',
+               goToMarker: 'gaNaarMarkering',
+               expectedBlock: 'baksteenVerwacht',
+               expectedBlockAt: 'baksteenVerwachtA',
+               topBlock: 'baksteenVanBoven',
+               blockAt: 'baksteenA',
+               brokenBlockAt: 'baksteenGebrokenA',
+               carriedBlock: 'baksteenVervoerd',
+               topBlockBroken: 'baksteenVanBovenGebroken',
+               carriedBlockBroken: 'baksteenVervoerdGebroken',
+               onMarker: 'opMarkering',
+               up: 'naar boven gaan',
+               down: 'naar beneden gaan',
+               readBlock: 'lezenBaksteen',
+               dieValue: 'waardeVan',
+               flip: 'return'
+            },
+            description: {
+               left: '@()Verplaats de kraan één vak naar links.',
+               right: '@()Verplaats de kraan één vak naar rechts.',
+               take: '@()Neem de baksteen die zich op de kraan bevindt.',
+               putDown: '@() Leg de baksteen, vervoerd door de kraan, neer.',
+               drop: '@()Laat de sloopkogel, gedragen door de kraan, los.',
+               colHeight: '@()Breng het aantal bakstenen, dat zich in onder de kraan bevindt, terug naar de kolom.',
+               placeMarker: '@(naam) Plaats een marker met deze naam op de huidige positie van de kraan, of breng er de kraan naartoe als de naam al bestaat.',
+               goToMarker: '@(naam) Verplaats de kraan naar de postie van de marker met die naam.',
+               onMarker: '@(naam) Geef aan of de marker met deze naam zich in de kolom van de kraan bevindt.',
+               expectedBlock: '@() Return nummer van het type baksteen dat geplaatst moet worden boven de kolom waar zich de kraan bevindt.',
+               expectedBlockAt: '@(lijn, kolom) Return nummer van het type baksteen dat in het rooster moet geplaatst worden, op de aangeduide lijn en kolom.',
+               topBlock: '@() Return nummer van het type baksteen dat zich bevindt boven de kolom waar de kraan zich bevindt.',
+               blockAt: '@(lijn, kolom) Return nummer van het type baksteen dat zich bevindt in het rooster op de aangeduide lijn en kolom.',
+               brokenBlockAt: '@(lijn, kolom) Return True als de baksteen die zich op de aangeduide lijn en kolom bevindt, gebroken is, en False indien niet.',
+               carriedBlock: '@() Return nummer van het type baksteen die momenteel door de kraan wordt vervoerd.',
+               topBlockBroken: '@() Return True als de baksteen die zich bovenaan de kolom bevindt waar de kraan zich bevindt, gebroken is, en False indien niet.',
+               carriedBlockBroken: '@() Return True als de baksteen die momenteel door de kraan wordt vervoerd, gebroken is, en False indien niet.',
+               up: '@() Verplaats het gereedschap één vak naar boven.',
+               down: '@() Verplaats het gereedschap één vak naar beneden.',
+               readBlock: '@() Return type nummer.',
+               dieValue: '@() Return waarde van de dobbelsteen.',
+               flip: '@() Recupereer de baksteen die zich onder de kraan bevindt.'
+            },
+            messages: {
+               yLimit: function(up) {
+                  var str = "L'outil ne peut pas "
+                  str += (up) ? "monter plus haut." : "descendre plus bas.";
+                  return str
+               },
+               outside: 'De kraan kan niet verder gaan in die richting.',
+               success: 'Bravo u bent geslaagd.',
+               failure: 'U heeft het doel niet bereikt.',
+               nothingToTake: 'Er is geen blok in deze kolom.',
+               notMovable: 'Dit blok kan niet verplaatst worden.',
+               holdingBlock: 'De kraan kan niet meer dan één blok tegelijk nemen.',
+               holdingBlock_sensor: 'U kan de sensor niet gebruiken terwijl de kraan een blok draagt.',
+               emptyCrane: 'De kraan draagt geen blok.',
+               cannotDrop: 'U kan geen blok in deze kolom neerleggen.',
+               notWrecking: 'U kan dit blok niet loslaten.',
+               wrongCoordinates: 'De gegevens zijn ongeldig.',
+               impossibleToRead: 'Onmogelijk om op deze plaats een steen te lezen.',
+               noMarker: function(num) {
+                  return "Le marqueur n°"+num+" n'existe pas"
+               },
+               partialSuccess: function(thresh,score) {
+                  // console.log(thresh,score)
+                  if(thresh){
+                     var perc = Math.round(thresh*100);
+                     return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+                  }else{
+                     var perc = Math.round(score*100);
+                     return "Vous avez réussi un objectif secondaire mais l'objectif principal n'est pas atteint. Vous avez gagné "+perc+"% du score total."
+                  }
+               },
+               failureMissing: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge devrait contenir un bloc"
+                  }
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureWrongBlock: function(nb) {
+                  if(nb == 0){
+                     return "La case encadrée en rouge ne devrait pas contenir ce bloc"
+                  }
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+               },
+               failureBrokenBlock: function(nb) {
+                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
+                  return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
+               },
+               failureHiddenBlock: 'Het blok in het rode kader is naar de verkeerde kant gedraaid.',
+               failureUnwanted: 'Het vak met het rode kader omvat een blok terwijl het leeg had moeten zijn.'
+            },
+            startingBlockName: 'Programma van de robot'
          }
       },
       default: {
