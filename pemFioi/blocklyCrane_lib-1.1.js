@@ -2809,37 +2809,37 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var redisplaySpotlight = function(resetZOrder) {
-      if(context.display !== true)
-         return
-      if(!context.spotlight)
-         return
-      var { element, col } = context.spotlight;
-      if(element){
-         element.remove();
-      }
-      var cSide = infos.cellSide;
-      var w = cSide*scale, h = w;
-      var x0 = infos.leftMargin*scale;
-      var y0 = infos.topMargin*scale;
-      var x = x0 + col*w;
-      var y = y0 + (markerH + 18)*scale;
-      var spotlightH = (craneH + 0.5)*h;
-      context.spotlight.element = paper.image(spotlightSrc,x,y,w,spotlightH);
-      if(backgroundObj){
-         for(var iElem = backgroundObj.length - 1; iElem >= 0; iElem--){
-            backgroundObj[iElem].toBack();
+      if(context.display){
+         if(!context.spotlight)
+            return
+         var { element, col } = context.spotlight;
+         if(element){
+            element.remove();
          }
-      }
-      if(resetZOrder){
-         resetCraneZOrder();
+         var cSide = infos.cellSide;
+         var w = cSide*scale, h = w;
+         var x0 = infos.leftMargin*scale;
+         var y0 = infos.topMargin*scale;
+         var x = x0 + col*w;
+         var y = y0 + (markerH + 18)*scale;
+         var spotlightH = (craneH + 0.5)*h;
+         context.spotlight.element = paper.image(spotlightSrc,x,y,w,spotlightH);
+         if(backgroundObj){
+            for(var iElem = backgroundObj.length - 1; iElem >= 0; iElem--){
+               backgroundObj[iElem].toBack();
+            }
+         }
+         if(resetZOrder){
+            resetCraneZOrder();
+         }
       }
       updateDarkness();
    };
 
    function updateDarkness() {
-      if(context.display !== true){
-         return
-      }
+      // if(context.display !== true){
+      //    return
+      // }
       let ini = context.initState;
       let dat = (!context.programIsRunning && ini && ini.dark) ? ini : context;
       // if(dat.dark.length == 0){
@@ -2850,15 +2850,18 @@ var getContext = function(display, infos, curLevel) {
       for(let row = 0; row < nbRows; row++){
          for(let col = 0; col < nbCols; col++){
             let val = ((spotlight && spotlight.col == col) || dark.length == 0) ? 0 : dark[row][col];
-            if(val){
-               cells[row][col].attr(darkCellAttr);
-            }else{
-               cells[row][col].attr("fill","none");
+            if(context.display){
+               if(val){
+                  cells[row][col].attr(darkCellAttr);
+               }else{
+                  cells[row][col].attr("fill","none");
+               }
             }
             let items = context.getItemsOn(row,col);
             for(let item of items){
                item.dark = (val == 1 && (!spotlight || spotlight.col != col));
-               redisplayItem(item);
+               if(context.display)
+                  redisplayItem(item);
             }
          }
       }
@@ -3934,6 +3937,7 @@ var getContext = function(display, infos, curLevel) {
          if(infos.actionDelay > 0) {
             updateTool();
             var delay = infos.actionDelay*Math.abs(newRow - oldPos);
+            console.log(infos.actionDelay,delay)
             if(animate && context.animate) {
                var animLine = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
                var animSensor = new Raphael.animation({ y: craneAttr.ySensor },delay);
@@ -4009,9 +4013,9 @@ var getContext = function(display, infos, curLevel) {
       }else{
          this.spotlight = { col }
       }
-      if(context.display) {
+      // if(context.display) {
          redisplaySpotlight(true);
-      }
+      // }
    };
 
    context.drawShape = function(shape,color) {
@@ -4380,6 +4384,7 @@ var getResources = function(subTask) {
 
 var robotEndConditions = {
    dev: function(context, lastTurn) {
+      console.log("validate")
       var scor = context.scoring;
       if(!scor || scor.length == 0){
          context.success = true;
@@ -4388,6 +4393,7 @@ var robotEndConditions = {
       }
       for(var iTarget = 0; iTarget < scor.length; iTarget++){
          var res = robotEndConditions.checkTarget(context,iTarget);
+         console.log(res)
          if(res.success || iTarget == scor.length - 1){
             if(context.display && res.highlights){
                for(var iHighlight = 0; iHighlight < res.highlights.length; iHighlight++){
@@ -4412,7 +4418,7 @@ var robotEndConditions = {
       }
    },
    checkTarget: function(context,iTarget) {
-      // console.log(iTarget)
+      console.log("checkTarget",iTarget)
       var tar = context.scoring[iTarget].target;
       var sco = context.scoring[iTarget].score;
       var sub = context.scoring[iTarget].subset;
@@ -4427,6 +4433,7 @@ var robotEndConditions = {
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
       var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,mar,nbWellPlaced,nbRequired});
+      // console.log(error)
       if(error){
          return error
       }
