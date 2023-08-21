@@ -861,14 +861,14 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "flip" },
       func: function(callback) {
          this.updateRunningState();
-         if(this.cranePosY > -1){
-            this.moveCraneY(-1, function () {
-               context.executeCallWhenReady('flip');
-               callback();
-            });
-         }else{
+         // if(this.cranePosY > -1){
+         //    this.moveCraneY(-1, function () {
+         //       context.executeCallWhenReady('flip');
+         //       callback();
+         //    });
+         // }else{
             this.flip(callback);
-         } 
+         // } 
       }
    });
 
@@ -2301,7 +2301,7 @@ var getContext = function(display, infos, curLevel) {
 
    }; 
 
-   var resetCraneZOrder = function() {
+   var resetCraneZOrder = function(noContent) {
       // console.log("resetZOrder")
       if(crane.target){
          crane.target.wheels.toFront();
@@ -2309,7 +2309,8 @@ var getContext = function(display, infos, curLevel) {
       var elem = [];
       for(var elemName in infos.craneZOrder) {
          var val = infos.craneZOrder[elemName];
-         if(context.craneContent && elemName == "item"){
+         if(!noContent && context.craneContent && elemName == "item"){
+            console.log('item')
             var obj = paper.set(context.craneContent.element);
             if(context.craneContent.darkElement){
                obj.push(context.craneContent.darkElement);
@@ -2333,8 +2334,9 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function resetAnimZOrder() {
-      resetCraneZOrder();
+   function resetAnimZOrder(noContent) {
+      console.log("resetAnimZOrder",noContent)
+      resetCraneZOrder(noContent);
       overlayToFront();
    };
 
@@ -3074,7 +3076,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function takeIntro() {
+   function takeIntro(flip) {
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
       }
@@ -3083,16 +3085,27 @@ var getContext = function(display, infos, curLevel) {
          updateTool();
       }
       var currPos = context.cranePos;
-      var topBlock = context.findTopBlock(currPos);
-      if(!topBlock || topBlock.num == 1){
-         if(!context.display){
-            throw(context.strings.messages.nothingToTake);
+      var currPosY = context.cranePosY;
+      // console.log(currPosY)
+      if(currPosY == -1){
+         var topBlock = context.findTopBlock(currPos);
+         if(!topBlock || topBlock.num == 1){
+            if(!context.display){
+               throw(context.strings.messages.nothingToTake);
+            }
+            topBlock.row = topBlock.row - 1;
+            // callback = null;
          }
-         topBlock.row = topBlock.row - 1;
-         callback = null;
-      }
-      if(!topBlock.isMovable && topBlock.num != 1){
-         throw(context.strings.messages.notMovable);
+         if(!topBlock.isMovable && topBlock.num != 1){
+            throw(context.strings.messages.notMovable);
+         }
+      }else{
+         var items = context.getItemsOn(currPosY, currPos, obj=>!obj.target && !obj.isMask && !obj.ini);
+         if(items.length > 0){
+            var topBlock = items[0];
+         }else{
+            throw(context.strings.messages.emptyCell);
+         }
       }
 
       if(topBlock.num != 1){
@@ -3118,8 +3131,12 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.takeAnimDown = function(topBlock,callback) {
+      // console.log("takeAnimDown",this.cranePosY)
+      if(topBlock.row == this.cranePosY){
+         resetAnimZOrder(true);
+      }
       var craneAttr = getCraneAttr();
-      var delay = takeAnimDelay*(topBlock.row + 1);
+      var delay = Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY));
       // console.log(takeAnimDelay)
       var aDelay = infos.actionDelay;
       var itemAttr = itemAttributes(topBlock);
@@ -3153,6 +3170,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.takeAnimUp = function(topBlock,newRow,callback) {
+      // console.log("takeAnimUp",topBlock.row,newRow)
       /* default crane row = -1 */
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(topBlock.row - newRow);
@@ -3160,8 +3178,8 @@ var getContext = function(display, infos, curLevel) {
 
       var catchOffsetY = topBlock.catchOffsetY || 0;
 
-      var deltaY = (newRow + 1)*cSide*scale;
-      var newItemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY + markerH)*scale + deltaY;
+      var deltaY = (newRow - this.cranePosY)*cSide*scale;
+      var newItemY = (infos.topMargin + clawsOffsetY + craneItemOffset - catchOffsetY + topBlock.offsetY + markerH)*scale + deltaY + (this.cranePosY + 1)*cSide*scale ;
       var newLineClip = Beav.Object.clone(craneAttr.lineClip);
       newLineClip[3] = craneAttr.lineClip[3] + deltaY;
       var newYShaft = craneAttr.yShaft + deltaY;
@@ -3214,7 +3232,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.flip = function(callback) {
       this.displayMessage("");
-      var topBlock = takeIntro();
+      var topBlock = takeIntro(true);
       // console.log("takeAndFlip",topBlock.dark)
       takeAnimDelay = infos.actionDelay*0.5;
       if(topBlock != 1){
@@ -3228,13 +3246,16 @@ var getContext = function(display, infos, curLevel) {
                throw(context.strings.messages.nothingToTake);
             }
          }else{
-            var craneAttr = getCraneAttr();
-            setCraneAttr(craneAttr);
+            // var craneAttr = getCraneAttr();
+            // setCraneAttr(craneAttr);
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
             }
             putDownIntro();
+            var craneAttr = getCraneAttr();
+            setCraneAttr(craneAttr);
             redisplayItem(topBlock);
+            resetAnimZOrder();
          }
       }else{
          putDownIntro();
@@ -3242,7 +3263,8 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 2 + 2) + 4*infos.actionDelay;
+         var delay = 2*Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY)) + 2*takeAnimDelay + 4*infos.actionDelay;
+         // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -3260,7 +3282,7 @@ var getContext = function(display, infos, curLevel) {
                });
             })     
          });
-      })
+      });
    };
 
    context.flipAnim = function(item,callback) {
@@ -3274,8 +3296,8 @@ var getContext = function(display, infos, curLevel) {
       var cSide = infos.cellSide;
       var deltaY = (item.row)*cSide*scale;
 
-      var cyLeftDown = craneAttr.cyLeft + deltaY;
-      var cyRightDown = craneAttr.cyRight + deltaY;
+      var cyLeftDown = craneAttr.cyLeft + deltaY - (this.cranePosY + 1)*cSide*scale;
+      var cyRightDown = craneAttr.cyRight + deltaY - (this.cranePosY + 1)*cSide*scale;
       var cx = x + w/2;
       var delay = infos.actionDelay;
 
@@ -3475,7 +3497,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.putDownAnimUp = function(row,callback) {
       var craneAttr = getCraneAttr();
-      var delay = takeAnimDelay*(row + 1);
+      var delay = Math.max(takeAnimDelay,takeAnimDelay*(row - this.cranePosY));
       // console.log(takeAnimDelay)
       maskToFront();
 
@@ -3946,7 +3968,7 @@ var getContext = function(display, infos, curLevel) {
          if(infos.actionDelay > 0) {
             updateTool();
             var delay = infos.actionDelay*Math.abs(newRow - oldPos);
-            console.log(infos.actionDelay,delay)
+            // console.log(infos.actionDelay,delay)
             if(animate && context.animate) {
                var animLine = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
                var animSensor = new Raphael.animation({ y: craneAttr.ySensor },delay);
@@ -4395,7 +4417,7 @@ var getResources = function(subTask) {
 
 var robotEndConditions = {
    dev: function(context, lastTurn) {
-      console.log("validate")
+      // console.log("validate")
       var scor = context.scoring;
       if(!scor || scor.length == 0){
          context.success = true;
@@ -4404,7 +4426,7 @@ var robotEndConditions = {
       }
       for(var iTarget = 0; iTarget < scor.length; iTarget++){
          var res = robotEndConditions.checkTarget(context,iTarget);
-         console.log(res)
+         // console.log(res)
          if(res.success || iTarget == scor.length - 1){
             if(context.display && res.highlights){
                for(var iHighlight = 0; iHighlight < res.highlights.length; iHighlight++){
@@ -4429,7 +4451,7 @@ var robotEndConditions = {
       }
    },
    checkTarget: function(context,iTarget) {
-      console.log("checkTarget",iTarget)
+      // console.log("checkTarget",iTarget)
       var tar = context.scoring[iTarget].target;
       var sco = context.scoring[iTarget].score;
       var sub = context.scoring[iTarget].subset;
@@ -4764,7 +4786,7 @@ var robotEndFunctionGenerator = {
          ],
          cellAttr: {
             stroke: "#525252",
-            // stroke: "red",
+            // stroke: "red",  
             "stroke-width": 0.2,
             // "stroke-width": 2,
             fill: "none"
