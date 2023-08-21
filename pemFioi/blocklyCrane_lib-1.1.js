@@ -4203,7 +4203,7 @@ var getContext = function(display, infos, curLevel) {
       if(!context.display || !context.overlay){
          return
       }
-      if(!context.programIsRunning && context.initState && !context.initState.overlay){
+      if(!context.programIsRunning && context.initState && context.initState.overlay === false){
          return
       }
       let ov = (!context.programIsRunning && context.initState && context.initState.overlay) ? context.initState.overlay : context.overlay;
