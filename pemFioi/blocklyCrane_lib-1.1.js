@@ -4199,13 +4199,14 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function updateOverlay() {
+      // console.log(context.initState)
       if(!context.display || !context.overlay){
          return
       }
-      if(!context.programIsRunning && context.initState){
+      if(!context.programIsRunning && context.initState && !context.initState.overlay){
          return
       }
-      let ov = context.overlay;
+      let ov = (!context.programIsRunning && context.initState && context.initState.overlay) ? context.initState.overlay : context.overlay;
       let pos1 = ov.pos[0];
       let pos2 = ov.pos[1];
       let { x, y } = context.getCellCoord(pos1[1],pos1[0]);
