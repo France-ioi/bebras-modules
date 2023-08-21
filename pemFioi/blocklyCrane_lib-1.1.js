@@ -1188,7 +1188,11 @@ var getContext = function(display, infos, curLevel) {
       }
    }
    if (infos.showLabels && infos.rowLabelEnabled) {
-      infos.rightMargin += infos.cellSide;
+      if(infos.rowLabelEnabled.side == 0){
+         infos.leftMargin += infos.cellSide;
+      }else{
+         infos.rightMargin += infos.cellSide;
+      }
    }
    if (infos.showLabels || infos.showContLabels) {
       infos.bottomMargin += infos.cellSide;
@@ -1987,11 +1991,12 @@ var getContext = function(display, infos, curLevel) {
       if(infos.showLabels) {
          if(infos.rowLabelEnabled){
             for(var iRow = 0;iRow < context.nbRows;iRow++) {
+               var num = (infos.rowLabelEnabled.countDir == 0) ? (iRow + 1) : nbRows - iRow;
                if(!infos.labelFrameAttr){
-                  rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+                  rowsLabels[iRow] = paper.text(0, 0, num);
                }else{
                   var frame = paper.rect(0,0,0,0).attr(infos.labelFrameAttr);
-                  var text = paper.text(0, 0, (iRow + 1));
+                  var text = paper.text(0, 0, num);
                   rowsLabels[iRow] = [frame,text];
                }
             }
@@ -2417,7 +2422,11 @@ var getContext = function(display, infos, curLevel) {
          var labelAttr = infos.labelAttr || textFontSize;
          if(infos.rowLabelEnabled){
             for(var iRow = 0;iRow < context.nbRows;iRow++) {
-               var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
+               if(infos.rowLabelEnabled.side == 0){
+                  var x = (infos.leftMargin - cSide / 2) * scale;
+               }else{
+                  var x = (infos.leftMargin + nbCol*cSide + infos.rightMargin - cSide / 2) * scale;
+               }
                var y = (cSide * (iRow + 0.5 + craneH) + infos.topMargin + markerH) * scale;
                if(!infos.labelFrameAttr){
                   rowsLabels[iRow].attr({x: x, y: y}).attr(labelAttr);
