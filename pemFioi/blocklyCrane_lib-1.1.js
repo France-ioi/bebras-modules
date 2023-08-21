@@ -4182,10 +4182,10 @@ var getContext = function(display, infos, curLevel) {
       if(!context.display || !context.underlay){
          return
       }
-      if(!context.programIsRunning && context.initState){
+      if(!context.programIsRunning && context.initState && context.initState.underlay === false){
          return
       }
-      let un = context.underlay;
+      let un = (!context.programIsRunning && context.initState && context.initState.underlay) ? context.initState.underlay : context.underlay;
       let pos1 = un.pos[0];
       let pos2 = un.pos[1];
       let { x, y } = context.getCellCoord(pos1[1],pos1[0]);
@@ -4195,7 +4195,8 @@ var getContext = function(display, infos, curLevel) {
       if(un.element){
          un.element.remove();
       }
-      un.element = paper.image(un.src,x,y,width,height).toFront();
+      // un.element = paper.image(un.src,x,y,width,height).toFront();
+      un.element = paper.image(un.src,x,y,width,height).toBack();
    };
 
    function updateOverlay() {
@@ -4754,7 +4755,9 @@ var robotEndFunctionGenerator = {
          ],
          cellAttr: {
             stroke: "#525252",
+            // stroke: "red",
             "stroke-width": 0.2,
+            // "stroke-width": 2,
             fill: "none"
          },
          contAttr: {
