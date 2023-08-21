@@ -2226,17 +2226,17 @@ var getContext = function(display, infos, curLevel) {
       }
 
       /** crane content **/
-      // if(context.initCraneContent != undefined){
-      //    resetItem({
-      //       row: 0,
-      //       col: context.initCranePos,
-      //       type: itemTypeByNum[context.initCraneContent]
-      //    }, false);
-      //    var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target && !obj.ini);
-      //    context.setIndexes();
-      //    context.items.splice(it[0].index, 1);
-      //    context.craneContent = it[0];
-      // }
+      if(context.initCraneContent != undefined){
+         resetItem({
+            row: 0,
+            col: context.initCranePos,
+            type: itemTypeByNum[context.initCraneContent]
+         }, false);
+         var it = context.getItemsOn(0,context.initCranePos, obj => !obj.target && !obj.ini);
+         context.setIndexes();
+         context.items.splice(it[0].index, 1);
+         context.craneContent = it[0];
+      }
    };
 
    context.getItemData = function(val) {
