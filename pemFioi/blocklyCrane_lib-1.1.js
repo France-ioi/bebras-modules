@@ -3675,7 +3675,7 @@ var getContext = function(display, infos, curLevel) {
       }else{
          context.dieValue = 1;
       }
-      console.log(context.dieValIndex)
+      // console.log(context.dieValIndex)
       redisplayItem(item);
    };
 
@@ -3884,7 +3884,7 @@ var getContext = function(display, infos, curLevel) {
       this.goToMarker("A");
       infos.actionDelay = aDelay;
 
-      if(this.display && this.animate){
+      if(this.display && this.animate && infos.actionDelay > 0){
          this.dieValIndex--;
          this.rollDieAnim();
       }
