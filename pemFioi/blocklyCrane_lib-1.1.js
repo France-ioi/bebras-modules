@@ -3276,7 +3276,7 @@ var getContext = function(display, infos, curLevel) {
             resetAnimZOrder();
          }
       }else{
-         putDownIntro();
+         putDownIntro(false,topBlock.row);
       }
 
       // context.advanceTime(1);
@@ -3787,7 +3787,7 @@ var getContext = function(display, infos, curLevel) {
       }
       let row = context.cranePosY;
       let col = context.cranePos;
-      let items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini);
+      let items = this.getItemsOn(row, col, obj => !obj.target && !obj.ini && !obj.isMask);
       if(items.length == 0){
          throw(context.strings.messages.emptyCell);
       }
@@ -4520,7 +4520,7 @@ var robotEndConditions = {
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
       var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,mar,nbWellPlaced,nbRequired});
-      // console.log(error)
+      // console.log(JSON.stringify(fac),error)
       if(error){
          return error
       }
