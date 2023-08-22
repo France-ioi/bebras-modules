@@ -3865,7 +3865,7 @@ var getContext = function(display, infos, curLevel) {
       var topBlock = this.findTopBlock(col);
       var bRow = topBlock.row + 1;
       var items = this.getItemsOn(bRow,col,obj => !obj.target && !obj.ini && !obj.isMask);
-      items[0].hidden = false;
+      items[0].hidden = !items[0].hidden;
       if(context.display && context.animate){
          redisplayItem(items[0],false);
       }
