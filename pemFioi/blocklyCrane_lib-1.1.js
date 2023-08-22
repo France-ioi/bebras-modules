@@ -88,7 +88,8 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "faire apparaître objet",
                destroyFaceItem: "détruire objet",
 
-               flipUnder: "retourner dessous"
+               flipUnder: "retourner dessous",
+               rollDie: "tirer au dé"
 
             },
             code: {
@@ -132,7 +133,8 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "faireApparaitreObjet",
                destroyFaceItem: "detruireObjet",
 
-               flipUnder: "retournerDessous"
+               flipUnder: "retournerDessous",
+               rollDie: "tirerAuDe"
 
 
             },
@@ -177,7 +179,8 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "@(type) Fait apparaître dans la grue un objet de façade du type indiqué.",
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
-               flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue."
+               flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
+               rollDie: "@() Lance le dé."
 
 
             },
@@ -1068,6 +1071,15 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
+   infos.newBlocks.push({
+      name: "rollDie",
+      type: "actions",
+      block: { name: "rollDie" },
+      func: function(callback) {
+         this.rollDieFct(callback);
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1288,7 +1300,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.rng = new RandomGenerator(0);
       context.dieValue = context.initDieValue || null;
-      context.rollDieIndex = 0;
+      context.dieValIndex = 0;
       
       context.items = [];
       context.multicell_items = [];
@@ -1634,7 +1646,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.getDieValue = function() {
       if(context.dieValues){
-         var currIndex = this.rollDieIndex%(this.dieValues.length);
+         var currIndex = this.dieValIndex%(this.dieValues.length);
          var val = this.dieValues[currIndex];
       }else{
          var val = this.dieValue;
@@ -3369,38 +3381,6 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animFlip1_shape" + Math.random(), item.shapeElement, anim1Dark);
    };
 
-   context.flipUnder = function(callback) {
-      var aDelay = infos.actionDelay;
-      infos.actionDelay = 0;
-      var col = this.cranePos;
-      var row = this.cranePosY;
-      this.take();
-      this.moveCrane(col + 1);
-      this.putDown();
-      this.moveCrane(col);
-      this.flip();
-      this.moveCrane(col + 1);
-      this.take();
-      this.moveCrane(col);
-      this.putDown();
-      infos.actionDelay = aDelay;
-
-      var topBlock = this.findTopBlock(col);
-      var bRow = topBlock.row + 1;
-      var items = this.getItemsOn(bRow,col,obj => !obj.target && !obj.ini && !obj.isMask);
-      items[0].hidden = false;
-      if(context.display && context.animate){
-         redisplayItem(items[0],false);
-      }
-      this.flip(callback,bRow);
-
-      // if(callback){
-      //    var delay = infos.actionDelay*Math.abs(bRow - row);
-      //    // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelay;
-      //    context.waitDelay(callback,null,delay);
-      // }
-   };
-
    context.putDown = function(callback) {
       this.displayMessage("");
       var { tempItem } = putDownIntro();
@@ -3691,7 +3671,7 @@ var getContext = function(display, infos, curLevel) {
 
    function rollDie(item) {
       if(context.dieValues){
-         context.rollDieIndex++;
+         context.dieValIndex++;
       }else{
          context.dieValue = 1;
       }
@@ -3862,6 +3842,82 @@ var getContext = function(display, infos, curLevel) {
       var animShaftDown = new Raphael.animation({ y: craneAttr.yShaft },delay);
       var animClaws = new Raphael.animation({ y: craneAttr.yClaws },delay);
    };  
+
+   /*** FUNCTIONS ***/
+
+   context.flipUnder = function(callback) {
+      var aDelay = infos.actionDelay;
+      infos.actionDelay = 0;
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      this.take();
+      this.moveCrane(col + 1);
+      this.putDown();
+      this.moveCrane(col);
+      this.flip();
+      this.moveCrane(col + 1);
+      this.take();
+      this.moveCrane(col);
+      this.putDown();
+      infos.actionDelay = aDelay;
+
+      var topBlock = this.findTopBlock(col);
+      var bRow = topBlock.row + 1;
+      var items = this.getItemsOn(bRow,col,obj => !obj.target && !obj.ini && !obj.isMask);
+      items[0].hidden = false;
+      if(context.display && context.animate){
+         redisplayItem(items[0],false);
+      }
+      this.flip(callback,bRow);
+   };
+
+   context.rollDieFct = function(callback) {
+      var aDelay = infos.actionDelay;
+      infos.actionDelay = 0;
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      this.placeMarker("A");
+      this.goToMarker("D");
+      this.take();
+      this.drop();
+      this.goToMarker("A");
+      infos.actionDelay = aDelay;
+
+      if(this.display){
+         this.dieValIndex--;
+         this.rollDieAnim();
+      }
+
+      if(callback){
+         var delay = 2*infos.actionDelay;
+         context.waitDelay(callback,null,delay);
+      }
+   };
+
+   context.rollDieAnim = function() {
+      for(var item of this.items){
+         if(item.isDie && !item.target){
+            // var { row, col } = item;
+            var a = itemAttributes(item);
+            break;
+         }
+      }
+      redisplayItem(item);
+
+      var newY = a.y - infos.cellSide*scale;
+      var del = infos.actionDelay;
+
+      var anim1 = new Raphael.animation({ "y": newY },del,"<",function() {
+         context.raphaelFactory.animate("animDie2", item.element, anim2);
+      });
+      var anim2 = new Raphael.animation({ "y": a.y },del/2,"<",function() {
+         rollDie(item);
+      });
+      
+      context.raphaelFactory.animate("animDie1", item.element, anim1);
+   };
+
+   /***/
 
    context.destroyFaceItem = function(callback) {
       this.displayMessage("");
@@ -4318,10 +4374,7 @@ var getContext = function(display, infos, curLevel) {
          if(item.shapeElement)
            item.shapeElement.remove();
       }
-   };
-   
-   
-   
+   };  
 
    function maskToFront() {
       for(var item of context.items){
