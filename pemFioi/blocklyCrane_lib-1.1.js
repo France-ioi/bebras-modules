@@ -88,6 +88,8 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "faire apparaître objet",
                destroyFaceItem: "détruire objet",
 
+               flipUnder: "retourner dessous"
+
             },
             code: {
                left: "gauche",
@@ -130,6 +132,9 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "faireApparaitreObjet",
                destroyFaceItem: "detruireObjet",
 
+               flipUnder: "retournerDessous"
+
+
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -171,6 +176,9 @@ var getContext = function(display, infos, curLevel) {
                conjure: "@(type) Fait apparaître dans la grue une brique du type indiqué.",
                conjureFaceItem: "@(type) Fait apparaître dans la grue un objet de façade du type indiqué.",
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
+
+               flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue."
+
 
             },
             messages: {
@@ -1048,6 +1056,15 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "destroyFaceItem" },
       func: function(callback) {
          this.destroyFaceItem(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "flipUnder",
+      type: "actions",
+      block: { name: "flipUnder" },
+      func: function(callback) {
+         this.flipUnder(callback);
       }
    });
 
@@ -3076,7 +3093,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function takeIntro(flip) {
+   function takeIntro(flip,row) {
       if(context.craneContent != undefined){
          throw(context.strings.messages.holdingBlock);
       }
@@ -3087,7 +3104,7 @@ var getContext = function(display, infos, curLevel) {
       var currPos = context.cranePos;
       var currPosY = context.cranePosY;
       // console.log(currPosY)
-      if(currPosY == -1){
+      if(currPosY == -1 && row == undefined){
          var topBlock = context.findTopBlock(currPos);
          if(!topBlock || topBlock.num == 1){
             if(!context.display){
@@ -3100,7 +3117,8 @@ var getContext = function(display, infos, curLevel) {
             throw(context.strings.messages.notMovable);
          }
       }else{
-         var items = context.getItemsOn(currPosY, currPos, obj=>!obj.target && !obj.isMask && !obj.ini);
+         var r = (row != undefined) ? row : currPosY;
+         var items = context.getItemsOn(r, currPos, obj=>!obj.target && !obj.isMask && !obj.ini);
          if(items.length > 0){
             var topBlock = items[0];
          }else{
@@ -3230,9 +3248,9 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.flip = function(callback) {
+   context.flip = function(callback,row) {
       this.displayMessage("");
-      var topBlock = takeIntro(true);
+      var topBlock = takeIntro(true,row);
       // console.log("takeAndFlip",topBlock.row)
       takeAnimDelay = infos.actionDelay*0.5;
       if(topBlock != 1){
@@ -3349,6 +3367,38 @@ var getContext = function(display, infos, curLevel) {
          context.raphaelFactory.animate("animFlip1_face_item" + Math.random(), item.faceItemElement, anim1Dark);
       if(item.shapeElement)
          context.raphaelFactory.animate("animFlip1_shape" + Math.random(), item.shapeElement, anim1Dark);
+   };
+
+   context.flipUnder = function(callback) {
+      var aDelay = infos.actionDelay;
+      infos.actionDelay = 0;
+      var col = this.cranePos;
+      var row = this.cranePosY;
+      this.take();
+      this.moveCrane(col + 1);
+      this.putDown();
+      this.moveCrane(col);
+      this.flip();
+      this.moveCrane(col + 1);
+      this.take();
+      this.moveCrane(col);
+      this.putDown();
+      infos.actionDelay = aDelay;
+
+      var topBlock = this.findTopBlock(col);
+      var bRow = topBlock.row + 1;
+      var items = this.getItemsOn(bRow,col,obj => !obj.target && !obj.ini && !obj.isMask);
+      items[0].hidden = false;
+      if(context.display && context.animate){
+         redisplayItem(items[0],false);
+      }
+      this.flip(callback,bRow);
+
+      // if(callback){
+      //    var delay = infos.actionDelay*Math.abs(bRow - row);
+      //    // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelay;
+      //    context.waitDelay(callback,null,delay);
+      // }
    };
 
    context.putDown = function(callback) {
@@ -3500,7 +3550,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.putDownAnimUp = function(row,callback) {
-      console.log("putDownAnimUp",row)
+      // console.log("putDownAnimUp",row)
       var craneAttr = getCraneAttr();
       var delay = Math.max(takeAnimDelay,takeAnimDelay*(row - this.cranePosY));
       maskToFront();
