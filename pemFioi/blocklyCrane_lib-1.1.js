@@ -2310,7 +2310,7 @@ var getContext = function(display, infos, curLevel) {
       for(var elemName in infos.craneZOrder) {
          var val = infos.craneZOrder[elemName];
          if(!noContent && context.craneContent && elemName == "item"){
-            console.log('item')
+            // console.log('item')
             var obj = paper.set(context.craneContent.element);
             if(context.craneContent.darkElement){
                obj.push(context.craneContent.darkElement);
@@ -2335,7 +2335,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function resetAnimZOrder(noContent) {
-      console.log("resetAnimZOrder",noContent)
+      // console.log("resetAnimZOrder",noContent)
       resetCraneZOrder(noContent);
       overlayToFront();
    };
@@ -3233,7 +3233,7 @@ var getContext = function(display, infos, curLevel) {
    context.flip = function(callback) {
       this.displayMessage("");
       var topBlock = takeIntro(true);
-      // console.log("takeAndFlip",topBlock.dark)
+      // console.log("takeAndFlip",topBlock.row)
       takeAnimDelay = infos.actionDelay*0.5;
       if(topBlock != 1){
          topBlock.hidden = !topBlock.hidden;
@@ -3251,7 +3251,7 @@ var getContext = function(display, infos, curLevel) {
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
             }
-            putDownIntro();
+            putDownIntro(false,topBlock.row);
             var craneAttr = getCraneAttr();
             setCraneAttr(craneAttr);
             redisplayItem(topBlock);
@@ -3263,7 +3263,7 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY)) + 2*takeAnimDelay + 4*infos.actionDelay;
+         var delay = 2*Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY)) + 3*takeAnimDelay + 4*infos.actionDelay;
          // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelay;
          context.waitDelay(callback,null,delay);
       }
@@ -3276,8 +3276,10 @@ var getContext = function(display, infos, curLevel) {
          }
          context.takeAnimUp(topBlock,topBlock.row - 1,function() {
             context.flipAnim(topBlock, function() {
-               var { tempItem } = putDownIntro();
+               var { tempItem } = putDownIntro(false,topBlock.row);
+               // console.log(topBlock.row - 1)
                context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
+                  resetAnimZOrder();
                   context.putDownAnimUp(topBlock.row);
                });
             })     
@@ -3374,7 +3376,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function putDownIntro(drop) {
+   function putDownIntro(drop,newRow) {
       if(!context.craneContent){
          throw(context.strings.messages.emptyCrane);
       }
@@ -3386,16 +3388,18 @@ var getContext = function(display, infos, curLevel) {
       }
 
       var currPos = context.cranePos;
-      var topBlock = context.findTopBlock(currPos);
+      if(newRow === undefined){
+         var topBlock = context.findTopBlock(currPos);
 
-      if(!topBlock || topBlock.row == 0){
-         throw(context.strings.messages.cannotDrop);
-      }
+         if(!topBlock || topBlock.row == 0){
+            throw(context.strings.messages.cannotDrop);
+         }
 
-      if(drop){
-         var newRow = (topBlock.num == 1 || !context.craneContent.wrecking) ? topBlock.row - 1 : topBlock.row;
-      }else{
-         var newRow = topBlock.row - 1;
+         if(drop){
+            var newRow = (topBlock.num == 1 || !context.craneContent.wrecking) ? topBlock.row - 1 : topBlock.row;
+         }else{
+            var newRow = topBlock.row - 1;
+         }
       }
 
       var newCol = currPos;
@@ -3496,9 +3500,9 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.putDownAnimUp = function(row,callback) {
+      console.log("putDownAnimUp",row)
       var craneAttr = getCraneAttr();
       var delay = Math.max(takeAnimDelay,takeAnimDelay*(row - this.cranePosY));
-      // console.log(takeAnimDelay)
       maskToFront();
 
       var animLineUp = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
