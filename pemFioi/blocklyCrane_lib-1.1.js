@@ -109,7 +109,11 @@ var getContext = function(display, infos, curLevel) {
                makeAppear: "faire apparaître",
                placeRow: "place rangée",
                readObjective: "lire objectif",
-               wordlePlayMove: "jouer un coup"
+               wordlePlayMove: "jouer un coup",
+               puzzleDestroyFour: "détruire quatre",
+               puzzleReadTarget: "lire l'objectif",
+               puzzleNextPiece: "prochaine pièce",
+               puzzlePlacePiece: "placer pièce"
             },
             code: {
                left: "gauche",
@@ -173,7 +177,11 @@ var getContext = function(display, infos, curLevel) {
                makeAppear: "faireApparaitre",
                placeRow: "placerRangee",
                readObjective: "lireObjectif",
-               wordlePlayMove: "jouerCoup"
+               wordlePlayMove: "jouerCoup",
+               puzzleDestroyFour: "detruireQuatre",
+               puzzleReadTarget: "lireObjectif",
+               puzzleNextPiece: "prochainePiece",
+               puzzlePlacePiece: "placerPiece"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -188,7 +196,7 @@ var getContext = function(display, infos, curLevel) {
                placeSpotlight: "@() Place le projecteur à la position actuelle de la grue, ou y déplace le projecteur s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
                onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
-			      expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
+               expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
                expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
                expectedBlockInCell: "@() Retourne le numéro du type de brique qu'il faut placer dans la case où se trouve le capteur.",
                topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
@@ -237,8 +245,11 @@ var getContext = function(display, infos, curLevel) {
                makeAppear: "@(val) faire apparaître",
                placeRow: "@(array) place rangée",
                readObjective: "@() lire objectif",
-               wordlePlayMove: "@() jouer un coup"
-
+               wordlePlayMove: "@() jouer un coup",
+               puzzleDestroyFour: "@() détruire quatre briques identiques",
+               puzzleReadTarget: "@() lire l'objectif",
+               puzzleNextPiece: "@() prochaine pièce",
+               puzzlePlacePiece: "@() placer la pièce"
             },
             messages: {
                yLimit: function(up) {
@@ -585,17 +596,17 @@ var getContext = function(display, infos, curLevel) {
       return imgUrlWithPrefix(url)
    };
 
-	for (var id = 1; id < 90; id++) {
-		var strId = "" + id;
-		if (id < 10) {
-			strId = "0" + id;
-		}
-		contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
-				   img: "crane/numbers/" + strId + ".png",
+   for (var id = 1; id < 90; id++) {
+       var strId = "" + id;
+       if (id < 10) {
+           strId = "0" + id;
+       }
+       contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
+               img: "crane/numbers/" + strId + ".png",
                brokenImg: "crane/numbers/broken_" + strId + ".png",
-				   hiddenImg: "crane/numbers/hidden_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
-	};
-	
+               hiddenImg: "crane/numbers/hidden_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
+       };
+    
    if(infos.newBlocks == undefined)
       infos.newBlocks = [];
    if(infos.maxFallAltitude == undefined)
@@ -1414,6 +1425,57 @@ var getContext = function(display, infos, curLevel) {
          this.wordlePlayMove(arr1,arr2,callback);
       }
    });
+
+   infos.newBlocks.push({
+      name: "puzzleDestroyFour",
+      type: "actions",
+      block: { name: "puzzleDestroyFour"},
+      func: function(callback) {
+         this.puzzleDestroyFour(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzleReadTarget",
+      type: "actions",
+      block: { name: "puzzleReadTarget", yieldsValue: true, params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": 1 },
+               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+	  },
+      func: function(startColumn, nbColumns, callback) {
+		  this.callCallback(callback, this.puzzleReadTarget(startColumn, nbColumns));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzleNextPiece",
+      type: "actions",
+      block: { name: "puzzleNextPiece", yieldsValue: true },
+      func: function(callback) {
+		  this.callCallback(callback, this.puzzleNextPiece());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzlePlacePiece",
+      type: "actions",
+      block: { name: "puzzlePlacePiece", params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": [] },
+            ]
+         }
+      },
+      func: function(column, heights, callback) {
+          this.callCallback(callback, this.puzzlePlacePiece(column, heights));
+      }
+   });
+
 
    var context = quickAlgoContext(display, infos);
    context.robot = {};
@@ -4540,6 +4602,62 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback,null,0);
       }
    };
+
+   context.puzzleDestroyFour = function(callback) {
+      infos.actionDelay = 0;
+      var col = this.cranePos + 1;
+      for (var iBlock = 0; iBlock < 4; iBlock++) {
+          this.take()
+          this.moveCraneColumn(13)
+          this.putDown()
+          this.moveCraneColumn(col)
+      }      
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
+   };
+
+   context.puzzleReadTarget = function(startCol, nbColumns) {
+      infos.actionDelay = 0;
+      var target = []
+      for (var iBlock = 0; iBlock < nbColumns; iBlock++) {
+          this.moveCraneColumn(startCol + iBlock)
+          target.push(this.getTopBlock());
+      }
+      return target;
+   };
+   
+   context.puzzleNextPiece = function() {
+      infos.actionDelay = 0;
+       var heights = [0, 0];
+       for (var col = 0; col < 2; col++) {
+           for (var row = 0; row < 2; row++) {
+               this.moveCraneColumn(14 + col);
+               this.take();
+               var destCol = col + 1;
+               if (this.getCarriedBlock() == 10) {
+                   destCol = 13;
+               } else {
+                   heights[col]++;
+               }
+               this.moveCraneColumn(destCol);
+               this.putDown();
+           }
+       }
+       return heights;
+   }
+   
+   context.puzzlePlacePiece = function(column, heights) {
+       infos.actionDelay = 0;
+       for (var col = 0; col < 2; col++) {
+           for (var row = 0; row < heights[col]; row++) {
+               this.moveCraneColumn(col + 1);
+               this.take();
+               this.moveCraneColumn(column + col);
+               this.putDown();
+           }
+       }
+   }
 
    /***/
 
