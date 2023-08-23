@@ -105,7 +105,8 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "lire le mot attendu",
                reverseWord: "inverse mot",
                moveToken: "déplace pion",
-               playMove: "joue coup"
+               playMove: "joue coup",
+               makeAppear: "faire apparaître"
             },
             code: {
                left: "gauche",
@@ -165,7 +166,8 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "lireMotAttendu",
                reverseWord: "inverserMot",
                moveToken: "deplacePion",
-               playMove: "joueCoup"
+               playMove: "joueCoup",
+               makeAppear: "faireApparaitre"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -225,7 +227,9 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "@(colonne) lit le mot attendu à cette colonne",
                reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)",
                moveToken: "@() déplace pion",
-               playMove: "@() joue coup"
+               playMove: "@() joue coup",
+               makeAppear: "@(val) faire apparaître"
+
             },
             messages: {
                yLimit: function(up) {
@@ -1344,6 +1348,21 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "playMove" },
       func: function(callback) {
          this.playMove(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "makeAppear",
+      type: "actions",
+      block: { name: "makeAppear", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(val, callback) {
+         this.callCallback(callback,this.makeAppear(val));
       }
    });
 
@@ -4417,6 +4436,18 @@ var getContext = function(display, infos, curLevel) {
       if(callback){
          context.waitDelay(callback,null,0);
       }
+   };
+
+   context.makeAppear = function(val) {
+      infos.actionDelay = 0;
+      var col = this.cranePos;
+      do{
+         this.shiftCrane(1);
+      }while(this.cranePos < 6 + val);
+      this.take();
+      do{
+         this.shiftCrane(-1);
+      }while(this.cranePos > col);
    };
 
    /***/
