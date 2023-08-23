@@ -89,7 +89,6 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "détruire objet",
 
                flipUnder: "retourner dessous",
-<<<<<<< HEAD
                rollDie: "tirer au dé",
                moveCraneColumn: "aller à la colonne",
                moveCraneRow: "aller à la ligne",
@@ -98,9 +97,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "gain horizontal",
                p4WinDiagonalLeft: "gain diagonale gauche",
                p4WinDiagonalRight: "gain diagonale droite"
-=======
-               rollDie: "tirer au dé"
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
 
             },
             code: {
@@ -145,7 +141,6 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "detruireObjet",
 
                flipUnder: "retournerDessous",
-<<<<<<< HEAD
                rollDie: "tirerAuDe",
                moveCraneColumn: "allerColonne",
                moveCraneRow: "allerLigne",
@@ -154,11 +149,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "gagneHorizontal",
                p4WinDiagonalLeft: "gagneDiagonaleGauche",
                p4WinDiagonalRight: "gagneDiagonaleDroite"
-=======
-               rollDie: "tirerAuDe"
-
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -202,7 +192,6 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
                flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
-<<<<<<< HEAD
                rollDie: "@() Lance le dé.",
                moveCraneColumn: "@(column) Déplace le grappin vers la colonne indiquée.",
                moveCraneRow: "@(row) Déplace le grappin vers la ligne indiquée.",
@@ -211,10 +200,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "@(joueur, colonne) Indique si le joueur gagne horizontalement depuis cette colonne.",
                p4WinDiagonalLeft: "@(joueur, colonne) Indique si le joueur gagne en diagonale gauche depuis cette colonne.",
                p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne."
-=======
-               rollDie: "@() Lance le dé."
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
 
             },
             messages: {
@@ -1113,7 +1098,6 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-<<<<<<< HEAD
    infos.newBlocks.push({
       name: "moveCraneColumn",
       type: "actions",
@@ -1223,8 +1207,6 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-=======
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
