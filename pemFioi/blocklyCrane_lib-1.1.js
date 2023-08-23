@@ -103,7 +103,8 @@ var getContext = function(display, infos, curLevel) {
                wordGamePlaceRow: "placer en colonne",
                wordGameReadWord: "lire le mot",
                wordGameReadExpectedWord: "lire le mot attendu",
-               reverseWord: "inverse mot"
+               reverseWord: "inverse mot",
+               moveToken: "déplace pion",
             },
             code: {
                left: "gauche",
@@ -161,7 +162,8 @@ var getContext = function(display, infos, curLevel) {
                wordGamePlaceRow: "placerEnColonne",
                wordGameReadWord: "lireMot",
                wordGameReadExpectedWord: "lireMotAttendu",
-               reverseWord: "inverserMot"
+               reverseWord: "inverserMot",
+               moveToken: "deplacePion",
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -219,7 +221,8 @@ var getContext = function(display, infos, curLevel) {
                wordGamePlaceRow: "@(ligne, colonne) place le mot de cette ligne dans cette colonne",
                wordGameReadWord: "@(ligne) lit le mot situé sur cette ligne",
                wordGameReadExpectedWord: "@(colonne) lit le mot attendu à cette colonne",
-               reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)"
+               reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)",
+               moveToken: "@() déplace pion",
             },
             messages: {
                yLimit: function(up) {
@@ -1320,6 +1323,15 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(word, callback) {
           this.callCallback(callback, this.reverseWord(word));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "moveToken",
+      type: "actions",
+      block: { name: "moveToken" },
+      func: function(callback) {
+         this.moveToken(callback);
       }
    });
 
@@ -4337,19 +4349,42 @@ var getContext = function(display, infos, curLevel) {
    context.playActionCard = function(callback) {
       infos.actionDelay = 0;
       this.take()
-      var col = this.cranePos;
+      // var col = this.cranePos;
       var topBlockID = this.getTopBlock();
       if(topBlockID == 3){
-         this.moveCrane(col - 1);
+         this.shiftCrane(-1);
          this.putDown();
          this.flipUnder();
       }else if(topBlockID == 4){
-         this.moveCrane(col + 1);
+         this.shiftCrane(1);
          this.putDown();
          this.flipUnder();
       }else{
          this.putDown();
       }
+
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
+   };
+
+   context.moveToken = function(callback) {
+      infos.actionDelay = 0;
+      this.rollDieFct();
+      var val = this.getDieValue();
+      for(var i = 0; i < val; i++){
+         if(this.getTopBlockSide() == 1){
+            this.take();
+            this.shiftCrane(1);
+         }else{
+            this.take();
+            this.shiftCrane(-1);
+         }
+         this.putDown();
+         if(this.cranePos == 8 || this.cranePos == 1)
+            this.flip();
+      }
+      this.flipUnder();
 
       if(callback){
          context.waitDelay(callback,null,0);
