@@ -168,12 +168,12 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadWord: "lireMot",
                wordGameReadExpectedWord: "lireMotAttendu",
                reverseWord: "inverserMot",
-               moveToken: "deplacePion",
-               playMove: "joueCoup",
+               moveToken: "deplacerPion",
+               playMove: "jouerCoup",
                makeAppear: "faireApparaitre",
-               placeRow: "placeRangee",
+               placeRow: "placerRangee",
                readObjective: "lireObjectif",
-               wordlePlayMove: "joueCoup"
+               wordlePlayMove: "jouerCoup"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
