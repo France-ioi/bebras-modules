@@ -89,19 +89,20 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "détruire objet",
 
                flipUnder: "retourner dessous",
-<<<<<<< HEAD
                rollDie: "tirer au dé",
                moveCraneColumn: "aller à la colonne",
                moveCraneRow: "aller à la ligne",
+               moveCrane: "aller à la position",
                p4PlayMove: "jouer un coup",
                p4WinVertical: "gain vertical",
                p4WinHorizontal: "gain horizontal",
                p4WinDiagonalLeft: "gain diagonale gauche",
-               p4WinDiagonalRight: "gain diagonale droite"
-=======
-               rollDie: "tirer au dé"
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
-
+               p4WinDiagonalRight: "gain diagonale droite",
+               attachedLetter: "lettre attachée",
+               wordGamePlaceRow: "placer en colonne",
+               wordGameReadWord: "lire le mot",
+               wordGameReadExpectedWord: "lire le mot attendu",
+               reverseWord: "inverse mot"
             },
             code: {
                left: "gauche",
@@ -145,20 +146,20 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "detruireObjet",
 
                flipUnder: "retournerDessous",
-<<<<<<< HEAD
                rollDie: "tirerAuDe",
                moveCraneColumn: "allerColonne",
                moveCraneRow: "allerLigne",
+               moveCrane: "placerGrappin",
                p4PlayMove: "jouerCoup",
                p4WinVertical: "gagneVertical",
                p4WinHorizontal: "gagneHorizontal",
                p4WinDiagonalLeft: "gagneDiagonaleGauche",
-               p4WinDiagonalRight: "gagneDiagonaleDroite"
-=======
-               rollDie: "tirerAuDe"
-
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
+               p4WinDiagonalRight: "gagneDiagonaleDroite",
+               attachedLetter: "lettreAttachee",
+               wordGamePlaceRow: "placerEnColonne",
+               wordGameReadWord: "lireMot",
+               wordGameReadExpectedWord: "lireMotAttendu",
+               reverseWord: "inverserMot"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -202,20 +203,21 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
                flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
-<<<<<<< HEAD
+
                rollDie: "@() Lance le dé.",
                moveCraneColumn: "@(column) Déplace le grappin vers la colonne indiquée.",
                moveCraneRow: "@(row) Déplace le grappin vers la ligne indiquée.",
+               moveCrane: "@(column, row) Déplace le grappin vers la position indiquée.",
                p4PlayMove: "@(joueur) Joue un coup de puissance 4 pour ce joueur.",
                p4WinVertical: "@(joueur, colonne) Indique si le joueur gagne verticalement dans cette colonne.",
                p4WinHorizontal: "@(joueur, colonne) Indique si le joueur gagne horizontalement depuis cette colonne.",
                p4WinDiagonalLeft: "@(joueur, colonne) Indique si le joueur gagne en diagonale gauche depuis cette colonne.",
-               p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne."
-=======
-               rollDie: "@() Lance le dé."
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
-
+               p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne.",
+               attachedLetter: "@() Retourne la lettre attachée à la brique où se trouve le grappin",
+               wordGamePlaceRow: "@(ligne, colonne) place le mot de cette ligne dans cette colonne",
+               wordGameReadWord: "@(ligne) lit le mot situé sur cette ligne",
+               wordGameReadExpectedWord: "@(colonne) lit le mot attendu à cette colonne",
+               reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)"
             },
             messages: {
                yLimit: function(up) {
@@ -1113,7 +1115,6 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-<<<<<<< HEAD
    infos.newBlocks.push({
       name: "moveCraneColumn",
       type: "actions",
@@ -1144,6 +1145,70 @@ var getContext = function(display, infos, curLevel) {
       }
    });
    
+   infos.newBlocks.push({
+      name: "moveCrane",
+      type: "actions",
+      block: { name: "moveCrane", params: [null, null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(column, row, callback) {
+         this.moveCraneFct(column, row, callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "wordGameReadWord",
+      type: "actions",
+      block: { name: "wordGameReadWord", params: [null], yieldsValue: 'string', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+            ]
+         }
+      },
+      func: function(ligne, callback) {
+         this.callCallback(callback, this.wordGameReadWord(ligne));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "wordGameReadExpectedWord",
+      type: "actions",
+      block: { name: "wordGameReadExpectedWord", params: [null], yieldsValue: 'string', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+            ]
+         }
+      },
+      func: function(column, callback) {
+         this.callCallback(callback, this.wordGameReadExpectedWord(column));
+      }
+   });
+
+
+
+   infos.newBlocks.push({
+      name: "wordGamePlaceRow",
+      type: "actions",
+      block: { name: "wordGamePlaceRow", params: [null, null], yieldsValue: 'int', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(ligne, colonne, callback) {
+         this.callCallback(callback, this.wordGamePlaceRow(ligne, colonne));
+      }
+   });
+
    infos.newBlocks.push({
       name: "p4PlayMove",
       type: "actions",
@@ -1223,8 +1288,30 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-=======
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
+   infos.newBlocks.push({
+      name: "attachedLetter",
+      type: "actions",
+      block: { name: "attachedLetter", yieldsValue: 'string' },
+      func: function(callback) {
+          this.callCallback(callback, this.attachedLetter());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "reverseWord",
+      type: "actions",
+      block: { name: "reverseWord", params: [null], yieldsValue: 'string', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+            ]
+         }
+      },
+      func: function(word, callback) {
+          this.callCallback(callback, this.reverseWord(word));
+      }
+   });
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -3991,6 +4078,24 @@ var getContext = function(display, infos, curLevel) {
 
    /*** FUNCTIONS ***/
    
+   context.reverseWord = function(word) {
+       var reversedWord = "";
+       for (var iPos = 0; iPos < word.length; iPos++) {
+           reversedWord = word[iPos] + reversedWord;
+       }
+       return reversedWord;
+   }
+   
+   context.attachedLetter = function() {
+      var type = context.readFaceItem();
+      return String.fromCharCode("A".charCodeAt(0) + type - 1);
+   };
+
+   context.expectedLetter = function() {
+      var type = context.getExpectedBlockInCell();
+      return String.fromCharCode("A".charCodeAt(0) + type - 1);
+   }
+   
    context.moveCraneColumn = function(column, callback) {
        infos.actionDelay = 0;
        this.moveCrane(column - 1);
@@ -4005,6 +4110,49 @@ var getContext = function(display, infos, curLevel) {
        if (callback) {
          context.waitDelay(callback,null,0);
        }
+   }
+
+   context.moveCraneFct = function(column, row, callback) {
+       infos.actionDelay = 0;
+       this.moveCrane(column - 1);
+       this.moveCraneY(context.nbRows - row);
+       if (callback) {
+         context.waitDelay(callback,null,0);
+       }
+   }
+
+   context.wordGamePlaceRow = function(sourceRow, destColumn) {
+       infos.actionDelay = 0;
+        for (var destRow = 1; destRow < 7; destRow++) {
+            var sourceColumn = 8 - destRow
+            this.moveCrane(sourceColumn - 1);
+            this.moveCraneY(context.nbRows - sourceRow);
+            this.detach()
+            this.moveCrane(destColumn - 1);
+            this.moveCraneY(context.nbRows - destRow);
+            this.attach()
+        }
+   }
+   
+   context.wordGameReadWord = function(row) {
+       infos.actionDelay = 0;
+       var word = "";
+       for (var col = 2; col < 8; col++) {
+           this.moveCraneFct(col, row);
+           this.flip()
+           word += this.attachedLetter()
+       }
+       return word;
+   }
+   
+   context.wordGameReadExpectedWord = function(column) {
+       infos.actionDelay = 0;
+       var word = "";
+       for (var numLetter = 1; numLetter < 7; numLetter++) {
+           this.moveCraneFct(column, 7 - numLetter);
+           word += this.expectedLetter()
+       }
+       return word;
    }
 
    context.p4PlayMove = function(player) {
