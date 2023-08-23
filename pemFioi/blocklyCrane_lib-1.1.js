@@ -89,8 +89,8 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "détruire objet",
 
                flipUnder: "retourner dessous",
-<<<<<<< HEAD
                rollDie: "tirer au dé",
+               playActionCard: "jouer action carte",
                moveCraneColumn: "aller à la colonne",
                moveCraneRow: "aller à la ligne",
                p4PlayMove: "jouer un coup",
@@ -98,9 +98,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "gain horizontal",
                p4WinDiagonalLeft: "gain diagonale gauche",
                p4WinDiagonalRight: "gain diagonale droite"
-=======
-               rollDie: "tirer au dé"
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
 
             },
             code: {
@@ -145,8 +142,8 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "detruireObjet",
 
                flipUnder: "retournerDessous",
-<<<<<<< HEAD
                rollDie: "tirerAuDe",
+               playActionCard: "jouerActionCarte",
                moveCraneColumn: "allerColonne",
                moveCraneRow: "allerLigne",
                p4PlayMove: "jouerCoup",
@@ -154,11 +151,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "gagneHorizontal",
                p4WinDiagonalLeft: "gagneDiagonaleGauche",
                p4WinDiagonalRight: "gagneDiagonaleDroite"
-=======
-               rollDie: "tirerAuDe"
-
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -202,8 +194,8 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
                flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
-<<<<<<< HEAD
                rollDie: "@() Lance le dé.",
+               playActionCard: "@() jouer action carte",
                moveCraneColumn: "@(column) Déplace le grappin vers la colonne indiquée.",
                moveCraneRow: "@(row) Déplace le grappin vers la ligne indiquée.",
                p4PlayMove: "@(joueur) Joue un coup de puissance 4 pour ce joueur.",
@@ -211,10 +203,6 @@ var getContext = function(display, infos, curLevel) {
                p4WinHorizontal: "@(joueur, colonne) Indique si le joueur gagne horizontalement depuis cette colonne.",
                p4WinDiagonalLeft: "@(joueur, colonne) Indique si le joueur gagne en diagonale gauche depuis cette colonne.",
                p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne."
-=======
-               rollDie: "@() Lance le dé."
-
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
 
             },
             messages: {
@@ -1113,7 +1101,15 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-<<<<<<< HEAD
+   infos.newBlocks.push({
+      name: "playActionCard",
+      type: "actions",
+      block: { name: "playActionCard" },
+      func: function(callback) {
+         this.playActionCard(callback);
+      }
+   });
+
    infos.newBlocks.push({
       name: "moveCraneColumn",
       type: "actions",
@@ -1223,8 +1219,6 @@ var getContext = function(display, infos, curLevel) {
       }
    });
 
-=======
->>>>>>> parent of 8d0cc208 (WIP on master: dbe29693 blocklyCrane_lib-1.1: bug fix)
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -4173,6 +4167,28 @@ var getContext = function(display, infos, curLevel) {
       });
       
       context.raphaelFactory.animate("animDie1", item.element, anim1);
+   };
+
+   context.playActionCard = function(callback) {
+      infos.actionDelay = 0;
+      this.take()
+      var col = this.cranePos;
+      var topBlockID = this.getTopBlock();
+      if(topBlockID == 3){
+         this.moveCrane(col - 1);
+         this.putDown();
+         this.flipUnder();
+      }else if(topBlockID == 4){
+         this.moveCrane(col + 1);
+         this.putDown();
+         this.flipUnder();
+      }else{
+         this.putDown();
+      }
+
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
    };
 
    /***/
