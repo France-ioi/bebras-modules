@@ -105,6 +105,7 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "lire le mot attendu",
                reverseWord: "inverse mot",
                moveToken: "déplace pion",
+               playMove: "joue coup"
             },
             code: {
                left: "gauche",
@@ -164,6 +165,7 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "lireMotAttendu",
                reverseWord: "inverserMot",
                moveToken: "deplacePion",
+               playMove: "joueCoup"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -223,6 +225,7 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadExpectedWord: "@(colonne) lit le mot attendu à cette colonne",
                reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)",
                moveToken: "@() déplace pion",
+               playMove: "@() joue coup"
             },
             messages: {
                yLimit: function(up) {
@@ -1332,6 +1335,15 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "moveToken" },
       func: function(callback) {
          this.moveToken(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "playMove",
+      type: "actions",
+      block: { name: "playMove" },
+      func: function(callback) {
+         this.playMove(callback);
       }
    });
 
@@ -4385,6 +4397,22 @@ var getContext = function(display, infos, curLevel) {
             this.flip();
       }
       this.flipUnder();
+
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
+   };
+
+   context.playMove = function(callback) {
+      infos.actionDelay = 0;
+      this.moveToken();
+      this.take();
+      do{
+         this.putDown();
+         this.playActionCard();
+         this.take();
+      }while(this.getTopBlock() != 2 && this.getTopBlockSide() == 1)
+      this.putDown();
 
       if(callback){
          context.waitDelay(callback,null,0);
