@@ -89,7 +89,14 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "détruire objet",
 
                flipUnder: "retourner dessous",
-               rollDie: "tirer au dé"
+               rollDie: "tirer au dé",
+               moveCraneColumn: "aller à la colonne",
+               moveCraneRow: "aller à la ligne",
+               p4PlayMove: "jouer un coup",
+               p4WinVertical: "gain vertical",
+               p4WinHorizontal: "gain horizontal",
+               p4WinDiagonalLeft: "gain diagonale gauche",
+               p4WinDiagonalRight: "gain diagonale droite"
 
             },
             code: {
@@ -134,9 +141,14 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "detruireObjet",
 
                flipUnder: "retournerDessous",
-               rollDie: "tirerAuDe"
-
-
+               rollDie: "tirerAuDe",
+               moveCraneColumn: "allerColonne",
+               moveCraneRow: "allerLigne",
+               p4PlayMove: "jouerCoup",
+               p4WinVertical: "gagneVertical",
+               p4WinHorizontal: "gagneHorizontal",
+               p4WinDiagonalLeft: "gagneDiagonaleGauche",
+               p4WinDiagonalRight: "gagneDiagonaleDroite"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -180,8 +192,14 @@ var getContext = function(display, infos, curLevel) {
                destroyFaceItem: "@() Détruit l'objet de façade transporté par la grue.",
 
                flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
-               rollDie: "@() Lance le dé."
-
+               rollDie: "@() Lance le dé.",
+               moveCraneColumn: "@(column) Déplace le grappin vers la colonne indiquée.",
+               moveCraneRow: "@(row) Déplace le grappin vers la ligne indiquée.",
+               p4PlayMove: "@(joueur) Joue un coup de puissance 4 pour ce joueur.",
+               p4WinVertical: "@(joueur, colonne) Indique si le joueur gagne verticalement dans cette colonne.",
+               p4WinHorizontal: "@(joueur, colonne) Indique si le joueur gagne horizontalement depuis cette colonne.",
+               p4WinDiagonalLeft: "@(joueur, colonne) Indique si le joueur gagne en diagonale gauche depuis cette colonne.",
+               p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne."
 
             },
             messages: {
@@ -1077,6 +1095,115 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "rollDie" },
       func: function(callback) {
          this.rollDieFct(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "moveCraneColumn",
+      type: "actions",
+      block: { name: "moveCraneColumn", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(column, callback) {
+         this.moveCraneColumn(column, callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "moveCraneRow",
+      type: "actions",
+      block: { name: "moveCraneRow", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(column, callback) {
+         this.moveCraneRow(column, callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "p4PlayMove",
+      type: "actions",
+      block: { name: "p4PlayMove", params: [null], yieldsValue: 'int', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+            ]
+         }
+      },
+      func: function(player, callback) {
+         this.callCallback(callback, this.p4PlayMove(player));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "p4WinVertical",
+      type: "actions",
+      block: { name: "p4WinVertical", params: [null, null], yieldsValue: 'bool', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(player, column, callback) {
+         this.callCallback(callback, this.p4WinVertical(player, column));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "p4WinHorizontal",
+      type: "actions",
+      block: { name: "p4WinHorizontal", params: [null, null], yieldsValue: 'bool', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(player, column, callback) {
+         this.callCallback(callback, this.p4WinHorizontal(player, column));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "p4WinDiagonalLeft",
+      type: "actions",
+      block: { name: "p4WinDiagonalLeft", params: [null, null], yieldsValue: 'bool', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(player, column, callback) {
+         this.callCallback(callback, this.p4WinDiagonalLeft(player, column));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "p4WinDiagonalRight",
+      type: "actions",
+      block: { name: "p4WinDiagonalRight", params: [null, null], yieldsValue: 'bool', 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+            ]
+         }
+      },
+      func: function(player, column, callback) {
+         this.callCallback(callback, this.p4WinDiagonalRight(player, column));
       }
    });
 
@@ -3845,9 +3972,128 @@ var getContext = function(display, infos, curLevel) {
    };  
 
    /*** FUNCTIONS ***/
+   
+   context.moveCraneColumn = function(column, callback) {
+       infos.actionDelay = 0;
+       this.moveCrane(column - 1);
+       if (callback) {
+         context.waitDelay(callback,null,0);
+       }
+   }
+
+   context.moveCraneRow = function(row, callback) {
+       infos.actionDelay = 0;
+       this.moveCraneY(context.nbRows - row);
+       if (callback) {
+         context.waitDelay(callback,null,0);
+       }
+   }
+
+   context.p4PlayMove = function(player) {
+       infos.actionDelay = 0;
+       this.moveCrane(10);
+       this.moveCraneY(-1);
+       this.flip();
+       this.take();
+       var destColumn = this.getCarriedBlock() - 1;
+       var col = this.cranePos;
+       this.moveCrane(col + 1);
+       this.putDown();
+       if (player == 1) {
+           this.moveCrane(col - 2);
+       } else {
+           this.moveCrane(col - 1);
+       }
+       this.take();
+       this.moveCrane(destColumn);
+       this.drop();
+       return destColumn + 1;
+   }
+   
+   context.p4WinVertical = function(player, column) {
+       this.moveCrane(column - 1);
+       var row = context.nbRows - 7;
+       while (this.getBlockAt(row,column) == 0) {
+           row++;
+       }
+       var nbBricksPlayer = 0;
+       while ((this.getBlockAt(row, column) == player) && row <= context.nbRows) {
+           row++;
+           nbBricksPlayer++;
+       }
+       return nbBricksPlayer == 4
+   }
+
+   context.p4WinHorizontal = function(player, column) {
+       this.moveCrane(column - 1);
+       var row = context.nbRows - 7;
+       while (this.getBlockAt(row, column) == 0) {
+           row++;
+       }
+       var col = column;
+       while (this.getBlockAt(row, col) == player && col > 1) {
+           col--;
+       }
+       if (this.getBlockAt(row, col) != player) {
+           col++;
+       }
+       var nbBricksPlayer = 0;
+       while (this.getBlockAt(row, col) == player) {
+           nbBricksPlayer++;
+           col++;
+       }
+       return nbBricksPlayer == 4;
+   }
+
+   context.p4WinDiagonalLeft = function(player, column) {
+       this.moveCrane(column - 1);
+       var row = context.nbRows - 7;
+       while (this.getBlockAt(row, column) == 0) {
+           row++;
+       }
+       var col = column;
+       while (row <= context.nbRows && col > 1  && (this.getBlockAt(row, col) == player)) {
+           row++;
+           col--;
+       }
+       if (this.getBlockAt(row, col) != player) {
+           row--;
+           col++;
+       }
+       var nbBricksPlayer = 0;
+       while (col <= context.nbCols && (this.getBlockAt(row, col) == player)) {
+           nbBricksPlayer++;
+           row--;
+           col++;
+       }
+       return nbBricksPlayer == 4;
+   }
+
+   context.p4WinDiagonalRight = function(player, column) {
+       this.moveCrane(column - 1);
+       var row = context.nbRows - 7;
+       while (this.getBlockAt(row, column) == 0) {
+           row++;
+       }
+       var col = column;
+       while (row <= context.nbRows && col <= context.nbCols  && (this.getBlockAt(row, col) == player)) {
+           row++;
+           col++;
+       }
+       if (this.getBlockAt(row, col) != player) {
+           row--;
+           col--;
+       }
+       var nbBricksPlayer = 0;
+       while ((col > 0) && (this.getBlockAt(row, col) == player)) {
+           nbBricksPlayer++;
+           row--;
+           col--;
+       }
+       return nbBricksPlayer == 4;
+   }
 
    context.flipUnder = function(callback) {
-      var aDelay = infos.actionDelay;
       infos.actionDelay = 0;
       var col = this.cranePos;
       var row = this.cranePosY;
@@ -3860,16 +4106,9 @@ var getContext = function(display, infos, curLevel) {
       this.take();
       this.moveCrane(col);
       this.putDown();
-      infos.actionDelay = aDelay;
-
-      var topBlock = this.findTopBlock(col);
-      var bRow = topBlock.row + 1;
-      var items = this.getItemsOn(bRow,col,obj => !obj.target && !obj.ini && !obj.isMask);
-      items[0].hidden = !items[0].hidden;
-      if(context.display && context.animate){
-         redisplayItem(items[0],false);
+      if (callback) {
+         context.waitDelay(callback,null,0);
       }
-      this.flip(callback,bRow);
    };
 
    context.rollDieFct = function(callback) {
