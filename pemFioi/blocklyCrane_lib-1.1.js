@@ -106,7 +106,10 @@ var getContext = function(display, infos, curLevel) {
                reverseWord: "inverse mot",
                moveToken: "déplace pion",
                playMove: "joue coup",
-               makeAppear: "faire apparaître"
+               makeAppear: "faire apparaître",
+               placeRow: "place rangée",
+               readObjective: "lire objectif",
+               wordlePlayMove: "jouer un coup"
             },
             code: {
                left: "gauche",
@@ -167,7 +170,10 @@ var getContext = function(display, infos, curLevel) {
                reverseWord: "inverserMot",
                moveToken: "deplacePion",
                playMove: "joueCoup",
-               makeAppear: "faireApparaitre"
+               makeAppear: "faireApparaitre",
+               placeRow: "placeRangee",
+               readObjective: "lireObjectif",
+               wordlePlayMove: "joueCoup"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -228,7 +234,10 @@ var getContext = function(display, infos, curLevel) {
                reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)",
                moveToken: "@() déplace pion",
                playMove: "@() joue coup",
-               makeAppear: "@(val) faire apparaître"
+               makeAppear: "@(val) faire apparaître",
+               placeRow: "@(array) place rangée",
+               readObjective: "@() lire objectif",
+               wordlePlayMove: "@() jouer un coup"
 
             },
             messages: {
@@ -1363,6 +1372,46 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(val, callback) {
          this.callCallback(callback,this.makeAppear(val));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "placeRow",
+      type: "actions",
+      block: { name: "placeRow", params: [null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": "[]" },
+            ]
+         }
+      },
+      func: function(arr, callback) {
+         this.callCallback(callback,this.placeRow(arr));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "readObjective",
+      type: "actions",
+      block: { name: "readObjective", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback,this.readObjective());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "wordlePlayMove",
+      type: "actions",
+      block: { name: "wordlePlayMove", params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": "[]" },
+               { "type": "field_input", "name": "PARAM_1", "value": "[]" },
+            ]
+         }
+      },
+      func: function(arr1, arr2, callback) {
+         this.wordlePlayMove(arr1,arr2,callback);
       }
    });
 
@@ -4448,6 +4497,48 @@ var getContext = function(display, infos, curLevel) {
       do{
          this.shiftCrane(-1);
       }while(this.cranePos > col);
+   };
+
+   context.placeRow = function(arr) {
+      infos.actionDelay = 0;
+      for(var shapeID of arr){
+         this.conjure(shapeID);
+         this.putDown();
+         this.shiftCrane(1);
+      }
+      for(var i = 0; i < arr.length; i++){
+         this.shiftCrane(-1);
+      }
+   };
+
+   context.readObjective = function(callback) {
+      infos.actionDelay = 0;
+      for(var i = 0; i < 12; i++){
+         this.shiftCrane(1);
+      }
+      this.shiftCraneY(1);
+      var objective = [];
+      this.shiftCraneY(1);
+      for(var i = 0; i < 5; i++){
+         this.shiftCraneY(1);
+         objective.push(this.getExpectedBlockInCell())
+      }
+      for(var i = 0; i < 12; i++){
+         this.shiftCrane(-1);
+      }
+      return objective
+   };
+
+   context.wordlePlayMove = function(shapes, objective, callback) {
+      infos.actionDelay = 0;
+      this.placeRow(shapes);
+      if(Beav.Object.eq(shapes,objective)){
+         this.displayMessage("Vous avez gagné !");
+      }
+
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
    };
 
    /***/
