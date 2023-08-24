@@ -109,7 +109,17 @@ var getContext = function(display, infos, curLevel) {
                makeAppear: "faire apparaître",
                placeRow: "place rangée",
                readObjective: "lire objectif",
-               wordlePlayMove: "jouer un coup"
+               wordlePlayMove: "jouer un coup",
+               puzzleDestroyFour: "détruire quatre",
+               puzzleReadTarget: "lire l'objectif",
+               puzzleNextPiece: "prochaine pièce",
+               puzzlePlacePiece: "placer pièce",
+               breakoutBuildAtPosition: "construire brique",
+               breakoutReadColumn: "lit colonne",
+               breakoutFindMarble: "trouve bille",
+               breakoutPositionDirection: "position dans direction",
+               breakoutHandleWallBounce: "rebond sur mur",
+               breakoutHandleType2Bounce: "rebond sur brique 2"
             },
             code: {
                left: "gauche",
@@ -168,12 +178,22 @@ var getContext = function(display, infos, curLevel) {
                wordGameReadWord: "lireMot",
                wordGameReadExpectedWord: "lireMotAttendu",
                reverseWord: "inverserMot",
-               moveToken: "deplacePion",
-               playMove: "joueCoup",
+               moveToken: "deplacerPion",
+               playMove: "jouerCoup",
                makeAppear: "faireApparaitre",
-               placeRow: "placeRangee",
+               placeRow: "placerRangee",
                readObjective: "lireObjectif",
-               wordlePlayMove: "joueCoup"
+               wordlePlayMove: "jouerCoup",
+               puzzleDestroyFour: "detruireQuatre",
+               puzzleReadTarget: "lireObjectif",
+               puzzleNextPiece: "prochainePiece",
+               puzzlePlacePiece: "placerPiece",
+               breakoutBuildAtPosition: "construireAPosition",
+               breakoutReadColumn: "lireColonne",
+               breakoutFindMarble: "trouverBille",
+               breakoutPositionDirection: "positionDirection",
+               breakoutHandleWallBounce: "directionRebondMur",
+               breakoutHandleType2Bounce: "directionRebondBrique2"
             },
             description: {
                left: "@() Déplace la grue d'une case vers la gauche.",
@@ -188,7 +208,7 @@ var getContext = function(display, infos, curLevel) {
                placeSpotlight: "@() Place le projecteur à la position actuelle de la grue, ou y déplace le projecteur s'il existe déjà.",             
                goToMarker: "@(nom) Déplace la grue à la position du marqueur portant ce nom.",
                onMarker: "@(nom) Indique si le marqueur portant se nom se trouve dans la colonne de la grue.",
-			      expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
+               expectedBlock: "@() Retourne le numéro du type de brique qu'il faut placer au sommet de la colonne où se trouve la grue.",
                expectedBlockAt: "@(ligne, colonne) Retourne le numéro du type de brique qu'il faut placer dans la grille, à la ligne et à la colonne indiquées.",
                expectedBlockInCell: "@() Retourne le numéro du type de brique qu'il faut placer dans la case où se trouve le capteur.",
                topBlock: "@() Retourne le numéro du type de brique se trouvant au sommet de la colonne où se trouve la grue.",
@@ -237,8 +257,17 @@ var getContext = function(display, infos, curLevel) {
                makeAppear: "@(val) faire apparaître",
                placeRow: "@(array) place rangée",
                readObjective: "@() lire objectif",
-               wordlePlayMove: "@() jouer un coup"
-
+               wordlePlayMove: "@() jouer un coup",
+               puzzleDestroyFour: "@() détruire quatre briques identiques",
+               puzzleReadTarget: "@() lire l'objectif",
+               puzzleNextPiece: "@() prochaine pièce",
+               puzzlePlacePiece: "@() placer la pièce",
+               breakoutBuildAtPosition: "@(colonne, ligne) construire une brique à cette position",
+               breakoutReadColumn: "@() lit les briques de la colonne actuelle",
+               breakoutFindMarble: "@() trouve la position de la bille",
+               breakoutPositionDirection:  "@(position, direction) donne la nouvelle position dans cette direction",
+               breakoutHandleWallBounce: "@(position, direction) donne la nouvelle direction après un éventuel rebond contre un mur",
+               breakoutHandleType2Bounce: "@(position, direction) donne la nouvelle direction après un éventuel rebond contre une brique de type 2"
             },
             messages: {
                yLimit: function(up) {
@@ -587,17 +616,17 @@ var getContext = function(display, infos, curLevel) {
       return imgUrlWithPrefix(url)
    };
 
-	for (var id = 1; id < 90; id++) {
-		var strId = "" + id;
-		if (id < 10) {
-			strId = "0" + id;
-		}
-		contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
-				   img: "crane/numbers/" + strId + ".png",
+   for (var id = 1; id < 90; id++) {
+       var strId = "" + id;
+       if (id < 10) {
+           strId = "0" + id;
+       }
+       contextParams.numbers.itemTypes["item_" + id] = { num: id + 1, id: id,
+               img: "crane/numbers/" + strId + ".png",
                brokenImg: "crane/numbers/broken_" + strId + ".png",
-				   hiddenImg: "crane/numbers/hidden_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
-	};
-	
+               hiddenImg: "crane/numbers/hidden_" + strId + ".png", side: 60, isMovable: true, zOrder: 1};
+       };
+    
    if(infos.newBlocks == undefined)
       infos.newBlocks = [];
    if(infos.maxFallAltitude == undefined)
@@ -1414,6 +1443,138 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(arr1, arr2, callback) {
          this.wordlePlayMove(arr1,arr2,callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzleDestroyFour",
+      type: "actions",
+      block: { name: "puzzleDestroyFour"},
+      func: function(callback) {
+         this.puzzleDestroyFour(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzleReadTarget",
+      type: "actions",
+      block: { name: "puzzleReadTarget", yieldsValue: true, params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": 1 },
+               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(startColumn, nbColumns, callback) {
+          this.callCallback(callback, this.puzzleReadTarget(startColumn, nbColumns));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzleNextPiece",
+      type: "actions",
+      block: { name: "puzzleNextPiece", yieldsValue: true },
+      func: function(callback) {
+          this.callCallback(callback, this.puzzleNextPiece());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "puzzlePlacePiece",
+      type: "actions",
+      block: { name: "puzzlePlacePiece", params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": [] },
+            ]
+         }
+      },
+      func: function(column, heights, callback) {
+          this.callCallback(callback, this.puzzlePlacePiece(column, heights));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutBuildAtPosition",
+      type: "actions",
+      block: { name: "breakoutBuildAtPosition", params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": [] },
+            ]
+         }
+      },
+      func: function(column, row, callback) {
+          this.callCallback(callback, this.breakoutBuildAtPosition(column, row));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutReadColumn",
+      type: "actions",
+      block: { name: "breakoutReadColumn", yieldValue: true },
+      func: function(callback) {
+          this.callCallback(callback, this.breakoutReadColumn());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutFindMarble",
+      type: "actions",
+      block: { name: "breakoutFindMarble", yieldValue: true },
+      func: function(callback) {
+          this.callCallback(callback, this.breakoutFindMarble());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutPositionDirection",
+      type: "actions",
+      block: { name: "breakoutPositionDirection", yieldValue: true, params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(position, direction, callback) {
+          this.callCallback(callback, this.breakoutPositionDirection(position, direction));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutHandleWallBounce",
+      type: "actions",
+      block: { name: "breakoutHandleWallBounce", yieldValue: true, params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(position, direction, callback) {
+          this.callCallback(callback, this.breakoutHandleWallBounce(position, direction));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "breakoutHandleType2Bounce",
+      type: "actions",
+      block: { name: "breakoutHandleType2Bounce", yieldValue: true, params: [null,null], 
+         blocklyJson: {
+               "args0": [
+               { "type": "field_input", "name": "PARAM_0", "value": [] },
+               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+            ]
+         }
+      },
+      func: function(position, direction, callback) {
+          this.callCallback(callback, this.breakoutHandleType2Bounce(position, direction));
       }
    });
 
@@ -4503,13 +4664,11 @@ var getContext = function(display, infos, curLevel) {
 
    context.placeRow = function(arr) {
       infos.actionDelay = 0;
+      this.moveCraneColumn(1);
       for(var shapeID of arr){
          this.conjure(shapeID);
          this.putDown();
          this.shiftCrane(1);
-      }
-      for(var i = 0; i < arr.length; i++){
-         this.shiftCrane(-1);
       }
    };
 
@@ -4542,6 +4701,137 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback,null,0);
       }
    };
+
+   context.puzzleDestroyFour = function(callback) {
+      infos.actionDelay = 0;
+      var col = this.cranePos + 1;
+      for (var iBlock = 0; iBlock < 4; iBlock++) {
+          this.take()
+          this.moveCraneColumn(13)
+          this.putDown()
+          this.moveCraneColumn(col)
+      }      
+      if(callback){
+         context.waitDelay(callback,null,0);
+      }
+   };
+
+   context.puzzleReadTarget = function(startCol, nbColumns) {
+      infos.actionDelay = 0;
+      var target = []
+      for (var iBlock = 0; iBlock < nbColumns; iBlock++) {
+          this.moveCraneColumn(startCol + iBlock)
+          target.push(this.getTopBlock());
+      }
+      return target;
+   };
+   
+   context.puzzleNextPiece = function() {
+      infos.actionDelay = 0;
+       var heights = [0, 0];
+       for (var col = 0; col < 2; col++) {
+           for (var row = 0; row < 2; row++) {
+               this.moveCraneColumn(14 + col);
+               this.take();
+               var destCol = col + 1;
+               if (this.getCarriedBlock() == 10) {
+                   destCol = 13;
+               } else {
+                   heights[col]++;
+               }
+               this.moveCraneColumn(destCol);
+               this.putDown();
+           }
+       }
+       return heights;
+   }
+   
+   context.puzzlePlacePiece = function(column, heights) {
+       infos.actionDelay = 0;
+       for (var col = 0; col < 2; col++) {
+           for (var row = 0; row < heights[col]; row++) {
+               this.moveCraneColumn(col + 1);
+               this.take();
+               this.moveCraneColumn(column + col);
+               this.putDown();
+           }
+       }
+   }
+
+   context.breakoutBuildAtPosition = function(column, row) {
+       infos.actionDelay = 0;
+       this.conjureFaceItem(2)
+       this.moveCraneFct(column, row);
+       this.attach();
+   }
+
+   context.breakoutReadColumn = function() {
+       infos.actionDelay = 0;
+       var types = [0, 0, 0, 0, 0, 0, 0];
+       var col = this.cranePos + 1;
+       for (var row = 6; row >= 3; row--) {
+           this.moveCraneFct(col, row);
+           types[row] = this.readFaceItem();
+       }
+       this.moveCraneFct(col, 7);
+       return types;
+   }
+   
+   context.breakoutFindMarble = function() {
+       infos.actionDelay = 0;
+       for (var row = 2; row < 7; row++) {
+           for (var col = 2; col < 12; col++) {
+               this.moveCraneFct(col, row);
+               if (this.readFaceItem() == 10) {
+                   return [col, row]
+               }
+           }
+       }
+   }
+   
+   context.breakoutPositionDirection = function(position, direction) {
+       infos.actionDelay = 0;
+       if (direction == 0) {
+           return [position[0] - 1, position[1] - 1];
+       } else if (direction == 1) {
+           return [position[0] - 1, position[1] + 1];
+       } else if (direction == 2) {
+           return [position[0] + 1, position[1] + 1];
+       } else {
+           return [position[0] + 1, position[1] - 1];
+       }
+   }
+   
+   context.breakoutVerticalBounce = function(direction) {
+       var bounces = [1, 0, 3, 2];
+       return bounces[direction];
+   }
+   
+   context.breakoutHandleWallBounce = function(position, direction) {    
+       if ((position[0] == 2 && direction < 2) || (position[0] == 11 && direction >= 2)) {
+          direction = 3 - direction;
+       }
+       if (position[1] == 6) {
+          direction = rebondVertical(direction);
+       }
+       return direction;
+   }
+
+   context.breakoutHandleType2Bounce = function(position, direction) {
+       var newPosMarble = this.breakoutPositionDirection(position, direction);
+       this.moveCraneFct(newPosMarble[0], newPosMarble[1]);
+       if (this.readFaceItem() == 2) {
+           if (direction == 1) {
+               direction = 0;
+           }
+           if (direction == 2) {
+               direction = 3;
+           }
+           this.detach();
+           this.destroyFaceItem();
+       }
+       return direction;
+   }
 
    /***/
 
