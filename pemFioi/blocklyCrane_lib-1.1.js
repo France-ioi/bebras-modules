@@ -4662,13 +4662,11 @@ var getContext = function(display, infos, curLevel) {
 
    context.placeRow = function(arr) {
       infos.actionDelay = 0;
+      this.moveCraneColumn(1);
       for(var shapeID of arr){
          this.conjure(shapeID);
          this.putDown();
          this.shiftCrane(1);
-      }
-      for(var i = 0; i < arr.length; i++){
-         this.shiftCrane(-1);
       }
    };
 
