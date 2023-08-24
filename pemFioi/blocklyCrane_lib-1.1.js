@@ -319,7 +319,9 @@ var getContext = function(display, infos, curLevel) {
                failureWrongCranePos: "La position finale de la grue n'est pas celle attendue.",
                failureMissingMarker: function(col) {
                   return "Il manque un marqueur à la colonne "+col+"."
-               }
+               },
+               failureNoMessage: "Il n'y a pas de message affiché.",
+               failureWrongMessage: "Le message affiché n'est pas celui attendu."
             },
             startingBlockName: "Programme du robot"
          },
@@ -5191,12 +5193,13 @@ var robotEndConditions = {
       var sha = context.scoring[iTarget].shapes;
       var cra = context.scoring[iTarget].cranePos;
       var mar = context.scoring[iTarget].markers;
+      var mes = context.scoring[iTarget].message;
       var til = context.tiles;
       var bro = context.broken;
       
       var { nbRequired, nbWellPlaced } = checkWellPlaced(context,tar,sub,til,bro);
 
-      var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,mar,nbWellPlaced,nbRequired});
+      var error = checkForErrors({context,tar,sub,hid,fac,sha,cra,mar,mes,nbWellPlaced,nbRequired});
       // console.log(JSON.stringify(fac),error)
       if(error){
          return error
@@ -5260,7 +5263,7 @@ function checkWellPlaced(context,tar,sub,til,bro) {
 };
 
 function checkForErrors(params) {
-   var { context, tar, sub, hid, fac, sha, cra, mar, nbWellPlaced, nbRequired } = params;
+   var { context, tar, sub, hid, fac, sha, cra, mar, mes, nbWellPlaced, nbRequired } = params;
    var partialSuccess = (nbWellPlaced >= nbRequired*context.partialSuccessThreshold && context.partialSuccessEnabled) ? true : false;
    var errorMsg = (partialSuccess) ? window.languageStrings.messages.partialSuccess(context.partialSuccessThreshold)+" " : "";
 
@@ -5353,6 +5356,18 @@ function checkForErrors(params) {
             return { success: false, msg: errorMsg }
          }
       }  
+   }
+   if(mes){
+      var finalMes = context.message;
+      console.log(mes,finalMes)
+      if(!finalMes){
+         errorMsg += window.languageStrings.messages.failureNoMessage;
+         return { success: false, msg: errorMsg }
+      }
+      if(finalMes.toUpperCase().replace(' ','') != mes.toUpperCase().replace(' ','')){
+         errorMsg += window.languageStrings.messages.failureWrongMessage;
+         return { success: false, msg: errorMsg }      
+      }
    }
 
    return false
