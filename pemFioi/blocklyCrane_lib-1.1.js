@@ -666,7 +666,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "left" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.shiftCrane(-1,callback);
       }
    });
@@ -676,7 +676,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "right" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.shiftCrane(1,callback);
       }
    });
@@ -686,7 +686,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "take" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('take');
@@ -703,7 +703,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "putDown" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.putDown(callback);
       }
    });
@@ -713,7 +713,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "drop" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.drop(callback);
       }
    });
@@ -723,7 +723,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "colHeight", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getColHeight());
       }
    });
@@ -733,7 +733,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "craneColumn", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.cranePos + 1);
       }
    });
@@ -743,7 +743,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "craneRow", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.nbRows - this.cranePosY);
       }
    });
@@ -753,7 +753,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "expectedBlock", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getExpectedBlock());
       }
    });
@@ -770,7 +770,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getExpectedBlockAt(row,col));
       }
    });
@@ -780,7 +780,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "expectedBlockInCell", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getExpectedBlockInCell());
       }
    });
@@ -790,7 +790,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlock", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getTopBlock());
       }
    });
@@ -800,7 +800,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlockBroken", yieldsValue: true },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.isTopBlockBroken());
       }
    });
@@ -817,7 +817,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getBlockAt(row,col));
       }
    });
@@ -834,7 +834,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(row,col,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.isBlockAtBroken(row,col));
       }
    });
@@ -844,7 +844,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "carriedBlock", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getCarriedBlock());
       }
    });
@@ -854,7 +854,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "carriedBlockBroken", yieldsValue: true },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.isCarriedBlockBroken());
       }
    });
@@ -871,7 +871,7 @@ var getContext = function(display, infos, curLevel) {
             }]
          } },
       func: function(value,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.isOnMarker(value));
       }
    });
@@ -889,7 +889,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value, callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.placeMarker(value);
          this.waitDelay(callback);
       }
@@ -908,7 +908,7 @@ var getContext = function(display, infos, curLevel) {
          },
       },
       func: function(value, callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.goToMarker(value,callback);
       }
    });
@@ -918,7 +918,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "up" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.shiftCraneY(-1,callback);
       }
    });
@@ -928,7 +928,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "down" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.shiftCraneY(1,callback);
       }
    });
@@ -938,7 +938,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readBlock", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getBlockType());
       }
    });
@@ -948,7 +948,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "dieValue", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getDieValue());
       }
    });
@@ -958,7 +958,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "flip" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          // if(this.cranePosY > -1){
          //    this.moveCraneY(-1, function () {
          //       context.executeCallWhenReady('flip');
@@ -975,7 +975,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "placeSpotlight" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('placeSpotlight');
@@ -993,7 +993,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "topBlockSide", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.getTopBlockSide());
       }
    });
@@ -1003,7 +1003,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "detach" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.detach(callback);
       }
    });
@@ -1013,7 +1013,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "attach" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.attach(callback);
       }
    });
@@ -1023,7 +1023,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readFaceItem", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.readFaceItem());
       }
    });
@@ -1045,7 +1045,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value1, value2, callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.drawShape(value1,value2);
          this.waitDelay(callback);
       }
@@ -1056,7 +1056,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "eraseShape" },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.eraseShape();
          this.waitDelay(callback);
       }
@@ -1067,7 +1067,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readShape", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.readShape());
       }
    });
@@ -1077,7 +1077,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "readColor", yieldsValue: 'int' },
       func: function(callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.callCallback(callback, this.readColor());
       }
    });
@@ -1093,7 +1093,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(value,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.displayMessage(value);
          this.waitDelay(callback,null,1000);
       }
@@ -1110,7 +1110,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(type,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          if(this.cranePosY > -1){
             this.moveCraneY(-1, function () {
                context.executeCallWhenReady('conjure',[type]);
@@ -1134,7 +1134,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(type,callback) {
-         this.updateRunningState();
+         this.beforeBlockExecution();
          this.conjureFaceItem(type);
          this.waitDelay(callback);
       }
@@ -1145,6 +1145,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "destroyFaceItem" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.destroyFaceItem(callback);
       }
    });
@@ -1154,6 +1155,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "flipUnder" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.flipUnder(callback);
       }
    });
@@ -1163,6 +1165,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "rollDie" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.rollDieFct(callback);
       }
    });
@@ -1172,6 +1175,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "playActionCard" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.playActionCard(callback);
       }
    });
@@ -1187,6 +1191,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, callback) {
+         this.beforeBlockExecution();
          this.moveCraneColumn(column, callback);
       }
    });
@@ -1202,6 +1207,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, callback) {
+         this.beforeBlockExecution();
          this.moveCraneRow(column, callback);
       }
    });
@@ -1218,6 +1224,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, row, callback) {
+         this.beforeBlockExecution();
          this.moveCraneFct(column, row, callback);
       }
    });
@@ -1233,6 +1240,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(ligne, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.wordGameReadWord(ligne));
       }
    });
@@ -1248,6 +1256,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.wordGameReadExpectedWord(column));
       }
    });
@@ -1266,6 +1275,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(ligne, colonne, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.wordGamePlaceRow(ligne, colonne));
       }
    });
@@ -1281,6 +1291,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(player, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.p4PlayMove(player));
       }
    });
@@ -1297,6 +1308,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(player, column, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.p4WinVertical(player, column));
       }
    });
@@ -1313,6 +1325,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(player, column, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.p4WinHorizontal(player, column));
       }
    });
@@ -1329,6 +1342,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(player, column, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.p4WinDiagonalLeft(player, column));
       }
    });
@@ -1345,6 +1359,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(player, column, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback, this.p4WinDiagonalRight(player, column));
       }
    });
@@ -1354,6 +1369,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "attachedLetter", yieldsValue: 'string' },
       func: function(callback) {
+         this.beforeBlockExecution();
           this.callCallback(callback, this.attachedLetter());
       }
    });
@@ -1369,6 +1385,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(word, callback) {
+         this.beforeBlockExecution();
           this.callCallback(callback, this.reverseWord(word));
       }
    });
@@ -1378,6 +1395,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "moveToken" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.moveToken(callback);
       }
    });
@@ -1387,6 +1405,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "playMove" },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.playMove(callback);
       }
    });
@@ -1402,6 +1421,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(val, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback,this.makeAppear(val));
       }
    });
@@ -1417,6 +1437,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(arr, callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback,this.placeRow(arr));
       }
    });
@@ -1426,6 +1447,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "readObjective", yieldsValue: true },
       func: function(callback) {
+         this.beforeBlockExecution();
          this.callCallback(callback,this.readObjective());
       }
    });
@@ -1442,6 +1464,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(arr1, arr2, callback) {
+         this.beforeBlockExecution();
          this.wordlePlayMove(arr1,arr2,callback);
       }
    });
@@ -1451,6 +1474,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "puzzleDestroyFour"},
       func: function(callback) {
+         this.beforeBlockExecution();
          this.puzzleDestroyFour(callback);
       }
    });
@@ -1467,6 +1491,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(startColumn, nbColumns, callback) {
+         this.beforeBlockExecution();
           this.callCallback(callback, this.puzzleReadTarget(startColumn, nbColumns));
       }
    });
@@ -1476,6 +1501,7 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "puzzleNextPiece", yieldsValue: true },
       func: function(callback) {
+         this.beforeBlockExecution();
           this.callCallback(callback, this.puzzleNextPiece());
       }
    });
@@ -1492,6 +1518,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, heights, callback) {
+         this.beforeBlockExecution();
           this.callCallback(callback, this.puzzlePlacePiece(column, heights));
       }
    });
@@ -1508,7 +1535,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(column, row, callback) {
-          this.callCallback(callback, this.breakoutBuildAtPosition(column, row));
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutBuildAtPosition(column, row));
       }
    });
 
@@ -1517,7 +1545,8 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "breakoutReadColumn", yieldValue: true },
       func: function(callback) {
-          this.callCallback(callback, this.breakoutReadColumn());
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutReadColumn());
       }
    });
 
@@ -1526,7 +1555,8 @@ var getContext = function(display, infos, curLevel) {
       type: "actions",
       block: { name: "breakoutFindMarble", yieldValue: true },
       func: function(callback) {
-          this.callCallback(callback, this.breakoutFindMarble());
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutFindMarble());
       }
    });
 
@@ -1542,7 +1572,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(position, direction, callback) {
-          this.callCallback(callback, this.breakoutPositionDirection(position, direction));
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutPositionDirection(position, direction));
       }
    });
 
@@ -1558,7 +1589,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(position, direction, callback) {
-          this.callCallback(callback, this.breakoutHandleWallBounce(position, direction));
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutHandleWallBounce(position, direction));
       }
    });
 
@@ -1574,7 +1606,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
       func: function(position, direction, callback) {
-          this.callCallback(callback, this.breakoutHandleType2Bounce(position, direction));
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.breakoutHandleType2Bounce(position, direction));
       }
    });
 
@@ -1691,7 +1724,7 @@ var getContext = function(display, infos, curLevel) {
    var dust;
    var spotlightSrc = getImgPath(spotlightUrl);
 
-   var takeAnimDelay = 0.5*infos.actionDelay;
+   var takeAnimDelay = 0.5*infos.actionDelayStable;
 
    var paper;
 
@@ -1899,8 +1932,10 @@ var getContext = function(display, infos, curLevel) {
          $("#nbMoves").html(context.nbMoves);
       }
    }
+   
 
-   context.updateRunningState = function() {
+   context.beforeBlockExecution = function() {
+      infos.actionDelayStable = infos.actionDelay
       if(!this.programIsRunning){
          this.programIsRunning = true;
          redisplayEverything();
@@ -3510,7 +3545,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.shiftCrane = function(dir,callback) {
       this.displayMessage("");
-      // this.updateRunningState();
+      // this.beforeBlockExecution();
       var newPos = context.cranePos + dir;
       var ttg = context.tryToGo(newPos);
       if(ttg === true){
@@ -3532,7 +3567,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.shiftCraneY = function(dir,callback) {
       this.displayMessage("");
-      // this.updateRunningState();
+      // this.beforeBlockExecution();
       var newPosY = context.cranePosY + dir;
       var ttg = context.tryToGoY(newPosY);
       if(ttg === true){
@@ -3575,13 +3610,13 @@ var getContext = function(display, infos, curLevel) {
    context.take = function(callback) {
       this.displayMessage("");
       var topBlock = takeIntro();
-      takeAnimDelay = 0.5*infos.actionDelay;
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       
       if(context.display) {
          // resetCraneZOrder();
          // updateOverlay();
          resetAnimZOrder();
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.takeAnim(topBlock);
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
@@ -3597,8 +3632,8 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*takeAnimDelay*(topBlock.row + 1) + 2*infos.actionDelay; // additional actionDelay to prevent bug with shape anim
-         // var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelay;
+         var delay = 2*takeAnimDelay*(topBlock.row + 1) + 2*infos.actionDelayStable; // additional actionDelayStable to prevent bug with shape anim
+         // var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelayStable;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -3660,13 +3695,14 @@ var getContext = function(display, infos, curLevel) {
 
    context.takeAnimDown = function(topBlock,callback) {
       // console.log("takeAnimDown",this.cranePosY)
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       if(topBlock.row == this.cranePosY){
          resetAnimZOrder(true);
       }
       var craneAttr = getCraneAttr();
       var delay = Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY));
       // console.log(takeAnimDelay)
-      var aDelay = infos.actionDelay;
+      var aDelay = infos.actionDelayStable;
       var itemAttr = itemAttributes(topBlock);
       maskToFront();
 
@@ -3698,6 +3734,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.takeAnimUp = function(topBlock,newRow,callback) {
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       // console.log("takeAnimUp",topBlock.row,newRow)
       /* default crane row = -1 */
       var craneAttr = getCraneAttr();
@@ -3762,13 +3799,13 @@ var getContext = function(display, infos, curLevel) {
       this.displayMessage("");
       var topBlock = takeIntro(true,row);
       // console.log("takeAndFlip",topBlock.row)
-      takeAnimDelay = infos.actionDelay*0.5;
+      takeAnimDelay = infos.actionDelayStable*0.5;
       if(topBlock != 1){
          topBlock.hidden = !topBlock.hidden;
       }
       if(context.display) {
          resetAnimZOrder();
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.takeAndFlipAnim(topBlock);
             if(topBlock.num == 1){
                throw(context.strings.messages.nothingToTake);
@@ -3791,8 +3828,11 @@ var getContext = function(display, infos, curLevel) {
 
       // context.advanceTime(1);
       if(callback){
-         var delay = 2*Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY)) + 3*takeAnimDelay + 4*infos.actionDelay;
-         // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelay;
+         var delay = 2*Math.max(takeAnimDelay,takeAnimDelay*(topBlock.row - this.cranePosY)) + 3*takeAnimDelay + 4*infos.actionDelayStable;
+         if (delay > 0) {
+             delay += 100;  // TODO: fix the real bug and remove
+         }
+         // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelayStable;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -3829,7 +3869,7 @@ var getContext = function(display, infos, curLevel) {
       var cyLeftDown = craneAttr.cyLeft + deltaY - (this.cranePosY + 1)*cSide*scale;
       var cyRightDown = craneAttr.cyRight + deltaY - (this.cranePosY + 1)*cSide*scale;
       var cx = x + w/2;
-      var delay = infos.actionDelay;
+      var delay = infos.actionDelayStable;
 
       var deltaY = (item.row)*cSide*scale;
       var newItemY = (infos.topMargin + clawsOffsetY + craneItemOffset /*- catchOffsetY*/ + item.offsetY + markerH)*scale + deltaY;
@@ -3882,10 +3922,10 @@ var getContext = function(display, infos, curLevel) {
    context.putDown = function(callback) {
       this.displayMessage("");
       var { tempItem } = putDownIntro();
-      takeAnimDelay = 0.5*infos.actionDelay;
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       // console.log("putDown",tempItem.dark)
       if(context.display) {
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.putDownAnim(tempItem,-1);
          }else{
             var craneAttr = getCraneAttr();
@@ -3894,12 +3934,12 @@ var getContext = function(display, infos, curLevel) {
             resetAnimZOrder();
          }
       }
-      if(!context.display || !context.animate || infos.actionDelay == 0){
+      if(!context.display || !context.animate || infos.actionDelayStable == 0){
          context.crush();
       }
 
       if(callback){
-         var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelay;
+         var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelayStable;
          context.waitDelay(callback, null, delay);
       }
    };
@@ -3957,6 +3997,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.putDownAnimDown = function(item,currRow,callback) {
       var craneAttr = getCraneAttr();
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       var delay = takeAnimDelay*(item.row - currRow);
       var cSide = infos.cellSide;
       var itemAttr = itemAttributes(item);
@@ -3997,8 +4038,8 @@ var getContext = function(display, infos, curLevel) {
          }, dustDuration);
 
       });
-      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelay);
-      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelay,callback);
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,cyRightDown] },infos.actionDelayStable);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,cyLeftDown] },infos.actionDelayStable,callback);
 
       context.raphaelFactory.animate("animCrane_line_down_" + Math.random(), crane.line, animLineDown);
       context.raphaelFactory.animate("animCrane_shaft_down_" + Math.random(), crane.shaft, animShaftDown);
@@ -4030,6 +4071,7 @@ var getContext = function(display, infos, curLevel) {
    context.putDownAnimUp = function(row,callback) {
       // console.log("putDownAnimUp",row)
       var craneAttr = getCraneAttr();
+      takeAnimDelay = 0.5*infos.actionDelayStable;
       var delay = Math.max(takeAnimDelay,takeAnimDelay*(row - this.cranePosY));
       maskToFront();
 
@@ -4045,11 +4087,12 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.drop = function(callback) {
+       takeAnimDelay = 0.5*infos.actionDelayStable;
       this.displayMessage("");
       var { tempItem, topBlock } = putDownIntro(true);
 
       if(context.display) {
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.dropAnim(tempItem,topBlock,callback);
          }else{
             if(tempItem.isDie){
@@ -4063,7 +4106,7 @@ var getContext = function(display, infos, curLevel) {
       }else{
          rollDie(tempItem);
       }
-      if(!context.display || !context.animate || infos.actionDelay == 0){
+      if(!context.display || !context.animate || infos.actionDelayStable == 0){
          if(topBlock.num > 1 && tempItem.wrecking){
             context.destroy(topBlock);
          }
@@ -4099,6 +4142,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.dropAnim = function(item,topBlock,callback) {
+       takeAnimDelay = 0.5*infos.actionDelayStable;
       var craneAttr = getCraneAttr();
       var delay = takeAnimDelay*(item.row + 1);
       var itemAttr = itemAttributes(item);
@@ -4107,8 +4151,8 @@ var getContext = function(display, infos, curLevel) {
       var dustY = itemAttr.y + itemAttr.height - dustH*scale/2;
       var dustX = itemAttr.x + (itemAttr.width - dustW*scale)/2;
       
-      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelay);
-      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelay);
+      var animOpenRightClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxRight,craneAttr.cyRight] },infos.actionDelayStable);
+      var animOpenLeftClaw = new Raphael.animation({ transform: ["R",0,craneAttr.cxLeft,craneAttr.cyLeft] },infos.actionDelayStable);
       var animItemDown = new Raphael.animation({ y: itemAttr.y },delay,"<",function() {
          if(topBlock && topBlock.num > 1 && item.wrecking){
             context.destroy(topBlock);
@@ -4201,7 +4245,7 @@ var getContext = function(display, infos, curLevel) {
       item.faceItemElement = null;
       
       if(context.display) {
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.detachAnim();
          }else{
             var craneAttr = getCraneAttr();
@@ -4210,14 +4254,17 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(callback){
-         var delay = 2.7*infos.actionDelay;
+         var delay = 2.7*infos.actionDelayStable;
+         if (delay > 0) {
+             delay += 100; // TODO: fix the real bug and remove
+         }
          context.waitDelay(callback,null,delay);
       }
    };
 
    context.detachAnim = function() {
       var craneAttr = getCraneAttr();
-      var delay = infos.actionDelay;
+      var delay = infos.actionDelayStable;
       var deltaY = detachDeltaY*scale;
       var lineClip = Beav.Object.clone(craneAttr.lineClip);
       lineClip[3] = craneAttr.lineClip[3] + deltaY;
@@ -4288,7 +4335,7 @@ var getContext = function(display, infos, curLevel) {
       
       if(context.display) {
          // context.tool = 1;
-         if(context.animate && infos.actionDelay > 0){
+         if(context.animate && infos.actionDelayStable > 0){
             context.attachAnim(item);
          }else{
             redisplayItem(item);
@@ -4299,14 +4346,14 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(callback){
-         var delay = 2.5*infos.actionDelay;
+         var delay = 2.5*infos.actionDelayStable;
          context.waitDelay(callback,null,delay);
       }
    };
 
    context.attachAnim = function(item) {
       var craneAttr = getCraneAttr();
-      var delay = infos.actionDelay;
+      var delay = infos.actionDelayStable;
       var deltaY = detachDeltaY*scale;
 
       var offsetY = craneFaceItemOffsetY*scale;
@@ -4363,7 +4410,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.moveCraneColumn = function(column, callback) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        this.moveCrane(column - 1);
        if (callback) {
          context.waitDelay(callback,null,0);
@@ -4371,7 +4418,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.moveCraneRow = function(row, callback) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        this.moveCraneY(context.nbRows - row);
        if (callback) {
          context.waitDelay(callback,null,0);
@@ -4379,7 +4426,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.moveCraneFct = function(column, row, callback) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        this.moveCrane(column - 1);
        this.moveCraneY(context.nbRows - row);
        if (callback) {
@@ -4388,7 +4435,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.wordGamePlaceRow = function(sourceRow, destColumn) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
         for (var destRow = 1; destRow < 7; destRow++) {
             var sourceColumn = 8 - destRow
             this.moveCrane(sourceColumn - 1);
@@ -4401,7 +4448,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.wordGameReadWord = function(row) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        var word = "";
        for (var col = 2; col < 8; col++) {
            this.moveCraneFct(col, row);
@@ -4412,7 +4459,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.wordGameReadExpectedWord = function(column) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        var word = "";
        for (var numLetter = 1; numLetter < 7; numLetter++) {
            this.moveCraneFct(column, 7 - numLetter);
@@ -4422,7 +4469,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.p4PlayMove = function(player) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        this.moveCrane(10);
        this.moveCraneY(-1);
        this.flip();
@@ -4526,7 +4573,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.flipUnder = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       var col = this.cranePos;
       var row = this.cranePosY;
       this.take();
@@ -4544,8 +4591,8 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.rollDieFct = function(callback) {
-      var aDelay = infos.actionDelay;
-      infos.actionDelay = 0;
+      var aDelay = infos.actionDelayStable;
+      infos.actionDelayStable = 0;
       var col = this.cranePos;
       var row = this.cranePosY;
       this.placeMarker("A");
@@ -4553,15 +4600,15 @@ var getContext = function(display, infos, curLevel) {
       this.take();
       this.drop();
       this.goToMarker("A");
-      infos.actionDelay = aDelay;
+      infos.actionDelayStable = aDelay;
 
-      if(this.display && this.animate && infos.actionDelay > 0){
+      if(this.display && this.animate && infos.actionDelayStable > 0){
          this.dieValIndex--;
          this.rollDieAnim();
       }
 
       if(callback){
-         var delay = 2*infos.actionDelay;
+         var delay = 2*infos.actionDelayStable;
          context.waitDelay(callback,null,delay);
       }
    };
@@ -4577,7 +4624,7 @@ var getContext = function(display, infos, curLevel) {
       redisplayItem(item);
 
       var newY = a.y - infos.cellSide*scale;
-      var del = infos.actionDelay;
+      var del = infos.actionDelayStable;
 
       var anim1 = new Raphael.animation({ "y": newY },del,"<",function() {
          context.raphaelFactory.animate("animDie2", item.element, anim2);
@@ -4590,7 +4637,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.playActionCard = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       this.take()
       // var col = this.cranePos;
       var topBlockID = this.getTopBlock();
@@ -4612,7 +4659,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.moveToken = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       this.rollDieFct();
       var val = this.getDieValue();
       for(var i = 0; i < val; i++){
@@ -4635,7 +4682,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.playMove = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       this.moveToken();
       this.take();
       do{
@@ -4651,7 +4698,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.makeAppear = function(val) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       var col = this.cranePos;
       do{
          this.shiftCrane(1);
@@ -4663,7 +4710,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.placeRow = function(arr) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       this.moveCraneColumn(1);
       for(var shapeID of arr){
          this.conjure(shapeID);
@@ -4673,7 +4720,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.readObjective = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       for(var i = 0; i < 12; i++){
          this.shiftCrane(1);
       }
@@ -4691,7 +4738,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.wordlePlayMove = function(shapes, objective, callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       this.placeRow(shapes);
       if(Beav.Object.eq(shapes,objective)){
          this.displayMessage("Vous avez gagné !");
@@ -4703,7 +4750,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.puzzleDestroyFour = function(callback) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       var col = this.cranePos + 1;
       for (var iBlock = 0; iBlock < 4; iBlock++) {
           this.take()
@@ -4717,7 +4764,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.puzzleReadTarget = function(startCol, nbColumns) {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
       var target = []
       for (var iBlock = 0; iBlock < nbColumns; iBlock++) {
           this.moveCraneColumn(startCol + iBlock)
@@ -4727,7 +4774,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.puzzleNextPiece = function() {
-      infos.actionDelay = 0;
+      infos.actionDelayStable = 0;
        var heights = [0, 0];
        for (var col = 0; col < 2; col++) {
            for (var row = 0; row < 2; row++) {
@@ -4747,7 +4794,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.puzzlePlacePiece = function(column, heights) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        for (var col = 0; col < 2; col++) {
            for (var row = 0; row < heights[col]; row++) {
                this.moveCraneColumn(col + 1);
@@ -4759,14 +4806,14 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.breakoutBuildAtPosition = function(column, row) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        this.conjureFaceItem(2)
        this.moveCraneFct(column, row);
        this.attach();
    }
 
    context.breakoutReadColumn = function() {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        var types = [0, 0, 0, 0, 0, 0, 0];
        var col = this.cranePos + 1;
        for (var row = 6; row >= 3; row--) {
@@ -4778,7 +4825,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.breakoutFindMarble = function() {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        for (var row = 2; row < 7; row++) {
            for (var col = 2; col < 12; col++) {
                this.moveCraneFct(col, row);
@@ -4790,7 +4837,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.breakoutPositionDirection = function(position, direction) {
-       infos.actionDelay = 0;
+       infos.actionDelayStable = 0;
        if (direction == 0) {
            return [position[0] - 1, position[1] - 1];
        } else if (direction == 1) {
@@ -4842,7 +4889,7 @@ var getContext = function(display, infos, curLevel) {
       this.craneContent = null;
       if(this.display){
          resetAnimZOrder();
-         if(this.animate && infos.actionDelay > 0){
+         if(this.animate && infos.actionDelayStable > 0){
             this.destroyFaceItemAnim(tempItem);
          }else{
             tempItem.element.remove()
@@ -4852,14 +4899,14 @@ var getContext = function(display, infos, curLevel) {
       }
 
       if(callback){
-         var delay = 2*infos.actionDelay;
+         var delay = 2*infos.actionDelayStable;
          context.waitDelay(callback,null,delay);
       }
    };
 
    context.destroyFaceItemAnim = function(tempItem) {
       var craneAttr = getCraneAttr();
-      var delay = infos.actionDelay;
+      var delay = infos.actionDelayStable;
       var deltaY = detachDeltaY*scale;
 
       var offsetY = craneFaceItemOffsetY*scale;
@@ -4928,8 +4975,8 @@ var getContext = function(display, infos, curLevel) {
       
       if(context.display) {
          var craneAttr = getCraneAttr();
-         if(infos.actionDelay > 0) {
-            var delay = infos.actionDelay*Math.abs(newCol - oldPos);
+         if(infos.actionDelayStable > 0) {
+            var delay = infos.actionDelayStable*Math.abs(newCol - oldPos);
             if(animate && context.animate) {
                var anim = new Raphael.animation({ x: craneAttr.xWheels },delay,function() {
                   context.addSound("crane_stop");
@@ -4978,7 +5025,7 @@ var getContext = function(display, infos, curLevel) {
       
       // context.advanceTime(1);
       if(callback){
-         context.waitDelay(callback, null, delay + infos.actionDelay); // additional actionDelay to prevent bug with shape anim
+         context.waitDelay(callback, null, delay + infos.actionDelayStable); // additional actionDelayStable to prevent bug with shape anim
       }
    };
 
@@ -4991,10 +5038,10 @@ var getContext = function(display, infos, curLevel) {
       if(context.display) {
          var craneAttr = getCraneAttr();
          var content = context.craneContent;
-         if(infos.actionDelay > 0) {
+         if(infos.actionDelayStable > 0) {
             updateTool();
-            var delay = infos.actionDelay*Math.abs(newRow - oldPos);
-            // console.log(infos.actionDelay,delay)
+            var delay = infos.actionDelayStable*Math.abs(newRow - oldPos);
+            // console.log(infos.actionDelayStable,delay)
             if(animate && context.animate) {
                var animLine = new Raphael.animation({ "clip-rect": craneAttr.lineClip },delay);
                var animSensor = new Raphael.animation({ y: craneAttr.ySensor },delay);
@@ -5671,7 +5718,7 @@ var robotEndFunctionGenerator = {
    var contextParams = {
       none: {
          hideSaveOrLoad: true,
-         actionDelay: 200,
+         actionDelayStable: 200,
          ignoreInvalidMoves: false,
          checkEndEveryTurn: false,
          cellSide: 60
