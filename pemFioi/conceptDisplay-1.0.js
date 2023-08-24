@@ -31,8 +31,9 @@ function conceptDisplay() {
 
   if(!targetDiv.length) { return; }
 
-  $('body > div').hide();
+  $('body > div, div[data-id]').hide();
   targetDiv.show();
+  targetDiv.parents().show();
   if(lang) {
     var allLangDivs = targetDiv.find('[data-lang]');
     var langDivs = allLangDivs.filter(function(i, e) {
