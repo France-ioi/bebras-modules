@@ -1088,7 +1088,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "displayMessage", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": "message" },
+               { "type": "field_input", "name": "PARAM_0", "text": "message" },
             ]
          }
       },
@@ -1432,7 +1432,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "placeRow", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": "[]" },
+               { "type": "field_input", "name": "PARAM_0", "text": "[]" },
             ]
          }
       },
@@ -1458,8 +1458,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "wordlePlayMove", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": "[]" },
-               { "type": "field_input", "name": "PARAM_1", "value": "[]" },
+               { "type": "field_input", "name": "PARAM_0", "text": "[]" },
+               { "type": "field_input", "name": "PARAM_1", "text": "[]" },
             ]
          }
       },
@@ -1485,8 +1485,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "puzzleReadTarget", yieldsValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": 1 },
-               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+               { "type": "field_input", "name": "PARAM_0", "text": 1 },
+               { "type": "field_input", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1512,8 +1512,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "puzzlePlacePiece", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": [] },
-               { "type": "field_input", "name": "PARAM_1", "value": [] },
+               { "type": "field_input", "name": "PARAM_0", "text": [] },
+               { "type": "field_input", "name": "PARAM_1", "text": [] },
             ]
          }
       },
@@ -1529,8 +1529,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "breakoutBuildAtPosition", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": [] },
-               { "type": "field_input", "name": "PARAM_1", "value": [] },
+               { "type": "field_input", "name": "PARAM_0", "text": [] },
+               { "type": "field_input", "name": "PARAM_1", "text": [] },
             ]
          }
       },
@@ -1566,8 +1566,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "breakoutPositionDirection", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": [] },
-               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+               { "type": "field_input", "name": "PARAM_0", "text": [] },
+               { "type": "field_input", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1583,8 +1583,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "breakoutHandleWallBounce", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": [] },
-               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+               { "type": "field_input", "name": "PARAM_0", "text": [] },
+               { "type": "field_input", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1600,8 +1600,8 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "breakoutHandleType2Bounce", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "value": [] },
-               { "type": "field_input", "name": "PARAM_1", "value": 1 },
+               { "type": "field_input", "name": "PARAM_0", "text": [] },
+               { "type": "field_input", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
