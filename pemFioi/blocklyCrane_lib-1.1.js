@@ -1619,6 +1619,16 @@ var getContext = function(display, infos, curLevel) {
          sensors: []
       }
    };
+
+   // TODO: replace concept base URL by the correct URL, and enter the appropriate categories
+   var conceptBaseUrl = 'https://fr.wikipedia.org';
+   context.conceptList = [
+      {id: 'category1', name: 'Catégorie 1', isBase: true, isCategory: true},
+      {id: 'child1', name: 'Enfant 1-1', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category1'},
+      {id: 'child2', name: 'Enfant 1-2', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category1'},
+      {id: 'category2', name: 'Catégorie 2', isBase: true, isCategory: true},
+      {id: 'child3', name: 'Enfant 2-1', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category2'},
+   ];
    
    for(var command in infos.newBlocks) {
       cmd = infos.newBlocks[command];
