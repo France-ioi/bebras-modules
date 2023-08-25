@@ -2595,9 +2595,14 @@ var getContext = function(display, infos, curLevel) {
 
       // var src = (infos.craneImgPath) ?  Object.assign(Beav.Object.clone(infos.craneSrc),infos.craneImgPath) : infos.craneSrc;
       var src = infos.craneSrc;
+      var prefix = "crane/";
+      if (infos.craneImgPath) {
+          prefix = infos.craneImgPath;
+      }
       var path = {};
       for(var key in src){
-         path[key] = (infos.craneImgPath && infos.craneImgPath[key]) ? infos.craneImgPath[key] : getImgPath(src[key]);
+        path[key] = getImgPath(prefix + src[key]);
+        //(infos.craneImgPath && infos.craneImgPath[key]) ? infos.craneImgPath[key] : 
       }
       crane.rail = paper.set();
       for(var iCol = 0; iCol < nbCol; iCol++){
@@ -4436,6 +4441,8 @@ var getContext = function(display, infos, curLevel) {
 
    context.wordGamePlaceRow = function(sourceRow, destColumn) {
        infos.actionDelayStable = 0;
+       this.moveCraneColumn(destColumn);
+       this.placeSpotlight();
         for (var destRow = 1; destRow < 7; destRow++) {
             var sourceColumn = 8 - destRow
             this.moveCrane(sourceColumn - 1);
@@ -4461,6 +4468,8 @@ var getContext = function(display, infos, curLevel) {
    context.wordGameReadExpectedWord = function(column) {
        infos.actionDelayStable = 0;
        var word = "";
+       this.moveCraneColumn(column);
+       this.placeSpotlight();
        for (var numLetter = 1; numLetter < 7; numLetter++) {
            this.moveCraneFct(column, 7 - numLetter);
            word += this.expectedLetter()
@@ -5753,9 +5762,9 @@ var robotEndFunctionGenerator = {
             craneItemOffset: 10
          },
          craneSrc: {
-            rail: /*imgPath+*/"crane/rail.png",
-            wheels: /*imgPath+*/"crane/wheels.png",
-            line: /*imgPath+*/"crane/line.png",
+            rail: /*imgPath+*/"rail.png",
+            wheels: /*imgPath+*/"wheels.png",
+            line: /*imgPath+*/"line.png",
             leftClaw: /*imgPath+*/"crane/left_claw.png",
             rightClaw: /*imgPath+*/"crane/right_claw.png",
             sensor: /*imgPath+*/"crane/sensor.png"
@@ -5821,13 +5830,13 @@ var robotEndFunctionGenerator = {
             craneItemOffset: 12,
          },
          craneSrc: {
-            rail: /*imgPath+*/"crane/rail.png",
-            wheels: /*imgPath+*/"crane/crane_wheels.png",
-            line: /*imgPath+*/"crane/crane_line.png",
-            leftClaw: /*imgPath+*/"crane/crane_left_claw_open.png",
-            rightClaw: /*imgPath+*/"crane/crane_right_claw_open.png",
-            shaft: /*imgPath+*/"crane/crane_shaft.png",
-            sensor: /*imgPath+*/"crane/sensor.png"
+            rail: /*imgPath+*/"rail.png",
+            wheels: /*imgPath+*/"crane_wheels.png",
+            line: /*imgPath+*/"crane_line.png",
+            leftClaw: /*imgPath+*/"crane_left_claw_open.png",
+            rightClaw: /*imgPath+*/"crane_right_claw_open.png",
+            shaft: /*imgPath+*/"crane_shaft.png",
+            sensor: /*imgPath+*/"sensor.png"
          },
          craneZOrder: {
             wheels: 1,
@@ -5935,13 +5944,13 @@ var robotEndFunctionGenerator = {
             craneFaceItemOffsetY: -28 // difference between crane position at the center of the cell and position to catch face item
          },
          craneSrc: {
-            rail: "crane/rail.png",
-            wheels: "crane/crane_wheels.png",
-            line: "crane/crane_line.png",
-            leftClaw: "crane/crane_left_claw_open.png",
-            rightClaw: "crane/crane_right_claw_open.png",
-            shaft: "crane/crane_shaft.png",
-            sensor: "crane/sensor.png"
+            rail: "rail.png",
+            wheels: "crane_wheels.png",
+            line: "crane_line.png",
+            leftClaw: "crane_left_claw_open.png",
+            rightClaw: "crane_right_claw_open.png",
+            shaft: "crane_shaft.png",
+            sensor: "sensor.png"
          },
          craneZOrder: {
             wheels: 1,
