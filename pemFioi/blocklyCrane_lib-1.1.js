@@ -200,7 +200,7 @@ var getContext = function(display, infos, curLevel) {
                right: "@() Déplace la grue d'une case vers la droite.",
                take: "@() Prend la brique se trouvant sous la grue.",
                putDown: "@() Pose la brique transportée par la grue.",
-               drop: "@() Lâche le boulet de démolition porté par la grue.",
+               drop: "@() Lâche la brique portée par la grue.",
                colHeight: "@() Retourne le nombre de briques se trouvant dans la colonne sous la grue.",
                craneColumn: "@() Retourne le numéro de la colonne de la grue",
                craneRow: "@() Retourne le numéro de la ligne de la grue",
@@ -218,8 +218,8 @@ var getContext = function(display, infos, curLevel) {
                topBlockBroken: "@() Retourne True si la brique se trouvant au sommet de la colonne où se trouve la grue est cassée, et False sinon.",
                carriedBlockBroken: "@() Retourne True si la brique actuellement transportée par la grue est cassée, et False sinon.", 
 
-               up: "@() Déplace l'outil d'une case vers le haut.",
-               down: "@() Déplace l'outil d'une case vers le bas.",           
+               up: "@() Déplace le grappin d'une case vers le haut.",
+               down: "@() Déplace le grappin d'une case vers le bas.",           
                readBlock: "@() Retourne le numéro du type.",
                readFaceItem: "@() Retourne le numéro de l'objet de façade.",
                dieValue: "@() Retourne la valeur du dé.",
@@ -271,7 +271,7 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                yLimit: function(up) {
-                  var str = "L'outil ne peut pas "
+                  var str = "Le grappin ne peut pas "
                   str += (up) ? "monter plus haut." : "descendre plus bas.";
                   return str
                },
@@ -533,7 +533,7 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                yLimit: function(up) {
-                  var str = "L'outil ne peut pas "
+                  var str = "Le grappin ne peut pas "
                   str += (up) ? "monter plus haut." : "descendre plus bas.";
                   return str
                },
@@ -1620,14 +1620,53 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   // TODO: replace concept base URL by the correct URL, and enter the appropriate categories
-   var conceptBaseUrl = 'https://fr.wikipedia.org';
+   var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
    context.conceptList = [
-      {id: 'category1', name: 'Catégorie 1', isBase: true, isCategory: true},
-      {id: 'child1', name: 'Enfant 1-1', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category1'},
-      {id: 'child2', name: 'Enfant 1-2', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category1'},
-      {id: 'category2', name: 'Catégorie 2', isBase: true, isCategory: true},
-      {id: 'child3', name: 'Enfant 2-1', url: conceptBaseUrl+'#printer_introduction', isBase: true, categoryId: 'category2'},
+      {id: 'crane_actions', name: 'Actions de la grue', isBase: true, isCategory: true},
+      {id: 'left', name: 'gauche()', url: conceptBaseUrl+'#left', python: ['left'], categoryId: 'crane_actions'},
+      {id: 'right', name: 'droite()', url: conceptBaseUrl+'#right', python: ['right'], categoryId: 'crane_actions'},
+      {id: 'up', name: 'monter()', url: conceptBaseUrl+'#up', python: ['up'], categoryId: 'crane_actions'},
+      {id: 'down', name: 'descendre()', url: conceptBaseUrl+'#down', python: ['down'], categoryId: 'crane_actions'},
+      {id: 'take', name: 'prendre()', url: conceptBaseUrl+'#take', python: ['take'], categoryId: 'crane_actions'},
+      {id: 'putDown', name: 'poser()', url: conceptBaseUrl+'#putDown', python: ['putDown'], categoryId: 'crane_actions'},
+      {id: 'drop', name: 'lacher()', url: conceptBaseUrl+'#drop', python: ['drop'], categoryId: 'crane_actions'},
+      {id: 'flip', name: 'retourner()', url: conceptBaseUrl+'#flip', python: ['flip'], categoryId: 'crane_actions'},
+      {id: 'placeSpotlight', name: 'placerProjecteur()', url: conceptBaseUrl+'#placeSpotlight', python: ['placeSpotlight'], categoryId: 'crane_actions'},
+      {id: 'goToMarker', name: 'allerAuMarqueur(nom)', url: conceptBaseUrl+'#goToMarker', python: ['goToMarker'], categoryId: 'crane_actions'},
+      {id: 'attach', name: 'attacherObjet()', url: conceptBaseUrl+'#attach', python: ['attach'], categoryId: 'crane_actions'},
+      {id: 'detach', name: 'detacherObjet()', url: conceptBaseUrl+'#detach', python: ['detach'], categoryId: 'crane_actions'},
+      {id: 'conjure', name: 'faireApparaitre(type)', url: conceptBaseUrl+'#conjure', python: ['conjure'], categoryId: 'crane_actions'},
+      {id: 'conjureFaceItem', name: 'faireApparaitreObjet(type)', url: conceptBaseUrl+'#conjureFaceItem', python: ['conjureFaceItem'], categoryId: 'crane_actions'},
+      {id: 'destroyFaceItem', name: 'detruireObjet()', url: conceptBaseUrl+'#destroyFaceItem', python: ['destroyFaceItem'], categoryId: 'crane_actions'},
+      {id: 'drawShape', name: 'dessinerForme(forme, couleur)', url: conceptBaseUrl+'#drawShape', python: ['drawShape'], categoryId: 'crane_actions'},
+      {id: 'eraseShape', name: 'effacerForme()', url: conceptBaseUrl+'#drawShape', python: ['drawShape'], categoryId: 'crane_actions'},
+      
+      {id: 'crane_sensors', name: 'Capteurs', isBase: true, isCategory: true},
+
+      {id: 'colHeight', name: 'hauteurColonne()', url: conceptBaseUrl+'#colHeight', python: ['colHeight'], categoryId: 'crane_sensors'},
+      {id: 'craneColumn', name: 'colonneGrue()', url: conceptBaseUrl+'#craneColumn', python: ['craneColumn'], categoryId: 'crane_sensors'},
+      {id: 'craneRow', name: 'ligneGrue()', url: conceptBaseUrl+'#craneRow', python: ['craneRow'], categoryId: 'crane_sensors'},
+      {id: 'placeMarker', name: 'placerMarqueur(nom)', url: conceptBaseUrl+'#placeMarker', python: ['placeMarker'], categoryId: 'crane_sensors'},
+      {id: 'onMarker', name: 'surMarqueur(nom)', url: conceptBaseUrl+'#onMarker', python: ['onMarker'], categoryId: 'crane_sensors'},
+      {id: 'expectedBlock', name: 'briqueAttendue()', url: conceptBaseUrl+'#expectedBlock', python: ['expectedBlock'], categoryId: 'crane_sensors'},
+      {id: 'expectedBlockAt', name: 'briqueAttendueA(colonne, ligne)', url: conceptBaseUrl+'#expectedBlockAt', python: ['expectedBlockAt'], categoryId: 'crane_sensors'},
+      {id: 'expectedBlockInCell', name: 'briqueAttendueDansCase()', url: conceptBaseUrl+'#expectedBlockInCell', python: ['expectedBlockInCell'], categoryId: 'crane_sensors'},
+      {id: 'topBlock', name: 'briqueDuDessus()', url: conceptBaseUrl+'#topBlock', python: ['topBlock'], categoryId: 'crane_sensors'},
+      {id: 'blockAt', name: 'briqueA()', url: conceptBaseUrl+'#blockAt', python: ['blockAt'], categoryId: 'crane_sensors'},
+      {id: 'brokenBlockAt', name: 'briqueCasseeA()', url: conceptBaseUrl+'#brokenBlockAt', python: ['brokenBlockAt'], categoryId: 'crane_sensors'},
+      {id: 'carriedBlock', name: 'briqueTransportee()', url: conceptBaseUrl+'#carriedBlock', python: ['carriedBlock'], categoryId: 'crane_sensors'},
+      {id: 'topBlockBroken', name: 'briqueDuDessusCassee()', url: conceptBaseUrl+'#topBlockBroken', python: ['topBlockBroken'], categoryId: 'crane_sensors'},
+      {id: 'carriedBlockBroken', name: 'briqueTransporteeCassee()', url: conceptBaseUrl+'#carriedBlockBroken', python: ['carriedBlockBroken'], categoryId: 'crane_sensors'},
+      {id: 'readBlock', name: 'lireBrique()', url: conceptBaseUrl+'#readBlock', python: ['readBlock'], categoryId: 'crane_sensors'},
+      {id: 'readFaceItem', name: 'lireTypeAttache()', url: conceptBaseUrl+'#readFaceItem', python: ['readFaceItem'], categoryId: 'crane_sensors'},
+      {id: 'dieValue', name: 'valeurDe()', url: conceptBaseUrl+'#dieValue', python: ['dieValue'], categoryId: 'crane_sensors'},
+      {id: 'topBlockSide', name: 'sensBriqueDuDessus()', url: conceptBaseUrl+'#topBlockSide', python: ['topBlockSide'], categoryId: 'crane_sensors'},
+      {id: 'readShape', name: 'lireForme()', url: conceptBaseUrl+'#readShape', python: ['readShape'], categoryId: 'crane_sensors'},
+      {id: 'readColor', name: 'lireCouleur()', url: conceptBaseUrl+'#readColor', python: ['readColor'], categoryId: 'crane_sensors'},
+
+      {id: 'display', name: 'Affichage', isBase: true, isCategory: true},
+      {id: 'displayMessage', name: 'afficheMessage(message)', url: conceptBaseUrl+'#displayMessage', python: ['displayMessage'], categoryId: 'display'},
+      {id: 'log', name: 'log(message)', url: conceptBaseUrl+'#log', python: ['log'], categoryId: 'display'},
    ];
    
    for(var command in infos.newBlocks) {
@@ -2265,7 +2304,7 @@ var getContext = function(display, infos, curLevel) {
       var col = this.cranePos;
       var topBlock = this.findTopBlock(col);
       if(!topBlock){
-         return 0
+         return false;
       }
       return (topBlock.broken === true)
    };
