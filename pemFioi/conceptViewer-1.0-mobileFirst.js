@@ -455,11 +455,17 @@ function conceptsFill(baseConcepts, allConcepts) {
       if(!curConcept.python) {
         curConcept.python = fullConcept.python;
       }
+      if(!curConcept.isCategory) {
+        curConcept.isCategory = fullConcept.isCategory;
+      }
+      if(!curConcept.categoryId) {
+        curConcept.categoryId = fullConcept.categoryId;
+      }
       if(!fullConcept.ignore) {
         concepts.push(curConcept);
       }
       delete baseConceptsById[fullConcept.id];
-    } else if(fullConcept.isBase && baseConceptsById['base']) {
+    } else if((fullConcept.isBase && baseConceptsById['base']) || fullConcept.isCategory) {
       concepts.push(fullConcept);
     }
   }
