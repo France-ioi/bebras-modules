@@ -22,6 +22,8 @@ $(document).ready(function() {
       };
     });
 
+    var taskSuccessMessage = $('#taskSuccessMessage').html();
+
     var additionalOptions = window.taskData.codecastParameters ? window.taskData.codecastParameters : {};
     if (window.codecastPreload) {
       additionalOptions.preload = true;
@@ -57,6 +59,7 @@ $(document).ready(function() {
       task: window.taskData,
       taskInstructions: taskInstructionsHtml,
       taskHints: hints,
+      taskSuccessMessage: taskSuccessMessage,
     }, additionalOptions, window.codecastPreload ? window.codecastPreload : {});
 
     Codecast.start(codecastParameters);
