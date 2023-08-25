@@ -1620,7 +1620,7 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
+   var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/index_tralalere_s3.html';
    context.conceptList = [
       {id: 'crane_actions', name: 'Actions de la grue', isBase: true, isCategory: true},
       {id: 'left', name: 'gauche()', url: conceptBaseUrl+'#left', python: ['left'], categoryId: 'crane_actions'},
