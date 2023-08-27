@@ -390,13 +390,15 @@ function getConceptViewerBaseUrl() {
 }
 
 
-function getConceptViewerBaseConcepts() {
+function getConceptViewerBaseConcepts(baseUrl) {
     // Get base concepts in the default help
-    var baseUrl = getConceptViewerBaseUrl();
-    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it' || window.stringsLanguage == 'en') {
-        baseUrl += 'index_' + window.stringsLanguage + '.html';
-    } else {
-        baseUrl += 'index.html';
+    if(!baseUrl) {
+       var baseUrl = getConceptViewerBaseUrl();
+       if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it' || window.stringsLanguage == 'en') {
+          baseUrl += 'index_' + window.stringsLanguage + '.html';
+       } else {
+          baseUrl += 'index.html';
+       }
     }
     var baseConcepts = [
         {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
