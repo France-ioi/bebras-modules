@@ -18,7 +18,8 @@ $(document).ready(function() {
         noHintId: elm.getAttribute('data-no-hint-id') ? elm.getAttribute('data-no-hint-id') : undefined,
         disablePrevious: elm.hasAttribute('data-disable-previous'),
         disableNext: elm.hasAttribute('data-disable-next'),
-        immediate: elm.hasAttribute('data-immediate')
+        immediate: elm.hasAttribute('data-immediate'),
+        levels: elm.hasAttribute('data-levels') ? elm.getAttribute('data-levels').split() : undefined,
       };
     });
 
