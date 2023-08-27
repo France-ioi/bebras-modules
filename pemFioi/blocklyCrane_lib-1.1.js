@@ -1621,6 +1621,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/index_tralalere_s3.html';
+   //var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
    context.conceptList = [
       {id: 'crane_actions', name: 'Actions de la grue', isBase: true, isCategory: true},
       {id: 'left', name: 'gauche()', url: conceptBaseUrl+'#left', python: ['left'], categoryId: 'crane_actions'},
@@ -1667,6 +1668,41 @@ var getContext = function(display, infos, curLevel) {
       {id: 'display', name: 'Affichage', isBase: true, isCategory: true},
       {id: 'displayMessage', name: 'afficheMessage(message)', url: conceptBaseUrl+'#displayMessage', python: ['displayMessage'], categoryId: 'display'},
       {id: 'log', name: 'log(message)', url: conceptBaseUrl+'#log', python: ['log'], categoryId: 'display'},
+
+      {id: 'customFunctions', name: 'Vos fonctions', isBase: true, isCategory: true},
+      {id: 'flipUnder', name: 'retournerDessous()', url: conceptBaseUrl+'#flipUnder', python: ['flipUnder'], categoryId: 'customFunctions'},
+      {id: 'rollDie', name: 'tirerAuDe()', url: conceptBaseUrl+'#rollDie', python: ['rollDie'], categoryId: 'customFunctions'},
+      {id: 'playActionCard', name: 'jouerActionCarte()', url: conceptBaseUrl+'#playActionCard', python: ['playActionCard'], categoryId: 'customFunctions'},
+      {id: 'moveCraneColumn', name: 'allerColonne()', url: conceptBaseUrl+'#moveCraneColumn', python: ['moveCraneColumn'], categoryId: 'customFunctions'},
+      {id: 'moveCraneRow', name: 'allerLigne()', url: conceptBaseUrl+'#moveCraneRow', python: ['moveCraneRow'], categoryId: 'customFunctions'},
+      {id: 'moveCrane', name: 'placerGrappin()', url: conceptBaseUrl+'#moveCrane', python: ['moveCrane'], categoryId: 'customFunctions'},
+      {id: 'p4PlayMove', name: 'jouerCoup()', url: conceptBaseUrl+'#p4PlayMove', python: ['p4PlayMove'], categoryId: 'customFunctions'},
+      {id: 'p4WinVertical', name: 'gagneVertical()', url: conceptBaseUrl+'#p4WinVertical', python: ['p4WinVertical'], categoryId: 'customFunctions'},
+      {id: 'p4WinHorizontal', name: 'gagneHorizontal()', url: conceptBaseUrl+'#p4WinHorizontal', python: ['p4WinHorizontal'], categoryId: 'customFunctions'},
+      {id: 'p4WinDiagonalLeft', name: 'gagneDiagonaleGauche()', url: conceptBaseUrl+'#p4WinDiagonalLeft', python: ['p4WinDiagonalLeft'], categoryId: 'customFunctions'},
+      {id: 'p4WinDiagonalRight', name: 'gagneDiagonaleDroite()', url: conceptBaseUrl+'#p4WinDiagonalRight', python: ['p4WinDiagonalRight'], categoryId: 'customFunctions'},
+      {id: 'attachedLetter', name: 'lettreAttachee()', url: conceptBaseUrl+'#attachedLetter', python: ['attachedLetter'], categoryId: 'customFunctions'},
+      {id: 'wordGamePlaceRow', name: 'placerEnColonne()', url: conceptBaseUrl+'#wordGamePlaceRow', python: ['wordGamePlaceRow'], categoryId: 'customFunctions'},
+      {id: 'wordGameReadWord', name: 'lireMot()', url: conceptBaseUrl+'#wordGameReadWord', python: ['wordGameReadWord'], categoryId: 'customFunctions'},
+      {id: 'wordGameReadExpectedWord', name: 'lireMotAttendu()', url: conceptBaseUrl+'#wordGameReadExpectedWord', python: ['wordGameReadExpectedWord'], categoryId: 'customFunctions'},
+      {id: 'reverseWord', name: 'inverserMot()', url: conceptBaseUrl+'#reverseWord', python: ['reverseWord'], categoryId: 'customFunctions'},
+      {id: 'moveToken', name: 'deplacerPion()', url: conceptBaseUrl+'#moveToken', python: ['moveToken'], categoryId: 'customFunctions'},
+      {id: 'playMove', name: 'jouerCoup()', url: conceptBaseUrl+'#playMove', python: ['playMove'], categoryId: 'customFunctions'},
+      {id: 'makeAppear', name: 'faireApparaitre()', url: conceptBaseUrl+'#makeAppear', python: ['makeAppear'], categoryId: 'customFunctions'},
+      {id: 'placeRow', name: 'placerRangee()', url: conceptBaseUrl+'#placeRow', python: ['placeRow'], categoryId: 'customFunctions'},
+      {id: 'readObjective', name: 'lireObjectif()', url: conceptBaseUrl+'#readObjective', python: ['readObjective'], categoryId: 'customFunctions'},
+      {id: 'wordlePlayMove', name: 'jouerCoup()', url: conceptBaseUrl+'#wordlePlayMove', python: ['wordlePlayMove'], categoryId: 'customFunctions'},
+      {id: 'puzzleDestroyFour', name: 'detruireQuatre()', url: conceptBaseUrl+'#puzzleDestroyFour', python: ['puzzleDestroyFour'], categoryId: 'customFunctions'},
+      {id: 'puzzleReadTarget', name: 'lireObjectif()', url: conceptBaseUrl+'#puzzleReadTarget', python: ['puzzleReadTarget'], categoryId: 'customFunctions'},
+      {id: 'puzzleNextPiece', name: 'prochainePiece()', url: conceptBaseUrl+'#puzzleNextPiece', python: ['puzzleNextPiece'], categoryId: 'customFunctions'},
+      {id: 'puzzlePlacePiece', name: 'placerPiece()', url: conceptBaseUrl+'#puzzlePlacePiece', python: ['puzzlePlacePiece'], categoryId: 'customFunctions'},
+      {id: 'breakoutBuildAtPosition', name: 'construireAPosition()', url: conceptBaseUrl+'#breakoutBuildAtPosition', python: ['breakoutBuildAtPosition'], categoryId: 'customFunctions'},
+      {id: 'breakoutReadColumn', name: 'lireColonne()', url: conceptBaseUrl+'#breakoutReadColumn', python: ['breakoutReadColumn'], categoryId: 'customFunctions'},
+      {id: 'breakoutFindMarble', name: 'trouverBille()', url: conceptBaseUrl+'#breakoutFindMarble', python: ['breakoutFindMarble'], categoryId: 'customFunctions'},
+      {id: 'breakoutPositionDirection', name: 'positionDirection()', url: conceptBaseUrl+'#breakoutPositionDirection', python: ['breakoutPositionDirection'], categoryId: 'customFunctions'},
+      {id: 'breakoutHandleWallBounce', name: 'directionRebondMur()', url: conceptBaseUrl+'#breakoutHandleWallBounce', python: ['breakoutHandleWallBounce'], categoryId: 'customFunctions'},
+      {id: 'breakoutHandleType2Bounce', name: 'directionRebondBrique2()', url: conceptBaseUrl+'#breakoutHandleType2Bounce', python: ['breakoutHandleType2Bounce'], categoryId: 'customFunctions'},
+
    ];
    
    for(var command in infos.newBlocks) {
@@ -5277,7 +5313,7 @@ var getContext = function(display, infos, curLevel) {
       if(this.display){
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
-         updateOverlay();
+         //updateOverlay();
       }
    };
 
@@ -5298,7 +5334,7 @@ var getContext = function(display, infos, curLevel) {
          this.craneContent = { type: "faceItem", id, element, offsetY: 32, offsetX: 0 };
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
-         updateOverlay();
+         //updateOverlay();
       }else{
          this.craneContent = { type: "faceItem", id, offsetY: 32, offsetX: 0 };
       }
