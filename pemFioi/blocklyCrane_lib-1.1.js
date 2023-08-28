@@ -2688,11 +2688,12 @@ var getContext = function(display, infos, curLevel) {
       // var src = (infos.craneImgPath) ?  Object.assign(Beav.Object.clone(infos.craneSrc),infos.craneImgPath) : infos.craneSrc;
       var src = infos.craneSrc;
       var prefix = "crane/";
-      if (infos.craneImgPath) {
-          prefix = infos.craneImgPath;
-      }
+      
       var path = {};
       for(var key in src){
+         if (infos.craneImgPath && infos.craneImgPath[key] != undefined) {
+             prefix = infos.craneImgPath;
+         }
         path[key] = getImgPath(prefix + src[key]);
         //(infos.craneImgPath && infos.craneImgPath[key]) ? infos.craneImgPath[key] : 
       }
@@ -5320,7 +5321,7 @@ var getContext = function(display, infos, curLevel) {
       if(this.display){
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
-         //updateOverlay();
+         updateOverlay(true);
       }
    };
 
@@ -5341,7 +5342,7 @@ var getContext = function(display, infos, curLevel) {
          this.craneContent = { type: "faceItem", id, element, offsetY: 32, offsetX: 0 };
          var craneAttr = getCraneAttr();
          setCraneAttr(craneAttr);
-         //updateOverlay();
+         // updateOverlay(true);
       }else{
          this.craneContent = { type: "faceItem", id, offsetY: 32, offsetX: 0 };
       }
@@ -5404,7 +5405,7 @@ var getContext = function(display, infos, curLevel) {
       un.element = paper.image(un.src,x,y,width,height).toBack();
    };
 
-   function updateOverlay() {
+   function updateOverlay(noRemove) {
       // console.log(context.initState)
       if(!context.display || !context.overlay){
          return
@@ -5420,7 +5421,12 @@ var getContext = function(display, infos, curLevel) {
       let width = coord2.x - x;
       let height = coord2.y - y;
       if(ov.element){
-         ov.element.remove();
+         if(!noRemove){
+            ov.element.remove();
+         }else{
+            ov.element.toFront();
+            return
+         }
       }
       ov.element = paper.image(ov.src,x,y,width,height).toFront();
    };
