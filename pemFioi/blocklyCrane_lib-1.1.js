@@ -1623,12 +1623,12 @@ var getContext = function(display, infos, curLevel) {
    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/index_tralalere_s3.html';
    //var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
    context.conceptList = [
-      {id: 'oie_presentation', name: 'Jeu de l\'oie', isBase: true, url: conceptBaseUrl+'#oie_presentation'},
-      {id: 'puissance4_presentation', name: 'Puissance 4', isBase: true, url: conceptBaseUrl+'#puissance4_presentation'},
-      {id: 'wordgame_presentation', name: 'Mots casés', isBase: true, url: conceptBaseUrl+'#wordgame_presentation'},
-      {id: 'wordle_presentation', name: 'Wordle', isBase: true, url: conceptBaseUrl+'#wordle_presentation'},
-      {id: 'puzzle_presentation', name: 'Puyo Puyo', isBase: true, url: conceptBaseUrl+'#puzzle_presentation'},
-      {id: 'breakout_presentation', name: 'Casse briques', isBase: true, url: conceptBaseUrl+'#breakout_presentation'},
+      {id: 'oie_presentation', name: 'Jeu de l\'oie', url: conceptBaseUrl+'#oie_presentation'},
+      {id: 'puissance4_presentation', name: 'Puissance 4', url: conceptBaseUrl+'#puissance4_presentation'},
+      {id: 'wordgame_presentation', name: 'Mots casés', url: conceptBaseUrl+'#wordgame_presentation'},
+      {id: 'wordle_presentation', name: 'Wordle', url: conceptBaseUrl+'#wordle_presentation'},
+      {id: 'puzzle_presentation', name: 'Puyo Puyo', url: conceptBaseUrl+'#puzzle_presentation'},
+      {id: 'breakout_presentation', name: 'Casse briques', url: conceptBaseUrl+'#breakout_presentation'},
 
       {id: 'crane_actions', name: 'Actions de la grue', isBase: true, isCategory: true},
       {id: 'left', name: 'gauche()', url: conceptBaseUrl+'#left', python: ['left'], categoryId: 'crane_actions'},
