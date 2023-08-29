@@ -1,5 +1,8 @@
-const conceptBaseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
+/*const conceptBaseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
     + 'static4.castor-informatique.fr/help/smart_contracts.html';
+*/
+
+const conceptBaseUrl = "file:///C:/Users/maxim/Desktop/test tortoise svn/v01/LanguagesHelp/smart_contracts.html"
 
 const smartPyBlocksList = {
 
@@ -11,7 +14,7 @@ const smartPyBlocksList = {
     }],
 
     'smartpy_import': [{
-        name: 'smartpy_smartpy_import',
+        name: 'smartpy_import',
         type: 'token',
         caption: 'def main():',
         snippet: `import smartpy as sp
@@ -22,8 +25,8 @@ def main():
     }],
 
 
-    'smart_contract': [{
-        name: 'smartpy_smart_contract',
+    'smartpy_contract_declaration': [{
+        name: 'smartpy_contract_declaration',
         type: 'token',
         caption: 'class ctr(sp.Contract)',
         snippet: `
@@ -32,23 +35,23 @@ def main():
 			`,
     }],
 
-    'self.data.value': [{
+    'smartpy_self_data_value': [{
         name: 'smartpy_self_data_value',
         type: 'token',
         caption: 'self.data.value = ...',
         snippet: `self.data.\${1:valueName} = \${2:value}`
     }],
 
-    'entry_point': [{
+    'smartpy_entry_point': [{
         name: 'smartpy_entry_point',
         type: 'token',
         caption: '@sp.entrypoint',
-        snippet: `@sp.entry_point
+        snippet: `@sp.entrypoint
 def \${1:entrypointName}(self):
     `,
     }],
 
-    'onchain_view': [{
+    'smartpy_onchain_view': [{
         name: 'smartpy_onchain_view',
         type: 'token',
         caption: '@sp.onchain_view',
@@ -63,8 +66,8 @@ def \${1:entrypointName}(self):
 
 /* Test */
 
-        'test': [{
-        name: 'smartpy_test',
+        'smartpy_test_starter': [{
+        name: 'smartpy_test_starter',
         type: 'token',
         caption: '@sp.add_test',
         snippet: `@sp.add_test(name = "\${1:name of your test}")
@@ -72,49 +75,49 @@ def \${2:test_name}():
         `,
     }],
 
-    'scenario_creation': [{
+    'smartpy_scenario_creation': [{
         name: 'smartpy_scenario_creation',
         type: 'token',
         caption: 'sp.test_scenario',
         snippet: `\${1:scenario_name} = sp.test_scenario(main)`,
     }],
 
-    'contract_instantiation': [{
+    'smartpy_contract_instantiation': [{
         name: 'smartpy_contract_instantiation',
         type: 'token',
         caption: 'c = main.ctr(...)',
         snippet: `\${1:instanceName} = main.\${2:contractName}(\${3:initialStorage})`
     }],
 
-    'adding_to_scenario': [{
+    'smartpy_adding_to_scenario': [{
         name: 'smartpy_adding_to_scenario',
         type: 'token',
         caption: 'scenario += c',
         snippet: `\${1:scenario_name} += \${2:instanceName}`
     }],
 
-    'test_unwrap_option': [{
+    'smartpy_test_unwrap_option': [{
         name: 'smartpy_test_unwrap_option',
         type: 'token',
         caption: 'opt.open_some()',
         snippet: `\${1:optionName}.open_some()`
     }],
 
-    'test_account': [{
+    'smartpy_test_account': [{
         name: 'smartpy_test_account',
         type: 'token',
         caption: 'sp.test_account(a)',
         snippet: `sp.test_account(\${1:accountName})`
     }],
 
-    'test_address': [{
+    'smartpy_test_address': [{
         name: 'smartpy_test_address',
         type: 'token',
         caption: 'acc.address',
         snippet: `\${1:accountName}.address`
     }],
 
-    'public_key_hash': [{
+    'smartpy_public_key_hash': [{
         name: 'smartpy_public_key_hash',
         type: 'token',
         caption: 'acc.public_key_hash',
@@ -122,7 +125,7 @@ def \${2:test_name}():
     }],
 
 
-    'public_key': [{
+    'smartpy_public_key': [{
         name: 'smartpy_public_key',
         type: 'token',
         caption: 'acc.public_key',
@@ -130,7 +133,7 @@ def \${2:test_name}():
     }],
 
 
-    'secret_key': [{
+    'smartpy_secret_key': [{
         name: 'smartpy_secret_key',
         type: 'token',
         caption: 'acc.secret_key',
@@ -138,77 +141,77 @@ def \${2:test_name}():
     }],
 
 
-    'test_some': [{
+    'smartpy_test_some': [{
         name: 'smartpy_test_some',
         type: 'token',
         caption: 'sp.some(value)',
         snippet: `sp.some(\${1:value})`
     }],
 
-    'scenario.verify': [{
+    'smartpy_scenario_verify': [{
         name: 'smartpy_scenario_verify',
         type: 'token',
         caption: 'scenario.verifiy(cond)',
         snippet: `scenario.verify(\${1:condition})`
     }],
 
-    'scenario.verify_equal': [{
+    'smartpy_scenario_verify_equal': [{
         name: 'smartpy_scenario_verify_equal',
         type: 'token',
         caption: 'scenario.verifiy_equal(a, b)',
         snippet: `scenario.verify_equal(\${1:value1}, \${2:value2})`
     }],
 
-    'scenario.show': [{
+    'smartpy_scenario_show': [{
         name: 'smartpy_scenario_show',
         type: 'token',
         caption: 'scenario.show(value)',
-        snippet: `scenario.show(value)`
+        snippet: `scenario.show(\${1:value})`
     }],
 
-    'contract.data': [{
+    'smartpy_contract_data': [{
         name: 'smartpy_contract_data',
         type: 'token',
         caption: 'contract.data.value',
         snippet: `\${1:contractName}.data.\${2:value}`
     }],
 
-    'contract.balance': [{
+    'smartpy_contract_balance': [{
         name: 'smartpy_contract_balance',
         type: 'token',
         caption: 'contract.balance',
         snippet: `\${1:contractName}.balance`
     }],
 
-    'contract.baker': [{
+    'smartpy_contract_baker': [{
         name: 'smartpy_contract_baker',
         type: 'token',
         caption: 'contract.baker',
         snippet: `\${1:contractName}.baker`
     }],
 
-    'contract.address': [{
+    'smartpy_contract_address': [{
         name: 'smartpy_contract_address',
         type: 'token',
         caption: 'contract.address',
         snippet: `\${1:contractName}.address`
     }],
 
-    'trace': [{
+    'smartpy_trace': [{
         name: 'smartpy_trace',
         type: 'token',
         caption: 'trace(value)',
         snippet: `trace(\${1:value})`
     }],
 
-    'scenario.h': [{
+    'smartpy_scenario_h': [{
         name: 'smartpy_scenario_h',
         type: 'token',
         caption: 'scenario.h1',
-        snippet: `scenario.h1`
+        snippet: `scenario.h1("\${1:scenario_name")`
     }],
 
-    'test_none': [{
+    'smartpy_test_none': [{
         name: 'smartpy_test_none',
         type: 'token',
         caption: 'sp.none',
@@ -253,50 +256,50 @@ def \${2:test_name}():
 
 /*Int - Nat - Tez */
 
-    'sp.int': [{
-        name: 'smartpy_type_int',
+    'int_declaration': [{
+        name: 'int_declaration',
         type: 'token',
         caption: 'sp.int(42)',
         snippet: `sp.int(\${1:42})`
     }],
 
-    'sp.nat': [{
-        name: 'smartpy_type_nat',
+    'nat_declaration': [{
+        name: 'nat_declaration',
         type: 'token',
         caption: 'sp.nat(42)',
         snippet: `sp.nat(\${1:42})`
     }],
 
-    'sp.to_int': [{
-        name: 'smartpy_sp_to_int',
+    'smartpy_to_int': [{
+        name: 'smartpy_to_int',
         type: 'token',
         caption: 'sp.to_int(a)',
         snippet: `sp.to_int(\${1:a})`
     }],
 
-    'sp.is_nat': [{
-        name: 'smartpy_sp_is_nat',
+    'smartpy_is_nat': [{
+        name: 'smartpy_is_nat',
         type: 'token',
         caption: 'sp.is_nat(a)',
         snippet: `sp.is_nat(\${1:a})`
     }],
 
-    'sp.as_nat': [{
-        name: 'smartpy_sp_as_nat',
+    'smartpy_as_nat': [{
+        name: 'smartpy_as_nat',
         type: 'token',
         caption: 'sp.as_nat(a)',
         snippet: `sp.as_nat(\${1:a})`
     }],
 
-    'type_int': [{
-        name: 'smartpy_sp_int',
+    'int_type': [{
+        name: 'int_type',
         type: 'token',
         caption: 'sp.int',
         snippet: `sp.int`
     }],
 
-    'type_nat': [{
-        name: 'smartpy_sp_nat',
+    'nat_type': [{
+        name: 'nat_type',
         type: 'token',
         caption: 'sp.nat',
         snippet: `sp.nat`
@@ -304,15 +307,15 @@ def \${2:test_name}():
 
 /* Types */
 
-    'sp.cast': [{
+    'smartpy_sp_cast': [{
         name: 'smartpy_sp_cast',
         type: 'token',
         caption: 'sp.cast(val, type)',
         snippet: `sp.cast(\${1:value}, \${2:type})`
     }],
 
-    'sp.unit': [{
-        name: 'smartpy_sp_unit',
+    'unit_type': [{
+        name: 'unit_type',
         type: 'token',
         caption: 'sp.unit',
         snippet: `sp.unit`
@@ -326,15 +329,15 @@ def \${2:test_name}():
     }],
 
 
-    'my_type': [{
-        name: 'smartpy_my_type',
+    'custom_type': [{
+        name: 'custom_type',
         type: 'token',
         caption: 'my_type:type = ...',
         snippet: `my_type:type = \${1:type_definition}`
     }],
 
 
-    'convert_to_tez': [{
+    'smartpy_convert_to_tez': [{
         name: 'smartpy_convert_to_tez',
         type: 'token',
         caption: 'sp.mul(n, sp.tez(x))',
@@ -346,100 +349,107 @@ def \${2:test_name}():
 /*Arithmetic*/
 
     'addition': [{
-        name: 'smartpy_addition', 
+        name: 'addition', 
         type: 'token',
         caption: 'a + b',
         snippet: `\${1:a} + \${2:b}`
     }],
 
-    'sp.add': [{
-        name: 'smartpy_sp_add',
+    'addition_multitypes': [{
+        name: 'addition_multitypes',
         type: 'token',
         caption: 'sp.add(a, b)',
         snippet: `sp.add(\${1:a}, \${2:b})`
     }],
 
     'substraction': [{
-        name: 'smartpy_substraction',
+        name: 'substraction',
         type: 'token',
         caption: 'a - b',
         snippet: `\${1:a} - \${2:b}`
     }],
 
-    'sp.sub': [{
-        name: 'smartpy_substraction',
+    'substraction_multitypes': [{
+        name: 'substraction_multitypes',
         type: 'token',
         caption: 'sp.sub(a, b)',
         snippet: `sp.sub(\${1:a}, \${2:b})`
     }],
 
     'multiply': [{
-        name: 'smartpy_multiply',
+        name: 'multiply',
         type: 'token',
         caption: 'a * b',
         snippet: `\${1:a} * \${2:b}`
     }],
 
-    'sp.mul': [{
-        name: 'smartpy_multiply',
+    'multiplication_multitypes': [{
+        name: 'multiplication_multitypes',
         type: 'token',
         caption: 'sp.mul(a, b)',
         snippet: `sp.mul(\${1:a}, \${2:b})`
     }],
 
     'divide': [{
-        name: 'smartpy_divide',
+        name: 'divide',
         type: 'token',
         caption: 'a / b',
         snippet: `\${1:a} / \${2:b}`
     }],
 
-    'sp.mod': [{
-        name: 'smartpy_sp_mod',
+    'modulo_multitypes': [{
+        name: 'modulo_multitypes',
         type: 'token',
         caption: 'sp.mod(a, b)',
         snippet: `sp.mod(\${1:a}, \${2:b})`
     }],
 
-    'sp.ediv': [{
-        name: 'smartpy_sp_ediv',
+    'euclidian_multitypes': [{
+        name: 'euclidian_multitypes',
         type: 'token',
         caption: 'sp.ediv(a, b)',
         snippet: `sp.ediv(\${1:x}, \${2:y})`
     }],
 
-    'split_tokens': [{
+    'smartpy_split_tokens': [{
         name: 'smartpy_split_tokens',
         type: 'token',
         caption: 'sp.split_tokens(a, q, t)',
         snippet: `sp.split_tokens(\${1:amount}, \${2:quantity}, \${3:totalQuantity})`
     }],
 
+    'shorthand_operators': [{
+        name: 'shorthand_operators',
+        type: 'token',
+        caption: '+= / -= / %= / *=',
+        snippet: '\${1:+}='
+    }],
+
 /*Strings*/
 
-    'type_string': [{
-        name: 'smartpy_type_string',
+    'string_type': [{
+        name: 'string_type',
         type: 'token',
         caption: 'sp.string',
         snippet: `sp.string`
     }],
 
     'string': [{
-        name: 'smartpy_string',
+        name: 'string',
         type: 'token',
         caption: '"example"',
         snippet: `"\${1:example}"`
     }],
 
 
-    'concatenate': [{
-        name: 'smartpy_concatenate',
+    'string_concatenate': [{
+        name: 'string_concatenate',
         type: 'token',
         caption: 'sp.concat([a, b])',
         snippet: `sp.concat([\${1:string1}, \${2:string2}])`
     }],
 
-    'slice': [{
+    'smartpy_slice': [{
         name: 'smartpy_slice',
         type: 'token',
         caption: 'sp.slice(off, len, txt)',
@@ -447,44 +457,51 @@ def \${2:test_name}():
     }],
 
     'length': [{
-        name: 'smartpy_length',
+        name: 'length',
         type: 'token',
         caption: 'sp.len(a)',
         snippet: `sp.len(\${1:text})`
     }],
 
+    'string_addition': [{
+        name: 'string_addition',
+        type: 'token',
+        caption: 'str1 + str2',
+        snippet: '\${1:string} + \${2:string}'
+    }],
+
 
 /*Timestamps*/
 
-    'sp.timestamp': [{
-        name: 'smartpy_timestamp',
+    'timestamp_from_seconds': [{
+        name: 'timestamp_from_seconds',
         type: 'token', 
         caption: 'sp.timestamp(nbSec)',
         snippet: `sp.timestamp(\${1:nbSeconds})`
     }],
 
-    'sp.now': [{
-        name: 'smartpy_now',
+    'current_timestamp': [{
+        name: 'current_timestamp',
         type: 'token',
         caption: 'sp.now',
         snippet: `sp.now`
     }],
 
-    'timestamp_from_utc': [{
+    'smartpy_timestamp_from_utc': [{
         name: 'smartpy_timestamp_from_utc',
         type: 'token',
         caption: '…from_utc(y, m, d,…)',
         snippet: `sp.timestamp_from_utc(\${1:year}, \${2:month}, \${3:day}, \${4:hours}, \${5:minutes}, \${6:seconds})`
     }],
 
-    'sp.add_seconds': [{
+    'smartpy_add_seconds': [{
         name: 'smartpy_add_seconds',
         type: 'token',
         caption: 'sp.add_seconds(t, s)',
         snippet: `sp.add_seconds(\${1:timestamp}, \${2:nbSeconds})`
     }],
 
-    'sp.add_days': [{
+    'smartpy_add_days': [{
         name: 'smartpy_add_days',
         type: 'token',
         caption: 'sp.add_days(t, d)',
@@ -492,14 +509,14 @@ def \${2:test_name}():
     }],
 
     'difference_timestamp': [{
-        name: 'smartpy_difference_timestamp',
+        name: 'difference_timestamp',
         type: 'token',
         caption: 't1 - t2',
         snippet: `\${1:timestamp1} - \${2:timestamp2}`
     }],
 
-    'type_timestamp': [{
-        name: 'smartpy_sp_timestamp',
+    'timestamp_type': [{
+        name: 'timestamp_type',
         type: 'token',
         caption: 'sp.timestamp',
         snippet: `sp.timestamp`
@@ -508,56 +525,56 @@ def \${2:test_name}():
 
 /*Addresses - Transactions -delegation */
 
-    'sp.tez': [{
-        name: 'smartpy_sp_tez',
+    'tez': [{
+        name: 'tez',
         type: 'token',
         caption: 'sp.tez(42)',
         snippet: `sp.tez(\${1:42})`
     }],
 
-    'sp.mutez': [{
-        name: 'smartpy_sp_mutez',
+    'mutez': [{
+        name: 'mutez',
         type: 'token',
         caption: 'sp.mutez(42)',
         snippet: `sp.mutez(\${1:42})`
     }],
 
-    'sp.sender': [{
-        name: 'smartpy_sp_sender',
+    'sender': [{
+        name: 'sender',
         type: 'token',
         caption: 'sp.sender',
         snippet: 'sp.sender'
     }],
 
-    'sp.amount': [{
-        name: 'smartpy_sp_amount',
+    'amount': [{
+        name: 'amount',
         type: 'token',
         caption: 'sp.amount',
         snippet: 'sp.amount'
     }],
 
-    'sp.balance': [{
-        name: 'smartpy_sp_balance',
+    'balance': [{
+        name: 'balance',
         type: 'token', 
         caption: 'sp.balance',
         snippet: 'sp.balance'
     }],
 
-    'sp.address': [{
-        name: 'smartpy_sp_address',
+    'address': [{
+        name: 'address',
         type: 'token',
         caption: 'sp.address("tz1...")',
         snippet: 'sp.address("\${1:tz1...address}")'
     }],
 
-    'sp.send': [{
+    'send_tez': [{
         name: 'smartpy_sp_send',
         type: 'token',
         caption: 'sp.send(dest, amnt)',
         snippet: 'sp.send(\${1:destination_address}, \${2:amount})'    
     }],
 
-    'set_delegate': [{
+    'smartpy_set_delegate': [{
         name: 'smartpy_set_delegate',
         type: 'token',
         caption: 'set_delegate()',
@@ -565,7 +582,7 @@ def \${2:test_name}():
     }],
 
     'type_mutez': [{
-        name: 'smartpy_type_mutez',
+        name: 'mutez_type',
         type: 'token',
         caption: 'sp.mutez',
         snippet: `sp.mutez`
@@ -573,7 +590,7 @@ def \${2:test_name}():
 
 /*Asserts, Booleans*/
 
-    'raise': [{
+    'smartpy_raise': [{
         name: 'smartpy_raise',
         type: 'token',
         caption: 'raise(value)',
@@ -581,99 +598,99 @@ def \${2:test_name}():
     }],
 
 
-    'assert': [{
-        name: 'smartpy_assert',
+    'verify': [{
+        name: 'verify',
         type: 'token',
         caption: 'assert cond',
         snippet: `assert \${1:condition}`
     }],
 
-    'assert_error': [{
-        name: 'smartpy_assert_error',
+    'verify_message': [{
+        name: 'verify_message',
         type: 'token',
         caption: 'assert cond, err',
         snippet: `assert \${1:condition}, \${2:errorValue}`
     }],
 
     'and': [{
-        name: 'smartpy_and',
+        name: 'and',
         type: 'token',
         caption: 'and',
         snippet: `and`
     }],
 
     'or': [{
-        name: 'smartpy_or',
+        name: 'or',
         type: 'token',
         caption: 'or',
         snippet: `or`
     }],
 
     '^': [{
-        name: 'smartpy_^',
+        name: '^',
         type: 'token',
         caption: '^',
         snippet: `^`
     }],
 
     'true': [{
-        name: 'smartpy_true',
+        name: 'true',
         type: 'token',
         caption: 'True',
         snippet: `True`
     }],
 
     'false': [{
-        name: 'smartpy_false',
+        name: 'false',
         type: 'token',
         caption: 'False',
         snippet: `False`
     }],
 
     '>': [{
-        name: 'smartpy_>',
+        name: '>',
         type: 'token',
         caption: '>',
         snippet: `>`
     }],
 
     '<': [{
-        name: 'smartpy_<',
+        name: '<',
         type: 'token',
         caption: '<',
         snippet: `<`
     }],
 
-    '<=': [{
-        name: 'smartpy_<=',
+    'less_or_equal': [{
+        name: 'less_or_equal',
         type: 'token',
         caption: '<=',
         snippet: `<=`
     }],
 
-    '>=': [{
-        name: 'smartpy_>=',
+    'more_or_equal': [{
+        name: 'more_or_equal',
         type: 'token',
         caption: '>=',
         snippet: `>=`
     }],
 
-    '==': [{
-        name: 'smartpy_==',
+    'equal_comparator': [{
+        name: 'equal_comparator',
         type: 'token',
         caption: '==',
         snippet: `==`
     }],
 
     '!=': [{
-        name: 'smartpy_!=',
+        name: '!=',
         type: 'token',
         caption: '!=',
         snippet: `!=`
     }],
 
-    'sp.bool': [{
-        name: 'smartpy_sp_bool',
+    'boolean_type': [{
+        name: 'boolean_type',
         type: 'token',
         caption: 'sp.bool',
         snippet: `sp.bool`
@@ -685,42 +702,42 @@ def \${2:test_name}():
 
 /* Options */
 
-    'sp.option': [{
-        name: 'smarpty_sp_option',
+    'option': [{
+        name: 'option',
         type: 'token',
         caption: 'sp.option[v_type]',
         snippet: 'sp.option[\${1:v_type}]'
     }],
 
-    'sp.Some': [{
-        name: 'smartpy_sp_some',
+    'some': [{
+        name: 'some',
         type: 'token',
         caption: 'sp.Some(value)',
         snippet: 'sp.Some(\${1:value})'
     }],
 
     'none': [{
-        name: 'smartpy_none',
+        name: 'none',
         type: 'token',
         caption: 'None',
         snippet: 'None'
     }],
 
-    'unwrap_some': [{
+    'smartpy_unwrap_some': [{
         name: 'smartpy_unwrap_some',
         type: 'token',
         caption: 'opt.unwrap_some()',
         snippet: `\${1:opt}.unwrap_some()`
     }],
 
-    'opt_is_none': [{
+    'smartpy_opt_is_none': [{
         name: 'smartpy_opt_is_none',
         type: 'token',
         caption: 'opt.is_none()',
         snippet: `\${1:opt}.is_none()`
     }],
 
-    'opt_is_some': [{
+    'smartpy_opt_is_some': [{
         name: 'smartpy_opt_is_some',
         type: 'token',
         caption: 'opt.is_some()',
@@ -730,23 +747,23 @@ def \${2:test_name}():
 /*Inter-contract calls - On-chain view*/
 
 
-    'sp.contract': [{
-        name: 'smartpy_sp_contract',
+    'contract_call': [{
+        name: 'contract_call',
         type: 'token',
         caption: 'sp.contract(p, ctr, e)',
         snippet: `sp.contract(\${1:parameterType}, \${2:contractAddress}, entrypoint = "\${3:entrypointName}").unwrap_some()`
     }],
 
     
-    'sp.transfer': [{
-        name: 'smartpy_sp_transfer',
+    'transfer_of_tez': [{
+        name: 'transfer_of_tez',
         type: 'token',
         caption: 'sp.transfer(p, a, ctr)',
         snippet: `sp.transfer(\${1:parameterValue}, \${2:amount}, \${3:contract})`
     }],
 
     
-    'sp.view': [{
+    'smartpy_sp_view': [{
         name: 'smartpy_sp_view',
         type: 'token',
         caption: 'sp.view',
@@ -764,49 +781,49 @@ def \${2:test_name}():
 /*Pairs - Tuples - Records*/
 
     'pair': [{
-        name: 'smartpy_pair',
+        name: 'pair',
         type: 'token',
         caption: '(a, b)',
         snippet: `(\${1:a}, \${2:b})`
     }],
 
     'variables_pair': [{
-        name: 'smartpy_variables_pair',
+        name: 'variables_pair',
         type: 'token',
         caption: '(x, y) = pair',
         snippet: `(\${1:x}, \${2:y}) = \${3:pair}`
     }],
 
-    'sp.fst': [{
-        name: 'smartpy_fst',
+    'first_element_pair': [{
+        name: 'first_element_pair',
         type: 'token',
         caption: 'sp.fst(pair)',
         snippet: `sp.fst(\${1:pair})`
     }],
 
-    'sp.snd': [{
-        name: 'smartpy_snd',
+    'second_element_pair': [{
+        name: 'second_element_pair',
         type: 'token',
         caption: 'sp.snd(pair)',
         snippet: `sp.snd(\${1:pair})`
     }],
 
     'tuple': [{
-        name: 'smartpy_tuple',
+        name: 'tuple',
         type: 'token',
         caption: '(a, b, c, ...)',
         snippet: `(\${1:a}, \${2:b}, \${3:c})`
     }],
 
     'variables_tuple': [{
-        name: 'smartpy_variables_tuple',
+        name: 'variables_tuple',
         type: 'token',
         caption: '(x, y, z, ...) = tuple',
         snippet: `(\${1:x}, \${2:y}, \${3:z}) = \${4:tuple}`
     }],
 
     'record': [{
-        name: 'smartpy_record',
+        name: 'record',
         type: 'token',
         caption: 'sp.record(f1 = x, ...)',
         snippet: `sp.record(\${1:field1} = \${2:x}, \${3:field2} = \${4:y})`
@@ -814,21 +831,21 @@ def \${2:test_name}():
     }],
 
     'record_type': [{
-        name: 'smartpy_record_type',
+        name: 'record_type',
         type: 'token',
         caption: 'sp.record(f1 = t1, ...)',
         snippet: 'sp.record(\${1:field1} = \${2:type1}, \${3:field2} = \${4:type2})'
     }],
 
-    'sp.pair': [{
-        name: 'smartpy_sp_pair',
+    'pair_type': [{
+        name: 'pair_type',
         type: 'token',
         caption: 'sp.pair[t1, t2]',
         snippet: `sp.pair[\${1:type1}, \${2:type2}]`
     }],
 
-    'sp.tuple': [{
-        name: 'smartpy_sp_tuple',
+    'tuple_type': [{
+        name: 'tuple_type',
         type: 'token',
         caption: 'sp.tuple[t1, t2, t3, ...]',
         snippet: `sp.tuple[\${1:type1}, \${2:type2}, \${3:type3}]`
@@ -840,13 +857,13 @@ def \${2:test_name}():
 /*Maps / Big maps*/
 
     'map': [{
-        name: 'smartpy_map',
+        name: 'map',
         type: 'token',
         caption : 'm = {key1 : v1, ...}',
         snippet: `\${1:m} = {\${2:key1} = \${3:value1}, \${4:key2} = \${5:value2}}`
     }],
 
-    'sp.big_map': [{
+    'smartpy_big_map': [{
         name: 'smartpy_big_map',
         type: 'token',
         caption: 'm = sp.big_map({})',
@@ -854,55 +871,55 @@ def \${2:test_name}():
     }],
 
     'delete_map_entry': [{
-        name: 'smartpy_delete_map_entry',
+        name: 'delete_map_entry',
         type: 'token',
         caption : 'del m[key]',
         snippet: `del \${1:m}[\${2:key}]`
     }],
 
-    'add_update_map_entry': [{
-        name: 'smartpy_add_update_map_entry',
+    'update_map_entry': [{
+        name: 'update_map_entry',
         type: 'token',
         caption : 'm[key] = val',
         snippet: `\${1:m}[\${2:key}] = \${3:newValue} `
     }],
 
     'access_map_entry': [{
-        name: 'smartpy_access_map_entry',
+        name: 'access_map_entry',
         type: 'token',
         caption : 'm[key]',
         snippet: `\${1:m}[\${2:key}]`
     }],
 
     'check_map_key': [{
-        name: 'smartpy_check_map_key',
+        name: 'check_map_key',
         type: 'token',
         caption : 'm.contains(key)',
         snippet: `\${1:m}.contains(\${2:key})`
     }],
 
     'size_map': [{
-        name: 'smartpy_size_map',
+        name: 'size_map',
         type: 'token',
         caption : 'sp.len(m)',
         snippet: `sp.len(\${1:m})`
     }],
 
-    'get_items': [{
+    'smartpy_get_items': [{
         name: 'smartpy_get_items',
         type: 'token',
         caption : 'm.items()',
         snippet: `\${1:m}.items()`
     }],
 
-    'get_keys': [{
+    'smartpy_get_keys': [{
         name: 'smartpy_get_keys',
         type: 'token',
         caption : 'm.keys()',
         snippet: `\${1:m}.keys()`
     }],
 
-    'get_values': [{
+    'smartpy_get_values': [{
         name: 'smartpy_get_values',
         type: 'token',
         caption : 'm.values()',
@@ -910,7 +927,7 @@ def \${2:test_name}():
     }],
 
     'type_map': [{
-        name: 'smartpy_type_map',
+        name: 'type_map',
         type: 'token',
         caption : 'sp.map[t_key, t_val]',
         snippet: `sp.map[\${1:type_key}, \${2:type_value}]`
@@ -926,90 +943,90 @@ def \${2:test_name}():
 /* Sets - Lists*/
 
     'list': [{
-        name: 'smartpy_list',
+        name: 'list',
         type: 'token',
         caption: 'lst = [v1, v2, v3, ...]',
         snippet: `\${1:lst} = [\${2:value1}, \${3:value2}, \${4:value3}]`,
     }],
 
     'list_size': [{
-        name: 'smartpy_list_size',
+        name: 'list_size',
         type: 'token',
         caption: 'len(lst)',
         snippet: `len(\${1:lst})`,
     }],
 
     'list_push': [{
-        name: 'smartpy_list_push',
+        name: 'list_push',
         type: 'token',
         caption: 'lst.push(val)',
         snippet: `\${1:lst}.push(\${2:value})`
     }],
 
-    'sp.range': [{
+    'smartpy_sp_range': [{
         name: 'smartpy_sp_range',
         type: 'token',
         caption: 'sp.range(begin, end)',
         snippet: `sp.range(\${1:begin}, \${2:end})`
     }],
 
-    'sp.sum': [{
+    'smartpy_sp_sum': [{
         name: 'smartpy_sp_sum',
         type: 'token',
         caption: 'sp.sum(lst)',
         snippet: `sp.sum(\${1:lst})`
     }],
 
-    'sp.list': [{
-        name: 'smartpy_sp_list',
+    'list_type': [{
+        name: 'list_type',
         type: 'token',
         caption: 'sp.list[type]',
         snippet: `sp.list[\${1:type}]`
     }],
 
     'set': [{
-        name: 'smartpy_set',
+        name: 'set',
         type: 'token',
         caption: '{value1, value2, ...}',
         snippet: `{\${1:value1}, \${2:value2}}`
     }],
 
-    'sp.set': [{
-        name: 'smartpy_sp_set',
+    'set_type': [{
+        name: 'set_type',
         type: 'token',
         caption: 'sp.set[type]',
         snippet: `sp.set[\${1:type}]`
     }],
 
-    'set_length': [{
+    'smartpy_set_length': [{
         name: 'smartpy_set_length',
         type: 'token',
         caption: 'len(s)',
         snippet: `len(\${1:setName})`
     }],
 
-    'set_contains': [{
+    'smartpy_set_contains': [{
         name: 'smartpy_set_contains',
         type: 'token',
         caption: 's.contains(v)',
         snippet: `\${1:setName}.contains(\${2:value})`
     }],
 
-    'set_elements': [{
+    'smartpy_set_elements': [{
         name: 'smartpy_set_elements',
         type: 'token',
         caption: 's.elements()',
         snippet: `\${1:setName}.elements()`
     }],
 
-    'set_add': [{
+    'smartpy_set_add': [{
         name: 'smartpy_set_add',
         type: 'token',
         caption: 's.add(value)',
         snippet: `\${1:setName}.add(\${2:value})`
     }],
 
-    'set_remove': [{
+    'smartpy_set_remove': [{
         name: 'smartpy_set_remove',
         type: 'token',
         caption: 's.remove(value)',
@@ -1020,35 +1037,35 @@ def \${2:test_name}():
 
 /*Bytes*/
 
-    'sp.bytes': [{
-        name: 'smartpy_sp_bytes',
+    'bytes': [{
+        name: 'bytes',
         type: 'token',
         caption: 'sp.bytes',
         snippet: `sp.bytes`
     }],
 
-    'sp.slice': [{
+    'smartpy_sp_slice': [{
         name: 'smartpy_sp_slice',
         type: 'token',
         caption: 'sp.slice(off, len, b)',
         snippet: `sp.slice(\${1:offset}, \${2:length}, \${3:bytes})`
     }],
 
-    'sp.concat': [{
+    'smartpy_sp_concat': [{
         name: 'smartpy_sp_concat',
         type: 'token',
         caption:'sp.concat([b1, b2])',
         snippet: `sp.concat([\${1:bytes1}, \${2:bytes2}])`
     }],
 
-    'and_bytes': [{
+    'smartpy_and_bytes': [{
         name: 'smartpy_and_bytes',
         type: 'token',
         caption: 'sp.and_bytes(b1, b2)',
         snippet: `sp.and_bytes(\${1:b1}, \${2:b2})`
     }],
 
-    'or_bytes': [{
+    'smartpy_or_bytes': [{
         name: 'smartpy_or_bytes',
         type: 'token',
         caption: 'sp.or_bytes(b1, b2)',
@@ -1056,7 +1073,7 @@ def \${2:test_name}():
     }],
 
 
-    'xor_bytes': [{
+    'smartpy_xor_bytes': [{
         name: 'smartpy_xor_bytes',
         type: 'token',
         caption: 'sp.xor_bytes(b1, b2)',
@@ -1064,21 +1081,21 @@ def \${2:test_name}():
     }],
 
 
-    'invert_bytes': [{
+    'smartpy_invert_bytes': [{
         name: 'smartpy_invert_bytes',
         type: 'token',
         caption: 'sp.invert_bytes(b)',
         snippet: `sp.invert_bytes(\${1:bytes})`
     }],
 
-    'lshift_bytes': [{
+    'smartpy_lshift_bytes': [{
         name: 'smartpy_lshift_bytes',
         type: 'token',
         caption: 'sp.lshift_bytes(b, sft)',
         snippet: `sp.lshift_bytes(\${1:bytes}, \${2:shiftValue})`
     }],
 
-    'rshift_bytes': [{
+    'smartpy_rshift_bytes': [{
         name: 'smartpy_rshift_bytes',
         type: 'token',
         caption: 'sp.rshift_bytes(b, sft)',
@@ -1199,8 +1216,8 @@ window.SmartContractConfig = {
             description: {
 
                 /*Contract*/
-                'smartpy_smartpy_import': "import smartpy, creates module",
-                'smartpy_smart_contract': "creates contract",
+                'smartpy_import': "import smartpy, creates module",
+                'smartpy_contract_declaration': "creates contract",
                 'smartpy_self_data_value': "storage initialization",
 
                 
@@ -1215,95 +1232,96 @@ window.SmartContractConfig = {
 				'smartpy_trace': "within entrypoint",
 
                 /*Int - Nat - Tez */
-                'smartpy_type_int': "creates an int value",
-                'smartpy_sp_to_int': "converts nat to int",
-                'smartpy_sp_is_nat': "sp.Some(a) if >= 0    None if < 0",
-                'smartpy_sp_as_nat': "Fails if a < 0",
-                'smartpy_sp_int': "type",
+                'int_declaration': "creates an int value",
+                'smartpy_to_int': "converts nat to int",
+                'smartpy_is_nat': "sp.Some(a) if >= 0    None if < 0",
+                'smartpy_as_nat': "Fails if a < 0",
+                'int_type': "type",
 
                 /*Types*/
                 'smartpy_sp_cast': "specifies val's type to help type inference", 
-                'smartpy_my_type': "type definition (place in module only)",
+                'custom_type': "type definition (place in module only)",
                 'smartpy_convert_to_tez': "converts int/nat to tez. Not recommended",
-                'smartpy_sp_unit': "unit type",
+                'unit_type': "unit type",
                 'smartpy_()': "unit value (nothing)",
 
                 /*Arithmetic*/
-                'smartpy_addition': "if the types are the same",
-                'smartpy_sp_add': "if the types are different",
-                'smartpy_divide': " integer division",
-                'smartpy_sp_mod': "➔ remainder of a / b",
-                'smartpy_sp_ediv': "➔ option on pair (quotient, remainder)",
+                'addition': "if the types are the same",
+                'addition_multitypes': "if the types are different",
+                'divide': " integer division",
+                'modulo_multitypes': "➔ remainder of a / b",
+                'euclidian_multitypes': "➔ option on pair (quotient, remainder)",
                 'smartpy_split_tokens': "➔ (a*q) / t as tez",
+                'shorthand_operators': "shorthand operator",
 
                 /*Strings*/
                 'smartpy_slice': "extracts a substring      returns an option",
-                'smartpy_type_string': "type",
+                'string_type': "type",
 
                 /*Timestamps*/
-                'smartpy_timestamp': "creates a timestamp as seconds since 1/1/1970",
+                'timestamp_from_seconds': "creates a timestamp as seconds since 1/1/1970",
                 'smartpy_timestamp_from_utc': "creates a timestamp from a utc date",
-                'smartpy_now': "timestamp of the block",
-                'smartpy_difference_timestamp': "difference in seconds between timestamps",
-                'smartpy_sp_timestamp': "type",
+                'current_timestamp': "timestamp of the block",
+                'difference_timestamp': "difference in seconds between timestamps",
+                'timestamp_type': "type",
 
 
                 /*Addresses - Transactions - Delegation*/
-                'smartpy_sp_sender': "address of direct caller",
-                'smartpy_sp_amount': "amount transferred to the contract by the caller",
-                'smartpy_sp_balance': "balance of the contract",
-                'smartpy_sp_address': " ➔ hard coded address",
+                'sender': "address of direct caller",
+                'amount': "amount transferred to the contract by the caller",
+                'balance': "balance of the contract",
+                'address': " ➔ hard coded address",
                 'smartpy_sp_send': "transfer of tez",
-                'smartpy_type_mutez': "type",
+                'mutez_type': "type",
 
                 /*Asserts, Booleans*/
                 'smartpy_raise': "fails immediately", 
-                'smartpy_assert_error': "specifies error value",
-                'smartpy_sp_bool': "type",
-                'smartpy_^': "exclusive or",
+                'verify_message': "specifies error value",
+                'boolean_type': "type",
+                '^': "exclusive or",
 
                 /*Options*/
-                'smarpty_sp_option': "type",
-                'smartpy_sp_some':"option with value",
-                'smartpy_none': "option with no value",
+                'option': "type",
+                'some':"option with value",
+                'none': "option with no value",
                 'smartpy_unwrap_some': "extract value of an option. Fails if None.",
                 'smartpy_opt_is_none': "➔ opt == None",
                 'smartpy_opt_is_some': "➔ opt != None",
 
                 /*Inter-contract*/
-                'smartpy_sp_contract': "obtains contract entrypoint",
-                'smartpy_sp_transfer': "calls entrypoint",
+                'contract_call': "obtains contract entrypoint",
+                'transfer_of_tez': "calls entrypoint",
                 'smartpy_sp_view': "calls on-chain view",
 
                 /*Pairs - Tuples - Records*/
-                'smartpy_pair': "creates a pair",
-                'smartpy_variables_pair': "destructures a pair into two variables",
-                'smartpy_fst': "➔ first element",
-                'smartpy_snd': "➔ second element",
-                'smartpy_tuple': "creates a tuple",
-                'smartpy_variables_tuple': "destructures a tuple",
-                'smartpy_record': "creates a record",
-                'smartpy_record_type': "type",
+                'pair': "creates a pair",
+                'variables_pair': "destructures a pair into two variables",
+                'first_element_pair': "➔ first element",
+                'second_element_pair': "➔ second element",
+                'tuple': "creates a tuple",
+                'variables_tuple': "destructures a tuple",
+                'record': "creates a record",
+                'record_type': "type",
                 
                 /*Maps / Big-maps */
-                'smartpy_map': "creates a map",
-                'smartpy_type_map': "type",
-                'smartpy_add_update_map_entry': "adds or updates an entry",
-                'smartpy_access_map_entry': "gets entry value",
-                'smartpy_check_map_key': "True if key is in m",
-                'smartpy_size_map': "➔ number of elements (map only)",
+                'map': "creates a map",
+                'type_map': "type",
+                'update_map_entry': "adds or updates an entry",
+                'access_map_entry': "gets entry value",
+                'check_map_key': "True if key is in m",
+                'size_map': "➔ number of elements (map only)",
                 'smartpy_get_items': "➔ list of pairs (key, val)",
                 'smartpy_get_keys': "➔ list of keys",
                 'smartpy_get_values': "➔ list of values",
 
                 /* Lists - Sets*/
-                'smartpy_list': "list of values of the same type",
-                'smartpy_list_push': "inserts at the beginning",
+                'list': "list of values of the same type",
+                'list_push': "inserts at the beginning",
                 'smartpy_sp_range': "➔[begin, ..., end - 1]",
                 'smartpy_sp_sum': "➔ sum of all elements",
-                'smartpy_set': "set of distincts values of the same type",
-                'smartpy_sp_set': "type",
-                'smartpy_sp_list': "type",
+                'set': "set of distincts values of the same type",
+                'set_type': "type",
+                'list_type': "type",
                 'smartpy_set_elements': "➔ list of values",
 
                 /* Bytes */
@@ -1311,255 +1329,268 @@ window.SmartContractConfig = {
                 'smartpy_and_bytes': "binary AND of b1 and b2",
                 'smartpy_invert_bytes': "inverts every bit",
                 'smartpy_lshift_bytes': "left shift of b by sft bits",
-                'smartpy_sp_bytes': "type"
+                'bytes': "type"
             },
         },
     },
     notionsList: {
         // category: [list of notion names]
-        "smart_contract_contract": ["smartpy_import", "smart_contract",  "self.data.value", "entry_point", "onchain_view"],
-        "smart_contract_tests": ["test", "scenario_creation", "contract_instantiation", "adding_to_scenario", "test_account", "test_address", "public_key_hash", "public_key", "secret_key", "scenario.show", "scenario.verify", "scenario.verify_equal", "contract.data", "contract.balance", "contract.baker", "contract.address", "trace", "scenario.h", "test_some", "test_none", "test_unwrap_option"],
-        "smart_contract_int_nat": ["sp.int", "sp.nat", "sp.to_int", "sp.is_nat", "sp.as_nat", "type_int", "type_nat", ],
-        "smart_contract_types": ["sp.cast", "my_type", "convert_to_tez", "()", "sp.unit"],
-        "smart_contract_arithmetic": ["addition", "sp.add", "substraction", "sp.sub", "multiply", "sp.mul", "divide", "sp.mod", "sp.ediv", "split_tokens"],
-        "smart_contract_strings": ["string", "concatenate", "slice", "length", "type_string"],
-        "smart_contract_timestamps": [ "sp.now",  "sp.timestamp", "timestamp_from_utc","sp.add_seconds", "sp.add_days", "difference_timestamp", "type_timestamp"],
-        "smart_contract_addresses_transactions": ["sp.tez", "sp.mutez", "sp.sender", "sp.amount", "sp.balance", "sp.address", "sp.send", "type_mutez"],
-        "smart_contract_asserts_booleans":["raise", "assert", "assert_error", "and", "or", "not", "^", "true", "false", ">", "<", "<=", ">=", "==", "!=", "sp.bool"],
-        "smart_contract_options": ["sp.Some", "none", "unwrap_some", "opt_is_none", "opt_is_some", "sp.option"],
-        "smart_contract_inter_contract": ["sp.contract", "sp.transfer", "sp.view"],
-        "smart_contract_pairs_tuples_records": ["pair", "variables_pair", "sp.fst", "sp.snd", "tuple", "variables_tuple", "record", "record_type", "sp.pair", "sp.tuple"],
-        "smart_contract_maps_big_maps": ["map", "sp.big_map", "delete_map_entry", "add_update_map_entry", "access_map_entry", "check_map_key", "size_map", "get_items", "get_keys", "get_values", "type_map", "type_big_map"],
-        "smart_contract_lists_sets": ["list", "list_size", "list_push", "sp.range", "sp.sum", "sp.list", "set", "set_length", "set_contains", "set_elements", "set_add", "set_remove", "sp.set"],
-        "smart_contract_bytes": ["sp.slice", "sp.concat", "and_bytes", "or_bytes", "xor_bytes", "invert_bytes", "lshift_bytes", "rshift_bytes", "sp.bytes"],
+        "smart_contract_contract": ["smartpy_import", "smartpy_contract_declaration",  "smartpy_self_data_value", "smartpy_entry_point", "smartpy_onchain_view"],
+        "smart_contract_tests": ["smartpy_test_starter", "smartpy_scenario_creation", "smartpy_contract_instantiation", "smartpy_adding_to_scenario", "smartpy_test_account", "smartpy_test_address", "smartpy_public_key_hash", "smartpy_public_key", "smartpy_secret_key", "smartpy_scenario_show", "smartpy_smartpy_scenario_verify", "smartpy_scenario_verify_equal", "smartpy_contract_data", "smartpy_contract_balance", "smartpy_contract_baker", "smartpy_contract_address", "smartpy_trace", "smartpy_scenario_h", "smartpy_test_some", "smartpy_test_none", "smartpy_test_unwrap_option"],
+        "smart_contract_int_nat": ["int_declaration", "nat_declaration", "smartpy_to_int", "smartpy_is_nat", "smartpy_as_nat", "int_type", "nat_type", ],
+        "smart_contract_types": ["smartpy_sp_cast", "custom_type", "smartpy_convert_to_tez", "()", "unit_type"],       
+        "smart_contract_arithmetic": ["addition", "addition_multitypes", "substraction", "substraction_multitypes", "multiply", "multiplication_multitypes", "divide", "modulo_multitypes", "euclidian_multitypes", "smartpy_split_tokens", "shorthand_operators"],        
+        "smart_contract_strings": ["string", "string_concatenate", "smartpy_slice", "length", "string_addition", "string_type"],
+        "smart_contract_timestamps": [ "current_timestamp",  "timestamp_from_seconds", "smartpy_timestamp_from_utc","smartpy_add_seconds", "smartpy_add_days", "difference_timestamp", "timestamp_type"],               
+        "smart_contract_addresses_transactions": ["sp.tez", "sp.mutez", "sender", "amount", "balance", "address", "send_tez", "smartpy_set_delegate", "type_mutez"],
+        "smart_contract_asserts_booleans":["smartpy_raise", "verify", "verify_message", "and", "or", "not", "^", "true", "false", ">", "<", "less_or_equal", "more_or_equal", "equal_comparator", "!=", "boolean_type"],       
+        "smart_contract_options": ["some", "none", "smartpy_unwrap_some", "smartpy_opt_is_none", "smartpy_opt_is_some", "option"],
+        "smart_contract_inter_contract": ["contract_call", "transfer_of_tez", "smartpy_sp_view"],
+        "smart_contract_pairs_tuples_records": ["pair", "variables_pair", "first_element_pair", "second_element_pair", "tuple", "variables_tuple", "record", "record_type", "pair_type", "tuple_type"],       
+        "smart_contract_maps_big_maps": ["map", "smartpy_big_map", "delete_map_entry", "update_map_entry", "access_map_entry", "check_map_key", "size_map", "smartpy_get_items", "smartpy_get_keys", "smartpy_get_values", "type_map", "type_big_map"],    
+        
+        "smart_contract_lists_sets": ["list", "list_size", "list_push", "smartpy_sp_range", "smartpy_sp_sum", "list_type", "set", "smartpy_set_length", "smartpy_set_contains", "smartpy_set_elements", "smartpy_set_add", "smartpy_set_remove", "set_type"],  
+        "smart_contract_bytes": ["smartpy_sp_slice", "smartpy_sp_concat", "smartpy_and_bytes", "smartpy_or_bytes", "smartpy_xor_bytes", "smartpy_invert_bytes", "smartpy_lshift_bytes", "smartpy_rshift_bytes", "bytes"],
     },
+
+
     conceptsList: [
 
         {
             id: 'smartpy_import',
             name: 'smartpy_import',
-            url: conceptBaseUrl + "#smart_smartpy_import"
+            url: conceptBaseUrl + "#smartpy_import"
         },
 
         {
-            id: 'smart_contract', // Must be the name of the notion
-            name: 'Lorem',
-            url: conceptBaseUrl + '#smart_contracts_lorem', // Must be the value of data-id in the documentation
+            id: 'smartpy_contract_declaration', // Must be the name of the notion
+            name: 'smartpy_contract_declaration',
+            url: conceptBaseUrl + '#smartpy_contract_declaration', // Must be the value of data-id in the documentation
         },
+
+
         {
-            id: 'entry_point',
-            name: 'Ipsum',
-            url: conceptBaseUrl + '#smart_contracts_ipsum',
+            name: 'smartpy_self_data_value',
+            id: 'smartpy_self_data_value',
+            url: conceptBaseUrl + '#smartpy_self_data_value'
         },
 
         {
-            id: 'storage',
-            name: 'storage',
-            url: conceptBaseUrl + "#smart_storage"
+            id: 'smartpy_entry_point',
+            name: 'smartpy_entry_point',
+            url: conceptBaseUrl + '#smartpy_entry_point',
         },
 
+
         {
-            id: 'onchain_view',
-            name: 'onchain_view',
-            url: conceptBaseUrl + "#smart_onchain_view"
+            id: 'smartpy_onchain_view',
+            name: 'smartpy_onchain_view',
+            url: conceptBaseUrl + "#smartpy_onchain_view"
         },
 
 /* Testing */
+
         {
-            id: 'scenario_creation',
-            name: 'scenario_creation',
-            url: conceptBaseUrl + '#smart_scenario_creation'
+            id: 'smartpy_test_starter',
+            name: 'smartpy_test_starter',
+            url: conceptBaseUrl + '#smartpy_test_starter',
         },
 
         {
-            id: 'contract_instantiation',
-            name: 'contract_instantiation',
-            url: conceptBaseUrl + '#smart_contract_instantiation'
+            id: 'smartpy_scenario_creation',
+            name: 'smartpy_scenario_creation',
+            url: conceptBaseUrl + '#smartpy_scenario_creation'
         },
 
         {
-            id: 'adding_to_scenario',
-            name: 'adding_to_scenario',
-            url: conceptBaseUrl + '#smart_adding_to_scenario'
+            id: 'smartpy_contract_instantiation',
+            name: 'smartpy_contract_instantiation',
+            url: conceptBaseUrl + '#smartpy_contract_instantiation'
         },
 
         {
-            id: 'test_unwrap_option',
-            name: 'test_unwrap_option',
-            url: conceptBaseUrl + "#smart_test_unwrap_option"
+            id: 'smartpy_adding_to_scenario',
+            name: 'smartpy_adding_to_scenario',
+            url: conceptBaseUrl + '#smartpy_adding_to_scenario'
         },
 
         {
-            id: 'test_account',
-            name: 'test_account',
-            url: conceptBaseUrl + "#smart_test_account"
+            id: 'smartpy_test_unwrap_option',
+            name: 'smartpy_test_unwrap_option',
+            url: conceptBaseUrl + "#smartpy_test_unwrap_option"
         },
 
         {
-            id: 'test_address',
-            name: 'test_address',
-            url: conceptBaseUrl + "#smart_test_address"
+            id: 'smartpy_test_account',
+            name: 'smartpy_test_account',
+            url: conceptBaseUrl + "#smartpy_test_account"
         },
 
         {
-            id: 'public_key_hash',
-            name: 'public_key_hash',
-            url: conceptBaseUrl + "#smart_public_key_hash"
+            id: 'smartpy_test_address',
+            name: 'smartpy_test_address',
+            url: conceptBaseUrl + "#smartpy_test_address"
         },
 
         {
-            id: 'public_key',
-            name: 'public_key',
-            url: conceptBaseUrl + "#smart_public_key"
+            id: 'smartpy_public_key_hash',
+            name: 'smartpy_public_key_hash',
+            url: conceptBaseUrl + "#smartpy_public_key_hash"
         },
 
         {
-            id: 'secret_key',
-            name: 'secret_key',
-            url: conceptBaseUrl + "#smart_secret_key"
+            id: 'smartpy_public_key',
+            name: 'smartpy_public_key',
+            url: conceptBaseUrl + "#smartpy_public_key"
         },
 
         {
-            id: 'test_some',
-            name: 'test_some',
-            url: conceptBaseUrl + "#smart_test_some"
+            id: 'smartpy_secret_key',
+            name: 'smartpy_secret_key',
+            url: conceptBaseUrl + "#smartpy_secret_key"
         },
 
         {
-            id: 'scenario.verify',
-            name: 'scenario.verify',
-            url: conceptBaseUrl + "#smart_scenario_verify"
+            id: 'smartpy_test_some',
+            name: 'smartpy_test_some',
+            url: conceptBaseUrl + "#smartpy_test_some"
         },
 
         {
-            id: 'scenario.verify_equal',
-            name: 'scenario.verify_equal',
-            url: conceptBaseUrl + "#smart_scenario.verify_equal"
+            id: 'smartpy_scenario.verify',
+            name: 'smartpy_scenario.verify',
+            url: conceptBaseUrl + "#smartpy_scenario_verify"
         },
 
         {
-            id: 'contract.data',
-            name: 'contract.data',
-            url: conceptBaseUrl + "#smart_contract.data"
+            id: 'smartpy_scenario_verify_equal',
+            name: 'smartpy_scenario_verify_equal',
+            url: conceptBaseUrl + "#smartpy_scenario_verify_equal"
         },
 
         {
-            id: 'contract.balance',
-            name: 'contract.balance',
-            url: conceptBaseUrl + "#smart_contract.balance"
+            id: 'smartpy_contract_data',
+            name: 'smartpy_contract_data',
+            url: conceptBaseUrl + "#smartpy_contract_data"
         },
 
         {
-            id: 'contract.baker',
-            name: 'contract.baker',
-            url: conceptBaseUrl + "#smart_contract.baker"
+            id: 'smartpy_contract_balance',
+            name: 'smartpy_contract_balance',
+            url: conceptBaseUrl + "#smartpy_contract_balance"
         },
 
         {
-            id: 'contract.address',
-            name: 'contract.address',
-            url: conceptBaseUrl + "#smart_contract.address"
+            id: 'smartpy_contract_baker',
+            name: 'smartpy_contract_baker',
+            url: conceptBaseUrl + "#smartpy_contract_baker"
         },
 
         {
-            id: 'scenario.h',
-            name: 'scenario.h',
-            url: conceptBaseUrl + "#smart_scenario.h"
+            id: 'smartpy_contract_address',
+            name: 'smartpy_contract_address',
+            url: conceptBaseUrl + "#smartpy_contract_address"
         },
 
         {
-            id: 'test_none',
-            name: 'test_none',
-            url: conceptBaseUrl + "#smart_none"
+            id: 'smartpy_scenario_h',
+            name: 'smartpy_scenario_h',
+            url: conceptBaseUrl + "#smartpy_scenario_h"
         },
 
         {
-            id: 'scenario.show',
-            name: 'scenario.show',
-            url: conceptBaseUrl + "#smart_scenario_show"
+            id: 'smartpy_test_none',
+            name: 'smartpy_test_none',
+            url: conceptBaseUrl + "#smartpy_test_none"
         },
 
         {
-            id: 'trace',
-            name: 'trace',
-            url: conceptBaseUrl + "#smart_trace"
+            id: 'smartpy_scenario_show',
+            name: 'smartpy_scenario_show',
+            url: conceptBaseUrl + "#smartpy_scenario_show"
+        },
+
+        {
+            id: 'smartpy_trace',
+            name: 'smartpy_trace',
+            url: conceptBaseUrl + "#smartpy_trace"
         },
 
 
 /*Int - Nat - Tez*/
 
         {
-            id: 'sp.int',
-            name: 'sp.int',
-            url: conceptBaseUrl + "#smart_contract_sp_int"
+            id: 'int_declaration',
+            name: 'int_declaration',
+            url: conceptBaseUrl + "#int_declaration"
         },
 
         {
-            id: 'sp.nat',
-            name: 'sp.nat',
-            url: conceptBaseUrl + "#smart_contract_sp_nat"
+            id: 'nat_declaration',
+            name: 'nat_declaration',
+            url: conceptBaseUrl + "#nat_declaration"
         },
 
         {
-            id: 'sp.to_int',
-            name: 'sp.to_int',
-            url: conceptBaseUrl + '#smart_contract_sp_to_int',
+            id: 'sp_to_int',
+            name: 'sp_to_int',
+            url: conceptBaseUrl + '#sp_to_int',
         },
 
         {
-            id: 'sp.is_nat',
-            name: 'sp.is_nat',
-            url: conceptBaseUrl + '#smart_contract_sp_is_nat'
+            id: 'sp_is_nat',
+            name: 'sp_is_nat',
+            url: conceptBaseUrl + '#sp_is_nat'
         },
 
         {
-            id: 'sp.as_nat',
-            name: 'sp.as_nat',
-            url: conceptBaseUrl + '#smart_contract_sp_as_nat'
+            id: 'sp_as_nat',
+            name: 'sp_as_nat',
+            url: conceptBaseUrl + '#sp_as_nat'
         },
 
         {
-            id: 'type_int',
-            name: 'Int',
-            url: conceptBaseUrl + '#smart_contract_int',
+            id: 'int_type',
+            name: 'int_type',
+            url: conceptBaseUrl + '#int_type',
         },
 
         {
-            id: 'type_nat',
-            name: 'Nat',
-            url: conceptBaseUrl + '#smart_contract_nat',
+            id: 'nat_type',
+            name: 'nat_type',
+            url: conceptBaseUrl + '#nat_type',
         },
 
 /* Types */
 
         {
-            id: 'sp.cast',
-            name: 'sp.cast',
-            url: conceptBaseUrl + "#smart_sp_cast"
+            id: 'smartpy_sp_cast',
+            name: 'smartpy_sp_cast',
+            url: conceptBaseUrl + "#smartpy_sp_cast"
         },
 
         {
-            id: 'sp.unit',
-            name: 'sp.unit',
-            url: conceptBaseUrl + "#smart_sp_unit"
+            id: 'unit_type',
+            name: 'unit_type',
+            url: conceptBaseUrl + "#unit_type"
         },
 
         {
             id: '()',
             name: '()',
-            url: conceptBaseUrl + "#smart_()"
+            url: conceptBaseUrl + "#()"
         },
 
         {
-            id: 'my_type',
-            name: 'my_type',
-            url: conceptBaseUrl + "#smart_my_type"
+            id: 'custom_type',
+            name: 'custom_type',
+            url: conceptBaseUrl + "#custom_type"
         },
 
         {
-            id: 'convert_to_tez',
-            name: 'convert_to_tez',
-            url: conceptBaseUrl + "#smart_convert_to_tez"
+            id: 'smartpy_convert_to_tez',
+            name: 'smartpy_convert_to_tez',
+            url: conceptBaseUrl + "#convert_to_tez"
         },
 
         {
@@ -1573,336 +1604,365 @@ window.SmartContractConfig = {
         {
             id: 'addition',
             name: 'addition',
-            url: conceptBaseUrl + '#smart_contract_add',
+            url: conceptBaseUrl + '#addition',
         },
 
         {
-            id: 'sp.add',
-            name: 'sp.add',
-            url: conceptBaseUrl + '#smart_contract_sp_add',
+            id: 'addition_multitypes',
+            name: 'addition_multitypes',
+            url: conceptBaseUrl + '#addition_multitypes',
         },
 
         {
             id: 'substraction',
             name: 'substraction',
-            url: conceptBaseUrl + '#smart_contract_sub',
+            url: conceptBaseUrl + '#substraction',
         },
 
         {
-            id:'sp.sub',
-            name:'sp.sub',
-            url: conceptBaseUrl + '#smart_contract_sp_sub'
+            id:'substraction_multitypes',
+            name:'substraction_multitypes',
+            url: conceptBaseUrl + '#substraction_multitypes'
         },
 
         {
             id: 'multiply',
             name: 'multiply',
-            url: conceptBaseUrl + '#smart_contract_mul',
+            url: conceptBaseUrl + '#multiply',
         },
 
         {
-            id: 'sp.mul',
-            name: 'sp.mul',
-            url: conceptBaseUrl + '#smart_contract_sp_mul'
+            id: 'multiplication_multitypes',
+            name: 'multiplication_multitypes',
+            url: conceptBaseUrl + '#multiplication_multitypes'
         },
 
         {
             id: 'modulo',
             name: 'modulo',
-            url: conceptBaseUrl + '#smart_contract_modulo',
+            url: conceptBaseUrl + '#modulo',
         },
 
         {
-            id: 'ediv',
-            name: 'ediv',
-            url: conceptBaseUrl + '#smart_contract_ediv',
+            id: 'divide',
+            name: 'divide',
+            url: conceptBaseUrl + '#divide'
         },
 
         {
-            id: 'split_tokens',
-            name: 'split Tokens',
-            url: conceptBaseUrl + "#smart_contract_split_tokens",
+            id: 'euclidian_multitypes',
+            name: 'euclidian_multitypes',
+            url: conceptBaseUrl + '#euclidian_multitypes',
+        },
+
+        {
+            id: 'smartpy_split_tokens',
+            name: 'smartpy_split_tokens',
+            url: conceptBaseUrl + "#smartpy_split_tokens",
+        },
+
+        {
+            id: 'shorthand_operators',
+            name: 'shorthand_operators',
+            url: conceptBaseUrl + "#shorthand_operators"
         },
 
 /*Strings*/
 
         {
-            id: 'type_string',
-            name: 'type_string',
-            url: conceptBaseUrl + '#smart_contract_string'
+            id: 'string_type',
+            name: 'string_type',
+            url: conceptBaseUrl + '#string_type'
         },
 
         {
             id: 'string',
             name: 'type_string',
-            url: conceptBaseUrl + "#smart_type_string"
+            url: conceptBaseUrl + "#string"
         },
 
         {
-            id: 'concatenate',
-            name: 'concatenate Strings',
-            url: conceptBaseUrl + '#smart_contract_string'
+            id: 'string_concatenate',
+            name: 'string_concatenate',
+            url: conceptBaseUrl + '#string_concatenate'
         },
 
         {
-            id: 'slice',
-            name: 'slice',
-            url: conceptBaseUrl + '#smart_contract_slice'
+            id: 'smartpy_slice',
+            name: 'smartpy_slice',
+            url: conceptBaseUrl + '#smartpy_slice'
         },
 
         {
-            id: 'length_string',
-            name: 'length_string',
-            url: conceptBaseUrl + '#smart_contract_slice'
+            id: 'length',
+            name: 'length',
+            url: conceptBaseUrl + '#length'
         },
 
+        {
+            id: 'string_addition',
+            name: 'string_addition',
+            url: conceptBaseUrl + "#string_addition"
+        },
 
 
 /*Timestamps*/
 
         {
-            id: 'type_timestamp',
-            name: 'timestamp',
-            url: conceptBaseUrl + '#smart_contract_string'
+            id: 'timestamp_from_seconds',
+            name: 'timestamp_from_seconds',
+            url: conceptBaseUrl + '#timestamp_from_seconds'
         },
 
         {
-            id: 'sp.now',
-            name: 'sp.now',
-            url: conceptBaseUrl + '#smart_sp_now'
+            id: 'current_timestamp',
+            name: 'current_timestamp',
+            url: conceptBaseUrl + '#current_timestamp'
         },
 
         {
-            id: 'timestamp_from_utc',
-            name: 'timestamp_from_utc',
-            url: conceptBaseUrl + '#smart_timestamp_from_utc'
+            id: 'smartpy_timestamp_from_utc',
+            name: 'smartpy_timestamp_from_utc',
+            url: conceptBaseUrl + '#smartpy_timestamp_from_utc'
         },
 
         {
-            id: 'sp.add_seconds',
-            name: 'sp.add_seconds',
-            url: conceptBaseUrl + '#smart_add_seconds'
+            id: 'smartpy_add_seconds',
+            name: 'smartpy_add_seconds',
+            url: conceptBaseUrl + '#smartpy_add_seconds'
         },
 
         {
-            id: 'sp.add_days',
-            name: 'sp.add_days',
-            url: conceptBaseUrl + '#smart_add_days'
+            id: 'smartpy_add_days',
+            name: 'smartpy_add_days',
+            url: conceptBaseUrl + '#smartpy_add_days'
         },
 
         {
             id: 'difference_timestamp',
             name: 'difference_timestamp',
-            url: conceptBaseUrl  + '#smart_difference_timestamp'
+            url: conceptBaseUrl  + '#difference_timestamp'
         },
 
         {
-            id: 'type_timestamp',
-            name: 'sp.timestamp',
-            url: conceptBaseUrl + '#smart_contract_timestamp',
+            id: 'timestamp_type',
+            name: 'timestamp_type',
+            url: conceptBaseUrl + '#timestamp_type',
         },
 
 
 /*Addresses - Transactions - Delegation*/
 
         {
-            id: 'sp.tez',
-            name: 'sp.tez',
-            url: conceptBaseUrl + '#smart_contract_sp_tez'
+            id: 'tez',
+            name: 'tez',
+            url: conceptBaseUrl + '#tez'
         },
 
         {
-            id: 'sp.mutez',
-            name: 'sp.mutez',
-            url: conceptBaseUrl + '#smart_contract_sp_mutez'
+            id: 'mutez',
+            name: 'mutez',
+            url: conceptBaseUrl + '#mutez'
         },
 
         {
-            id: 'sp.sender',
-            name: 'sp.sender',
-            url: conceptBaseUrl + '#smart_sp_sender'
+            id: 'sender',
+            name: 'sender',
+            url: conceptBaseUrl + '#sender'
         },
 
         {
-            id: 'sp.amount',
-            name: 'sp.amount',
-            url: conceptBaseUrl + "#smart_sp_amount"
+            id: 'amount',
+            name: 'amount',
+            url: conceptBaseUrl + "#amount"
         },
 
         {
-            id: 'sp.balance',
-            name: 'sp.balance', 
-            url: conceptBaseUrl + "#smart_sp_balance"
+            id: 'balance',
+            name: 'balance', 
+            url: conceptBaseUrl + "#balance"
         },
 
 
         {
-            id: 'sp.address',
-            name: 'sp.address',
-            url: conceptBaseUrl + "#smart_sp_address"
+            id: 'address',
+            name: 'address',
+            url: conceptBaseUrl + "#address"
         },
 
         {
-            id: 'sp.send',
-            name: 'sp.send',
+            id: 'send_tez',
+            name: 'send_tez',
             url: conceptBaseUrl + "#smart_sp_send"
+        },
+
+        {
+            id: 'smartpy_set_delegate',
+            name: 'smartpy_set_delegate',
+            url: conceptBaseUrl + '#smartpy_set_delegate'
         },
 
         {
             id: 'type_mutez',
             name: 'type_mutez',
-            url: conceptBaseUrl + "#smart_type_mutez"
+            url: conceptBaseUrl + "#type_mutez"
         },
 
 /* Asserts, Booleans*/
 
         {
-            id: 'assert',
-            name: 'assert',
-            url: conceptBaseUrl + "#smart_assert"
+            id: 'raise',
+            name: 'raise',
+            url: conceptBaseUrl + "#raise"
         },
 
         {
-            id: 'assert_error',
-            name: 'assert_error',
-            url: conceptBaseUrl + "#smart_assert_error"
+            id: 'verify',
+            name: 'verify',
+            url: conceptBaseUrl + "#verify"
+        },
+
+        {
+            id: 'verify_message',
+            name: 'verify_message',
+            url: conceptBaseUrl + "#verify_message"
         },
 
         {
             id: 'and',
             name: 'and',
-            url: conceptBaseUrl + "#smart_and"
+            url: conceptBaseUrl + "#and"
         },
 
         {
             id: 'or',
             name: 'or',
-            url: conceptBaseUrl + "#smart_or"
+            url: conceptBaseUrl + "#or"
         },
 
         {
             id: 'not',
             name: 'not',
-            url: conceptBaseUrl + "#smart_not"
+            url: conceptBaseUrl + "#not"
         },
 
         {
             id: '^',
             name: '^',
-            url: conceptBaseUrl + "#smart_^"
+            url: conceptBaseUrl + "#^"
         },
 
         {
             id: 'true',
             name: 'true',
-            url: conceptBaseUrl + "#smart_true"
+            url: conceptBaseUrl + "#true"
         },
 
         {
             id: 'false',
             name: 'false',
-            url: conceptBaseUrl + "#smart_false"
+            url: conceptBaseUrl + "#false"
         },
 
         {
             id: '>',
             name: '>',
-            url: conceptBaseUrl + "#smart_>"
+            url: conceptBaseUrl + "#>"
         },
 
         {
             id: '<',
             name: '<',
-            url: conceptBaseUrl + "#smart_<"
+            url: conceptBaseUrl + "#<"
         },
 
         {
-            id: '<=',
-            name: '<=',
-            url: conceptBaseUrl + "#smart_<="
+            id: 'less_or_equal',
+            name: 'less_or_equal',
+            url: conceptBaseUrl + "#less_or_equal"
         },
 
         {
-            id: '>=',
-            name: '>=',
-            url: conceptBaseUrl + "#smart_>="
+            id: 'more_or_equal',
+            name: 'more_or_equal',
+            url: conceptBaseUrl + "#more_or_equal"
         },
 
         {
-            id: '==',
-            name: '==',
-            url: conceptBaseUrl + "#smart_=="
+            id: 'equal_comparator',
+            name: 'equal_comparator',
+            url: conceptBaseUrl + "#equal_comparator"
         },
 
         {
             id: '!=',
             name: '!=',
-            url: conceptBaseUrl + "#smart_!="
+            url: conceptBaseUrl + "#!="
         },
 
         {
-            id: 'sp.bool',
-            name: 'sp.bool',
-            url: conceptBaseUrl + "#smart_sp_bool"
+            id: 'boolean_type',
+            name: 'boolean_type',
+            url: conceptBaseUrl + "#boolean_type"
         },
 
 
 /* Options */
 
         {
-            id: 'sp.option',
-            name: 'sp.option',
-            url: conceptBaseUrl + "#smart_sp_option"
+            id: 'option',
+            name: 'option',
+            url: conceptBaseUrl + "#option"
         },
 
         {
-            id: 'sp.some',
-            name: 'sp.some',
-            url: conceptBaseUrl + "#smart_sp_some"
+            id: 'some',
+            name: 'some',
+            url: conceptBaseUrl + "#some"
         },
 
         {
             id: 'none',
             name: 'none',
-            url: conceptBaseUrl + "#smart_none"
+            url: conceptBaseUrl + "#none"
         },
 
         {
-            id: 'unwrap_some',
-            name: 'unwrap_some',
-            url: conceptBaseUrl + "#smart_unwrap_some"
+            id: 'smartpy_unwrap_some',
+            name: 'smartpy_unwrap_some',
+            url: conceptBaseUrl + "#smartpy_unwrap_some"
         },
 
         {
-            id: 'x_is_none',
-            name: 'x_is_none',
-            url: conceptBaseUrl + "#smart_x_is_none"
+            id: 'smartpy_opt_is_none',
+            name: 'smartpy_opt_is_none',
+            url: conceptBaseUrl + "#smartpy_opt_is_none"
         },
 
         {
-            id: 'x_is_some',
-            name: 'x_is_some',
-            url: conceptBaseUrl + "#smart_x_is_some"
+            id: 'smartpy_opt_is_some',
+            name: 'smartpy_opt_is_some',
+            url: conceptBaseUrl + "#smartpy_opt_is_some"
         },
 
 /*Inter-contract*/
 
         {
-            id: 'sp.contract',
-            name: 'sp.contract',
-            url: conceptBaseUrl + "#smart_sp_contract"
+            id: 'contract_call',
+            name: 'contract_call',
+            url: conceptBaseUrl + "#contract_call"
         },
 
         {
-            id: 'sp.transfer',
-            name: 'sp.transfer',
-            url: conceptBaseUrl + "#smart_sp_transfer"
+            id: 'transfer_of_tez',
+            name: 'transfer_of_tez',
+            url: conceptBaseUrl + "#transfer_of_tez"
         },
 
         {
-            id: 'sp.view',
-            name: 'sp.view',
-            url: conceptBaseUrl + "#smart_sp_view"
+            id: 'smartpy_sp_view',
+            name: 'smartpy_sp_view',
+            url: conceptBaseUrl + "#smartpy_sp_view"
         },
 
 /*Pairs - Tuples - Records*/
@@ -1910,61 +1970,61 @@ window.SmartContractConfig = {
         {
             id: 'pair',
             name: 'pair',
-            url: conceptBaseUrl + "#smart_pair"
+            url: conceptBaseUrl + "#pair"
         },
 
         {
             id: 'variables_pair',
             name: 'variables_pair',
-            url: conceptBaseUrl + "#smart_variables_pair"
+            url: conceptBaseUrl + "#variables_pair"
         },
 
         {
-            id: 'sp.fst',
-            name: 'sp.fst',
-            url: conceptBaseUrl + "#smart_sp_fst"
+            id: 'first_element_pair',
+            name: 'first_element_pair',
+            url: conceptBaseUrl + "#first_element_pair"
         },
 
         {
-            id: 'sp.snd',
-            name: 'sp.snd',
-            url: conceptBaseUrl + "#smart_sp_snd"
+            id: 'second_element_pair',
+            name: 'second_element_pair',
+            url: conceptBaseUrl + "#second_element_pair"
         },
 
         {
             id: 'tuple',
             name: 'tuple',
-            url: conceptBaseUrl + "#smart_tuple"
+            url: conceptBaseUrl + "#tuple"
         },
 
         {
             id: 'variables_tuple',
             name: 'variables_tuple',
-            url: conceptBaseUrl + "#smart_variables_tuple"
+            url: conceptBaseUrl + "#variables_tuple"
         },
 
         {
             id: 'record',
             name: 'record',
-            url: conceptBaseUrl + "#smart_record"
+            url: conceptBaseUrl + "#record"
         },
 
         {
             id: 'record_type',
             name: 'record_type',
-            url: conceptBaseUrl + "#smart_record_type"
+            url: conceptBaseUrl + "#record_type"
         },
 
         {
-            id: 'sp.pair',
-            name: 'sp.pair',
-            url: conceptBaseUrl + "#smart_sp_pair"
+            id: 'pair_type',
+            name: 'pair_type',
+            url: conceptBaseUrl + "#pair_type"
         },
 
         {
-            id: 'sp.tuple',
-            name: 'sp.tuple',
-            url: conceptBaseUrl + "#smart_sp_tuple"
+            id: 'tuple_type',
+            name: 'tuple_type',
+            url: conceptBaseUrl + "#tuple_type"
         },
 
 
@@ -1973,76 +2033,76 @@ window.SmartContractConfig = {
         {
             id: 'map',
             name: 'map',
-            url: conceptBaseUrl + "#smart_map"
+            url: conceptBaseUrl + "#map"
         },
 
         {
-            id: 'big_map',
-            name: 'big_map',
-            url: conceptBaseUrl + "#smart_big_map"
+            id: 'smartpy_big_map',
+            name: 'smartpy_big_map',
+            url: conceptBaseUrl + "#smartpy_big_map"
         },
 
         {
             id: 'type_map',
             name: 'type_map',
-            url: conceptBaseUrl + "#smart_type_map"
+            url: conceptBaseUrl + "#type_map"
         },
 
         {
             id: 'type_big_map',
             name: 'type_big_map',
-            url: conceptBaseUrl + "#smart_type_big_map"
+            url: conceptBaseUrl + "#type_big_map"
         },
 
         {
             id: 'delete_map_entry',
             name: 'delete_map_entry',
-            url: conceptBaseUrl + "#smart_delete_map_entry"
+            url: conceptBaseUrl + "#delete_map_entry"
         },
 
         {
-            id: 'add_update_map_entry',
-            name: 'add_update_map_entry',
-            url: conceptBaseUrl + "#smart_add_update_map_entry"
+            id: 'update_map_entry',
+            name: 'update_map_entry',
+            url: conceptBaseUrl + "#update_map_entry"
         },
 
         {
             id: 'access_map_entry',
             name: 'access_map_entry',
-            url: conceptBaseUrl + "#smart_access_map_entry"
+            url: conceptBaseUrl + "#access_map_entry"
         },
 
         {
             id: 'check_map_key',
             name: 'check_map_key',
-            url: conceptBaseUrl + "#smart_check_map_key"
+            url: conceptBaseUrl + "#check_map_key"
         },
 
         {
             id: 'size_map',
             name: 'size_map',
-            url: conceptBaseUrl + "#smart_size_map"
+            url: conceptBaseUrl + "#size_map"
             
         },
 
         {
-            id: 'get_items',
-            name: 'get_items',
-            url: conceptBaseUrl + "#smart_get_items"
+            id: 'smartpy_get_items',
+            name: 'smartpy_get_items',
+            url: conceptBaseUrl + "#smartpy_get_items"
             
         },
 
         {
-            id: 'get_keys',
-            name: 'get_keys',
-            url: conceptBaseUrl + "#smart_get_keys"
+            id: 'smartpy_get_keys',
+            name: 'smartpy_get_keys',
+            url: conceptBaseUrl + "#smartpy_get_keys"
             
         },
 
         {
-            id: 'get_values',
-            name: 'get_values',
-            url: conceptBaseUrl + "#smart_get_values"
+            id: 'smartpy_get_values',
+            name: 'smartpy_get_values',
+            url: conceptBaseUrl + "#smartpy_get_values"
             
         },
 
@@ -2051,134 +2111,134 @@ window.SmartContractConfig = {
         {
             id: 'list',
             name: 'list',
-            url: conceptBaseUrl + "#smart_list"
+            url: conceptBaseUrl + "#list"
         },
 
         {
             id: 'list_size',
             name: 'list_size',
-            url: conceptBaseUrl + "#smart_list_size"
+            url: conceptBaseUrl + "#list_size"
         },
 
         {
             id: 'list_push',
             name: 'list_push',
-            url: conceptBaseUrl + "#smart_list_push"
+            url: conceptBaseUrl + "#list_push"
         },
 
         {
-            id: 'sp.range',
-            name: 'sp.range',
-            url: conceptBaseUrl + "#smart_sp_range"
+            id: 'smartpy_sp_range',
+            name: 'smartpy_sp_range',
+            url: conceptBaseUrl + "#smartpy_sp_range"
         },
 
         {
-            id: 'sp.sum',
-            name: 'sp.sum',
-            url: conceptBaseUrl + "#smart_sp_sum"
+            id: 'smartpy_sp_sum',
+            name: 'smartpy_sp_sum',
+            url: conceptBaseUrl + "#smartpy_sp_sum"
         },
         {
-            id: 'sp.list',
-            name: 'sp.list',
-            url: conceptBaseUrl + "#smart_sp_list"
+            id: 'smartpy_list_type',
+            name: 'smartpy_list_type',
+            url: conceptBaseUrl + "#smartpy_list_type"
         },
 
         {
             id: 'set',
             name: 'set',
-            url: conceptBaseUrl + "#smart_set"
+            url: conceptBaseUrl + "#set"
         },
 
         {
-            id: 'sp.set',
-            name: 'sp.set',
-            url: conceptBaseUrl + "#smart_sp_set"
+            id: 'set_type',
+            name: 'set_type',
+            url: conceptBaseUrl + "#set_type"
         },
 
         {
-            id: 'set_length',
-            name: 'set_length',
-            url: conceptBaseUrl + "#smart_set_length"
+            id: 'smartpy_set_length',
+            name: 'smartpy_set_length',
+            url: conceptBaseUrl + "#smartpy_set_length"
         },
 
         {
-            id: 'set_contains',
-            name: 'set_contains',
-            url: conceptBaseUrl + "#smart_set_contains"
+            id: 'smartpy_set_contains',
+            name: 'smartpy_set_contains',
+            url: conceptBaseUrl + "#smartpy_set_contains"
         },
 
         {
-            id: 'set_elements',
-            name: 'set_elements',
-            url: conceptBaseUrl + "#smart_set_elements"
+            id: 'smartpy_set_elements',
+            name: 'smartpy_set_elements',
+            url: conceptBaseUrl + "#smartpy_set_elements"
         },
 
         {
-            id: 'set_add',
-            name: 'set_add',
-            url: conceptBaseUrl + "#smart_set_add"
+            id: 'smartpy_set_add',
+            name: 'smartpy_set_add',
+            url: conceptBaseUrl + "#smartpy_set_add"
         },
 
         {
-            id: 'set_remove',
-            name: 'set_remove',
-            url: conceptBaseUrl + "#smart_set_remove"
+            id: 'smartpy_set_remove',
+            name: 'smartpy_set_remove',
+            url: conceptBaseUrl + "#smartpy_set_remove"
         },
 
 /* Bytes */
 
         {
-            id: 'sp.bytes',
-            name: 'sp.bytes',
-            url: conceptBaseUrl + "#smart_sp_bytes"
+            id: 'bytes',
+            name: 'bytes',
+            url: conceptBaseUrl + "#bytes"
         },
 
         {
-            id: 'sp.slice',
-            name: 'sp.slice',
-            url: conceptBaseUrl + "#smart_sp_slice"
+            id: 'smartpy_sp_slice',
+            name: 'smartpy_sp_slice',
+            url: conceptBaseUrl + "#smartpy_sp_slice"
         },
 
         {
-            id: 'sp.concat',
-            name: 'sp.concat',
-            url: conceptBaseUrl + "#smart_sp_concat"
+            id: 'smartpy_sp_concat',
+            name: 'smartpy_sp_concat',
+            url: conceptBaseUrl + "#smartpy_sp_concat"
         },
 
         {
-            id: 'and_bytes',
-            name: 'adn_bytes',
-            url: conceptBaseUrl + "#smart_and_bytes"
+            id: 'smartpy_and_bytes',
+            name: 'smartpy_and_bytes',
+            url: conceptBaseUrl + "#smartpy_and_bytes"
         },
 
         {
-            id: 'or_bytes',
-            name: 'or_bytes',
-            url: conceptBaseUrl + "#smart_or_bytes"
+            id: 'smartpy_or_bytes',
+            name: 'smartpy_or_bytes',
+            url: conceptBaseUrl + "#smartpy_or_bytes"
         },
 
         {
-            id: 'xor_bytes',
-            name: 'xor_bytes',
-            url: conceptBaseUrl + "#smart_xor_bytes"
+            id: 'smartpy_xor_bytes',
+            name: 'smartpy_xor_bytes',
+            url: conceptBaseUrl + "#smartpy_xor_bytes"
         },
 
         {
-            id: 'invert_bytes',
-            name: 'invert_bytes',
-            url: conceptBaseUrl + "#smart_invert_bytes"
+            id: 'smartpy_invert_bytes',
+            name: 'smartpy_invert_bytes',
+            url: conceptBaseUrl + "#smartpy_invert_bytes"
         },
 
         {
-            id: 'lshift_bytes',
-            name: 'lshift_bytes',
-            url: conceptBaseUrl + "#smart_lshift_bytes"
+            id: 'smartpy_lshift_bytes',
+            name: 'smartpy_lshift_bytes',
+            url: conceptBaseUrl + "#smartpy_lshift_bytes"
         },
 
         {
-            id: 'rshift_bytes',
-            name: 'rshift_bytes',
-            url: conceptBaseUrl + "#smart_rshift_bytes"
+            id: 'smartpy_rshift_bytes',
+            name: 'smartpy_rshift_bytes',
+            url: conceptBaseUrl + "#smartpy_rshift_bytes"
         },
 
 ],
