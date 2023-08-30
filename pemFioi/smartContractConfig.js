@@ -1,8 +1,5 @@
-/*const conceptBaseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
+const conceptBaseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
     + 'static4.castor-informatique.fr/help/smart_contracts.html';
-*/
-
-const conceptBaseUrl = "file:///C:/Users/maxim/Desktop/test tortoise svn/v01/LanguagesHelp/smart_contracts.html"
 
 const smartPyBlocksList = {
 
