@@ -645,7 +645,7 @@ var quickAlgoLanguageStrings = {
          turtle: "Grafika"
       },
       exerciseTypeAbout: {
-         default: "Naloga podprta z <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: verify
+         default: "Naloga podprta s pomočjo <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: verify
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> projekt od " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: verify
       },
