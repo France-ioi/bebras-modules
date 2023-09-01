@@ -515,9 +515,9 @@ var quickAlgoInterface = {
             var licenseTxt = this.strings.license;
             // if the license is not inside of our predefined licenses then we write it without "more details" button
             if (!this.licenses[license])
-                licenseTxt += license;
+                licenseTxt += " " + license;
             else
-                licenseTxt += license + " " + this._getAboutLicenseButton(false, license);
+                licenseTxt += " " + license + " " + this._getAboutLicenseButton(false, license);
         } else {
             var licenseTxt = this.strings.licenseReserved;
         }
