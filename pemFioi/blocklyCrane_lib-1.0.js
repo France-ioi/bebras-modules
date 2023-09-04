@@ -882,7 +882,8 @@ var getContext = function(display, infos, curLevel) {
          $("body").append("<audio src="+getSoundPath("background.mp3")+" autoplay loop id=background_music></audio>");
          $("html").click(function() {
             if($("#background_music").length > 0){
-               $("#background_music")[0].play();
+               // Don't throw the exception "The play() request was interrupted because the media was removed from the document" on level change
+               $("#background_music")[0].play().catch(function () {});
             }
          })
          var vol = (context.soundEnabled) ? 1 : 0;
