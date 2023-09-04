@@ -394,7 +394,7 @@ function getConceptViewerBaseConcepts(baseUrl) {
     // Get base concepts in the default help
     if(!baseUrl) {
        var baseUrl = getConceptViewerBaseUrl();
-       if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it' || window.stringsLanguage == 'en') {
+       if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
           baseUrl += 'index_' + window.stringsLanguage + '.html';
        } else {
           baseUrl += 'index.html';
