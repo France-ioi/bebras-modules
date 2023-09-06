@@ -1621,7 +1621,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/index_tralalere_s3.html';
-   //var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
+   //var conceptBaseUrl = 'file:///C:/www/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
    context.conceptDisabledList = ['language'];
    context.conceptList = [
       {id: 'oie_presentation', name: 'Jeu de l\'oie', url: conceptBaseUrl+'#oie_presentation'},
@@ -1631,7 +1631,7 @@ var getContext = function(display, infos, curLevel) {
       {id: 'puzzle_presentation', name: 'Puyo Puyo', url: conceptBaseUrl+'#puzzle_presentation'},
       {id: 'breakout_presentation', name: 'Casse briques', url: conceptBaseUrl+'#breakout_presentation'},
 
-      {id: 'crane_actions', name: 'Actions de la grue', isBase: true, isCategory: true},
+      {id: 'crane_actions', name: 'Actions', isBase: true, isCategory: true},
       {id: 'left', name: 'gauche()', url: conceptBaseUrl+'#left', python: ['left'], categoryId: 'crane_actions'},
       {id: 'right', name: 'droite()', url: conceptBaseUrl+'#right', python: ['right'], categoryId: 'crane_actions'},
       {id: 'up', name: 'monter()', url: conceptBaseUrl+'#up', python: ['up'], categoryId: 'crane_actions'},
@@ -1649,6 +1649,9 @@ var getContext = function(display, infos, curLevel) {
       {id: 'destroyFaceItem', name: 'detruireObjet()', url: conceptBaseUrl+'#destroyFaceItem', python: ['destroyFaceItem'], categoryId: 'crane_actions'},
       {id: 'drawShape', name: 'dessinerForme(forme, couleur)', url: conceptBaseUrl+'#drawShape', python: ['drawShape'], categoryId: 'crane_actions'},
       {id: 'eraseShape', name: 'effacerForme()', url: conceptBaseUrl+'#drawShape', python: ['drawShape'], categoryId: 'crane_actions'},
+      {id: 'displayMessage', name: 'afficheMessage(message)', url: conceptBaseUrl+'#displayMessage', python: ['displayMessage'], categoryId: 'crane_actions'},
+      {id: 'log', name: 'log(message)', url: conceptBaseUrl+'#log', python: ['log'], categoryId: 'crane_actions'},
+
       
       {id: 'crane_sensors', name: 'Capteurs', isBase: true, isCategory: true},
 
@@ -1673,9 +1676,6 @@ var getContext = function(display, infos, curLevel) {
       {id: 'readShape', name: 'lireForme()', url: conceptBaseUrl+'#readShape', python: ['readShape'], categoryId: 'crane_sensors'},
       {id: 'readColor', name: 'lireCouleur()', url: conceptBaseUrl+'#readColor', python: ['readColor'], categoryId: 'crane_sensors'},
 
-      {id: 'display', name: 'Affichage', isBase: true, isCategory: true},
-      {id: 'displayMessage', name: 'afficheMessage(message)', url: conceptBaseUrl+'#displayMessage', python: ['displayMessage'], categoryId: 'display'},
-      {id: 'log', name: 'log(message)', url: conceptBaseUrl+'#log', python: ['log'], categoryId: 'display'},
 
       {id: 'customFunctions', name: 'Vos fonctions', isBase: true, isCategory: true},
       {id: 'flipUnder', name: 'retournerDessous()', url: conceptBaseUrl+'#flipUnder', python: ['flipUnder'], categoryId: 'customFunctions'},
@@ -1710,6 +1710,23 @@ var getContext = function(display, infos, curLevel) {
       {id: 'breakoutPositionDirection', name: 'positionDirection()', url: conceptBaseUrl+'#breakoutPositionDirection', python: ['breakoutPositionDirection'], categoryId: 'customFunctions'},
       {id: 'breakoutHandleWallBounce', name: 'directionRebondMur()', url: conceptBaseUrl+'#breakoutHandleWallBounce', python: ['breakoutHandleWallBounce'], categoryId: 'customFunctions'},
       {id: 'breakoutHandleType2Bounce', name: 'directionRebondBrique2()', url: conceptBaseUrl+'#breakoutHandleType2Bounce', python: ['breakoutHandleType2Bounce'], categoryId: 'customFunctions'},
+
+      {id: 'languageConcepts', name: 'Langage Python', isBase: true, isCategory: true},
+      {id: 'controls_repeat', name: 'Boucle for', url: conceptBaseUrl+'#controls_repeat', python: ['controls_repeat'], categoryId: 'languageConcepts'},
+      {id: 'blockly_controls_if', name: 'Instructions conditionnelles', url: conceptBaseUrl+'#blockly_controls_if', python: ['blockly_controls_if'], categoryId: 'languageConcepts'},
+      {id: 'comparison_operators', name: 'Opérateurs de comparaison', url: conceptBaseUrl+'#comparison_operators', python: ['comparison_operators'], categoryId: 'languageConcepts'},
+      {id: 'controls_whileUntil', name: 'Boucle while', url: conceptBaseUrl+'#controls_whileUntil', python: ['controls_whileUntil'], categoryId: 'languageConcepts'},
+      {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: conceptBaseUrl+'#blockly_logic_operation', python: ['blockly_logic_operation'], categoryId: 'languageConcepts'},
+      {id: 'variables', name: 'Variables', url: conceptBaseUrl+'#variables', python: ['variables'], categoryId: 'languageConcepts'},
+      {id: 'extra_function', name: 'Fonctions sans paramètre', url: conceptBaseUrl+'#extra_function', python: ['extra_function'], categoryId: 'languageConcepts'},
+      {id: 'extra_function_parameters', name: 'Fonctions avec paramètre', url: conceptBaseUrl+'#extra_function_parameters', python: ['extra_function_parameters'], categoryId: 'languageConcepts'},
+      {id: 'strings', name: 'Chaînes de caractères', url: conceptBaseUrl+'#strings', python: ['strings'], categoryId: 'languageConcepts'},
+      {id: 'lists', name: 'Listes', url: conceptBaseUrl+'#lists', python: ['lists'], categoryId: 'languageConcepts'},
+
+      
+      
+      
+
 
    ];
    
