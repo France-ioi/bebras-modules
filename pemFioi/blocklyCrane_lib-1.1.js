@@ -1712,16 +1712,16 @@ var getContext = function(display, infos, curLevel) {
       {id: 'breakoutHandleType2Bounce', name: 'directionRebondBrique2()', url: conceptBaseUrl+'#breakoutHandleType2Bounce', python: ['breakoutHandleType2Bounce'], categoryId: 'customFunctions'},
 
       {id: 'languageConcepts', name: 'Langage Python', isBase: true, isCategory: true},
-      {id: 'blockly_controls_repeat', name: 'Boucle for', url: conceptBaseUrl+'#blockly_controls_repeat', python: ['blockly_controls_repeat'], categoryId: 'languageConcepts'},
-      {id: 'blockly_controls_if', name: 'Instructions conditionnelles', url: conceptBaseUrl+'#blockly_controls_if', python: ['blockly_controls_if'], categoryId: 'languageConcepts'},
-      {id: 'blockly_logic_compare', name: 'Opérateurs de comparaison', url: conceptBaseUrl+'#blockly_logic_compare', python: ['blockly_logic_compare'], categoryId: 'languageConcepts'},
-      {id: 'blockly_controls_whileUntil', name: 'Boucle while', url: conceptBaseUrl+'#blockly_controls_whileUntil', python: ['blockly_controls_whileUntil'], categoryId: 'languageConcepts'},
-      {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: conceptBaseUrl+'#blockly_logic_operation', python: ['blockly_logic_operation'], categoryId: 'languageConcepts'},
-      {id: 'variables', name: 'Variables', url: conceptBaseUrl+'#variables', python: ['variables'], categoryId: 'languageConcepts'},
-      {id: 'extra_function', name: 'Fonctions sans paramètre', url: conceptBaseUrl+'#extra_function', python: ['extra_function'], categoryId: 'languageConcepts'},
-      {id: 'extra_function_parameters', name: 'Fonctions avec paramètre', url: conceptBaseUrl+'#extra_function_parameters', python: ['extra_function_parameters'], categoryId: 'languageConcepts'},
-      {id: 'blockly_text', name: 'Chaînes de caractères', url: conceptBaseUrl+'#blockly_text', python: ['blockly_text'], categoryId: 'languageConcepts'},
-      {id: 'extra_list', name: 'Listes', url: conceptBaseUrl+'#extra_list', python: ['extra_list'], categoryId: 'languageConcepts'},
+      {id: 'blockly_controls_repeat', name: 'Boucle for', url: conceptBaseUrl+'#blockly_controls_repeat', python: ['blockly_controls_repeat'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'blockly_controls_if', name: 'Instructions conditionnelles', url: conceptBaseUrl+'#blockly_controls_if', python: ['blockly_controls_if'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'blockly_logic_compare', name: 'Opérateurs de comparaison', url: conceptBaseUrl+'#blockly_logic_compare', python: ['blockly_logic_compare'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'blockly_controls_whileUntil', name: 'Boucle while', url: conceptBaseUrl+'#blockly_controls_whileUntil', python: ['blockly_controls_whileUntil'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: conceptBaseUrl+'#blockly_logic_operation', python: ['blockly_logic_operation'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'variables', name: 'Variables', url: conceptBaseUrl+'#variables', python: ['variables'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'extra_function', name: 'Fonctions sans paramètre', url: conceptBaseUrl+'#extra_function', python: ['extra_function'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'extra_function_parameters', name: 'Fonctions avec paramètre', url: conceptBaseUrl+'#extra_function_parameters', python: ['extra_function_parameters'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'blockly_text', name: 'Chaînes de caractères', url: conceptBaseUrl+'#blockly_text', python: ['blockly_text'], categoryId: 'languageConcepts', keepConceptName: true},
+      {id: 'extra_list', name: 'Listes', url: conceptBaseUrl+'#extra_list', python: ['extra_list'], categoryId: 'languageConcepts', keepConceptName: true},
 
       
       
