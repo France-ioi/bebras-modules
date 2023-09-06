@@ -1622,6 +1622,7 @@ var getContext = function(display, infos, curLevel) {
 
    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/index_tralalere_s3.html';
    //var conceptBaseUrl = 'http://localhost/France-ioi/tasks2/v01/LanguagesHelp/index_tralalere_s3.html';
+   context.conceptDisabledList = ['language'];
    context.conceptList = [
       {id: 'oie_presentation', name: 'Jeu de l\'oie', url: conceptBaseUrl+'#oie_presentation'},
       {id: 'puissance4_presentation', name: 'Puissance 4', url: conceptBaseUrl+'#puissance4_presentation'},
