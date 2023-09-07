@@ -4980,7 +4980,7 @@ var getContext = function(display, infos, curLevel) {
           direction = 3 - direction;
        }
        if (position[1] == 6) {
-          direction = rebondVertical(direction);
+          direction = this.breakoutVerticalBounce(direction);
        }
        return direction;
    }
