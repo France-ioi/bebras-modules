@@ -4372,10 +4372,15 @@ var getContext = function(display, infos, curLevel) {
 
       if(callback){
          var delay = 2.7*infos.actionDelayStable;
-         if (delay > 0) {
-             delay += 100; // TODO: fix the real bug and remove
+         // if (delay > 0) {
+         //     delay += 100; // TODO: fix the real bug and remove
+         // }
+         // context.waitDelay(callback,null,delay);
+         if (context.display && context.animate && infos.actionDelayStable > 0) {
+            context.waitUntilCallback(callback);
+         } else {
+            context.waitDelay(callback,null,delay);
          }
-         context.waitDelay(callback,null,delay);
       }
    };
 
@@ -4408,6 +4413,7 @@ var getContext = function(display, infos, curLevel) {
          context.delayFactory.createTimeout("setCraneAttr", function() {
             setCraneAttr(craneAttr);
             overlayToFront();
+            context.signalExecutionIsOver();
          }, delay*0.2);
       });
 
