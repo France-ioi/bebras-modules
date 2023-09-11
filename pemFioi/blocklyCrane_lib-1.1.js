@@ -47,6 +47,9 @@ var getContext = function(display, infos, curLevel) {
    var contextStrings = {
       none: {
          fr: {
+            categories: {
+               myActions: "Mes actions"
+            },
             label: {
                left: "déplacer vers la gauche",
                right: "déplacer vers la droite",
@@ -1152,7 +1155,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "flipUnder",
-      type: "actions",
+      type: "myActions",
       block: { name: "flipUnder" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1616,7 +1619,8 @@ var getContext = function(display, infos, curLevel) {
    context.customBlocks = {
       robot: {
          actions: [],
-         sensors: []
+         sensors: [],
+         myActions: []
       }
    };
 
