@@ -48,7 +48,7 @@ var getContext = function(display, infos, curLevel) {
       none: {
          fr: {
             categories: {
-               myActions: "Mes actions"
+               myFunctions: "Mes fonctions"
             },
             label: {
                left: "déplacer vers la gauche",
@@ -91,38 +91,38 @@ var getContext = function(display, infos, curLevel) {
                conjureFaceItem: "faire apparaître objet",
                destroyFaceItem: "détruire objet",
 
-               flipUnder: "retournerDessous",
-               rollDie: "tirerAuDe",
-               playActionCard: "jouerActionCarte",
-               moveCraneColumn: "allerColonne",
-               moveCraneRow: "allerLigne",
-               moveCrane: "placerGrappin",
-               p4PlayMove: "jouerCoup",
-               p4WinVertical: "gagneVertical",
-               p4WinHorizontal: "gagneHorizontal",
-               p4WinDiagonalLeft: "gagneDiagonaleGauche",
-               p4WinDiagonalRight: "gagneDiagonaleDroite",
-               attachedLetter: "lettreAttachee",
-               wordGamePlaceRow: "placerEnColonne",
-               wordGameReadWord: "lireMot",
-               wordGameReadExpectedWord: "lireMotAttendu",
-               reverseWord: "inverserMot",
-               moveToken: "deplacerPion",
-               playMove: "jouerCoup",
-               makeAppear: "faireApparaitre",
-               placeRow: "placerRangee",
-               readObjective: "lireObjectif",
-               wordlePlayMove: "jouerCoup",
-               puzzleDestroyFour: "detruireQuatre",
-               puzzleReadTarget: "lireObjectif",
-               puzzleNextPiece: "prochainePiece",
-               puzzlePlacePiece: "placerPiece",
-               breakoutBuildAtPosition: "construireAPosition",
-               breakoutReadColumn: "lireColonne",
-               breakoutFindMarble: "trouverBille",
-               breakoutPositionDirection: "positionDirection",
-               breakoutHandleWallBounce: "directionRebondMur",
-               breakoutHandleType2Bounce: "directionRebondBrique2"
+               flipUnder: "retournerDessous()",
+               rollDie: "tirerAuDe()",
+               playActionCard: "jouerActionCarte()",
+               moveCraneColumn: "allerColonne(colonne %1)",
+               moveCraneRow: "allerLigne(ligne %1)",
+               moveCrane: "placerGrappin(colonne %1, ligne %2)",
+               p4PlayMove: "jouerCoup()",
+               p4WinVertical: "gagneVertical(joueur %1, colonne %2)",
+               p4WinHorizontal: "gagneHorizontal(joueur %1, colonne %2)",
+               p4WinDiagonalLeft: "gagneDiagonaleGauche(joueur %1, colonne %2)",
+               p4WinDiagonalRight: "gagneDiagonaleDroite(joueur %1, colonne %2)",
+               attachedLetter: "lettreAttachee()",
+               wordGamePlaceRow: "placerEnColonne(ligne %1, colonne %2)",
+               wordGameReadWord: "lireMot(ligne %1)",
+               wordGameReadExpectedWord: "lireMotAttendu(colonne %1)",
+               reverseWord: "inverserMot(mot %1)",
+               moveToken: "deplacerPion()",
+               playMove: "jouerCoup()",
+               makeAppear: "faireApparaitre(type %1)",
+               placeRow: "placerRangee(types %1)",
+               readObjective: "lireObjectif()",
+               wordlePlayMove: "jouerCoup()",
+               puzzleDestroyFour: "detruireQuatre()",
+               puzzleReadTarget: "lireObjectif()",
+               puzzleNextPiece: "prochainePiece()",
+               puzzlePlacePiece: "placerPiece()",
+               breakoutBuildAtPosition: "construireAPosition(colonne %1, ligne %2)",
+               breakoutReadColumn: "lireColonne()",
+               breakoutFindMarble: "trouverBille()",
+               breakoutPositionDirection: "positionDirection(position %1, direction %2)",
+               breakoutHandleWallBounce: "directionRebondMur(position %1, direction %2)",
+               breakoutHandleType2Bounce: "directionRebondBrique2(position %1, direction %2)"
             },
             code: {
                left: "gauche",
@@ -242,9 +242,9 @@ var getContext = function(display, infos, curLevel) {
                flipUnder: "@() Retourner la brique en dessous de celle se trouvant au sommet de la colonne où se trouve la grue.",
                rollDie: "@() Lance le dé.",
                playActionCard: "@() jouer action carte",
-               moveCraneColumn: "@(column) Déplace le grappin vers la colonne indiquée.",
-               moveCraneRow: "@(row) Déplace le grappin vers la ligne indiquée.",
-               moveCrane: "@(column, row) Déplace le grappin vers la position indiquée.",
+               moveCraneColumn: "@(colonne) Déplace le grappin vers la colonne indiquée.",
+               moveCraneRow: "@(ligne) Déplace le grappin vers la ligne indiquée.",
+               moveCrane: "@(colonne, ligne) Déplace le grappin vers la position indiquée.",
                p4PlayMove: "@(joueur) Joue un coup de puissance 4 pour ce joueur.",
                p4WinVertical: "@(joueur, colonne) Indique si le joueur gagne verticalement dans cette colonne.",
                p4WinHorizontal: "@(joueur, colonne) Indique si le joueur gagne horizontalement depuis cette colonne.",
@@ -257,8 +257,8 @@ var getContext = function(display, infos, curLevel) {
                reverseWord: "@(mot) Retourne le mot inversé (lu de droite à gauche)",
                moveToken: "@() déplace pion",
                playMove: "@() joue coup",
-               makeAppear: "@(val) faire apparaître",
-               placeRow: "@(array) place rangée",
+               makeAppear: "@(type) faire apparaître",
+               placeRow: "@(rangee) place rangée",
                readObjective: "@() lire objectif",
                wordlePlayMove: "@() jouer un coup",
                puzzleDestroyFour: "@() détruire quatre briques identiques",
@@ -1155,7 +1155,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "flipUnder",
-      type: "myActions",
+      type: "myFunctions",
       block: { name: "flipUnder" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1165,7 +1165,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "rollDie",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "rollDie" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1175,7 +1175,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "playActionCard",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "playActionCard" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1185,11 +1185,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "moveCraneColumn",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "moveCraneColumn", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
@@ -1201,11 +1201,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "moveCraneRow",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "moveCraneRow", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
@@ -1217,12 +1217,12 @@ var getContext = function(display, infos, curLevel) {
    
    infos.newBlocks.push({
       name: "moveCrane",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "moveCrane", params: [null, null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 },
             ]
          }
       },
@@ -1234,11 +1234,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "wordGameReadWord",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "wordGameReadWord", params: [null], yieldsValue: 'string', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 }
             ]
          }
       },
@@ -1250,11 +1250,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "wordGameReadExpectedWord",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "wordGameReadExpectedWord", params: [null], yieldsValue: 'string', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 }
             ]
          }
       },
@@ -1268,12 +1268,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "wordGamePlaceRow",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "wordGamePlaceRow", params: [null, null], yieldsValue: 'int', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 },
             ]
          }
       },
@@ -1285,11 +1285,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "p4PlayMove",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "p4PlayMove", params: [null], yieldsValue: 'int', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
@@ -1301,12 +1301,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "p4WinVertical",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "p4WinVertical", params: [null, null], yieldsValue: 'bool', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 }
             ]
          }
       },
@@ -1318,12 +1318,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "p4WinHorizontal",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "p4WinHorizontal", params: [null, null], yieldsValue: 'bool', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 }
             ]
          }
       },
@@ -1335,12 +1335,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "p4WinDiagonalLeft",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "p4WinDiagonalLeft", params: [null, null], yieldsValue: 'bool', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 }
             ]
          }
       },
@@ -1352,12 +1352,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "p4WinDiagonalRight",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "p4WinDiagonalRight", params: [null, null], yieldsValue: 'bool', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
-               { "type": "field_number", "name": "PARAM_1", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_1", "value": 1 }
             ]
          }
       },
@@ -1369,7 +1369,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "attachedLetter",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "attachedLetter", yieldsValue: 'string' },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1379,11 +1379,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "reverseWord",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "reverseWord", params: [null], yieldsValue: 'string', 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 }
+               { "type": "input_value", "name": "PARAM_0", "value": 1 }
             ]
          }
       },
@@ -1395,7 +1395,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "moveToken",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "moveToken" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1405,7 +1405,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "playMove",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "playMove" },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1415,11 +1415,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "makeAppear",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "makeAppear", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
@@ -1431,11 +1431,11 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "placeRow",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "placeRow", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": "[]" },
+               { "type": "input_value", "name": "PARAM_0", "text": "[]" },
             ]
          }
       },
@@ -1447,7 +1447,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "readObjective",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "readObjective", yieldsValue: true },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1457,12 +1457,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "wordlePlayMove",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "wordlePlayMove", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": "[]" },
-               { "type": "field_input", "name": "PARAM_1", "text": "[]" },
+               { "type": "input_value", "name": "PARAM_0", "text": "[]" },
+               { "type": "input_value", "name": "PARAM_1", "text": "[]" },
             ]
          }
       },
@@ -1474,7 +1474,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "puzzleDestroyFour",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "puzzleDestroyFour"},
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1484,12 +1484,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "puzzleReadTarget",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "puzzleReadTarget", yieldsValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": 1 },
-               { "type": "field_input", "name": "PARAM_1", "text": 1 },
+               { "type": "input_value", "name": "PARAM_0", "text": 1 },
+               { "type": "input_value", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1501,7 +1501,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "puzzleNextPiece",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "puzzleNextPiece", yieldsValue: true },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1511,12 +1511,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "puzzlePlacePiece",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "puzzlePlacePiece", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": [] },
-               { "type": "field_input", "name": "PARAM_1", "text": [] },
+               { "type": "input_value", "name": "PARAM_0", "text": [] },
+               { "type": "input_value", "name": "PARAM_1", "text": [] },
             ]
          }
       },
@@ -1528,12 +1528,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "breakoutBuildAtPosition",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "breakoutBuildAtPosition", params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": [] },
-               { "type": "field_input", "name": "PARAM_1", "text": [] },
+               { "type": "input_value", "name": "PARAM_0", "text": [] },
+               { "type": "input_value", "name": "PARAM_1", "text": [] },
             ]
          }
       },
@@ -1545,7 +1545,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "breakoutReadColumn",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "breakoutReadColumn", yieldValue: true },
       func: function(callback) {
          this.beforeBlockExecution();
@@ -1565,12 +1565,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "breakoutPositionDirection",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "breakoutPositionDirection", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": [] },
-               { "type": "field_input", "name": "PARAM_1", "text": 1 },
+               { "type": "input_value", "name": "PARAM_0", "text": [] },
+               { "type": "input_value", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1582,12 +1582,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "breakoutHandleWallBounce",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "breakoutHandleWallBounce", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": [] },
-               { "type": "field_input", "name": "PARAM_1", "text": 1 },
+               { "type": "input_value", "name": "PARAM_0", "text": [] },
+               { "type": "input_value", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1599,12 +1599,12 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "breakoutHandleType2Bounce",
-      type: "actions",
+      type: "myFunctions",
       block: { name: "breakoutHandleType2Bounce", yieldValue: true, params: [null,null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_input", "name": "PARAM_0", "text": [] },
-               { "type": "field_input", "name": "PARAM_1", "text": 1 },
+               { "type": "input_value", "name": "PARAM_0", "text": [] },
+               { "type": "input_value", "name": "PARAM_1", "text": 1 },
             ]
          }
       },
@@ -1620,7 +1620,7 @@ var getContext = function(display, infos, curLevel) {
       robot: {
          actions: [],
          sensors: [],
-         myActions: []
+         myFunctions: []
       }
    };
 
