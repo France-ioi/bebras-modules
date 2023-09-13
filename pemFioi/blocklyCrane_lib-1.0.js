@@ -912,15 +912,20 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.getInnerState = function() {
-      return {
-         items: context.items,
-         multicell_items: context.multicell_items,
-         last_connect: context.last_connext,
-         wires: context.wires,
-         nbMoves: context.nbMoves,
-         time: context.time,
-         bag: context.bag,
+      var removeItemElement = function (item) {
+         var modifiedItem = Object.assign({}, item);
+         delete modifiedItem.element;
+         return modifiedItem;
       };
+      innerState.items = context.items.map(removeItemElement);
+      innerState.multicell_items = context.multicell_items.map(removeItemElement);
+      innerState.last_connect = context.last_connect;
+      innerState.wires = context.wires.map(removeItemElement);
+      innerState.nbMoves = context.nbMoves;
+      innerState.time = context.time;
+      innerState.bag = context.bag.map(removeItemElement);
+
+      return innerState;
    };
 
    context.implementsInnerState = function () {
