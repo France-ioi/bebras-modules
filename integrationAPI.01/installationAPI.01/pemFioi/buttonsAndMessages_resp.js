@@ -726,9 +726,7 @@ window.displayHelper = {
       }
       this.strings = this.languageStrings[window.stringsLanguage];
    },
-   /***********************************************
-    * Initialization functions called by the task *
-    ***********************************************/
+   // *** Initialization functions called by the task ***
    load: function(views) {
       this.initLanguage();
       var self = this;
@@ -738,48 +736,48 @@ window.displayHelper = {
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
-
-         $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
-         $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
-         if(!self.responsive){
-            var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
-         }else{
-            var addTaskHTML = '<div id="displayHelperAnswering">';
-         }
-         // Place button placements at the end of HTML if they don't already exist
-         if(!self.responsive){
-            var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
-         }else{
-            var placementNames = ['graderMessage', 'cancel', 'validate',  'saved'];
-         }
-         for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
-            var placement = 'displayHelper_' + placementNames[iPlacement];
-            if ($('#' + placement).length === 0) {
-               addTaskHTML += '<div id="' + placement + '"></div>';
-            }
-         }
-         addTaskHTML += '</div>';
-         if (!document.getElementById('displayHelperAnswering')) {
-            $(self.taskSelector).append(addTaskHTML);
-         }
-         self.loaded = true;
-         self.timeLoaded = new Date().getTime();
-         if (self.popupMessageShown) {
-            $('#displayHelperAnswering').hide();
-         }
-
-         var taskDelayWarning = function() {
-            if (self.popupMessageShown) {
-               self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
-            } else {
-               self.showPopupMessage(self.formatTranslation(self.strings.warningTimeout, [self.timeoutMinutes]), 'blanket', self.strings.alright, null, null, "warning");
-               self.taskDelayWarningTimeout = null;
-            }
-         };
-         if (self.timeoutMinutes > 0) {
-            self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
-         }
       });
+
+      $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
+      $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
+      if (!self.responsive) {
+         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+      } else {
+         var addTaskHTML = '<div id="displayHelperAnswering">';
+      }
+      // Place button placements at the end of HTML if they don't already exist
+      if (!self.responsive) {
+         var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+      } else {
+         var placementNames = ['graderMessage', 'cancel', 'validate', 'saved'];
+      }
+      for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
+         var placement = 'displayHelper_' + placementNames[iPlacement];
+         if ($('#' + placement).length === 0) {
+            addTaskHTML += '<div id="' + placement + '"></div>';
+         }
+      }
+      addTaskHTML += '</div>';
+      if (!document.getElementById('displayHelperAnswering')) {
+         $(self.taskSelector).append(addTaskHTML);
+      }
+      self.loaded = true;
+      self.timeLoaded = new Date().getTime();
+      if (self.popupMessageShown) {
+         $('#displayHelperAnswering').hide();
+      }
+
+      var taskDelayWarning = function () {
+         if (self.popupMessageShown) {
+            self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
+         } else {
+            self.showPopupMessage(self.formatTranslation(self.strings.warningTimeout, [self.timeoutMinutes]), 'blanket', self.strings.alright, null, null, "warning");
+            self.taskDelayWarningTimeout = null;
+         }
+      };
+      if (self.timeoutMinutes > 0) {
+         self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
+      }
 
       if(this.responsive){
          $('#displayHelperAnswering').appendTo($('#zone_3'));
@@ -973,7 +971,7 @@ window.displayHelper = {
       }
 
       this.setupParams();
-      if (!document.getElementById('popupMessage')) {
+      if (!document.getElementById('tabsMenu')) {
          this.setupLevelsTabs();
 
          if(!this.responsive){
@@ -1845,6 +1843,12 @@ window.displayHelper = {
 
       this.views = views;
       this.hasSolution = (typeof views.solution !== 'undefined');
+
+      if (!views.solution || this.hideSolutionButton) {
+         $('#showExercice, #showSolution').hide();
+         $('#zone_3').addClass('noSolution');
+      }
+
       if (this.hasSolution && this.graderScore) {
          this.prevSavedScore = this.graderScore;
       }
