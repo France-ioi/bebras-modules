@@ -22,8 +22,8 @@ def main():
     }],
 
 
-    'smartpy_contract_declaration': [{
-        name: 'smartpy_contract_declaration',
+    'smartpy_contract_creation': [{
+        name: 'smartpy_contract_creation',
         type: 'token',
         caption: 'class ctr(sp.Contract)',
         snippet: `
@@ -171,6 +171,13 @@ def \${2:test_name}():
         type: 'token',
         caption: 'contract.data.value',
         snippet: `\${1:contractName}.data.\${2:value}`
+    }],
+
+    'smartpy_contract_entrypointcall': [{
+        name: 'smartpy_contract_entrypointcall',
+        type: 'token',
+        caption: 'contract.entrypoint',
+        snippet: `\${1:contractName}.\${2:entrypoint}`
     }],
 
     'smartpy_contract_balance': [{
@@ -418,7 +425,7 @@ def \${2:test_name}():
     'shorthand_operators': [{
         name: 'shorthand_operators',
         type: 'token',
-        caption: '+= / -= / %= / *=',
+        caption: '+=, -=,  %=, *=',
         snippet: '\${1:+}='
     }],
 
@@ -595,15 +602,15 @@ def \${2:test_name}():
     }],
 
 
-    'verify': [{
-        name: 'verify',
+    'assert': [{
+        name: 'assert',
         type: 'token',
         caption: 'assert cond',
         snippet: `assert \${1:condition}`
     }],
 
-    'verify_message': [{
-        name: 'verify_message',
+    'assert_message': [{
+        name: 'assert_message',
         type: 'token',
         caption: 'assert cond, err',
         snippet: `assert \${1:condition}, \${2:errorValue}`
@@ -1097,8 +1104,51 @@ def \${2:test_name}():
         type: 'token',
         caption: 'sp.rshift_bytes(b, sft)',
         snippet: `sp.rshift_bytes(\${1:bytes}, \${2:shiftValue})`
-    }]
+    }],
 
+/* Basic Python*/
+
+    'smartpy_if': [{
+        name: 'smartpy_if',
+        type: 'token',
+        caption: 'if cond:',
+        snippet: `if \${1:condition}:`
+    }],
+
+    'smartpy_else': [{
+        name: 'smartpy_else',
+        type: 'token',
+        caption: 'else:',
+        snippet: `else:`
+    }],
+
+    'smartpy_elif': [{
+        name: 'smartpy_elif',
+        type: 'token',
+        caption: 'elif cond:',
+        snippet: `elif \${1:condition}:`
+    }],
+
+    'smartpy_while': [{
+        name: 'smartpy_while',
+        type: 'token',
+        caption: 'while cond:',
+        snippet: `while \${1:condition}:`
+    }],
+
+    'smartpy_for': [{
+        name: 'smartpy_for',
+        type: 'token',
+        caption: 'for ...:',
+        snippet: `for \${1:value} in \${2:range}: `
+    }],
+
+    'smartpy_variable_affectation': [{
+        name: 'smartpy_variable',
+        type: 'token',
+        caption: 'variable = ',
+        snippet: `\${1:variableName} = `
+    }],
 
 
 };
@@ -1209,12 +1259,13 @@ window.SmartContractConfig = {
                 'smart_contract_maps_big_maps': "Maps, Big-maps",
                 'smart_contract_lists_sets': 'Lists, Sets',
                 'smart_contract_bytes': 'Bytes',
+                'smart_contract_basic_python': 'Basic Python',
             },
             description: {
 
                 /*Contract*/
                 'smartpy_import': "import smartpy, creates module",
-                'smartpy_contract_declaration': "creates contract",
+                'smartpy_contract_creation': "creates contract",
                 'smartpy_self_data_value': "storage initialization",
 
                 
@@ -1249,7 +1300,7 @@ window.SmartContractConfig = {
                 'modulo_multitypes': "➔ remainder of a / b",
                 'euclidian_multitypes': "➔ option on pair (quotient, remainder)",
                 'smartpy_split_tokens': "➔ (a*q) / t as tez",
-                'shorthand_operators': "shorthand operator",
+                'shorthand_operators': "shorthand operators",
 
                 /*Strings*/
                 'smartpy_slice': "extracts a substring      returns an option",
@@ -1273,7 +1324,7 @@ window.SmartContractConfig = {
 
                 /*Asserts, Booleans*/
                 'smartpy_raise': "fails immediately", 
-                'verify_message': "specifies error value",
+                'assert_message': "specifies error value",
                 'boolean_type': "type",
                 '^': "exclusive or",
 
@@ -1332,230 +1383,454 @@ window.SmartContractConfig = {
     },
     notionsList: {
         // category: [list of notion names]
-        "smart_contract_contract": ["smartpy_import", "smartpy_contract_declaration",  "smartpy_self_data_value", "smartpy_entry_point", "smartpy_onchain_view"],
-        "smart_contract_tests": ["smartpy_test_starter", "smartpy_scenario_creation", "smartpy_contract_instantiation", "smartpy_adding_to_scenario", "smartpy_test_account", "smartpy_test_address", "smartpy_public_key_hash", "smartpy_public_key", "smartpy_secret_key", "smartpy_scenario_show", "smartpy_smartpy_scenario_verify", "smartpy_scenario_verify_equal", "smartpy_contract_data", "smartpy_contract_balance", "smartpy_contract_baker", "smartpy_contract_address", "smartpy_trace", "smartpy_scenario_h", "smartpy_test_some", "smartpy_test_none", "smartpy_test_unwrap_option"],
-        "smart_contract_int_nat": ["int_declaration", "nat_declaration", "smartpy_to_int", "smartpy_is_nat", "smartpy_as_nat", "int_type", "nat_type", ],
-        "smart_contract_types": ["smartpy_sp_cast", "custom_type", "smartpy_convert_to_tez", "()", "unit_type"],       
-        "smart_contract_arithmetic": ["addition", "addition_multitypes", "substraction", "substraction_multitypes", "multiply", "multiplication_multitypes", "divide", "modulo_multitypes", "euclidian_multitypes", "smartpy_split_tokens", "shorthand_operators"],        
-        "smart_contract_strings": ["string", "string_concatenate", "smartpy_slice", "length", "string_addition", "string_type"],
-        "smart_contract_timestamps": [ "current_timestamp",  "timestamp_from_seconds", "smartpy_timestamp_from_utc","smartpy_add_seconds", "smartpy_add_days", "difference_timestamp", "timestamp_type"],               
-        "smart_contract_addresses_transactions": ["sp.tez", "sp.mutez", "sender", "amount", "balance", "address", "send_tez", "smartpy_set_delegate", "type_mutez"],
-        "smart_contract_asserts_booleans":["smartpy_raise", "verify", "verify_message", "and", "or", "not", "^", "true", "false", ">", "<", "less_or_equal", "more_or_equal", "equal_comparator", "!=", "boolean_type"],       
-        "smart_contract_options": ["some", "none", "smartpy_unwrap_some", "smartpy_opt_is_none", "smartpy_opt_is_some", "option"],
-        "smart_contract_inter_contract": ["contract_call", "transfer_of_tez", "smartpy_sp_view"],
-        "smart_contract_pairs_tuples_records": ["pair", "variables_pair", "first_element_pair", "second_element_pair", "tuple", "variables_tuple", "record", "record_type", "pair_type", "tuple_type"],       
-        "smart_contract_maps_big_maps": ["map", "smartpy_big_map", "delete_map_entry", "update_map_entry", "access_map_entry", "check_map_key", "size_map", "smartpy_get_items", "smartpy_get_keys", "smartpy_get_values", "type_map", "type_big_map"],    
+        "smart_contract_contract": [
+            "smartpy_import", 
+            "smartpy_contract_creation",
+            "smartpy_self_data_value",
+            "smartpy_entry_point", 
+            "smartpy_onchain_view"
+        ],
+
+        "smart_contract_tests": [
+            "smartpy_test_starter", 
+            "smartpy_scenario_creation", 
+            "smartpy_contract_instantiation", 
+            "smartpy_adding_to_scenario", 
+            "smartpy_contract_entrypointcall", 
+            "smartpy_test_account", 
+            "smartpy_test_address", 
+            "smartpy_public_key_hash", 
+            "smartpy_public_key", 
+            "smartpy_secret_key", 
+            "smartpy_scenario_show", 
+            "smartpy_scenario_verify", 
+            "smartpy_scenario_verify_equal", 
+            "smartpy_contract_data", 
+            "smartpy_contract_balance", 
+            "smartpy_contract_baker", 
+            "smartpy_contract_address", 
+            "smartpy_trace", 
+            "smartpy_scenario_h", 
+            "smartpy_test_some", 
+            "smartpy_test_none", 
+            "smartpy_test_unwrap_option"
+        ],
+
+        "smart_contract_int_nat": [
+            "int_declaration", 
+            "nat_declaration", 
+            "smartpy_to_int", 
+            "smartpy_is_nat", 
+            "smartpy_as_nat", 
+            "int_type", 
+            "nat_type", 
+        ],
+
+        "smart_contract_types": [
+            "smartpy_sp_cast", 
+            "custom_type", 
+            "smartpy_convert_to_tez", 
+            "()", 
+            "unit_type"
+        ],  
+
+        "smart_contract_arithmetic": [
+            "addition", 
+            "addition_multitypes", 
+            "substraction", 
+            "substraction_multitypes", 
+            "multiply", 
+            "multiplication_multitypes", 
+            "divide",
+            "modulo_multitypes", 
+            "euclidian_multitypes", 
+            "smartpy_split_tokens", 
+            "shorthand_operators"
+        ],        
+
+        "smart_contract_strings": [
+            "string", 
+            "string_concatenate", 
+            "smartpy_slice", "length", 
+            "string_addition", 
+            "string_type"
+        ],
+
+        "smart_contract_timestamps": [
+            "current_timestamp",  
+            "timestamp_from_seconds", 
+            "smartpy_timestamp_from_utc",
+            "smartpy_add_seconds", 
+            "smartpy_add_days", 
+            "difference_timestamp", 
+            "timestamp_type"
+        ],          
+
+        "smart_contract_addresses_transactions": [
+            "sp.tez", 
+            "sp.mutez", 
+            "sender", 
+            "amount", 
+            "balance", 
+            "address", 
+            "send_tez", 
+            "smartpy_set_delegate", 
+            "type_mutez"
+        ],
+
+        "smart_contract_asserts_booleans":[
+            "smartpy_raise", 
+            "assert", 
+            "assert_message", 
+            "and", 
+            "or", 
+            "not", 
+            "^", 
+            "true", 
+            "false", 
+            ">", 
+            "<", 
+            "less_or_equal", 
+            "more_or_equal", 
+            "equal_comparator", 
+            "!=", 
+            "boolean_type"
+        ],
+
+        "smart_contract_options": [
+            "some", 
+            "none", 
+            "smartpy_unwrap_some", 
+            "smartpy_opt_is_none", 
+            "smartpy_opt_is_some", 
+            "option"
+        ],
+
+        "smart_contract_inter_contract": [
+            "contract_call", 
+            "transfer_of_tez", 
+            "smartpy_sp_view"
+        ],
+
+        "smart_contract_pairs_tuples_records": [
+            "pair", 
+            "variables_pair", 
+            "first_element_pair", 
+            "second_element_pair", 
+            "tuple", 
+            "variables_tuple", 
+            "record", 
+            "record_type", 
+            "pair_type", 
+            "tuple_type"
+        ],       
+       
+        "smart_contract_maps_big_maps": [
+            "map", 
+            "smartpy_big_map", 
+            "delete_map_entry", 
+            "update_map_entry", 
+            "access_map_entry", 
+            "check_map_key",
+            "size_map", 
+            "smartpy_get_items", 
+            "smartpy_get_keys", 
+            "smartpy_get_values", 
+            "type_map", 
+            "type_big_map"
+        ],    
         
-        "smart_contract_lists_sets": ["list", "list_size", "list_push", "smartpy_sp_range", "smartpy_sp_sum", "list_type", "set", "smartpy_set_length", "smartpy_set_contains", "smartpy_set_elements", "smartpy_set_add", "smartpy_set_remove", "set_type"],  
-        "smart_contract_bytes": ["smartpy_sp_slice", "smartpy_sp_concat", "smartpy_and_bytes", "smartpy_or_bytes", "smartpy_xor_bytes", "smartpy_invert_bytes", "smartpy_lshift_bytes", "smartpy_rshift_bytes", "bytes"],
+        "smart_contract_lists_sets": [
+            "list", 
+            "list_size", 
+            "list_push", 
+            "smartpy_sp_range", 
+            "smartpy_sp_sum", 
+            "list_type", 
+            "set", 
+            "smartpy_set_length", 
+            "smartpy_set_contains", 
+            "smartpy_set_elements", 
+            "smartpy_set_add", 
+            "smartpy_set_remove",
+            "set_type"
+        ],  
+        
+        "smart_contract_bytes": [
+            "smartpy_sp_slice", 
+            "smartpy_sp_concat", 
+            "smartpy_and_bytes", 
+            "smartpy_or_bytes", 
+            "smartpy_xor_bytes", 
+            "smartpy_invert_bytes", 
+            "smartpy_lshift_bytes", 
+            "smartpy_rshift_bytes", 
+            "bytes"
+        ],
+
+        "smart_contract_basic_python": [
+            "smartpy_if", 
+            "smartpy_else", 
+            "smartpy_elif", 
+            "smartpy_while", 
+            "smartpy_for", 
+            "smartpy_variable"
+        ]
     },
 
 
     conceptsList: [
 
+        {id: 'contract', name:'Smart contract', isCategory: true},
+
         {
             id: 'smartpy_import',
-            name: 'smartpy_import',
-            url: conceptBaseUrl + "#smartpy_import"
+            name: 'Smartpy import',
+            url: conceptBaseUrl + "#smartpy_import",
+            categoryId: 'contract'
         },
 
         {
-            id: 'smartpy_contract_declaration', // Must be the name of the notion
-            name: 'smartpy_contract_declaration',
-            url: conceptBaseUrl + '#smartpy_contract_declaration', // Must be the value of data-id in the documentation
+            id: 'smartpy_contract_creation', // Must be the name of the notion
+            name: 'Contract creation',
+            url: conceptBaseUrl + '#smartpy_contract_creation', // Must be the value of data-id in the documentation
+            categoryId: 'contract'
         },
 
 
         {
-            name: 'smartpy_self_data_value',
+            name: 'Storage initialization',
             id: 'smartpy_self_data_value',
-            url: conceptBaseUrl + '#smartpy_self_data_value'
+            url: conceptBaseUrl + '#smartpy_self_data_value',
+            categoryId: 'contract'
+            
         },
 
         {
             id: 'smartpy_entry_point',
-            name: 'smartpy_entry_point',
+            name: 'Entrypoint',
             url: conceptBaseUrl + '#smartpy_entry_point',
+            categoryId: 'contract'
         },
 
 
         {
             id: 'smartpy_onchain_view',
-            name: 'smartpy_onchain_view',
-            url: conceptBaseUrl + "#smartpy_onchain_view"
+            name: 'Onchain view',
+            url: conceptBaseUrl + "#smartpy_onchain_view",
+            categoryId: 'contract'
         },
 
 /* Testing */
 
+        {id: 'testing', name:'Testing', isBase: true, isCategory: true},
+
         {
             id: 'smartpy_test_starter',
-            name: 'smartpy_test_starter',
+            name: 'Test starter',
             url: conceptBaseUrl + '#smartpy_test_starter',
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_scenario_creation',
-            name: 'smartpy_scenario_creation',
-            url: conceptBaseUrl + '#smartpy_scenario_creation'
+            name: 'Scenario creation',
+            url: conceptBaseUrl + '#smartpy_scenario_creation',
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_contract_instantiation',
-            name: 'smartpy_contract_instantiation',
-            url: conceptBaseUrl + '#smartpy_contract_instantiation'
+            name: 'Contract instanciation',
+            url: conceptBaseUrl + '#smartpy_contract_instantiation',
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_adding_to_scenario',
-            name: 'smartpy_adding_to_scenario',
-            url: conceptBaseUrl + '#smartpy_adding_to_scenario'
+            name: 'Adding to scenario',
+            url: conceptBaseUrl + '#smartpy_adding_to_scenario',
+            categoryId: 'testing'
+        },
+
+        {
+            id: 'smartpy_contract_entrypointcall',
+            name: 'Call an entrypoint',
+            url: conceptBaseUrl + '#smartpy_contract_entrypointcall',
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_test_unwrap_option',
-            name: 'smartpy_test_unwrap_option',
-            url: conceptBaseUrl + "#smartpy_test_unwrap_option"
+            name: 'Test unwrap option',
+            url: conceptBaseUrl + "#smartpy_test_unwrap_option",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_test_account',
-            name: 'smartpy_test_account',
-            url: conceptBaseUrl + "#smartpy_test_account"
+            name: 'Test account',
+            url: conceptBaseUrl + "#smartpy_test_account",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_test_address',
-            name: 'smartpy_test_address',
-            url: conceptBaseUrl + "#smartpy_test_address"
+            name: 'Address for test',
+            url: conceptBaseUrl + "#smartpy_test_address",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_public_key_hash',
-            name: 'smartpy_public_key_hash',
-            url: conceptBaseUrl + "#smartpy_public_key_hash"
+            name: 'Public key hash',
+            url: conceptBaseUrl + "#smartpy_public_key_hash",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_public_key',
-            name: 'smartpy_public_key',
-            url: conceptBaseUrl + "#smartpy_public_key"
+            name: 'Public key',
+            url: conceptBaseUrl + "#smartpy_public_key",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_secret_key',
-            name: 'smartpy_secret_key',
-            url: conceptBaseUrl + "#smartpy_secret_key"
+            name: 'Secret key',
+            url: conceptBaseUrl + "#smartpy_secret_key",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_test_some',
-            name: 'smartpy_test_some',
-            url: conceptBaseUrl + "#smartpy_test_some"
+            name: 'Some in tests',
+            url: conceptBaseUrl + "#smartpy_test_some",
+            categoryId: 'testing'
         },
 
         {
-            id: 'smartpy_scenario.verify',
-            name: 'smartpy_scenario.verify',
-            url: conceptBaseUrl + "#smartpy_scenario_verify"
+            id: 'smartpy_scenario_verify',
+            name: 'Verify a value in tests',
+            url: conceptBaseUrl + "#smartpy_scenario_verify",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_scenario_verify_equal',
-            name: 'smartpy_scenario_verify_equal',
-            url: conceptBaseUrl + "#smartpy_scenario_verify_equal"
+            name: 'Verify equality without arithmetic',
+            url: conceptBaseUrl + "#smartpy_scenario_verify_equal",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_contract_data',
-            name: 'smartpy_contract_data',
-            url: conceptBaseUrl + "#smartpy_contract_data"
+            name: 'Contract storage',
+            url: conceptBaseUrl + "#smartpy_contract_data",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_contract_balance',
-            name: 'smartpy_contract_balance',
-            url: conceptBaseUrl + "#smartpy_contract_balance"
+            name: 'Contract balance in tests',
+            url: conceptBaseUrl + "#smartpy_contract_balance",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_contract_baker',
-            name: 'smartpy_contract_baker',
-            url: conceptBaseUrl + "#smartpy_contract_baker"
+            name: 'Contract baker in tests',
+            url: conceptBaseUrl + "#smartpy_contract_baker",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_contract_address',
-            name: 'smartpy_contract_address',
-            url: conceptBaseUrl + "#smartpy_contract_address"
+            name: 'Contract address in tests',
+            url: conceptBaseUrl + "#smartpy_contract_address",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_scenario_h',
-            name: 'smartpy_scenario_h',
-            url: conceptBaseUrl + "#smartpy_scenario_h"
+            name: 'Scenario title',
+            url: conceptBaseUrl + "#smartpy_scenario_h",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_test_none',
-            name: 'smartpy_test_none',
-            url: conceptBaseUrl + "#smartpy_test_none"
+            name: 'None for test',
+            url: conceptBaseUrl + "#smartpy_test_none",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_scenario_show',
-            name: 'smartpy_scenario_show',
-            url: conceptBaseUrl + "#smartpy_scenario_show"
+            name: 'Scenario show',
+            url: conceptBaseUrl + "#smartpy_scenario_show",
+            categoryId: 'testing'
         },
 
         {
             id: 'smartpy_trace',
-            name: 'smartpy_trace',
-            url: conceptBaseUrl + "#smartpy_trace"
+            name: 'Trace',
+            url: conceptBaseUrl + "#smartpy_trace",
+            categoryId: 'testing'
         },
 
 
 /*Int - Nat - Tez*/
 
+        {id: 'int_nat', name:'Int, Nat', isBase: true, isCategory: true},
+
         {
             id: 'int_declaration',
-            name: 'int_declaration',
-            url: conceptBaseUrl + "#int_declaration"
+            name: 'Int value',
+            url: conceptBaseUrl + "#int_declaration",
+            categoryId: 'int_nat'
         },
 
         {
             id: 'nat_declaration',
-            name: 'nat_declaration',
-            url: conceptBaseUrl + "#nat_declaration"
+            name: 'Nat declaration',
+            url: conceptBaseUrl + "#nat_declaration",
+            categoryId: 'int_nat'
         },
 
         {
             id: 'sp_to_int',
             name: 'sp_to_int',
             url: conceptBaseUrl + '#sp_to_int',
+            categoryId: 'int_nat'
         },
 
         {
             id: 'sp_is_nat',
             name: 'sp_is_nat',
-            url: conceptBaseUrl + '#sp_is_nat'
+            url: conceptBaseUrl + '#sp_is_nat',
+            categoryId: 'int_nat'
         },
 
         {
             id: 'sp_as_nat',
             name: 'sp_as_nat',
-            url: conceptBaseUrl + '#sp_as_nat'
+            url: conceptBaseUrl + '#sp_as_nat',
+            categoryId: 'int_nat'
         },
 
         {
             id: 'int_type',
             name: 'int_type',
             url: conceptBaseUrl + '#int_type',
+            categoryId: 'int_nat'
         },
 
         {
             id: 'nat_type',
             name: 'nat_type',
             url: conceptBaseUrl + '#nat_type',
+            categoryId: 'int_nat'
         },
 
 /* Types */
@@ -1598,108 +1873,130 @@ window.SmartContractConfig = {
 
 /*Arithmetic*/
 
+        {id: 'arithmetic', name:'Arithmetic', isBase: true, isCategory: true},
+
         {
             id: 'addition',
-            name: 'addition',
+            name: 'Addition',
             url: conceptBaseUrl + '#addition',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'addition_multitypes',
-            name: 'addition_multitypes',
+            name: 'Addition multitypes',
             url: conceptBaseUrl + '#addition_multitypes',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'substraction',
-            name: 'substraction',
+            name: 'Substraction',
             url: conceptBaseUrl + '#substraction',
+            categoryId: 'arithmetic'
         },
 
         {
             id:'substraction_multitypes',
-            name:'substraction_multitypes',
-            url: conceptBaseUrl + '#substraction_multitypes'
+            name:'Substraction multitypes',
+            url: conceptBaseUrl + '#substraction_multitypes',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'multiply',
-            name: 'multiply',
+            name: 'Multiplication',
             url: conceptBaseUrl + '#multiply',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'multiplication_multitypes',
-            name: 'multiplication_multitypes',
-            url: conceptBaseUrl + '#multiplication_multitypes'
+            name: 'Multiplication multitypes',
+            url: conceptBaseUrl + '#multiplication_multitypes',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'modulo',
-            name: 'modulo',
+            name: 'Modulo',
             url: conceptBaseUrl + '#modulo',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'divide',
-            name: 'divide',
-            url: conceptBaseUrl + '#divide'
+            name: 'Division',
+            url: conceptBaseUrl + '#divide',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'euclidian_multitypes',
-            name: 'euclidian_multitypes',
+            name: 'Euclidian division multitypes',
             url: conceptBaseUrl + '#euclidian_multitypes',
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'smartpy_split_tokens',
-            name: 'smartpy_split_tokens',
+            name: 'Split tokens',
             url: conceptBaseUrl + "#smartpy_split_tokens",
+            categoryId: 'arithmetic'
         },
 
         {
             id: 'shorthand_operators',
-            name: 'shorthand_operators',
-            url: conceptBaseUrl + "#shorthand_operators"
+            name: 'Shorthand operators',
+            url: conceptBaseUrl + "#shorthand_operators",
+            categoryId: 'arithmetic'
         },
 
 /*Strings*/
 
-        {
-            id: 'string_type',
-            name: 'string_type',
-            url: conceptBaseUrl + '#string_type'
-        },
+        {id: 'strings', name:'Strings', isBase: true, isCategory: true},
+
 
         {
             id: 'string',
-            name: 'type_string',
-            url: conceptBaseUrl + "#string"
+            name: 'String',
+            url: conceptBaseUrl + "#string",
+            categoryId: 'strings'
         },
 
         {
             id: 'string_concatenate',
-            name: 'string_concatenate',
-            url: conceptBaseUrl + '#string_concatenate'
+            name: 'String concatenation',
+            url: conceptBaseUrl + '#string_concatenate',
+            categoryId: 'strings'
         },
 
         {
             id: 'smartpy_slice',
-            name: 'smartpy_slice',
-            url: conceptBaseUrl + '#smartpy_slice'
+            name: 'String slice',
+            url: conceptBaseUrl + '#smartpy_slice',
+            categoryId: 'strings'
         },
 
         {
             id: 'length',
-            name: 'length',
-            url: conceptBaseUrl + '#length'
+            name: 'String length',
+            url: conceptBaseUrl + '#length',
+            categoryId: 'strings'
         },
 
         {
             id: 'string_addition',
-            name: 'string_addition',
-            url: conceptBaseUrl + "#string_addition"
+            name: 'String addition',
+            url: conceptBaseUrl + "#string_addition",
+            categoryId: 'strings'
+        },
+
+        {
+            id: 'string_type',
+            name: 'String type',
+            url: conceptBaseUrl + '#string_type',
+            categoryId: 'strings'
         },
 
 
@@ -1807,100 +2104,118 @@ window.SmartContractConfig = {
 
 /* Asserts, Booleans*/
 
+        {id: 'asserts_booleans', name:'Asserts, Booleans', isBase: true, isCategory: true},
+
         {
             id: 'raise',
-            name: 'raise',
-            url: conceptBaseUrl + "#raise"
+            name: 'Raise',
+            url: conceptBaseUrl + "#raise",
+            categoryId: 'asserts_booleans'
         },
 
         {
-            id: 'verify',
-            name: 'verify',
-            url: conceptBaseUrl + "#verify"
+            id: 'assert',
+            name: 'Assert',
+            url: conceptBaseUrl + "#assert",
+            categoryId: 'asserts_booleans'
         },
 
         {
-            id: 'verify_message',
-            name: 'verify_message',
-            url: conceptBaseUrl + "#verify_message"
+            id: 'assert_message',
+            name: 'Assert with error value',
+            url: conceptBaseUrl + "#assert_message",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'and',
-            name: 'and',
-            url: conceptBaseUrl + "#and"
+            name: 'And',
+            url: conceptBaseUrl + "#and",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'or',
-            name: 'or',
-            url: conceptBaseUrl + "#or"
+            name: 'Or',
+            url: conceptBaseUrl + "#or",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'not',
-            name: 'not',
-            url: conceptBaseUrl + "#not"
+            name: 'Not',
+            url: conceptBaseUrl + "#not",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: '^',
             name: '^',
-            url: conceptBaseUrl + "#^"
+            url: conceptBaseUrl + "#^",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'true',
-            name: 'true',
-            url: conceptBaseUrl + "#true"
+            name: 'True',
+            url: conceptBaseUrl + "#true",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'false',
-            name: 'false',
-            url: conceptBaseUrl + "#false"
+            name: 'False',
+            url: conceptBaseUrl + "#false",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: '>',
             name: '>',
-            url: conceptBaseUrl + "#>"
+            url: conceptBaseUrl + "#>",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: '<',
             name: '<',
-            url: conceptBaseUrl + "#<"
+            url: conceptBaseUrl + "#<",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'less_or_equal',
-            name: 'less_or_equal',
-            url: conceptBaseUrl + "#less_or_equal"
+            name: '<=',
+            url: conceptBaseUrl + "#less_or_equal",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'more_or_equal',
-            name: 'more_or_equal',
-            url: conceptBaseUrl + "#more_or_equal"
+            name: '>=',
+            url: conceptBaseUrl + "#more_or_equal",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'equal_comparator',
-            name: 'equal_comparator',
-            url: conceptBaseUrl + "#equal_comparator"
+            name: '==',
+            url: conceptBaseUrl + "#equal_comparator",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: '!=',
             name: '!=',
-            url: conceptBaseUrl + "#!="
+            url: conceptBaseUrl + "#!=",
+            categoryId: 'asserts_booleans'
         },
 
         {
             id: 'boolean_type',
-            name: 'boolean_type',
-            url: conceptBaseUrl + "#boolean_type"
+            name: 'Boolean type',
+            url: conceptBaseUrl + "#boolean_type",
+            categoryId: 'asserts_booleans'
         },
 
 
@@ -2238,6 +2553,50 @@ window.SmartContractConfig = {
             url: conceptBaseUrl + "#smartpy_rshift_bytes"
         },
 
-],
+
+/* Basic Python */
+
+        {
+            id: 'smartpy_if',
+            name: 'smartpy_if',
+            url: conceptBaseUrl + "#smartpy_if"
+        },
+
+        {
+            id: 'smartpy_else',
+            name: 'smartpy_else',
+            url: conceptBaseUrl + "#smartpy_else"
+        },
+
+        {
+            id: 'smartpy_elif',
+            name: 'smartpy_elif',
+            url: conceptBaseUrl + "#smartpy_elif"
+        },
+
+        {
+            id: 'smartpy_while',
+            name: 'smartpy_while',
+            url: conceptBaseUrl + "#smartpy_while"
+        },
+
+        {
+            id: 'smartpy_for',
+            name: 'smartpy_for',
+            url: conceptBaseUrl + "#smartpy_for"
+        },
+
+        {
+            id: 'smartpy_variable',
+            name: 'smartpy_variable',
+            url: conceptBaseUrl + "#smartpy_variable"
+        },
+
+    ],
+
+
     smartContractsBlocksList: smartContractsBlocksList,
 };
+
+
+
