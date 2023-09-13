@@ -769,7 +769,8 @@ var getContext = function(display, infos, curLevel) {
       infos.bottomMargin += infos.cellSide;
    }
 
-   
+   var innerState = {};
+
    switch(infos.blocklyColourTheme) {
       case "bwinf":
          context.provideBlocklyColours = function() {

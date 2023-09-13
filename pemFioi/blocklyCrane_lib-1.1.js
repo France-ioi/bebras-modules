@@ -1872,6 +1872,7 @@ var getContext = function(display, infos, curLevel) {
       infos.bottomMargin += infos.cellSide;
    }
 
+   var innerState = {};
    
    switch(infos.blocklyColourTheme) {
       case "bwinf":
@@ -2065,8 +2066,6 @@ var getContext = function(display, infos, curLevel) {
       };
       innerState.items = context.items.map(removeItemElement);
       innerState.multicell_items = context.multicell_items.map(removeItemElement);
-      innerState.last_connect = context.last_connect;
-      innerState.wires = context.wires.map(removeItemElement);
       innerState.nbMoves = context.nbMoves;
       innerState.time = context.time;
       innerState.bag = context.bag.map(removeItemElement);
@@ -2081,8 +2080,6 @@ var getContext = function(display, infos, curLevel) {
    context.reloadInnerState = function(data) {
       context.items = data.items;
       context.multicell_items = data.multicell_items;
-      context.last_connect = data.last_connect;
-      context.wires = data.wires;
       context.nbMoves = data.nbMoves;
       context.time = data.time;
       context.bag = data.bag;
