@@ -2068,7 +2068,6 @@ var getContext = function(display, infos, curLevel) {
       innerState.multicell_items = context.multicell_items.map(removeItemElement);
       innerState.nbMoves = context.nbMoves;
       innerState.time = context.time;
-      innerState.bag = context.bag.map(removeItemElement);
 
       return innerState;
    };
@@ -2082,7 +2081,6 @@ var getContext = function(display, infos, curLevel) {
       context.multicell_items = data.multicell_items;
       context.nbMoves = data.nbMoves;
       context.time = data.time;
-      context.bag = data.bag;
    };
 
    context.unload = function() {
