@@ -3508,6 +3508,11 @@ var getContext = function(display, infos, curLevel) {
       
       if(item.img) {
          item.element = paper.image(imgUrlWithPrefix(item.img), x, y, item.side * item.nbStates * scale, item.side * scale);
+         var imgalt = item.imgalt || itemType.imgalt
+         if (imgalt) {
+            item.element.attr('title', imgalt);
+         }
+
       }
       else if(item.value !== undefined) {
          var fontColor = item.fontColor;
