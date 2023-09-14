@@ -1865,6 +1865,10 @@ var getContext = function(display, infos, curLevel) {
       var itemType = infos.itemTypes[item.type];
       if (itemType.img) {
          item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+         var imgalt = item.imgalt || itemType.imgalt;
+         if (imgalt) {
+            item.element.attr('title', imgalt);
+         }
       } else if (itemType.value !== undefined) {
          item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, itemType.value).attr({"font-size": item.side * scale / 2});
       }
