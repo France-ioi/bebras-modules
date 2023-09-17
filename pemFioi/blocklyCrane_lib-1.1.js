@@ -97,7 +97,7 @@ var getContext = function(display, infos, curLevel) {
                moveCraneColumn: "allerColonne(colonne %1)",
                moveCraneRow: "allerLigne(ligne %1)",
                moveCrane: "placerGrappin(colonne %1, ligne %2)",
-               p4PlayMove: "jouerCoup()",
+               p4PlayMove: "jouerCoup(joueur %1)",
                p4WinVertical: "gagneVertical(joueur %1, colonne %2)",
                p4WinHorizontal: "gagneHorizontal(joueur %1, colonne %2)",
                p4WinDiagonalLeft: "gagneDiagonaleGauche(joueur %1, colonne %2)",
