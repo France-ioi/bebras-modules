@@ -98,11 +98,13 @@ var getContext = function(display, infos, curLevel) {
                moveCraneRow: "allerLigne(ligne %1)",
                moveCrane: "placerGrappin(colonne %1, ligne %2)",
                p4PlayMove: "jouerCoup(joueur %1)",
-               p4WinVertical: "gagneVertical(joueur %1, colonne %2)",
-               p4WinHorizontal: "gagneHorizontal(joueur %1, colonne %2)",
-               p4WinDiagonalLeft: "gagneDiagonaleGauche(joueur %1, colonne %2)",
-               p4WinDiagonalRight: "gagneDiagonaleDroite(joueur %1, colonne %2)",
+               p4WinVertical: "gagneVertical(briqueCherchee %1, colonne %2)",
+               p4WinHorizontal: "gagneHorizontal(briqueCherchee %1, colonne %2)",
+               p4WinDiagonalLeft: "gagneDiagonaleGauche(briqueCherchee %1, colonne %2)",
+               p4WinDiagonalRight: "gagneDiagonaleDroite(briqueCherchee %1, colonne %2)",
                attachedLetter: "lettreAttachee()",
+               text_ord: "code ASCII de %1",
+               text_chr: "lettre de code ASCII %1",
                wordGamePlaceRow: "placerEnColonne(ligne %1, colonne %2)",
                wordGameReadWord: "lireMot(ligne %1)",
                wordGameReadExpectedWord: "lireMotAttendu(colonne %1)",
@@ -177,6 +179,8 @@ var getContext = function(display, infos, curLevel) {
                p4WinDiagonalLeft: "gagneDiagonaleGauche",
                p4WinDiagonalRight: "gagneDiagonaleDroite",
                attachedLetter: "lettreAttachee",
+               text_ord: "ord",
+               text_chr: "chr",
                wordGamePlaceRow: "placerEnColonne",
                wordGameReadWord: "lireMot",
                wordGameReadExpectedWord: "lireMotAttendu",
@@ -251,6 +255,8 @@ var getContext = function(display, infos, curLevel) {
                p4WinDiagonalLeft: "@(joueur, colonne) Indique si le joueur gagne en diagonale gauche depuis cette colonne.",
                p4WinDiagonalRight: "@(joueur, colonne) Indique si le joueur gagne en diagonale droite depuis cette colonne.",
                attachedLetter: "@() Retourne la lettre attachée à la brique où se trouve le grappin",
+               text_ord: "@(lettre) Retourne le code ASCII de la lettre",
+               text_chr: "@(code) Retourne la lettre qui a ce code ASCII",
                wordGamePlaceRow: "@(ligne, colonne) place le mot de cette ligne dans cette colonne",
                wordGameReadWord: "@(ligne) lit le mot situé sur cette ligne",
                wordGameReadExpectedWord: "@(colonne) lit le mot attendu à cette colonne",
@@ -1269,7 +1275,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "wordGamePlaceRow",
       type: "myFunctions",
-      block: { name: "wordGamePlaceRow", params: [null, null], yieldsValue: 'int', 
+      block: { name: "wordGamePlaceRow", params: [null, null], 
          blocklyJson: {
                "args0": [
                { "type": "input_value", "name": "PARAM_0", "value": 1 },
@@ -1374,6 +1380,44 @@ var getContext = function(display, infos, curLevel) {
       func: function(callback) {
          this.beforeBlockExecution();
           this.callCallback(callback, this.attachedLetter());
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "text_ord",
+      type: "texts",
+      block: {
+         name: "text_ord",
+         params: [null],
+         yieldsValue: 'int',
+         blocklyJson: {
+            "args0": [
+               { "type": "input_value", "name": "PARAM_0", "value": "" }
+            ]
+         }
+      },
+      func: function (letter, callback) {
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.text_ord(letter));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "text_chr",
+      type: "texts",
+      block: {
+         name: "text_chr",
+         params: [null],
+         yieldsValue: 'string',
+         blocklyJson: {
+            "args0": [
+               { "type": "input_value", "name": "PARAM_0", "value": 1 }
+            ]
+         }
+      },
+      func: function (letter, callback) {
+         this.beforeBlockExecution();
+         this.callCallback(callback, this.text_chr(letter));
       }
    });
 
@@ -1620,6 +1664,7 @@ var getContext = function(display, infos, curLevel) {
       robot: {
          actions: [],
          sensors: [],
+         texts: [],
          myFunctions: []
       }
    };
@@ -1694,6 +1739,8 @@ var getContext = function(display, infos, curLevel) {
       {id: 'p4WinDiagonalLeft', name: 'gagneDiagonaleGauche()', url: conceptBaseUrl+'#p4WinDiagonalLeft', python: ['p4WinDiagonalLeft'], categoryId: 'customFunctions'},
       {id: 'p4WinDiagonalRight', name: 'gagneDiagonaleDroite()', url: conceptBaseUrl+'#p4WinDiagonalRight', python: ['p4WinDiagonalRight'], categoryId: 'customFunctions'},
       {id: 'attachedLetter', name: 'lettreAttachee()', url: conceptBaseUrl+'#attachedLetter', python: ['attachedLetter'], categoryId: 'customFunctions'},
+      { id: 'text_ord', name: 'text_ord()', url: conceptBaseUrl + '#text_ord', python: ['text_ord'], categoryId: 'texts' },
+      { id: 'text_chr', name: 'text_chr()', url: conceptBaseUrl + '#text_chr', python: ['text_chr'], categoryId: 'texts' },
       {id: 'wordGamePlaceRow', name: 'placerEnColonne()', url: conceptBaseUrl+'#wordGamePlaceRow', python: ['wordGamePlaceRow'], categoryId: 'customFunctions'},
       {id: 'wordGameReadWord', name: 'lireMot()', url: conceptBaseUrl+'#wordGameReadWord', python: ['wordGameReadWord'], categoryId: 'customFunctions'},
       {id: 'wordGameReadExpectedWord', name: 'lireMotAttendu()', url: conceptBaseUrl+'#wordGameReadExpectedWord', python: ['wordGameReadExpectedWord'], categoryId: 'customFunctions'},
@@ -4529,6 +4576,14 @@ var getContext = function(display, infos, curLevel) {
    context.attachedLetter = function() {
       var type = context.readFaceItem();
       return String.fromCharCode("A".charCodeAt(0) + type - 1);
+   };
+
+   context.text_ord = function (letter) {
+      return letter.toString().charCodeAt(0);
+   };
+
+   context.text_chr = function (code) {
+      return String.fromCharCode(code);
    };
 
    context.expectedLetter = function() {
