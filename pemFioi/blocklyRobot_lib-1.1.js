@@ -2528,6 +2528,7 @@ var getContext = function(display, infos, curLevel) {
    }
 
    context.reloadInnerState = function(data) {
+      innerState = data;
       context.items = data.items;
       context.multicell_items = data.multicell_items;
       context.last_connect = data.last_connect;
