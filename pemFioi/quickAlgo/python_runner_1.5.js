@@ -505,7 +505,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.get_source_line = function (lineno) {
-    return this._code.split('\n')[lineno];
+    return this._code.split('\n')[lineno] || '';
   };
 
   this._continue = function () {
