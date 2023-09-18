@@ -3336,7 +3336,7 @@ var getContext = function(display, infos, curLevel) {
          if((infos.customItems) && (item.num < 90) && !defaultPath){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
             var newSrc = "assets/png/"+fileName;
-            src = newSrc;
+            src = imgUrlWithPrefix(newSrc);
          }
          if(item.crusher && infos.crusherImgPath){
             src = infos.crusherImgPath;
@@ -3359,7 +3359,7 @@ var getContext = function(display, infos, curLevel) {
             if((infos.customItems) && (item.num < 90) && !defaultPath){
                var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
                var newSrc = "assets/png/"+fileName;
-               src = newSrc;
+               src = imgUrlWithPrefix(newSrc);
             }
             var op = (item.dark) ? 1 : 0;
             item.darkElement = paper.image(src, x, y, w * scale, h * scale).attr("opacity",op);

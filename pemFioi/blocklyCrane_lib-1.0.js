@@ -1783,7 +1783,7 @@ var getContext = function(display, infos, curLevel) {
          if((infos.customItems) && (item.num < 90)){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
             var newSrc = "assets/png/"+fileName;
-            src = newSrc;
+            src = imgUrlWithPrefix(newSrc);
          }
          var w = item.width || item.side;
          var h = item.height || item.side;
