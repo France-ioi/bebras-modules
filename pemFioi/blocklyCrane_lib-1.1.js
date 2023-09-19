@@ -86,9 +86,9 @@ var getContext = function(display, infos, curLevel) {
                eraseShape: "effacer forme",
                readShape: "lire forme",
                readColor: "lire couleur",
-               displayMessage: "afficher message",
-               conjure: "faire apparaître brique",
-               conjureFaceItem: "faire apparaître objet",
+               displayMessage: "afficher message %1",
+               conjure: "faire apparaître brique %1",
+               conjureFaceItem: "faire apparaître objet %1",
                destroyFaceItem: "détruire objet",
 
                flipUnder: "retournerDessous()",
@@ -1114,7 +1114,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "conjure", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
@@ -1138,7 +1138,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "conjureFaceItem", params: [null], 
          blocklyJson: {
                "args0": [
-               { "type": "field_number", "name": "PARAM_0", "value": 1 },
+               { "type": "input_value", "name": "PARAM_0", "value": 1 },
             ]
          }
       },
