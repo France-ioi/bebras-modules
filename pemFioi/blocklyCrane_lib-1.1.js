@@ -542,8 +542,8 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                yLimit: function(up) {
-                  var str = "Le grappin ne peut pas "
-                  str += (up) ? "monter plus haut." : "descendre plus bas.";
+                  var str = "De tool kan niet "
+                  str += (up) ? "hoger gaan." : "lager gaan.";
                   return str
                },
                outside: 'De kraan kan niet verder gaan in die richting.',
@@ -559,35 +559,38 @@ var getContext = function(display, infos, curLevel) {
                wrongCoordinates: 'De gegevens zijn ongeldig.',
                impossibleToRead: 'Onmogelijk om op deze plaats een steen te lezen.',
                noMarker: function(num) {
-                  return "Le marqueur n°"+num+" n'existe pas"
+                  return "De marker n°" + num + " bestaat niet"
                },
                partialSuccess: function(thresh,score) {
                   // console.log(thresh,score)
                   if(thresh){
                      var perc = Math.round(thresh*100);
-                     return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+                     return "Je hebt ten minste "+perc+"% van de blokken correct geplaatst, maar het doel is niet volledig bereikt.";
                   }else{
                      var perc = Math.round(score*100);
-                     return "Vous avez réussi un objectif secondaire mais l'objectif principal n'est pas atteint. Vous avez gagné "+perc+"% du score total."
+                     return "U heeft een secundair doel bereikt, maar het hoofddoel is niet bereikt. U heeft "+perc+"% van de totale score behaald.";
                   }
                },
                failureMissing: function(nb) {
                   if(nb == 0){
-                     return "La case encadrée en rouge devrait contenir un bloc"
+                     return "Het rood omkaderde vak moet een blok bevatten";
                   }
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde vak moet  "+str+" bevatten"
                },
                failureWrongBlock: function(nb) {
                   if(nb == 0){
-                     return "La case encadrée en rouge ne devrait pas contenir ce bloc"
+                     return "Het rood omkaderde vak moet dat blok niet bevatten"
                   }
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde vak moet  "+str+" bevatten"
                },
                failureBrokenBlock: function(nb) {
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde blok is gebroken en moet vervangen worden door  "+str;
+               },
+               failureMissingMarker: function(col) {
+                  return "Er ontbreekt een marker aan de kolom "+col+".";
                },
                failureHiddenBlock: 'Het blok in het rode kader is naar de verkeerde kant gedraaid.',
                failureUnwanted: 'Het vak met het rode kader omvat een blok terwijl het leeg had moeten zijn.'

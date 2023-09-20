@@ -328,29 +328,32 @@ var getContext = function(display, infos, curLevel) {
                wrongCoordinates: 'De gegevens zijn ongeldig.',
                impossibleToRead: 'Onmogelijk om op deze plaats een steen te lezen.',
                noMarker: function(num) {
-                  return "Le marqueur n°"+num+" n'existe pas"
+                  return "De marker n°" + num + " bestaat niet"
                },
                partialSuccess: function(thresh) {
                   var perc = Math.round(thresh*100);
-                  return "Vous avez correctement placé au moins "+perc+"% des blocs, mais l'objectif n'est pas totalement atteint."
+                  return "Je hebt ten minste "+perc+"% van de blokken correct geplaatst, maar het doel is niet volledig bereikt.";
                },
                failureMissing: function(nb) {
                   if(nb == 0){
-                     return "La case encadrée en rouge devrait contenir un bloc"
+                     return "Het rood omkaderde vak moet een blok bevatten";
                   }
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde vak moet  "+str+" bevatten"
                },
                failureWrongBlock: function(nb) {
                   if(nb == 0){
-                     return "La case encadrée en rouge ne devrait pas contenir ce bloc"
+                     return "Het rood omkaderde vak moet dat blok niet bevatten"
                   }
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "La case encadrée en rouge devrait contenir "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde vak moet  "+str+" bevatten"
                },
                failureBrokenBlock: function(nb) {
-                  var str = (nb > 1) ? "un des blocs encadrés" : "le bloc encadré";
-                  return "Le bloc encadré en rouge est cassé et devrait être remplacé par "+str+" en jaune"
+                  var str = (nb > 1) ? "één van de geel omkaderde blokken" : "het geel omkaderde blok";
+                  return "Het rood omkaderde blok is gebroken en moet vervangen worden door  "+str;
+               },
+               failureMissingMarker: function(col) {
+                  return "Er ontbreekt een marker aan de kolom "+col+".";
                },
                failureHiddenBlock: 'Het blok in het rode kader is naar de verkeerde kant gedraaid.',
                failureUnwanted: 'Het vak met het rode kader omvat een blok terwijl het leeg had moeten zijn.'
