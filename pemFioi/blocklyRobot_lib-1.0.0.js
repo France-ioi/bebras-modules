@@ -2290,7 +2290,7 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       pixelArt: {
-         newBlocks: (function(names, colors, colorsSecondary, colorsTertiary, translations) {
+         newBlocks: (function(names, colors, colorsSecondary, colorsTertiary, colorsFill, translations) {
             var blocks = [];
             for(var iColor = 0;iColor < colors.length;iColor++) {
                blocks.push({
@@ -2305,9 +2305,12 @@ var getContext = function(display, infos, curLevel) {
                   category: "robot",
                   type: "actions",
                   block: {
-                     name: names[iColor], blocklyJson: {"colour": colors[iColor], "colourSecondary": colorsSecondary[iColor], "colourTertiary": colorsTertiary[iColor]}
+                     name: names[iColor], blocklyJson: {"colour": colors[iColor],
+                                                        "colourSecondary": colorsSecondary[iColor],
+                                                        "colourTertiary": colorsTertiary[iColor],
+                                                        "textStyle": "fill:" + colorsFill[iColor] +"; font-weight: 500;"}
                   },
-                  func: (function(cur_color) { return function(callback) {
+                  func: (function(cur_img) { return function(callback) {
                      var robot = this.getRobot();
                      if(infos.allowRewrite === true) {
                         this.withdraw(undefined, false);
@@ -2316,7 +2319,7 @@ var getContext = function(display, infos, curLevel) {
                         throw(window.languageStrings.messages.failureRewrite);
                      }
                      
-                     this.dropObject({type: "paint", color: cur_color});
+                     this.dropObject({type: "paint", img: cur_img, imgalt: translations["fr"][iColor]});
                      if (robot.col == context.nbCols - 1) {
                         robot.row = (robot.row + 1) % context.nbRows;
                         robot.col = 0;
@@ -2325,7 +2328,7 @@ var getContext = function(display, infos, curLevel) {
                      } else {
                         this.forward(callback);
                      };
-                  } })(colors[iColor])
+                  } })(names[iColor]+".png")
                });
             }
             return blocks;
@@ -2333,25 +2336,27 @@ var getContext = function(display, infos, curLevel) {
             ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
             ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"], 
             ["#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd"],
-            {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
+            ["#ffffff", "#ffffff", "#777777", "#777777", "#777777", "#ffffff", "#777777", "#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+            {fr: ["Rouge", "Bleu", "Jaune", "Blanc", "Vert", "Orange", "Rose", "Violet", "Marron", "Gris", "Noir"]}),
          backgroundColor: "#ece4ce",
          ignoreBag: true,
          blockingFilter: false,
          itemTypes: {
             green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
-            marker_red: { num: 2, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff0000";} },
-            marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#0000ff";} },
-            marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ffff00";} },
-            marker_white: { num: 5, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ffffff";} },
-            marker_green: { num: 6, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#00ff00";} },
-            marker_orange: { num: 7, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff8000";} },
-            marker_pink: { num: 8, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff80ff";} },
-            marker_purple: { num: 9, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#800080";} },
-            marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#804d00";} },
-            marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#808080";} },
-            marker_black: { num: 12, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#000000";} },
+            marker_red: { num: 2, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "red.png";} },
+            marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "blue.png";} },
+            marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "yellow.png";} },
+            marker_white: { num: 5, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "white.png";} },
+            marker_green: { num: 6, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "green.png";} },
+            marker_orange: { num: 7, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "orange.png";} },
+            marker_pink: { num: 8, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "pink.png";} },
+            marker_purple: { num: 9, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "purple.png";} },
+            marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "brown.png";} },
+            marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "grey.png";} },
+            marker_black: { num: 12, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "black.png";} },
             paint: { side: 60, isWithdrawable: true, zOrder: 1 },
             marker_paint: { num: 1, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.type === "paint";} },
+            marker: { num: 13, img: "marker.png", isWritable: true, side: 60, zOrder: 0},
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
