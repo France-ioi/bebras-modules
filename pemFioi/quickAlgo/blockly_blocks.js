@@ -2116,10 +2116,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var stdBlocks = this.getStdBlocks();
 
          // It is normally executed during load, but for 
-         if (this.scratchMode) {
-            this.fixScratch();
-         }
          var taskStdInclude = (this.includeBlocks && this.includeBlocks.standardBlocks) || {};
+         if (this.scratchMode) {
+            taskStdInclude.singleBlocks = this.blocksToScratch(taskStdInclude.singleBlocks || []);
+         }
          var stdInclude = {
             wholeCategories: [],
             singleBlocks: [],
