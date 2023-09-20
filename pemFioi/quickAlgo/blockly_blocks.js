@@ -2117,8 +2117,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          // It is normally executed during load, but for 
          var taskStdInclude = (this.includeBlocks && this.includeBlocks.standardBlocks) || {};
+         var tsiSingleBlocks = taskStdInclude.singleBlocks || [];
          if (this.scratchMode) {
-            taskStdInclude.singleBlocks = this.blocksToScratch(taskStdInclude.singleBlocks || []);
+            tsiSingleBlocks = this.blocksToScratch(tsiSingleBlocks);
          }
          var stdInclude = {
             wholeCategories: [],
@@ -2135,7 +2136,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
          mergeIntoArray(stdInclude.wholeCategories, taskStdInclude.wholeCategories || []);
-         mergeIntoArray(stdInclude.singleBlocks, taskStdInclude.singleBlocks || []);
+         mergeIntoArray(stdInclude.singleBlocks, tsiSingleBlocks || []);
          mergeIntoArray(stdInclude.excludedBlocks, taskStdInclude.excludedBlocks || []);
          // Add block sets
          if(taskStdInclude.blockSets) {
