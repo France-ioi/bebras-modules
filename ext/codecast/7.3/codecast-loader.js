@@ -4,9 +4,6 @@ $(document).ready(function() {
       window.taskData.waitInit();
     }
 
-    // Remove the width set by bebras-platform
-    $('body').css('width', '');
-
     var taskInstructionsHtml = $('#taskIntro').html();
 
     var hints = $('#taskHints > div').toArray().map(elm => {
