@@ -8,6 +8,13 @@ FioiBlockly.langErrorDisplayed = {};
 
 FioiBlockly.maxListSize = 100;
 
+// Set to null to use the default help behavior
+// Set to false to disable help completely (the button still displays)
+// Set to an object with two functions to enable custom help:
+// * exists : function(block) { return true/false; }
+// * display : function(block) { ... }
+FioiBlockly.helpHooks = false;
+
 // Import messages for a language
 FioiBlockly.loadLanguage = function(lang) {
   if(!FioiBlockly.Msg[lang] && !FioiBlockly.langErrorDisplayed[lang]) {
@@ -89,6 +96,26 @@ Blockly.Block.prototype.getTextStyle = function () {
 Blockly.Block.prototype.setTextStyle = function (style) {
     this.textStyle_ = style;
 }
+Blockly.BlockSvg.prototype.originalShowContextMenu_ = Blockly.BlockSvg.prototype.showContextMenu_;
+
+Blockly.BlockSvg.prototype.showContextMenu_ = function () {
+    if (FioiBlockly.helpHooks === false) {
+        this.helpUrl = null;
+    } else if (FioiBlockly.helpHooks) {
+        this.helpUrl = FioiBlockly.helpHooks.exists(this) && '#';
+    }
+    this.originalShowContextMenu_.apply(this, arguments);
+};
+
+Blockly.BlockSvg.prototype.showHelp_ = function () {
+    if (FioiBlockly.helpHooks) {
+        return FioiBlockly.helpHooks.display(this);
+    }
+    var url = goog.isFunction(this.helpUrl) ? this.helpUrl() : this.helpUrl;
+    if (url) {
+        window.open(url);
+    }
+};
 Blockly.copy_ = function(block) {
   var xmlBlock = Blockly.Xml.blockToDom(block);
   // Encode start position in XML.
