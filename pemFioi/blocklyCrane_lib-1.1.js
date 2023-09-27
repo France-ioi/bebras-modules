@@ -3806,7 +3806,12 @@ var getContext = function(display, infos, curLevel) {
       if(callback){
          var delay = 2*takeAnimDelay*(topBlock.row + 1) + 2*infos.actionDelayStable; // additional actionDelayStable to prevent bug with shape anim
          // var delay = 2*takeAnimDelay*(topBlock.row + 1) + infos.actionDelayStable;
-         context.waitDelay(callback,null,delay);
+
+         if (context.display && context.animate && infos.actionDelayStable > 0) {
+            context.waitUntilCallback(callback);
+         } else {
+            context.waitDelay(callback,null,delay);
+         }
       }
    };
 
@@ -3861,7 +3866,9 @@ var getContext = function(display, infos, curLevel) {
          if(topBlock.num == 1){
             return
          }
-         context.takeAnimUp(topBlock,-1);
+         context.takeAnimUp(topBlock,-1, function () {
+            context.signalExecutionIsOver();
+         });
       })
    };
 
@@ -4112,7 +4119,12 @@ var getContext = function(display, infos, curLevel) {
 
       if(callback){
          var delay = 2*takeAnimDelay*(tempItem.row + 1) + infos.actionDelayStable;
-         context.waitDelay(callback, null, delay);
+
+         if (context.display && context.animate && infos.actionDelayStable > 0) {
+            context.waitUntilCallback(callback);
+         } else {
+            context.waitDelay(callback,null,delay);
+         }
       }
    };
 
@@ -4163,7 +4175,9 @@ var getContext = function(display, infos, curLevel) {
 
    context.putDownAnim = function(item,currRow) {
       this.putDownAnimDown(item,currRow, function() {
-         context.putDownAnimUp(item.row);
+         context.putDownAnimUp(item.row, function () {
+            context.signalExecutionIsOver();
+         });
       });
    };
 
