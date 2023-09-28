@@ -728,12 +728,12 @@ Blockly.Procedures.resetFlyoutOptions = function (initial) {
     Blockly.Procedures.flyoutOptions = {
       disableArgs: false, // Disable the arguments mutator
       inlineArgs: false, // Put fields inline
-      includedBlocks: { noret: false, ret: false, ifret: false }, // Blocks to add to the list
+      includedBlocks: { noret: false, ret: false, ifret: false, noifret: false }, // Blocks to add to the list
     };
   } else {
     // Keep inlineArgs option
     Blockly.Procedures.flyoutOptions.disableArgs = false;
-    Blockly.Procedures.includedBlocks = { noret: false, ret: false, ifret: false };
+    Blockly.Procedures.includedBlocks = { noret: false, ret: false, ifret: false, noifret: false };
   }
 };
 Blockly.Procedures.resetFlyoutOptions(true);
@@ -768,6 +768,13 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     // <block type="procedures_ifreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_ifreturn');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
+  }
+  if (incl.noifret && Blockly.Blocks['procedures_return']) {
+    // <block type="procedures_ifreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_return');
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
@@ -2785,6 +2792,89 @@ if(Blockly.Blocks['procedures_defreturn']) {
   };
 }
 
+
+Blockly.Blocks['procedures_return'] = {
+  /**
+   * Block for returning a value from a procedure.
+   * @this Blockly.Block
+   */
+  init: function () {
+    this.appendValueInput('VALUE')
+      .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(Blockly.Blocks.procedures.HUE);
+    this.hasReturnValue_ = true;
+  },
+  /**
+   * Create XML to represent whether this block has a return value.
+   * @return {!Element} XML storage element.
+   * @this Blockly.Block
+   */
+  mutationToDom: function () {
+    var container = document.createElement('mutation');
+    container.setAttribute('value', Number(this.hasReturnValue_));
+    return container;
+  },
+  /**
+   * Parse XML to restore whether this block has a return value.
+   * @param {!Element} xmlElement XML storage element.
+   * @this Blockly.Block
+   */
+  domToMutation: function (xmlElement) {
+    var value = xmlElement.getAttribute('value');
+    this.hasReturnValue_ = (value == 1);
+    if (!this.hasReturnValue_) {
+      this.removeInput('VALUE');
+      this.appendDummyInput('VALUE')
+        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+    }
+  },
+  /**
+   * Called whenever anything on the workspace changes.
+   * Add warning if this flow block is not nested inside a loop.
+   * @param {!Blockly.Events.Abstract} e Change event.
+   * @this Blockly.Block
+   */
+  onchange: function (e) {
+    var legal = false;
+    // Is the block nested in a procedure?
+    var block = this;
+    do {
+      if (this.FUNCTION_TYPES.indexOf(block.type) != -1) {
+        legal = true;
+        break;
+      }
+      block = block.getSurroundParent();
+    } while (block);
+    if (legal) {
+      // If needed, toggle whether this block has a return value.
+      if (block.type == 'procedures_defnoreturn' && this.hasReturnValue_) {
+        this.removeInput('VALUE');
+        this.appendDummyInput('VALUE')
+          .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+        this.hasReturnValue_ = false;
+      } else if (block.type == 'procedures_defreturn' &&
+        !this.hasReturnValue_) {
+        this.removeInput('VALUE');
+        this.appendValueInput('VALUE')
+          .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+        this.hasReturnValue_ = true;
+      }
+      this.setWarningText(null);
+    } else {
+      this.setWarningText(Blockly.Msg.PROCEDURES_IFRETURN_WARNING);
+    }
+  },
+  /**
+   * List of block types that are functions and thus do not need warnings.
+   * To add a new function type add this to your code:
+   * Blockly.Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
+   */
+  FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn']
+};
+
 if(typeof Blockly.Blocks.tables === 'undefined') {
   Blockly.Blocks.tables = {};
 }
@@ -3736,6 +3826,15 @@ Blockly.JavaScript['math_change'] = function(block) {
   return incrCode + reportCode;
 };
 
+Blockly.JavaScript['procedures_return'] = function (block) {
+    if (block.hasReturnValue_) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || 'null';
+        return 'return ' + value + ';\n';
+    } else {
+        return 'return;\n';
+    }
+};
 Blockly.JavaScript['tables_2d_init'] = function(block) {
   var blockVarName = block.getFieldValue('VAR');
   if(blockVarName) {
@@ -4161,6 +4260,17 @@ Blockly.Python['math_arithmetic'] = function(block) {
   // legibility of the generated code.
 };
 
+
+Blockly.Python['procedures_return'] = function (block) {
+    // Conditionally return value from a procedure.
+    if (block.hasReturnValue_) {
+        var value = Blockly.Python.valueToCode(block, 'VALUE',
+            Blockly.Python.ORDER_NONE) || 'None';
+        return 'return ' + value + '\n';
+    } else {
+        return 'return\n';
+    }
+};
 
 Blockly.Python['tables_2d_init'] = function(block) {
   var blockVarName = block.getFieldValue('VAR');
