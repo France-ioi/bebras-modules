@@ -2175,7 +2175,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                Blockly.Variables.flyoutOptions.any = true;
                continue;
             } else if (categoryName == 'functions') {
-               Blockly.Procedures.flyoutOptions.includedBlocks = {noret: true, ret: true, ifret: true};
+               Blockly.Procedures.flyoutOptions.includedBlocks = {noret: true, ret: true, ifret: true, noifret: true};
                continue;
             }
             var blocks = stdBlocks[categoryName];
@@ -2200,6 +2200,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(proceduresOptions.noret) { Blockly.Procedures.flyoutOptions.includedBlocks['noret'] = true; }
             if(proceduresOptions.ret) { Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true; }
             if(proceduresOptions.ifret) { Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true; }
+            if(proceduresOptions.noifret) { Blockly.Procedures.flyoutOptions.includedBlocks['noifret'] = true; }
             Blockly.Procedures.flyoutOptions.disableArgs = !!proceduresOptions.disableArgs;
          }
 
@@ -2212,6 +2213,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true;
             } else if(blockName == 'procedures_ifreturn') {
                Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true;
+            } else if(blockName == 'procedures_return') {
+               Blockly.Procedures.flyoutOptions.includedBlocks['noifret'] = true;
             } else {
                continue;
             }
@@ -2222,7 +2225,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
          if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ret']
-               || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+               || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']
+               || Blockly.Procedures.flyoutOptions.includedBlocks['noifret']) {
             if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']) {
                this.addBlocksAllowed(['procedures_defnoreturn', 'procedures_callnoreturn']);
             }
@@ -2230,7 +2234,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                this.addBlocksAllowed(['procedures_defreturn', 'procedures_callreturn']);
             }
             if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
-               this.addBlocksAllowed(['procedures_ifreturn']);
+               this.addBlocksAllowed(['procedures_ifreturn', 'procedures_return']);
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['noifret']) {
+               this.addBlocksAllowed(['procedures_return']);
             }
             categoriesInfos['functions'] = {
                blocksXml: []
