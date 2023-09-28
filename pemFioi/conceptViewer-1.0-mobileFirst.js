@@ -49,6 +49,31 @@ var conceptViewerStrings = {
       "arguments": 'Functions with arguments',
     }
   },
+  nl: {
+    viewerTitle: "Aide",
+    selectLanguage: "Sélectionnez un langage…",
+    selectTopic: "Sélectionnez une rubrique…",
+    reloadFromTask: "Merci d'ouvrir cette documentation directement depuis l'exercice. Vous pouvez fermer cette fenêtre.",
+    concepts: {
+      "taskplatform": 'Résolution des exercices',
+      "language": "Création d'un programme",
+      "blockly_text_print": 'Afficher du texte',
+      "blockly_text_print_noend": 'Afficher consécutivement du texte',
+      "blockly_controls_repeat": 'Herhalingslus',
+      "blockly_controls_if": 'Het blok « als »',
+      "blockly_controls_if_else": 'Het blol « als / zoniet »',
+      "blockly_controls_whileUntil": 'Het blok «herhalen zolang als »',
+      "blockly_controls_infiniteloop": 'Boucle infinie',
+      "blockly_logic_operation": 'Boleaanse Operatoren',
+      "extra_nested_repeat": 'Boucles imbriquées',
+      "extra_variable": 'Variables',
+      "extra_list": 'Listes',
+      "extra_function": 'Eenvoudige functies',
+      "extra_markers": 'Markers',
+      "robot_commands": 'Commandes du robot',
+      "arguments": 'Fonctions avec arguments',
+    }
+  },
   es: {
     viewerTitle: "Ayuda",
     selectLanguage: "Seleccione un lenguaje…",
