@@ -4104,6 +4104,7 @@ var getContext = function(display, infos, curLevel) {
       takeAnimDelay = 0.5*infos.actionDelayStable;
       // console.log("putDown",tempItem.dark)
       if(context.display) {
+         resetAnimZOrder();
          if(context.animate && infos.actionDelayStable > 0){
             context.putDownAnim(tempItem,-1);
          }else{
@@ -4278,6 +4279,7 @@ var getContext = function(display, infos, curLevel) {
       var { tempItem, topBlock } = putDownIntro(true);
 
       if(context.display) {
+         resetAnimZOrder();
          if(context.animate && infos.actionDelayStable > 0){
             context.dropAnim(tempItem,topBlock,callback);
          }else{
