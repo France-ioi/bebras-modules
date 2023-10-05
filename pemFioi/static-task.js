@@ -64,6 +64,7 @@ task.getMetaData = function (success, error) {
    if (typeof json !== 'undefined') {
       if (json) {
          json.disablePlatformProgress = true;
+         json.usesTokens = false;
       }
       success(json);
    } else {
