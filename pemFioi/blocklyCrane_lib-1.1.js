@@ -4012,7 +4012,12 @@ var getContext = function(display, infos, curLevel) {
              delay += 100;  // TODO: fix the real bug and remove
          }
          // var delay = 2*takeAnimDelay*(topBlock.row + 4) + 4*infos.actionDelayStable;
-         context.waitDelay(callback,null,delay);
+
+         if (context.display && context.animate && infos.actionDelayStable > 0) {
+            context.waitUntilCallback(callback);
+         } else {
+            context.waitDelay(callback,null,delay);
+         }
       }
    };
 
@@ -4027,7 +4032,9 @@ var getContext = function(display, infos, curLevel) {
                // console.log(topBlock.row - 1)
                context.putDownAnimDown(tempItem,topBlock.row - 1, function() {
                   resetAnimZOrder();
-                  context.putDownAnimUp(topBlock.row);
+                  context.putDownAnimUp(topBlock.row, function () {
+                     context.signalExecutionIsOver();
+                  });
                });
             })     
          });
