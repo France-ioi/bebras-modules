@@ -1319,6 +1319,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   name: "text_prompt_ext_noShadow",
                   blocklyXml: "<block type='text_prompt_ext'></block>",
                   excludedByDefault: true
+               },
+
+               {
+                  name: "text_str",
+                  blocklyXml: "<block type='text_str'></block>"
                }
             ],
             lists: [

@@ -1599,6 +1599,9 @@ FioiBlockly.Msg.en.TEXT_PRINT_TOOLTIP = "Print the text, number or other value, 
 FioiBlockly.Msg.en.TEXT_PRINT_NOEND_TITLE = "print %1";
 FioiBlockly.Msg.en.TEXT_PRINT_NOEND_TOOLTIP = "Print the text, number or other value, without newline.";
 
+FioiBlockly.Msg.en.TEXT_STR_TITLE = "convert to text %1";
+FioiBlockly.Msg.en.TEXT_STR_TOOLTIP = "Convert a value to text.";
+
 FioiBlockly.Msg.en.LISTS_APPEND_MSG = "to the list %1 add the element %2";
 FioiBlockly.Msg.en.LISTS_APPEND_TOOLTIP = "Add an element to the list '%1'";
 FioiBlockly.Msg.en.LISTS_GET_INDEX_FIRST = "at the beginning";
@@ -1757,6 +1760,9 @@ FioiBlockly.Msg.fr.TEXT_PRINT_NOEND_TOOLTIP = "Afficher le texte, le nombre ou u
 FioiBlockly.Msg.fr.TEXT_EVAL_TITLE = "évaluer";
 FioiBlockly.Msg.fr.TEXT_EVAL_TOOLTIP = "Évalue l'expression arithmétique spécifiée.";
 FioiBlockly.Msg.fr.TEXT_EVAL_INVALID = "Attention : %1 ; ce bloc retournera 'faux' !";
+
+FioiBlockly.Msg.fr.TEXT_STR_TITLE = "convertir en texte %1";
+FioiBlockly.Msg.fr.TEXT_STR_TOOLTIP = "Convertir une valeur en texte.";
 
 FioiBlockly.Msg.fr.EVAL_ERROR_SEMICOLON = "le point-virgule ';' n'est pas autorisé";
 FioiBlockly.Msg.fr.EVAL_ERROR_SYNTAX = "l'expression n'est pas syntaxiquement valide";
@@ -3191,6 +3197,28 @@ Blockly.Blocks['text_eval'] = {
   }
 };
 
+Blockly.Blocks['text_str'] = {
+  /**
+   * Block to convert to string.
+   * @this Blockly.Block
+   */
+  init: function () {
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_STR_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "EXPR"
+        }
+      ],
+      "output": "String",
+      "colour": Blockly.Colours ? Blockly.Colours.texts.primary : Blockly.Blocks.texts.HUE,
+      "colourSecondary": Blockly.Colours ? Blockly.Colours.texts.secondary : null,
+      "colourTertiary": Blockly.Colours ? Blockly.Colours.texts.tertiary : null,
+      "tooltip": Blockly.Msg.TEXT_STR_TOOLTIP
+    });
+  }
+};
 /**
  * Initialise the database of variable names.
  * @param {!Blockly.Workspace} workspace Workspace to generate code from.
@@ -3981,6 +4009,34 @@ Blockly.JavaScript['text_eval'] = function(block) {
   }
 };
 
+Blockly.JavaScript['text_str'] = function (block) {
+  Blockly.JavaScript.definitions_['text_str'] = '' +
+    'function textStr(x, forceStr) {\n' +
+    '  if(Array.isArray(x)) {\n' +
+    '    var strs = [];\n' +
+    '    for(var i = 0; i < x.length; i++) {\n' +
+    '       strs[i] = textStr(x[i], true);\n' +
+    '    }\n' +
+    '    return "["+strs.join(\', \')+"]";\n' +
+    '  } else if(x && typeof x == "object" && Object.prototype.toString(x) === "[object Object]") {\n' +
+    '    var strs = [];\n' +
+    '    for(var key in x) {\n' +
+    '       if(key == "constructor") continue;\n' +
+    '       strs.push("\'" + key + "\': " + textStr(x[key], true));\n' +
+    '    }\n' +
+    '    return "{"+strs.join(\', \')+"}";\n' +
+    '  } else if(x && forceStr && typeof x == "string") {\n' +
+    '    return "\\"" + x + "\\"";\n' +
+    '  } else if(x) {\n' +
+    '    return String(x);\n' +
+    '  } else {\n' +
+    '    return "" + x;\n' +
+    '  }\n' +
+    '}\n';
+
+  var expr = Blockly.JavaScript.valueToCode(block, 'EXPR', Blockly.JavaScript.ORDER_NONE) || 'null';
+  return ['textStr(' + expr + ')', Blockly.JavaScript.ORDER_ATOMIC];
+}
 Blockly.JavaScript['variables_set'] = function(block) {
   // Variable setter.
   var argument0 = Blockly.JavaScript.valueToCode(block, 'VALUE',
@@ -4404,3 +4460,8 @@ Blockly.Python['text_eval'] = function(block) {
     return [reindexExpr, Blockly.Python.ORDER_NONE];
   }
 };
+
+Blockly.Python['text_str'] = function (block) {
+  var expr = Blockly.JavaScript.valueToCode(block, 'EXPR', Blockly.JavaScript.ORDER_NONE) || 'null';
+  return 'str(' + expr + ')';
+}
