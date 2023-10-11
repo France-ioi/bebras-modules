@@ -72,7 +72,10 @@ task.getMetaData = function (success, error) {
    }
 };
 
+window.staticTaskReloadedAnswer = '';
+
 task.reloadAnswer = function (strAnswer, success, error) {
+   window.staticTaskReloadedAnswer = strAnswer;
    success();
 };
 
@@ -207,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
    if (sto.autoValidate) {
       // Auto-validate with a score after 5s
       setTimeout(function () {
+         if (window.staticTaskReloadedAnswer == 'page_read') { return; } // already validated
          window.staticTaskAnswer = "page_read";
          try {
             platform.validate("done");
