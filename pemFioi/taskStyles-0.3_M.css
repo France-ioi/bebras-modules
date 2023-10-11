@@ -496,7 +496,8 @@ h1 .stars {
 /* ERROR */
 #error {
    display: inline-block;
-   background: red;
+/*   background: red;*/
+   background: #EB0000;
    color: white;
    border-radius: 5px;
    position: fixed;
