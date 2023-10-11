@@ -2310,7 +2310,7 @@ var getContext = function(display, infos, curLevel) {
                                                         "colourTertiary": colorsTertiary[iColor],
                                                         "textStyle": "fill:" + colorsFill[iColor] +"; font-weight: 500;"}
                   },
-                  func: (function(cur_img) { return function(callback) {
+                  func: (function(cur_color) { return function(callback) {
                      var robot = this.getRobot();
                      if(infos.allowRewrite === true) {
                         this.withdraw(undefined, false);
@@ -2318,8 +2318,8 @@ var getContext = function(display, infos, curLevel) {
                      else if(this.isOn(function(obj) { return obj.isWithdrawable === true;})) {
                         throw(window.languageStrings.messages.failureRewrite);
                      }
-                     
-                     this.dropObject({type: "paint", img: cur_img, imgalt: translations["fr"][iColor]});
+
+                     this.dropObject({type: "paint", color: names[cur_color], img: names[cur_color] + '.png', imgalt: translations["fr"][cur_color]});
                      if (robot.col == context.nbCols - 1) {
                         robot.row = (robot.row + 1) % context.nbRows;
                         robot.col = 0;
@@ -2328,7 +2328,7 @@ var getContext = function(display, infos, curLevel) {
                      } else {
                         this.forward(callback);
                      };
-                  } })(names[iColor]+".png")
+                  } })(iColor)
                });
             }
             return blocks;
@@ -2343,17 +2343,17 @@ var getContext = function(display, infos, curLevel) {
          blockingFilter: false,
          itemTypes: {
             green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
-            marker_red: { num: 2, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "red.png";} },
-            marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "blue.png";} },
-            marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "yellow.png";} },
-            marker_white: { num: 5, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "white.png";} },
-            marker_green: { num: 6, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "green.png";} },
-            marker_orange: { num: 7, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "orange.png";} },
-            marker_pink: { num: 8, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "pink.png";} },
-            marker_purple: { num: 9, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "purple.png";} },
-            marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "brown.png";} },
-            marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "grey.png";} },
-            marker_black: { num: 12, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.img === "black.png";} },
+            marker_red: { num: 2, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "red";} },
+            marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "blue";} },
+            marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "yellow";} },
+            marker_white: { num: 5, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "white";} },
+            marker_green: { num: 6, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "green";} },
+            marker_orange: { num: 7, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "orange";} },
+            marker_pink: { num: 8, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "pink";} },
+            marker_purple: { num: 9, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "purple";} },
+            marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "brown";} },
+            marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "grey";} },
+            marker_black: { num: 12, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "black";} },
             paint: { side: 60, isWithdrawable: true, zOrder: 1 },
             marker_paint: { num: 1, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.type === "paint";} },
             marker: { num: 13, img: "marker.png", isWritable: true, side: 60, zOrder: 0},
