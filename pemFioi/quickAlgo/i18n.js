@@ -630,8 +630,8 @@ var quickAlgoLanguageStrings = {
          colour: "Barve",
          dicts: "Slovarji",
          input: "Vnos",
-         lists: "Tabele",
-         tables: "2D Tabele",
+         lists: "Seznami",
+         tables: "Tabele",
          logic: "Logika",
          loops: "Zanke",
          control: "Nadzor",
@@ -645,9 +645,9 @@ var quickAlgoLanguageStrings = {
          turtle: "Grafika"
       },
       exerciseTypeAbout: {
-         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
-         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
-             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
+         default: "Naloga podprta s pomočjo <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: verify
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> projekt od " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: verify
       },
       invalidContent: "Neveljavna vsebina",
       unknownFileType: "Neznana vrsta datoteke",
@@ -660,8 +660,8 @@ var quickAlgoLanguageStrings = {
       submitProgram: "Oddaj program",
       runProgram: "Poženi program",
       stopProgram: "|<",
-      speedSliderSlower: "Slower",
-      speedSliderFaster: "Faster",
+      speedSliderSlower: "Počasneje",
+      speedSliderFaster: "Hitreje",
       speed: "Hitrost:",
       stepProgram: "|>",
       slowSpeed: ">",
@@ -685,42 +685,42 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Izdaja vaje", // TODO: verify
       titleEdition: "Naslov:", // TODO: verify
       descriptionEdition: "Opis:", // TODO: verify
-      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
-      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
-      about: "À propos", // TODO: Translate
-      license: "Licenca:", // TODO: tanslate
+      saveAndQuit: "Shrani in izstopi", // TODO: verify
+      quitWithoutSavingConfirmation: "Izstopi brez shranjevanja?", // TODO: verify
+      about: "O nas", // TODO: verify
+      license: "Licenca:", // TODO: verify
       licenseReserved: "Vse pravice pridržane.",
-      authors: "Avtorji:", // TODO: translate
+      authors: "Avtorji:", // TODO: verify
       other: "drugo", // TODO: verify
-      otherLicense: "Other license", // TODO: translate
-      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
+      otherLicense: "Druge licence", // TODO: verify
+      pleaseSpecifyLicense: "Prosim navedite licenco", // TODO: verify
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
       restart: "Ponastavi",
       loadBestAnswer: "Naloži najboljši odgovor",
       saveProgram: "Shrani",
-      copy: "Copy", // TODO :: translate
-      paste: "Paste",
-      blocklyToPython: "Convert to Python",
-      blocklyToPythonTitle: "Python code",
-      blocklyToPythonIntro: "",
-      blocklyToPythonPassComment: '# Insert instructions here',
-      svgExport: "Export display as SVG", // TODO: translate
+      copy: "Kopiraj", // TODO: verify
+      paste: "Prilepi",
+      blocklyToPython: "Pretvori v Python",
+      blocklyToPythonTitle: "Python koda",
+      blocklyToPythonIntro: "Spodnji koda je ekvivalent vašega Blockly programa v jeziku Python.",  // TODO: verify
+      blocklyToPythonPassComment: '# Vnesi navodila semkaj',
+      svgExport: "Izvozi kot SVG", // TODO: verify
       limitBlocks: "Delčkov na voljo: {remainingBlocks}",
       limitBlocksOver: "{remainingBlocks} delčkov preko meje {maxBlocks}",
-      limitElements: "{remainingBlocks} elementov izmed {maxBlocks} imaš še na voljo.",
-      limitElementsOver: "{remainingBlocks} elementov preko meje {maxBlocks} elementov, ki so na voljo.",
+      limitElements: "{remainingBlocks} delčkov izmed {maxBlocks} imaš še na voljo.",
+      limitElementsOver: "{remainingBlocks} delčkov preko meje {maxBlocks} delčkov, ki so na voljo.",
       capacityWarning: "Opozorilo : program je rešen narobe, uporablja preveliko število delčkov. Bodi pozoren na število delčkov, ki jih lahko uporabiš, informacijo o tem imaš zgoraj.",
-      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
-      waitBetweenExecutions: "Think carefully before starting a different program!",
+      clipboardDisallowedBlocks: "Tega programa ni možno prilepiti, ker vsebuje delčke, ki niso na voljo v tej nalogi.", // TODO : verify
+      waitBetweenExecutions: "Dobro premisli preden začneš z novim programom!",
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
       errorEmptyProgram: "Program je prazen! Poveži delčke.",
       tooManyBlocks: "Uporabljaš preveč delčkov!",
-      limitedBlock: "Uporabljaš preveliko število omejeneg števila blokov:",
-      limitedBlocks: "Uporabljaš preveliko število omejeneg števila blokov:",
+      limitedBlock: "Uporabljaš preveliko število omejeneg števila delčkov:",
+      limitedBlocks: "Uporabljaš preveliko število omejeneg števila delčkov:",
       uninitializedVar: "Spremenljivka ni določena:",
       undefinedMsg: "Do napake lahko pride, ker je indeks prevelik, ali pa spremenljivka ni definirana.",
       valueTrue: 'resnično',
@@ -737,8 +737,8 @@ var quickAlgoLanguageStrings = {
       textVariable: "besedilo",
       listVariable: "tabela",
       scaleDrawing: "Približaj ×2",
-      loopRepeat: "repeat",
-      loopDo: "do",
+      loopRepeat: "ponavljaj", // TODO: verify
+      loopDo: "izvedi",
       loopIteration: "ponovitev",
       displayVideo: "Prikaži video",
       showDetails: "Prikaži podrobnosti",
@@ -749,20 +749,20 @@ var quickAlgoLanguageStrings = {
       testError: "napaka",
       testSuccess: "pravilno",
       seeTest: "poglej test",
-      infiniteLoop: "répéter indéfiniment", // TODO :: translate
-      availableFunctions: "Fonctions disponibles : ", // TODO :: translate
-      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
-      startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
-      startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
-      keyword: "ključna beseda", // TODO :: verify
-      keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
-      keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
-      keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
-      keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
-      variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
-      variablesForbidden: "Les variables sont interdites.", // TODO :: translate
-      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
-      autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
+      infiniteLoop: "neskončna zanka", // TODO : verify
+      availableFunctions: "Razpoložljive funkcije: ", // TODO : verify,
+      availableFunctionsVerbose: "Razpoložljive funkcije za nadzor junaka:", // TODO : verify,
+      startingLine: "Vaš program mora začeti z vrstico", // TODO : verify,
+      startingLines: "Vaš program mora začeti z vrsticami", // TODO : verify,
+      keyword: "ključna beseda", // TODO :: verify,
+      keywordAllowed: "Naslednja ključna beseda je dovoljena: ", // TODO : verify,
+      keywordForbidden: "Naslednja ključna beseda je prepovedana: ", // TODO : verify,
+      keywordsAllowed: "Naslednje ključne besede so dovoljene: ", // TODO : verify,
+      keywordsForbidden: "Naslednje ključne besede so prepovedene: ", // TODO : verify,
+      variablesAllowed: "Spremenljivke so dovoljene.", // TODO : verify,
+      variablesForbidden: "Spremenljivke niso dovoljene.", // TODO :: verify,
+      readDocumentation: "Med tekmovanjem je dovoljeno brati dokumentacijo o Pythonu in uporabljati spletni brskalnik.", // TODO : verify,
+      autorizedKeyWords: "Dovoljene ključne besede: ", // TODO : verify,
       constant: "konstanten", // TODO :: verify
       variable: "spremenljivka" // TODO :: verify
    },
