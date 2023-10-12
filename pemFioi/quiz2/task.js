@@ -234,7 +234,7 @@
 
         init: function() {
             var query = document.location.search.replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
-            this.token = query.sToken || '';
+            this.token = this.token || query.sToken;
         },
 
         get: function() {
