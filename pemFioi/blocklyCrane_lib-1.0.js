@@ -1783,6 +1783,9 @@ var getContext = function(display, infos, curLevel) {
             var imgId = item.imgId;
             var src = getImgPath(srcObj[imgId]);
          }
+         if(item.type == "mask" && infos.windowMaskSrc){
+            src = imgUrlWithPrefix(infos.windowMaskSrc);
+         }
          if((infos.customItems) && (item.num < 90)){
             var fileName = src.match(/^.+\/(\w+\.png)$/)[1];
             var newSrc = "assets/png/"+fileName;
