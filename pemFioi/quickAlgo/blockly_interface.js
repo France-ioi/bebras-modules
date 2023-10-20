@@ -198,6 +198,11 @@ function getBlocklyInterface(maxBlocks, subTask) {
             this.savePrograms();
          }
 
+         var that = this;
+         Blockly.BlockSvg.terminateDragCallback = function () {
+             that.dragJustTerminated = true;
+         };
+
          if(window.quickAlgoInterface) { quickAlgoInterface.updateControlsDisplay(); }
       },
 
@@ -393,7 +398,8 @@ function getBlocklyInterface(maxBlocks, subTask) {
 
          // Refresh the toolbox for new procedures (same with variables
          // but it's already handled correctly there)
-         if(this.scratchMode && this.includeBlocks.groupByCategory && this.workspace.toolbox_) {
+         if(this.scratchMode && this.includeBlocks.groupByCategory && this.workspace.toolbox_ && this.dragJustTerminated) {
+            this.dragJustTerminated = false;
             this.workspace.toolbox_.refreshSelection();
          }
       },
