@@ -96,6 +96,8 @@ Blockly.Block.prototype.getTextStyle = function () {
 Blockly.Block.prototype.setTextStyle = function (style) {
     this.textStyle_ = style;
 }
+Blockly.BlockSvg.terminateDragCallback = null;
+
 Blockly.BlockSvg.prototype.originalShowContextMenu_ = Blockly.BlockSvg.prototype.showContextMenu_;
 
 Blockly.BlockSvg.prototype.showContextMenu_ = function () {
@@ -116,6 +118,17 @@ Blockly.BlockSvg.prototype.showHelp_ = function () {
         window.open(url);
     }
 };
+
+Blockly.BlockSvg.originalTerminateDrag = Blockly.BlockSvg.terminateDrag;
+
+Blockly.BlockSvg.terminateDrag = function () {
+    if (Blockly.BlockSvg.terminateDragCallback && Blockly.dragMode_ == Blockly.DRAG_FREE) {
+        try {
+            Blockly.BlockSvg.terminateDragCallback();
+        } catch (e) { }
+    }
+    Blockly.BlockSvg.originalTerminateDrag.apply(this, arguments);
+}
 Blockly.copy_ = function(block) {
   var xmlBlock = Blockly.Xml.blockToDom(block);
   // Encode start position in XML.
