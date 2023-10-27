@@ -2064,7 +2064,8 @@ function GraphEditor(settings) {
                var neighbors1 = graph.getNeighbors(id1);
                var neighbors2 = graph.getNeighbors(id2);
                var neighbors = neighbors1.concat(neighbors2);
-               for(var neighbor of neighbors){
+               for(var iN = 0; iN < neighbors.length; iN++){
+                  var neighbor = neighbors[iN];
                   if(neighbor != id1 && neighbor != id2 && areAligned(id1,id2,neighbor)){
                      var edges1 = graph.getEdgesBetween(id1,neighbor);
                      var edges2 = graph.getEdgesBetween(id2,neighbor);
@@ -2084,7 +2085,8 @@ function GraphEditor(settings) {
          // console.log(parameterSet[nTry])
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
       }
-      for(var edge of edges){
+      for(var iE = 0; iE < edges.length; iE++){
+         var edge = edges[iE];
          var vInfo = visualGraph.getEdgeVisualInfo(edge);
          if(!vInfo["radius-ratio"]){
             vInfo = {};
@@ -2407,7 +2409,8 @@ function GraphEditor(settings) {
 
       if(!self.allowMutlipleInitial){
          var vertices = graph.getAllVertices();
-         for(var vertex of vertices){
+         for(var iV = 0; iV < vertices.length; iV++){
+            var vertex = vertices[iV];
             if(vertex != vID){
                var currInfo = graph.getVertexInfo(vertex);
                if(currInfo.initial){

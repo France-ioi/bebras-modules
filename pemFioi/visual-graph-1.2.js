@@ -461,7 +461,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    this.drawEdge = function(id, vertex1, vertex2) {
       if(thickMode) {
          var path = this._getThickEdgePath(vertex1, vertex2);
-         return [this.paper.path(path).attr(this.lineAttr).toBack(), this.paper.path(path).attr(innerLineAttr)];
+         var innerLine = this.paper.path(path).attr(innerLineAttr).toBack();
+         var line = this.paper.path(path).attr(this.lineAttr).toBack();
+         return [line, innerLine];
       }
       else {
          var info = this.graph.getEdgeInfo(id);
