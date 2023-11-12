@@ -28,6 +28,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
       startingBlock: true,
+      startingExampleIds: [],
       mediaUrl: (
          (window.location.protocol == 'file:' && modulesPath)
             ? modulesPath+'/img/blockly/'
@@ -422,9 +423,10 @@ function getBlocklyInterface(maxBlocks, subTask) {
       },
 
       getDefaultContent: function() {
-         if(this.options.startingExample) {
-            var xml = this.options.startingExample[this.language];
-            if(xml) { return xml; }
+         var xml = this.options.startingExample && this.options.startingExample[this.language];
+         if(xml) {
+            this.getStartingExampleIds(xml);
+            return xml;
          }
          return this.getEmptyContent();
       },

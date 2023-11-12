@@ -2324,7 +2324,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                return 10000;
             }
 
-         for (var categoryName in categoriesInfos) {
+            for (var categoryName in categoriesInfos) {
                orderedCategories.push(categoryName);
                categoriesInfos[categoryName].blocksXml.sort(function(a, b) {
                   var indexA = getBlockIdx(a);
@@ -2737,17 +2737,17 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          for(var i=0; i<blockList.length; i++) {
             var block = blockList[i];
 
+            // Clean up read-only attributes
+            if(block.getAttribute('type') != 'robot_start' && this.startingExampleIds.indexOf(blockId) == -1) {
+               block.removeAttribute('deletable');
+               block.removeAttribute('movable');
+               block.removeAttribute('editable');
+            }
+
             // Clean up IDs which contain now forbidden characters
             var blockId = block.getAttribute('id');
             if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
                block.setAttribute('id', Blockly.genUid());
-            }
-
-            // Clean up read-only attributes
-            if(block.getAttribute('type') != 'robot_start') {
-               block.removeAttribute('deletable');
-               block.removeAttribute('movable');
-               block.removeAttribute('editable');
             }
 
             // Get minimum x and y
@@ -2769,6 +2769,25 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 block.setAttribute('y', parseInt(y) - minY + origin.y);
             }
          }
-      }
+      },
+
+      getStartingExampleIds: function(xml) {
+         this.startingExampleIds = [];
+         var blockList = Blockly.Xml.textToDom(xml).getElementsByTagName('block');
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockId = block.getAttribute('id');
+            if(!blockId) {
+               if(block.getAttribute('type') != 'robot_start' && 
+                     (block.getAttribute('deletable') == 'false' ||
+                     block.getAttribute('movable') == 'false' ||
+                     block.getAttribute('editable') == 'false')) {
+                  console.log('Warning: starting block of type \'' + block.getAttribute('type') + '\' with read-only attributes has no id, these attributes will be removed.');
+               }
+               continue;
+            }
+            this.startingExampleIds.push(blockId);
+         }
+      },
    };
 }
