@@ -2301,8 +2301,51 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             Blockly.Procedures.flyoutOptions.disableArgs = true;
          }
 
-         var xmlString = "";
+         var orderedCategories = [];
+         if (this.includeBlocks.blocksOrder) {
+            var that = this;
+
+            function getBlockIdx(blockXml) {
+               var blockType = Blockly.Xml.textToDom(blockXml, "text/xml").getAttribute('type');
+               var blockIdx = that.includeBlocks.blocksOrder.indexOf(blockType);
+               return blockIdx == -1 ? 10000 : blockIdx;
+            }
+
+            function getCategoryIdx(categoryName) {
+               var categoryIdx = that.includeBlocks.blocksOrder.indexOf(categoryName);
+               if(categoryIdx != -1) { return categoryIdx; }
+               for(var iBlock = 0; iBlock < categoriesInfos[categoryName].blocksXml.length; iBlock++) {
+                  var blockXml = categoriesInfos[categoryName].blocksXml[iBlock];
+                  var blockIdx = getBlockIdx(blockXml);
+                  if(blockIdx != 10000) {
+                     return blockIdx;
+                  }
+               }
+               return 10000;
+            }
+
          for (var categoryName in categoriesInfos) {
+               orderedCategories.push(categoryName);
+               categoriesInfos[categoryName].blocksXml.sort(function(a, b) {
+                  var indexA = getBlockIdx(a);
+                  var indexB = getBlockIdx(b);
+                  return indexA - indexB;
+               });
+            }
+            orderedCategories.sort(function(a, b) {
+               var indexA = getCategoryIdx(a);
+               var indexB = getCategoryIdx(b);
+               return indexA - indexB;
+            });
+         } else {
+            for (var categoryName in categoriesInfos) {
+               orderedCategories.push(categoryName);
+            }
+         }
+
+         var xmlString = "";
+         for (var iCategory = 0; iCategory < orderedCategories.length; iCategory++) {
+            var categoryName = orderedCategories[iCategory];
             var categoryInfo = categoriesInfos[categoryName];
             if (this.includeBlocks.groupByCategory) {
                var colour = categoryInfo.colour;
