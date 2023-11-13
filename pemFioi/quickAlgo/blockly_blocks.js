@@ -2303,16 +2303,19 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          var orderedCategories = [];
          if (this.includeBlocks.blocksOrder) {
-            var that = this;
+            var blocksOrder = this.includeBlocks.blocksOrder;
+            if(this.scratchMode) {
+               blocksOrder = this.blocksToScratch(blocksOrder);
+            }
 
             function getBlockIdx(blockXml) {
                var blockType = Blockly.Xml.textToDom(blockXml, "text/xml").getAttribute('type');
-               var blockIdx = that.includeBlocks.blocksOrder.indexOf(blockType);
+               var blockIdx = blocksOrder.indexOf(blockType);
                return blockIdx == -1 ? 10000 : blockIdx;
             }
 
             function getCategoryIdx(categoryName) {
-               var categoryIdx = that.includeBlocks.blocksOrder.indexOf(categoryName);
+               var categoryIdx = blocksOrder.indexOf(categoryName);
                if(categoryIdx != -1) { return categoryIdx; }
                for(var iBlock = 0; iBlock < categoriesInfos[categoryName].blocksXml.length; iBlock++) {
                   var blockXml = categoriesInfos[categoryName].blocksXml[iBlock];
