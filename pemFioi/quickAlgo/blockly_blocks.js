@@ -2739,6 +2739,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var minX = Infinity, minY = Infinity;
          for(var i=0; i<blockList.length; i++) {
             var block = blockList[i];
+            var blockId = block.getAttribute('id');
 
             // Clean up read-only attributes
             if(block.getAttribute('type') != 'robot_start' && this.startingExampleIds.indexOf(blockId) == -1) {
@@ -2748,7 +2749,6 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
 
             // Clean up IDs which contain now forbidden characters
-            var blockId = block.getAttribute('id');
             if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
                block.setAttribute('id', Blockly.genUid());
             }
