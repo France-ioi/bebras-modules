@@ -1892,6 +1892,9 @@ window.displayHelper = {
     * Internal functions *
     **********************/
    restartAll: function() {
+      if (this.customRestart != undefined) {
+         this.customRestart();
+      } else 
       if(this.confirmRestartAll) {
          this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, this.restartAllNoConfirm, this.strings.no);
       }
