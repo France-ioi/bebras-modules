@@ -218,7 +218,8 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case.",
-               noContainer: "Il n'y a pas de conteneur ici !"
+               noContainer: "Il n'y a pas de conteneur ici !",
+               failureLineBreak: "Le robot ne peut pas changer de ligne."
             },
             cardinals: {
                north: "Nord",
@@ -703,13 +704,6 @@ var getContext = function(display, infos, curLevel) {
                forward: "avancer",
                backwards: "reculer",
                jump: "sauter",
-               obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleDroite",
-               obstacleWest: "obstacleGauche",
-               obstacleNorth: "obstacleHaut",
-               obstacleSouth: "obstacleBas",
-               obstacleRight: "obstacleDroiteRel",
-               obstacleLeft: "obstacleGaucheRel",
                gridEdgeEast: "bordGrilleDroite",
                gridEdgeWest: "bordGrilleGauche",
                gridEdgeNorth: "bordGrilleHaut",
@@ -2315,8 +2309,12 @@ var getContext = function(display, infos, curLevel) {
                      if(infos.allowRewrite === true) {
                         this.withdraw(undefined, false);
                      }
-                     else if(this.isOn(function(obj) { return obj.isWithdrawable === true;})) {
+                     else if(this.isOn(function(obj) { return obj.type === "paint";})) {
                         throw(window.languageStrings.messages.failureRewrite);
+                     }
+
+                     if(this.isOn(function(obj) { return obj.isTrap === true;})) {
+                        throw(window.languageStrings.messages.failureLineBreak);
                      }
 
                      this.dropObject({type: "paint", color: names[cur_color], img: names[cur_color] + '.png', imgalt: translations["fr"][cur_color]});
@@ -2328,6 +2326,32 @@ var getContext = function(display, infos, curLevel) {
                      } else {
                         this.forward(callback);
                      };
+                  } })(iColor)
+               });
+
+               function capitalise(str) {
+                  return str.toUpperCase()[0] + str.substring(1);
+               }
+
+               blocks.push({
+                  name: "on" + capitalise(names[iColor]),
+                  strings: {
+                    fr: {
+                       label: "Sur " + translations["fr"][iColor],
+                       code: "sur" + translations["fr"][iColor],
+                       description: "sur" + translations["fr"][iColor] + "(): Teste si la case est en " + translations["fr"][iColor]
+                    }
+                  },
+                  category: "robot",
+                  type: "sensors",
+                  block: {
+                     name: "on" + capitalise(names[iColor]), yieldsValue: true, blocklyJson: {"colour": colors[iColor],
+                                                        "colourSecondary": colorsSecondary[iColor],
+                                                        "colourTertiary": colorsTertiary[iColor],
+                                                        "textStyle": "fill:" + colorsFill[iColor] +"; font-weight: 500;"}
+                  },
+                  func: (function(cur_color) { return function(callback) {
+                     this.callCallback(callback, this.isOn(function(obj) { return obj.color === names[cur_color]; }));
                   } })(iColor)
                });
             }
@@ -2357,6 +2381,7 @@ var getContext = function(display, infos, curLevel) {
             paint: { side: 60, isWithdrawable: true, zOrder: 1 },
             marker_paint: { num: 1, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.type === "paint";} },
             marker: { num: 13, img: "marker.png", isWritable: true, side: 60, zOrder: 0},
+            stop_cell: {num:100, side:60, isTrap: true},
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
