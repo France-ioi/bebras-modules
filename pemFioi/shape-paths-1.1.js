@@ -87,6 +87,9 @@ function getShapePath(shape,x,y,params) {
             "L", x-radius + roundedRectangleRadius, y+radius,
             "Q", x-radius, y+radius, x-radius, y+radius - roundedRectangleRadius,
             "Z"],
+        heart: ["M",x,(y + radius),
+            "C",(x - 1.5*radius),y,(x - radius),(y - radius*1.2),x,(y - radius/2),
+            "C",(x + radius),(y - radius*1.2),(x + 1.5*radius),y,x,(y + radius)],
         arrow: ["M"+xRect+" "+yRect+",H"+xTr1+",V"+yTr1+",L"+xTr2+" "+yTr2+
          ",L"+xTr1+" "+yTr3+",V"+(yRect + rectH)+",H"+xRect+",Z"],
         cross: ["M", x - radius, y - radius, "L", x + radius, y + radius, "M", x - radius, y + radius, "L", x + radius, y - radius ]
