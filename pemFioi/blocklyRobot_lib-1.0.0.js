@@ -2084,7 +2084,8 @@ var getContext = function(display, infos, curLevel) {
            count: 200,
            type: "flower"
          },
-         backgroundColor: "#f9f9c1",
+         backgroundColor: "#BFF4A6",
+         borderColor: "#A5D88B",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
