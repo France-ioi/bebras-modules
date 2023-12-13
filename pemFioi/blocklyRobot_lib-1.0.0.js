@@ -1032,24 +1032,24 @@ var getContext = function(display, infos, curLevel) {
       course: {
          fr: {
             messages: {
-               successReachExit: "Bravo, le robot a atteint la case verte !",
-               failureReachExit: "Le robot n'est pas arrivé sur la case verte.",
-               obstacle: "Le robot tente de foncer dans un mur !"
+               successReachExit: "Bravo, le robot a atteint le drapeau !",
+               failureReachExit: "Le robot n'est pas arrivé sur la case du drapeau.",
+               obstacle: "Le robot tente de foncer dans un buisson !"
             }
          },
          en: {
             messages: {
-               successReachExit: "Congratulations, the robot reached the green cell!",
-               failureReachExit: "The robot didn't reach the green cell.",
-               obstacle: "The robot is attemting to run into a wall!"
+               successReachExit: "Congratulations, the robot reached the flag!",
+               failureReachExit: "The robot didn't reach the flag.",
+               obstacle: "The robot is attemting to run into a bush!"
             }
          },
 
          es: {
             messages: {
-               successReachExit: "Bravo, ¡El robot llegó a la casilla verde!",
-               failureReachExit: "El robot no llegó a la casilla verde.",
-               obstacle: "¡El robot intenta traspasar un muro!"
+               successReachExit: "Bravo, ¡El robot llegó a la bandera!",
+               failureReachExit: "El robot no llegó a la bandera.",
+               obstacle: "¡El robot intenta traspasar un arbusto!"
             }
          }
       },
@@ -1937,10 +1937,12 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       course: {
+         backgroundColor: "#fff1c4",
+         borderColor: "#d4eda5",
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
-            green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0},
+            green: { num: 3, img: "green.png", side: 60, isExit: true, zOrder: 0},
             number: { num: 5, side: 60, zOrder: 1 },
             horizontal_closed_door: { num: 7, img: "horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
             vertical_closed_door: { num: 8, img: "vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
