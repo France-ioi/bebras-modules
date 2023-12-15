@@ -10035,7 +10035,7 @@ var getContext = function (display, infos, curLevel) {
         quickpi: {
             // Categories are reflected in the Blockly menu
             sensors: [
-                { name: "currentTime", yieldsValue: true },
+                { name: "currentTime", yieldsValue: 'int' },
 
                 {
                     name: "waitForButton", params: ["String"], blocklyJson: {
@@ -10047,10 +10047,10 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "isButtonPressed", yieldsValue: true
+                    name: "isButtonPressed", yieldsValue: 'bool'
                 },
                 {
-                    name: "isButtonPressedWithName", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "isButtonPressedWithName", yieldsValue: 'bool', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
@@ -10059,7 +10059,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "buttonWasPressed", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "buttonWasPressed", yieldsValue: 'bool', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
@@ -10068,7 +10068,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readTemperature", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readTemperature", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("temperature")
@@ -10077,7 +10077,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readRotaryAngle", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readRotaryAngle", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("potentiometer")
@@ -10086,7 +10086,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readDistance", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readDistance", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("range")
@@ -10095,7 +10095,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readLightIntensity", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readLightIntensity", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("light")
@@ -10104,7 +10104,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readHumidity", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readHumidity", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("humidity")
@@ -10113,7 +10113,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readAcceleration", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readAcceleration", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
@@ -10122,7 +10122,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "computeRotation", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "computeRotation", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": [["pitch", "pitch"], ["roll", "roll"]]
@@ -10131,7 +10131,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readSoundLevel", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readSoundLevel", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("sound")
@@ -10140,7 +10140,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readMagneticForce", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readMagneticForce", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
@@ -10149,10 +10149,10 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "computeCompassHeading", yieldsValue: true
+                    name: "computeCompassHeading", yieldsValue: 'int'
                 },
                 {
-                    name: "readInfraredState", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readInfraredState", yieldsValue: 'bool', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("irrecv")
@@ -10161,7 +10161,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "readIRMessage", yieldsValue: true, params: ["String", "Number"], blocklyJson: {
+                    name: "readIRMessage", yieldsValue: 'string', params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             { "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("irrecv") },
                             { "type": "input_value", "name": "PARAM_1"},
@@ -10172,7 +10172,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "readAngularVelocity", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readAngularVelocity", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
@@ -10184,7 +10184,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "setGyroZeroAngle"
                 },
                 {
-                    name: "computeRotationGyro", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "computeRotationGyro", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
@@ -10233,7 +10233,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "getBuzzerNote", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "getBuzzerNote", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
@@ -10255,7 +10255,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "getLedBrightness", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "getLedBrightness", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
@@ -10264,10 +10264,10 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "isLedOn", yieldsValue: true
+                    name: "isLedOn", yieldsValue: 'bool'
                 },
                 {
-                    name: "isLedOnWithName", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "isLedOnWithName", yieldsValue: 'bool', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
@@ -10276,10 +10276,10 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "isBuzzerOn", yieldsValue: true
+                    name: "isBuzzerOn", yieldsValue: 'bool'
                 },
                 {
-                    name: "isBuzzerOnWithName", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "isBuzzerOnWithName", yieldsValue: 'bool', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
@@ -10311,7 +10311,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "getServoAngle", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "getServoAngle", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("servo")
@@ -10413,7 +10413,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "isPointSet", yieldsValue: true, params: ["Number", "Number"], blocklyJson: {
+                    name: "isPointSet", yieldsValue: 'bool', params: ["Number", "Number"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0"},
                             { "type": "input_value", "name": "PARAM_1"},
@@ -10517,7 +10517,7 @@ var getContext = function (display, infos, curLevel) {
             ],
             internet: [
                 {
-                    name: "getTemperatureFromCloud", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "getTemperatureFromCloud", yieldsValue: 'int', params: ["String"], blocklyJson: {
                         "args0": [
                             { "type": "field_input", "name": "PARAM_0", text: "Paris"},
                         ]
@@ -10553,7 +10553,7 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "readFromCloudStore", yieldsValue: true, params: ["String", "String"], blocklyJson: {
+                    name: "readFromCloudStore", yieldsValue: 'string', params: ["String", "String"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0", text: ""},
                             { "type": "input_value", "name": "PARAM_1", text: ""},
