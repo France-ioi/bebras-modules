@@ -191,6 +191,7 @@
         init: function() {
             if(this.holder) return;
             $('#showSolutionButton').remove();
+            $('.quiz-toolbar').remove();
             if (quiz_settings.sublanguage) {
                 lang.setSublanguage(quiz_settings.sublanguage);
             }
@@ -373,7 +374,9 @@
                     versions: Quiz.versions.get(),
                     validated: task_toolbar.validated
                 }
-                if(lastReloadedAnswer && lastReloadedAnswer.data == answerObj.data && lastReloadedAnswer.versions == answerObj.versions) {
+                if(lastReloadedAnswer
+                        && JSON.stringify(lastReloadedAnswer.data) == JSON.stringify(answerObj.data)
+                        && JSON.stringify(lastReloadedAnswer.versions) == JSON.stringify(answerObj.versions)) {
                     // Keep the validated attribute if the answer didn't change
                     answerObj.validated = answerObj.validated || lastReloadedAnswer.validated;
                 }
