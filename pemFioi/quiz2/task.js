@@ -336,6 +336,7 @@
 
     task.load = function(views, success) {
         var lastViews = views;
+        var lastReloadedAnswer = null;
         task_token.init()
 
         platform.getTaskParams(null, null, function(taskParams) {
@@ -372,7 +373,10 @@
                     versions: Quiz.versions.get(),
                     validated: task_toolbar.validated
                 }
-                //console.log('task.getAnswerObject', answerObj)
+                if(lastReloadedAnswer && lastReloadedAnswer.data == answerObj.data && lastReloadedAnswer.versions == answerObj.versions) {
+                    // Keep the validated attribute if the answer didn't change
+                    answerObj.validated = answerObj.validated || lastReloadedAnswer.validated;
+                }
                 return answerObj;
             };            
 
@@ -396,6 +400,7 @@
             task.reloadAnswerObject = function(answerObj) {
                 var new_format = answerObj !== null && typeof answerObj === 'object' && 'data' in answerObj;
                 q.setAnswer(new_format ? answerObj.data : answerObj);
+                lastReloadedAnswer = answerObj;
             }
 
 
