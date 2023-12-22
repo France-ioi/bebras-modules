@@ -2274,13 +2274,14 @@ var getContext = function(display, infos, curLevel) {
            type: "paint"
          },
          ignoreBag: true,
-         backgroundColor: "#ffbf5e",
+         backgroundColor: "#c5e2dd",
+         borderColor: "#b4ccc7",
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 3 },
-            initialPaint: { num: 2, color: "#2e1de5", side: 60, isPaint: true, zOrder: 1 },
+            initialPaint: { num: 2, img: "paint.png", side: 60, isPaint: true, zOrder: 1 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, containerFilter: function(item) {return item.type === "paint";}, zOrder: 0 },
             marker_white: { num: 4, img: "marker_white.png", isContainer: true, isFake: true, side: 60, zOrder: 0 },
-            paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
+            paint: { img: "paint.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { side: 60, zOrder: 2 },
             board_background: { num: 5, color: "#ffffff", side: 60, zOrder: 0 },
             board: { side: 60, isWritable: true, zOrder: 1 }
@@ -2405,7 +2406,8 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkReachExit
       },
       sokoban: {
-         backgroundColor: "#ffeead",
+         backgroundColor: "#c2c6f2",
+         borderColor: "#a4aacd",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
