@@ -472,7 +472,7 @@ function conceptsFill(baseConcepts, allConcepts) {
     if(baseConceptsById[fullConcept.id]) {
       var curConcept = baseConceptsById[fullConcept.id];
       // Translate concept name if available
-      curConcept.name = (!fullConcept.keepConceptName && conceptNames[curConcept.id] ? conceptNames[curConcept.id] : fullConcept.name);
+      curConcept.name = conceptNames[curConcept.id] || fullConcept.name;
       if(!curConcept.url) {
         curConcept.url = fullConcept.url;
       }
