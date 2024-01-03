@@ -33,4 +33,9 @@ function convertDOM() {
    $("#taskContent").children().detach().appendTo("#task");
    $("#taskContent").remove();
    $("#zone_2 #error").remove();
+
+   if($("#enemyWarning").length > 0){
+      $("#enemyWarning").detach().appendTo(consigne);
+      $("#enemyWarning").css("width","auto");
+   }
 };
