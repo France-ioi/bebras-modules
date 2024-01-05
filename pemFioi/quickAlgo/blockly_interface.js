@@ -408,7 +408,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
       },
 
       setIncludeBlocks: function(includeBlocks) {
-         this.includeBlocks = includeBlocks;
+         this.includeBlocks  = includeBlocks;
       },
 
       getEmptyContent: function() {
