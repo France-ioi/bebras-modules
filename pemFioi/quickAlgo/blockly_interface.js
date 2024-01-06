@@ -400,7 +400,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
          // Refresh the toolbox for new procedures (same with variables
          // but it's already handled correctly there)
          if(this.scratchMode && this.includeBlocks.groupByCategory && this.workspace.toolbox_
-           && (eventType !== Blockly.Events.Move || this.dragJustTerminated)
+           && (eventType === Blockly.Events.Change || this.dragJustTerminated)
          ) {
             this.dragJustTerminated = false;
             this.workspace.toolbox_.refreshSelection();
