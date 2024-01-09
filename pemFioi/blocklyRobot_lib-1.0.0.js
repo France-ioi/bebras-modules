@@ -2169,7 +2169,7 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkReachExit
       },
       laser: {
-         backgroundColor: "#33237a",
+         backgroundColor: "#00015e",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2, isOpaque: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, isOpaque: true },
@@ -4344,7 +4344,7 @@ var getContext = function(display, infos, curLevel) {
       if(context.display && paper != undefined) {
          var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
          
-         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
+         segment.attr({'stroke-width': 5, 'stroke': '#fab9c7'});
          
          context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
             segment.remove();
