@@ -47,7 +47,7 @@
             },
 
             isAnswered: function() {
-                return this.getAnswer() != '';
+                return this.getAnswer() !== '';
             },
 
             showResult: function(mistakes, message) {

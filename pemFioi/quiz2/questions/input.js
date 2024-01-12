@@ -62,7 +62,7 @@
             },
 
             checkAnswered: function(error_message) {
-                var answered = this.getAnswer()[0] != '';
+                var answered = this.getAnswer()[0] !== '';
                 if(!answered && Quiz.params.alert_if_no_answer) {
                     Quiz.common.toggleAlertMessage(answer, error_message, 'error');
                 }
