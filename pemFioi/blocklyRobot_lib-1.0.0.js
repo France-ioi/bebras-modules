@@ -1741,7 +1741,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isRound===true;}));
                }
             },
@@ -1767,7 +1767,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
                }
             },
@@ -1793,7 +1793,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isTriangle===true;}));
                }
             },
@@ -1819,7 +1819,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isQuadrille===true;}));
                }
             },
@@ -1845,7 +1845,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isStriped===true;}));
                }
             },
@@ -1871,7 +1871,7 @@ var getContext = function(display, infos, curLevel) {
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
+                     this.leave(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isDotted===true ;}));
                }
             }
@@ -2087,11 +2087,12 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#BFF4A6",
          borderColor: "#A5D88B",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 3 },
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
             fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 },
-            number: { num: 6, side: 60, zOrder: 1 }
+            number: { num: 6, side: 60, zOrder: 1 },
+            mask: {num: 7, img: "mask.png", side: 60, isMask: true, zOrder: 2 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -2315,11 +2316,11 @@ var getContext = function(display, infos, curLevel) {
                         this.withdraw(undefined, false);
                      }
                      else if(this.isOn(function(obj) { return obj.type === "paint";})) {
-                        throw(window.languageStrings.messages.failureRewrite);
+                        this.leave(window.languageStrings.messages.failureRewrite);
                      }
 
                      if(this.isOn(function(obj) { return obj.isTrap === true;})) {
-                        throw(window.languageStrings.messages.failureLineBreak);
+                        this.leave(window.languageStrings.messages.failureLineBreak);
                      }
 
                      this.dropObject({type: "paint", color: names[cur_color], img: names[cur_color] + '.png', imgalt: translations["fr"][cur_color]});
@@ -2777,6 +2778,8 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "onContainer", yieldsValue: true },
       func: function(callback) {
+         var robot = this.getRobot();
+         this.destroyMask(robot.row, robot.col);
          this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
       }
    });
@@ -3010,7 +3013,7 @@ var getContext = function(display, infos, curLevel) {
             }
          }
          else {
-            throw(window.languageStrings.messages.failureLaser);
+            this.leave(window.languageStrings.messages.failureLaser);
          }
          this.waitDelay(callback);
       }
@@ -3047,7 +3050,7 @@ var getContext = function(display, infos, curLevel) {
             }
          }
          else {
-            throw(window.languageStrings.messages.failureLaser);
+            this.leave(window.languageStrings.messages.failureLaser);
          }
          this.waitDelay(callback);
       }
@@ -3084,7 +3087,7 @@ var getContext = function(display, infos, curLevel) {
             this.waitDelay(callback, retour);
          }
          else {
-            throw(window.languageStrings.messages.failureLaser);
+            this.leave(window.languageStrings.messages.failureLaser);
             this.callCallback(callback);
          }
       }
@@ -3123,7 +3126,7 @@ var getContext = function(display, infos, curLevel) {
             this.waitDelay(callback, retour);
          }
          else {
-            throw(window.languageStrings.messages.failureLaser);
+            this.leave(window.languageStrings.messages.failureLaser);
             this.callCallback(callback);
          }
       }
@@ -3163,11 +3166,11 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "dropPlatformInFront" },
       func: function(callback) {
          if(this.nbPlatforms == 0)
-            throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            this.leave(window.languageStrings.messages.failureNotEnoughPlatform);
             
          var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
          if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-            throw(window.languageStrings.messages.failureDropPlatform);
+            this.leave(window.languageStrings.messages.failureDropPlatform);
          }
          this.nbPlatforms -= 1;
          this.dropObject({type: "platform"}, coords);
@@ -3181,11 +3184,11 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "dropPlatformAbove" },
       func: function(callback) {
          if(this.nbPlatforms == 0)
-            throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            this.leave(window.languageStrings.messages.failureNotEnoughPlatform);
             
          var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
          if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-            throw(window.languageStrings.messages.failureDropPlatform);
+            this.leave(window.languageStrings.messages.failureDropPlatform);
          }
          this.nbPlatforms -= 1;
          this.dropObject({type: "platform"}, coords);
@@ -3579,6 +3582,11 @@ var getContext = function(display, infos, curLevel) {
       if(resetZOrder)
          resetItemsZOrder(item.row, item.col);
    };
+
+   context.leave = function(error) {
+      context.destroyMasks();
+      throw(error);
+   };
    
    context.updateScale = function() {
       if(!context.display) {
@@ -3696,7 +3704,7 @@ var getContext = function(display, infos, curLevel) {
          
          var robot = this.getRobot();
          if(this.hasOn(robot.row, robot.col, function(item) { return item.isProjectile === true; })) {
-            throw(context.strings.messages.failureProjectile);
+            context.leave(context.strings.messages.failureProjectile);
          }
       }
    };
@@ -3933,6 +3941,22 @@ var getContext = function(display, infos, curLevel) {
          item.element.remove();
       }
    };
+
+   context.destroyMask = function(row, col) {
+      var masks = context.getItemsOn(row, col, function(obj) { return obj.isMask === true; });
+      
+      for(var iMask = 0;iMask < masks.length;iMask++) {
+          context.destroy(masks[iMask]);
+      }
+   };
+
+   context.destroyMasks = function() {
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            context.destroyMask(row, col);
+         }
+      }
+   };
    
    context.fall = function(item, row, col, callback) {
       var startRow = row;
@@ -3944,11 +3968,11 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(!context.isInGrid(row + 1, col)) {
-         throw(context.strings.messages.falls);
+         context.leave(context.strings.messages.falls);
       }
       
       if(row - startRow > infos.maxFallAltitude) {
-         throw(context.strings.messages.willFallAndCrash);
+         context.leave(context.strings.messages.willFallAndCrash);
       }
       context.nbMoves++;
       context.moveRobot(row, col, item.dir, callback);
@@ -3956,20 +3980,20 @@ var getContext = function(display, infos, curLevel) {
    
    context.jump = function(callback) {
       if(!infos.hasGravity) {
-         throw("Error: can't jump without gravity");
+         context.leave("Error: can't jump without gravity");
       }
       
       var item = context.getRobot();
       if(!context.isInGrid(item.row - 1, item.col)) {
-         throw(context.strings.messages.jumpOutsideGrid);
+         context.leave(context.strings.messages.jumpOutsideGrid);
       }
       var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
       if(obstacle.length > 0) {
-         throw(context.strings.messages.jumpObstacleBlocking);
+         context.leave(context.strings.messages.jumpObstacleBlocking);
       }
       var platforms = context.getItemsOn(item.row - 1, item.col, function(obj) { return obj.isObstacle === true; });
       if(platforms.length == 0) {
-         throw(context.strings.messages.jumpNoPlatform);
+         context.leave(context.strings.messages.jumpNoPlatform);
       }
       context.nbMoves++;
       context.moveRobot(item.row - 2, item.col, item.dir, callback);
@@ -3986,12 +4010,12 @@ var getContext = function(display, infos, curLevel) {
       var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
       if(withdrawables.length == 0) {
          if(errorWhenEmpty)
-            throw(context.strings.messages.nothingToPickUp);
+         context.leave(context.strings.messages.nothingToPickUp);
          return;
       }
       
       if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
-         throw(context.strings.messages.tooManyObjects);
+         context.leave(context.strings.messages.tooManyObjects);
       }
       
       var withdrawable = withdrawables[0];
@@ -4031,7 +4055,7 @@ var getContext = function(display, infos, curLevel) {
             filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
          
          if(container.containerSize != undefined && context.getItemsOn(coords.row, coords.col, filter).length > container.containerSize) {
-            throw(window.languageStrings.messages.failureDropObject);
+            context.leave(window.languageStrings.messages.failureDropObject);
             return;
          }
 
@@ -4040,7 +4064,7 @@ var getContext = function(display, infos, curLevel) {
          if(container.containerFilter != undefined) {
             if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) }) && (context.infos.blockingFilter !== false)) {
 
-               throw(window.languageStrings.messages.failureDropObject);
+               context.leave(window.languageStrings.messages.failureDropObject);
                return;
             }
          }
@@ -4058,10 +4082,11 @@ var getContext = function(display, infos, curLevel) {
          var item = context.getRobot();
          coords = {row: item.row, col: item.col};
       }
-      
+      context.destroyMask(coords.row, coords.col);
+
       for(var i = 0;i < count;i++) {
          if(context.bag.length == 0) {
-            throw(context.strings.messages.emptyBag);
+            context.leave(context.strings.messages.emptyBag);
          }
          
          var object = context.bag.pop();
@@ -4092,7 +4117,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(!context.isInGrid(coords.row, coords.col)) {
-         throw(window.languageStrings.messages.failureDropOutside);
+         context.leave(window.languageStrings.messages.failureDropOutside);
          return;
       }
       
@@ -4145,7 +4170,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
@@ -4164,7 +4189,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
@@ -4178,7 +4203,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(item.row - 1/4, item.col, 3);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
@@ -4192,7 +4217,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(item.row + 1/4, item.col, 1);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
@@ -4206,7 +4231,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(item.row, item.col + 1/4, 0);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
@@ -4220,11 +4245,13 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       } else {
          context.moveRobot(item.row, item.col - 1/4, 2);
-         throw ttbo;
+         context.leave(ttbo);
       }
    };
    
    context.obstacleInFront = function() {
+      var coords = context.coordsInFront();
+      context.destroyMask(coords.row, coords.col);
       return context.isInFront(function(obj) { return obj.isObstacle === true; });
    };
    
@@ -4242,7 +4269,7 @@ var getContext = function(display, infos, curLevel) {
       var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
       
       if(numbers.length == 0) {
-         throw(strings.messages.failureWriteHere);
+         context.leave(strings.messages.failureWriteHere);
       }
       
       var number = numbers[0];
@@ -4256,7 +4283,7 @@ var getContext = function(display, infos, curLevel) {
       var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
       
       if(numbers.length == 0) {
-         throw(strings.messages.failureReadHere);
+         context.leave(strings.messages.failureReadHere);
       }
       
       return parseInt(numbers[0].value);
@@ -4269,17 +4296,17 @@ var getContext = function(display, infos, curLevel) {
       var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
       
       if(items.length == 0) {
-         throw(strings.messages.failureNothingToPush);
+         context.leave(strings.messages.failureNothingToPush);
       }
       
       var coordsAfter = context.coordsInFront(0, 2);
       
       if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
-         throw(strings.messages.failureWhilePushing);
+         context.leave(strings.messages.failureWhilePushing);
       if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
-         throw(strings.messages.failureWhilePushing);
+         context.leave(strings.messages.failureWhilePushing);
       if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
-         throw(strings.messages.failureWhilePushing);
+         context.leave(strings.messages.failureWhilePushing);
       
       context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
       
@@ -4360,20 +4387,20 @@ var getContext = function(display, infos, curLevel) {
       var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
       
       if(plugs.length == 0) {
-         throw(strings.messages.failureNoPlug);
+         context.leave(strings.messages.failureNoPlug);
       }
       
       var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
       
       if(wires.length != 0) {
-         throw(strings.messages.failureAlreadyWired);
+         context.leave(strings.messages.failureAlreadyWired);
       }
       
       this.dropObject({type: "wire", zOrder: 1});
       
       if(this.last_connect !== undefined) {
          if(this.last_connect.plugType + plugs[0].plugType != 0)
-            throw(strings.messages.failureWrongPlugType);
+            context.leave(strings.messages.failureWrongPlugType);
             
          function segmentLength(segment) {
             return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
@@ -4382,19 +4409,19 @@ var getContext = function(display, infos, curLevel) {
          var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
          
          if(segmentLength(wire) > infos.maxWireLength) {
-            throw(strings.messages.failureWireTooLong);
+            context.leave(strings.messages.failureWireTooLong);
          }
          
          var totalLength = segmentLength(wire);
          for(var iWire = 0;iWire < this.wires.length;iWire++) {
             if(this.isCrossing(wire, this.wires[iWire])) {
-               throw(strings.messages.failureWireCrossing);
+               context.leave(strings.messages.failureWireCrossing);
             }
             totalLength += segmentLength(this.wires[iWire]);
          }
          
          if(totalLength > infos.maxTotalLength) {
-            throw(strings.messages.failureTotalLengthExceeded);
+            context.leave(strings.messages.failureTotalLengthExceeded);
          }
          
          this.wires.push(wire);
@@ -4428,11 +4455,11 @@ var robotEndConditions = {
       var robot = context.getRobot();
       if(context.isOn(function(obj) { return obj.isExit === true; })) {
          context.success = true;
-         throw(window.languageStrings.messages.successReachExit);
+         context.leave(window.languageStrings.messages.successReachExit);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
+         context.leave(window.languageStrings.messages.failureReachExit);
       }
    },
    checkPickedAllWithdrawables: function(context, lastTurn) {
@@ -4447,11 +4474,11 @@ var robotEndConditions = {
       
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         context.leave(window.languageStrings.messages.successPickedAllWithdrawables);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+         context.leave(window.languageStrings.messages.failurePickedAllWithdrawables);
       }
    },
    checkPlugsWired: function(context, lastTurn) {
@@ -4466,11 +4493,11 @@ var robotEndConditions = {
       
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successPlugsWired);
+         context.leave(window.languageStrings.messages.successPlugsWired);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failurePlugsWired);
+         context.leave(window.languageStrings.messages.failurePlugsWired);
       }
    },
    checkContainersFilled: function(context, lastTurn) {
@@ -4485,7 +4512,7 @@ var robotEndConditions = {
       if (context.infos.maxMoves != undefined) {
          if (context.nbMoves > context.infos.maxMoves) {
             context.success = false;
-            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
+            context.leave(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
          }
       }
       for(var row = 0;row < context.nbRows;row++) {
@@ -4535,11 +4562,11 @@ var robotEndConditions = {
       
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successContainersFilled);
+         context.leave(window.languageStrings.messages.successContainersFilled);
       }
       if(lastTurn) {
          context.success = false;
-         throw(messages[message]);
+         context.leave(messages[message]);
       }
    },
    checkBothReachAndCollect: function(context, lastTurn) {
@@ -4550,19 +4577,19 @@ var robotEndConditions = {
             for(var col = 0;col < context.nbCols;col++) {
                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
                   solved = false;
-                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+                  context.leave(window.languageStrings.messages.failurePickedAllWithdrawables);
                }
             }
          }
          
          if(solved) {
             context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+            context.leave(window.languageStrings.messages.successPickedAllWithdrawables);
          }
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
+         context.leave(window.languageStrings.messages.failureReachExit);
       }
    },
    checkLights: function(context, lastTurn) {
@@ -4577,11 +4604,11 @@ var robotEndConditions = {
       
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successLights);
+         context.leave(window.languageStrings.messages.successLights);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failureLights);
+         context.leave(window.languageStrings.messages.failureLights);
       }
    }
 };
@@ -4603,17 +4630,17 @@ var robotEndFunctionGenerator = {
          for(var item in context.bag) {
             if(!filter(context.bag[item])) {
                context.success = false;
-               throw(window.languageStrings.messages.failureUnfilteredObject);
+               context.leave(window.languageStrings.messages.failureUnfilteredObject);
             }
          }
          
          if(solved) {
             context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+            context.leave(window.languageStrings.messages.successPickedAllWithdrawables);
          }
          if(lastTurn) {
             context.success = false;
-            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+            context.leave(window.languageStrings.messages.failurePickedAllWithdrawables);
          }
       };
    },
@@ -4624,7 +4651,7 @@ var robotEndFunctionGenerator = {
             var number = numbers[iNumber];
             var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
             if(items.length == 0)
-               throw("Error: no number here");
+               context.leave("Error: no number here");
             
             var expected;
             if(typeof number.value === "number") {
@@ -4640,12 +4667,12 @@ var robotEndFunctionGenerator = {
          
          if(solved) {
             context.success = true;
-            throw(window.languageStrings.messages.successNumbersWritten);
+            context.leave(window.languageStrings.messages.successNumbersWritten);
          }
          
          if(lastTurn) {
             context.success = false;
-            throw(window.languageStrings.messages.failureNumbersWritten);
+            context.leave(window.languageStrings.messages.failureNumbersWritten);
          }
       };
    }
