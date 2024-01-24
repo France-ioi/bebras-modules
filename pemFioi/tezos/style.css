@@ -42,7 +42,8 @@ html {
    margin-left: 20px;
 }
 #transaction_table_cont,
-#accounts_table {
+#accounts_table,
+#smartContractsCont {
    margin-bottom: 20px;
 }
 
@@ -51,12 +52,22 @@ html {
    text-align: center;
 }
 
-#accounts_table .col_0 {
-   padding-left: 10px;
+#mem_pool_table .col_3,
+ #transaction_table .col_3 {
+   white-space: nowrap;
 }
 
-#accounts_table .col_1 {
+#accounts_table .col_0 {
    width: 30%;
+   text-align: center;
+}
+
+#accounts_table .col_2 {
+   width: 30%;
+   text-align: center;
+}
+
+#smart_contracts_table td {
    text-align: center;
 }
 
@@ -98,10 +109,16 @@ html {
    transform: translate(-50%,-50%);
    left: 50%;
    top: 50%;
+   max-height: 100%;
+   max-width: 100%;
+   width: fit-content;
+   overflow: auto;
+   white-space: nowrap;
 }
 .view#view_account {
-   width: 470px;   
+/*   width: 470px;   */
 }
+
 .view #header {
    border: solid black 1px;
    padding: 10px 20px;
@@ -114,14 +131,26 @@ html {
    border: solid black 1px;
    padding: 10px;
 }
+.view #header,
+.view #content {
+   min-width: 100%;
+/*   width: fit-content;*/
+}
 .view #content .line {
    padding: 5px 10px;
    margin: 0;
-   overflow: hidden;
-   text-overflow: ellipsis;
+/*   overflow: auto;*/
+/*   text-overflow: ellipsis;*/
+
 }
 .view #content .line .label {
    margin-right: 5px;
+}
+.view #content .line .parameter {
+   margin-left: 20px;
+}
+.view #content #storage_change {
+   padding-left: 20px;
 }
 #simView #header .icon {
    display: none;
@@ -135,6 +164,45 @@ html {
    margin-top: 10px;
 }
 
+.view#view_contract {
+   width: 70%;
+/*   overflow: hidden;*/
+}
+.view#view_contract #content {
+   border: solid black 1px;
+   display: flex;
+   padding: 0;
+}
+.view#view_contract #content > * {
+   width: 50%;
+   max-height: 80%;
+   padding: 10px;
+   overflow: auto;
+}
+.view#view_contract .storage_line {
+   padding: 0 20px;
+   margin: 5px 0;
+   white-space: nowrap;
+}
+.view#view_contract .big_map_line {
+   padding: 0 30px;
+   margin: 5px 0;
+   white-space: nowrap;
+}
+.view#view_contract h4 {
+   margin-top: 0;
+   margin-bottom: 10px;
+}
+.view#view_contract .text {
+   margin: 0;
+   padding: 5px 10px;
+   tab-size: 20px;
+   white-space: pre-wrap;
+   width: fit-content;
+}
+.view#view_contract .entrypoint:hover {
+   background: lightgreen;
+}
 /*** FORM ***/
 
 .form {
@@ -159,8 +227,11 @@ html {
    gap: 20px;
    align-items: center;
 }
-.form #content .field button {
-   margin: 0;
+.form #content button#sign {
+   margin-top: 0;
+   margin-bottom: 10px;
+   max-width: 150px;
+   align-self: center;
 }
 .form #content .field .input {
    width: 100px;
@@ -169,6 +240,7 @@ html {
    padding-top: 10px;
    display: flex;
    flex-direction: row;
+   justify-content: space-evenly;
 }
 .form #content #buttons button {
    width: 100px;
