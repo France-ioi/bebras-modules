@@ -115,9 +115,6 @@ html {
    overflow: auto;
    white-space: nowrap;
 }
-.view#view_account {
-/*   width: 470px;   */
-}
 
 .view #header {
    border: solid black 1px;
@@ -134,14 +131,10 @@ html {
 .view #header,
 .view #content {
    min-width: 100%;
-/*   width: fit-content;*/
 }
 .view #content .line {
    padding: 5px 10px;
    margin: 0;
-/*   overflow: auto;*/
-/*   text-overflow: ellipsis;*/
-
 }
 .view #content .line .label {
    margin-right: 5px;
@@ -166,7 +159,6 @@ html {
 
 .view#view_contract {
    width: 70%;
-/*   overflow: hidden;*/
 }
 .view#view_contract #content {
    border: solid black 1px;
@@ -202,6 +194,21 @@ html {
 }
 .view#view_contract .entrypoint:hover {
    background: lightgreen;
+}
+.view#view_contract .sc_view:hover {
+   background: lightblue;
+}
+
+.view#sc_view {
+   min-width: 30%;
+   max-width: 100%;
+}
+#simView #sc_view #header .icon  {
+   display: block;
+}
+.view#sc_view .content {
+   padding: 20px;
+   border: solid 1px black;  
 }
 /*** FORM ***/
 
