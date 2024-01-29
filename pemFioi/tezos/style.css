@@ -48,11 +48,13 @@ html {
 }
 
 #mem_pool_table td, 
-#transaction_table td {
+#transaction_table td,
+#sub_transaction_table td {
    text-align: center;
 }
 
 #mem_pool_table .col_3,
+#sub_transaction_table .col_3,
  #transaction_table .col_3 {
    white-space: nowrap;
 }
