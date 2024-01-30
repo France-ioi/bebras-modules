@@ -132,7 +132,7 @@ html {
 }
 .view #header,
 .view #content {
-   min-width: 100%;
+/*   min-width: 100%;*/
 }
 .view #content .line {
    padding: 5px 10px;
@@ -160,7 +160,8 @@ html {
 }
 
 .view#view_contract {
-   width: 70%;
+/*   width: 70%;*/
+   max-width: 100%;
 }
 .view#view_contract #content {
    border: solid black 1px;
@@ -168,8 +169,8 @@ html {
    padding: 0;
 }
 .view#view_contract #content > * {
-   width: 50%;
-   max-height: 80%;
+/*   width: 50%;*/
+/*   max-height: 80%;*/
    padding: 10px;
    overflow: auto;
 }
@@ -191,8 +192,15 @@ html {
    margin: 0;
    padding: 5px 10px;
    tab-size: 20px;
-   white-space: pre-wrap;
+/*   white-space: pre-wrap;*/
    width: fit-content;
+}
+.view#view_contract .text ul {
+   margin-top: 5px;
+}
+.view#view_contract .entrypoint,
+.view#view_contract .sc_view {
+   font-family: monospace;
 }
 .view#view_contract .entrypoint:hover {
    background: lightgreen;

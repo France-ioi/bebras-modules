@@ -51,6 +51,8 @@ const taskStrings = {
    noRecipient: "Vous devez spécifier le compte destinataire",
    recipientIsSender: "Les comptes émetteur et destinataire sont les mêmes",
    wrongAmount: "Le montant doit être un nombre positif.",
+   amountWrongFormat: "Le format du montant de tez est incorrect.",
+   amountUnwanted: "Le transfert de tez est rejeté par cet entrypoint.",
    wrongNbOfTokens: "Le nombre de jetons doit être un nombre entier positif.",
    amountTooHigh: function(ba) {
       return "Le solde du compte émetteur est insuffisant. (Solde actuel = "+Number.parseFloat(ba)+" tez)"
@@ -231,16 +233,16 @@ class Ledger extends SmartContract {
          },
          entrypoints: {
             "transfer_tokens": { 
-               text: "transfer_tokens(source,destination,amount):\n"+
-                  "\t-check if balances[source] >= amount\n"+
-                  "\t-if !balances[destination], set balances[destination] = 0\n"+
-                  "\t-balances[source] -= amount\n"+
-                  "\t-balances[destination] += amount",
+               text: "<span class=ep_name>transfer_tokens(source,destination,amount):</span>"+
+                  "<ul><li>check if balances[source] >= amount</li>"+
+                  "<li>if !balances[destination], set balances[destination] = 0</li>"+
+                  "<li>balances[source] -= amount</li>"+
+                  "<li>balances[destination] += amount</li></ul>",
                clickable: true,
                fct: "transfer"
             },
             "change_user_balance": {
-               text: "change_user_balance",
+               text: "<span class=ep_name>change_user_balance</span>",
                clickable: false,
                fct: "sub_changeUserBalance"
             }
@@ -357,6 +359,16 @@ class Ledger extends SmartContract {
       // console.log(trans)
       let dat = trans || this.tezos.newTransaction;
       // console.log(dat.nbOfTokens)
+      if(isNaN(dat.amount)){
+         displayError(taskStrings.amountWrongFormat);
+         $("#amount").addClass("highlight");
+         return false
+      }
+      if(dat.amount){
+         displayError(taskStrings.amountUnwanted);
+         $("#amount").addClass("highlight");
+         return false
+      }
       if(!dat.recipient_ep){
          if(trans === undefined){
             displayError(taskStrings.noRecipient);
@@ -415,18 +427,18 @@ class LiquidityPool extends SmartContract {
    constructor(params) {
       params.entrypoints = {
          "buy_tokens": { 
-            text: "buy_tokens(amount,min_tokens_bought):\n"+
-               "\t-compute tokens_obtained\n"+
-               "\t-if tokens_obtained > min_tokens_bought, transfer tokens\n"+
-               "\t-update storage",
+            text: "<span class=ep_name>buy_tokens(amount,min_tokens_bought):</span><ul>"+
+               "<li>compute tokens_obtained</li>"+
+               "<li>-if tokens_obtained > min_tokens_bought, transfer tokens</li>"+
+               "<li>-update storage</li></ul>",
             clickable: true,
             fct: "buyTokens" 
          }, 
          "sell_tokens": {
-            text: "sell_tokens(nb_tokens,min_tez):\n"+
-               "\t-compute tez_obtained\n"+
-               "\t-if tez_obtained > min_tez, transfer tokens\n"+
-               "\t-update storage",
+            text: "<span class=ep_name>sell_tokens(nb_tokens,min_tez):</span><ul>"+
+               "<li>-compute tez_obtained</li>"+
+               "<li>-if tez_obtained > min_tez, transfer tokens</li>"+
+               "<li>-update storage</li></ul>",
             clickable: true,
             fct: "sellTokens"
          } 
@@ -434,8 +446,8 @@ class LiquidityPool extends SmartContract {
          
       params.views = {
          "get_token_price" : { 
-            text: "get_token_price():\n"+
-               "\t-returns what we would get if we sold one token",
+            text: "<span class=ep_name>get_token_price():</span><ul>"+
+               "<li>-returns what we would get if we sold one token</li></ul>",
             fct: "viewTokenPrice"
          }
       };       
@@ -451,7 +463,7 @@ class LiquidityPool extends SmartContract {
       let params = { 
          id: "buy_tokens",
          sc_address: this.address,
-         fields: ["amount_ep","minTokensExpected"],
+         fields: ["minTokensExpected"],
          gas: "computeTransactionGas",
          storage: "computeTransactionStorage",
          storageChange: "getStorageChange",
@@ -488,7 +500,7 @@ class LiquidityPool extends SmartContract {
       let sID = trans.sender;
       let sAcc = this.tezos.objectsPerAddress[sID];
       if(id == "buy_tokens"){
-         let amo = trans.amount_ep;
+         let amo = trans.amount;
          let nb = this.getNbOfTokensBought(amo);
          sAcc.balance -= amo;
          this.balance += amo;
@@ -497,7 +509,7 @@ class LiquidityPool extends SmartContract {
       }else if(id == "sell_tokens"){
          let nb = trans.nbOfTokens;
          let amo = this.getAmountOfTezBought(nb);
-         console.log(nb,amo)
+         // console.log(nb,amo)
          sAcc.balance += amo;
          this.balance -= amo;
          this.storage.tokens_owned.val += nb;
@@ -516,7 +528,7 @@ class LiquidityPool extends SmartContract {
 
    computeTransactionStorage() {
       let tr = this.tezos.newTransaction;
-      let nb = this.getNbOfTokensBought(tr.amount_ep);
+      let nb = this.getNbOfTokensBought(tr.amount);
       let blob = new Blob([tr.sender+""+nb]);
       let sto = blob.size;
 
@@ -537,7 +549,7 @@ class LiquidityPool extends SmartContract {
       let subFct = sc[subFctID];
       let nb;
       if(mainID == "buy_tokens"){
-         nb = this.getNbOfTokensBought(tr.amount_ep);
+         nb = this.getNbOfTokensBought(tr.amount);
       }else if(mainID == "sell_tokens"){
          nb = -tr.nbOfTokens;
       }
@@ -554,7 +566,7 @@ class LiquidityPool extends SmartContract {
       let k = this.storage.k.val;
       let b1 = this.balance;
       if(tr.params.id == "buy_tokens"){
-         let nb = this.getNbOfTokensBought(tr.amount_ep);
+         let nb = this.getNbOfTokensBought(tr.amount);
          let tok2 = tok1 - nb;
          text += "- change "+this.alias+" nb of tokens from "+tok1+" to "+tok2;
       }else
@@ -570,17 +582,17 @@ class LiquidityPool extends SmartContract {
       let dat = trans || this.tezos.newTransaction;
       // console.log(dat)
       if(dat.params.id == "buy_tokens"){
-         if(!dat.amount_ep || isNaN(dat.amount_ep) || dat.amount_ep < 0) {
+         if(!dat.amount || isNaN(dat.amount) || dat.amount < 0) {
             if(trans === undefined){
                displayError(taskStrings.wrongAmount);
-               $("#amount_ep").addClass("highlight");
+               $("#amount").addClass("highlight");
             }
             return false
          }
          let acc = this.tezos.objectsPerAddress[dat.sender];
-         if(acc.balance < dat.amount_ep){
+         if(acc.balance < dat.amount){
             displayError(taskStrings.amountTooHigh(acc.balance));
-            $("#amount_ep").addClass("highlight");
+            $("#amount").addClass("highlight");
             return false
          }
          if(isNaN(dat.minTokensExpected)){
@@ -588,7 +600,7 @@ class LiquidityPool extends SmartContract {
             $("#minTokensExpected").addClass("highlight");
             return false
          }
-         let nbTok = this.getNbOfTokensBought(dat.amount_ep);
+         let nbTok = this.getNbOfTokensBought(dat.amount);
          // console.log(nbTok,dat.minTokensExpected)
          if(nbTok < dat.minTokensExpected){
             displayError(taskStrings.minTokensExpectedTooHigh);
@@ -597,11 +609,21 @@ class LiquidityPool extends SmartContract {
          }
          if(nbTok > this.storage.tokens_owned.val){
             displayError(taskStrings.nbOfTokensBoughtTooHigh);
-            $("#amount_ep").addClass("highlight");
+            $("#amount").addClass("highlight");
             return false
          }
       }else
       if(dat.params.id == "sell_tokens"){
+         if(isNaN(dat.amount)){
+            displayError(taskStrings.amountWrongFormat);
+            $("#amount").addClass("highlight");
+            return false
+         }
+         if(dat.amount){
+            displayError(taskStrings.amountUnwanted);
+            $("#amount").addClass("highlight");
+            return false
+         }
          if(!dat.nbOfTokens || isNaN(dat.nbOfTokens) || dat.nbOfTokens < 0) {
             displayError(taskStrings.wrongNbOfTokens);
             $("#nbOfTokens").addClass("highlight");
@@ -659,7 +681,7 @@ class LiquidityPool extends SmartContract {
       text += "The ratios before and after a potential purchase of "+nb+" token would be: ";
       text += r1+" "+r2+"\n";
       text += "The price of the token returned is:"+p+" tez\n";
-      console.log(text)
+      // console.log(text)
       return p
    }
 
@@ -722,7 +744,7 @@ function Tezos(params) {
    this.mempool = mempool || [];
    this.blocks = [];
    this.blockIndex = 1;
-   this.signatureIndex = (transactions.length > 0) ? transactions[transactions.length - 1].signature : (1000000).toString(16);
+   this.signatureIndex = (transactions.length > 0) ? transactions[transactions.length - 1].signature : Math.pow(10,20).toString(16);
    this.bakerBalance = 0;
    this.ledger;
    this.smartContracts = [];
@@ -1090,9 +1112,9 @@ function Tezos(params) {
                case "recipient_ep":
                   html += "<p class=line><span class='label parameter'>"+taskStrings.recipient+":</span> "+self.objectsPerAddress[dat[key]].alias+"</p>";
                   break;
-               case "amount_ep":
-                  html += "<p class=line><span class='label parameter'>"+taskStrings.amount+":</span> "+dat[key]+" tez</p>";
-                  break;
+               // case "amount_ep":
+               //    html += "<p class=line><span class='label parameter'>"+taskStrings.amount+":</span> "+dat[key]+" tez</p>";
+               //    break;
                case "nbOfTokens":
                case "minTokensExpected":
                case "minTezExpected":
@@ -1190,9 +1212,9 @@ function Tezos(params) {
                if(field == "recipient_ep"){
                   name = taskStrings.recipient;
                }
-               if(field == "amount_ep"){
-                  name = taskStrings.amount;
-               }
+               // if(field == "amount_ep"){
+               //    name = taskStrings.amount;
+               // }
                html += "<p class=field>"+name;
                switch(field){
                case "sender":
@@ -1218,15 +1240,15 @@ function Tezos(params) {
                   html += "</select>";
                   break;
                case "amount":
-               case "amount_ep":
+               // case "amount_ep":
                case "nbOfTokens":
                case "minTokensExpected":
                case "minTezExpected":
-                  if(!params.simple && field =="amount"){
-                     self.newTransaction[field] = 0;
-                     html += "<span class=amount>"+self.newTransaction[field]+"</span>";
-                     break;  
-                  }
+                  // if(!params.simple && field =="amount"){
+                  //    self.newTransaction[field] = 0;
+                  //    html += "<span class=amount>"+self.newTransaction[field]+"</span>";
+                  //    break;  
+                  // }
                   let val = self.newTransaction[field] || 0;
                   self.newTransaction[field] = val;
                   html += "<input type=text id="+field+" class=input value="+val+" />";
@@ -1292,16 +1314,16 @@ function Tezos(params) {
             let val = roundTezAmount(this.value);
             self.newTransaction.amount = Number(val);
          });
-         $("#amount_ep").on("keyup",function() {
-            displayError("");
-            if(isNaN(this.value)){
-               $(this).addClass("highlight");
-            }else{
-               $(this).removeClass("highlight");
-            }
-            let val = roundTezAmount(this.value);
-            self.newTransaction.amount_ep = Number(val);
-         });
+         // $("#amount_ep").on("keyup",function() {
+         //    displayError("");
+         //    if(isNaN(this.value)){
+         //       $(this).addClass("highlight");
+         //    }else{
+         //       $(this).removeClass("highlight");
+         //    }
+         //    let val = roundTezAmount(this.value);
+         //    self.newTransaction.amount_ep = Number(val);
+         // });
          $("#nbOfTokens").on("keyup",function() {
             displayError("");
             if(isNaN(this.value)){
@@ -1367,11 +1389,11 @@ function Tezos(params) {
          if(params.simple){
             self.newTransaction.storage = 0;
          }else{
-            if(self.newTransaction.amont_ep){
-               $("#amount_ep").val(self.newTransaction.amount_ep);
-            }
+            // if(self.newTransaction.amont_ep){
+            //    $("#amount_ep").val(self.newTransaction.amount_ep);
+            // }
             if(self.newTransaction.minTezExpected){
-               $("#amount_ep").val(self.newTransaction.minTezExpected);
+               $("#minTezExpected").val(self.newTransaction.minTezExpected);
             }
             let sc = self.objectsPerAddress[params.sc_address];
             self.newTransaction.storage = sc[params.storage]();
@@ -1671,7 +1693,7 @@ function Tezos(params) {
          if(!trans.params.simple){
             let sc = self.objectsPerAddress[trans.params.sc_address];
             let ep = sc.entrypoints;
-            entry = ep[trans.params.id].text;
+            entry = $(ep[trans.params.id].text).html();
          }else{
             entry = "";
          }
