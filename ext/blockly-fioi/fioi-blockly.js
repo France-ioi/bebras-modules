@@ -1837,6 +1837,8 @@ FioiBlockly.Msg.fr.TABLES_VAR_NAME = "tableau";
 FioiBlockly.Msg.fr.TABLES_TOO_BIG = "Dimensions du tableau trop grandes !";
 FioiBlockly.Msg.fr.TABLES_OUT_OF_BOUNDS = "Tentative d'accès à une case hors du tableau !";
 
+FioiBlockly.Msg.fr.VARIABLES_SET = "dans %1 mettre %2";
+
 FioiBlockly.Msg.fr.MATH_DIVISIONFLOOR_SYMBOL = ' // ';
 FioiBlockly.Msg.fr.MATH_ARITHMETIC_TOOLTIP_DIVIDEFLOOR = "Renvoie la partie entière de la division des deux nombres.";
 
