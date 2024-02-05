@@ -30,6 +30,7 @@ html {
    border: 1px solid black;
    overflow: hidden;
    text-overflow: ellipsis;
+   white-space: nowrap;
 }
 
 #mainPage th {
@@ -41,16 +42,20 @@ html {
 #transaction_table .block_header .timestamp {
    margin-left: 20px;
 }
-#transaction_table_cont,
+/*#transaction_table_cont,*/
 #accounts_table,
 #smartContractsCont {
    margin-bottom: 20px;
+}
+#mem_pool_table {
+   margin-top: 20px;
 }
 
 #mem_pool_table td, 
 #transaction_table td,
 #sub_transaction_table td {
    text-align: center;
+   background: white;
 }
 
 #mem_pool_table .col_3,
@@ -60,17 +65,21 @@ html {
 }
 
 #accounts_table .col_0 {
-   width: 30%;
+   width: 20%;
    text-align: center;
 }
 
 #accounts_table .col_2 {
-   width: 30%;
+   width: 40%;
    text-align: center;
 }
 
 #smart_contracts_table td {
    text-align: center;
+}
+
+#sub_transaction_table {
+/*   margin: 0 20px;*/
 }
 
 /*** BUTTONS ***/
@@ -130,10 +139,7 @@ html {
    border: solid black 1px;
    padding: 10px;
 }
-.view #header,
-.view #content {
-/*   min-width: 100%;*/
-}
+
 .view #content .line {
    padding: 5px 10px;
    margin: 0;
@@ -146,6 +152,12 @@ html {
 }
 .view #content #storage_change {
    padding-left: 20px;
+}
+.view #content .ep_cont {
+   border: 1px solid black;
+   border-radius: 5px;
+   background: lightgrey;
+   padding: 10px;
 }
 #simView #header .icon {
    display: none;
@@ -160,7 +172,6 @@ html {
 }
 
 .view#view_contract {
-/*   width: 70%;*/
    max-width: 100%;
 }
 .view#view_contract #content {
@@ -169,8 +180,6 @@ html {
    padding: 0;
 }
 .view#view_contract #content > * {
-/*   width: 50%;*/
-/*   max-height: 80%;*/
    padding: 10px;
    overflow: auto;
 }
@@ -179,10 +188,11 @@ html {
    margin: 5px 0;
    white-space: nowrap;
 }
-.view#view_contract .big_map_line {
+.view#view_contract .level_1 {
    padding: 0 30px;
-   margin: 5px 0;
-   white-space: nowrap;
+}
+.view#view_contract .level_2 {
+   padding: 0 40px;
 }
 .view#view_contract h4 {
    margin-top: 0;
