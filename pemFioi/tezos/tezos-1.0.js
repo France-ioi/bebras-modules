@@ -93,6 +93,10 @@ const taskStrings = {
       }
       str += ") failed with: ";
       return str
+   },
+   errorBalance: function(cur,tar) {
+      let str = (cur == tar) ? "égal" : "inférieur";
+      return "Vous n'avez pas fait de gain. Votre solde actuel de "+cur+" tez est "+str+" à votre solde de départ de "+tar+" tez."
    }
 };
 
@@ -189,16 +193,7 @@ class SmartContract {
             if(type != "big-map"){
                html1 += "<p class='storage_line line'><span class=label>"+key+":</span> "+self.storage[key].val+"</p>";
             }else{
-               // let obj = self.storage[key];
                html1 += getBigMapHTML(key,self.storage,0);
-               // html1 += "<p class=storage_line><span class=label>"+key+":</span> </p>";
-               // for(let k in obj) {
-               //    if(k == "type"){
-               //       continue;
-               //    }
-
-               //    html1 += "<p class='minTokensExpected_line line'><span class=label>"+k+":</span>"+obj[k].val+"</p>";
-               // }
             }
          }
 
@@ -938,7 +933,7 @@ class LiquidityPool extends SmartContract {
 function Tezos(params) {
    let { accounts, transactions, mempool, mempoolMode, nbCreatedAccounts, 
       counterEnabled, ledgerEnabled, createAccountEnabled, transactionTableLength,
-      smartContracts, liquidityPools, pageW, pageH } = params;
+      smartContracts, liquidityPools, pageW, pageH, saveAnswer } = params;
    let self = this;
 
    transactionTableLength = transactionTableLength || 7;
@@ -1826,6 +1821,7 @@ function Tezos(params) {
       }
       self.objectsPerAddress[sID].transactionNum++;
       self.bakerBalance += (fee + gas*gasCostPerUnit);
+      saveAnswer(self);
    };
 
    function createNextBlock() {
