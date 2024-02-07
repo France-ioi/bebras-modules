@@ -98,7 +98,8 @@ const taskStrings = {
    errorBalance: function(cur,tar) {
       let str = (cur == tar) ? "égal" : "inférieur";
       return "Vous n'avez pas fait de gain. Votre solde actuel de "+cur+" tez est "+str+" à votre solde de départ de "+tar+" tez."
-   }
+   },
+   cantSign: "Vous ne pouvez pas signer cette transaction car le compte émetteur ne vous appartient pas."
 };
 
 function displayError(msg) {
@@ -854,6 +855,53 @@ class LiquidityPool extends SmartContract {
    } 
 };
 
+class Raffle extends SmartContract {
+   constructor(params) {
+      params.entrypoints = {
+         "bid": { 
+            text: "<span class=ep_name>bid(hash):</span><ul>"+
+               "<li>check that amount == bid_amount + deposit_amount</li>"+
+               "<li>set players[nb_players] = { address: sender, hash, revealed: false }</li>"+
+               "<li>nb_players++</li>"+
+               "<li>total_bids += bid_amount</li>"+
+               "<li>total_deposits += deposit_amount</li></ul>",
+            clickable: true,
+            fct: "bid" 
+         }, 
+         "reveal": {
+            text: "<span class=ep_name>reveal(id_player,value):</span><ul>"+
+               "<li>player = players[id_player]</li>"+
+               "<li>check if !player.revealed</li>"+
+               "<li>check if player.hash = hash(value)</li>"+
+               "<li>player.revealed = true</li>"+
+               "<li>nb_revealed++</li>"+
+               "<li>total += value</li></ul>",
+            clickable: true,
+            fct: "reveal"
+         } 
+      };
+         
+      // params.views = {
+      //    "get_token_price" : { 
+      //       text: "<span class=ep_name>get_token_price():</span><ul>"+
+      //          "<li>returns what we would get if we sold one token</li></ul>",
+      //       fct: "viewTokenPrice"
+      //    }
+      // };       
+      params.storage = {
+         bid_amount: { val: 0, type: "nat" },
+         deposit_amount: { val: 0, type: "nat" },
+         players: { type: "big-map" },
+         nb_players: { type: "big-map" },
+         total_bids: { val: 0, val: "nat" },
+         total_deposits: { val: 0, val: "nat" },
+         total: { val: 0, val: "nat" },
+         nb_revealed: { val: 0, val: "nat" }
+      };
+      super(params);
+   }
+}
+
 
 function Tezos(params) {
    let { accounts, transactions, mempool, mempoolMode, nbCreatedAccounts, 
@@ -899,6 +947,8 @@ function Tezos(params) {
    
    let nbSmartContracts;
    let fields;
+   let copied = null;
+
 
 
    function init() {
@@ -1307,7 +1357,8 @@ function Tezos(params) {
                $("#view #copy").on("click",function() {
                   deleteView()();
                   self.newTransaction = Beav.Object.clone(self.transactions[id]);
-                  delete self.newTransaction.signature;
+                  copied = id;
+                  // delete self.newTransaction.signature;
                   self.createNewTransaction()();
                });   
             }
@@ -1315,7 +1366,11 @@ function Tezos(params) {
                $("#simView #cancel").on("click",deleteView(type));
                $("#simView #cancel").css("cursor","pointer");
                $("#simView #validate").on("click",function() {
-                  signTransaction();
+                  let err = signTransaction();
+                  if(err){
+                     displayError(err);
+                     return
+                  }
                   createTransaction();
                   deleteView()();
                });
@@ -1335,12 +1390,21 @@ function Tezos(params) {
          }
 
          function signTransaction() {
-            // displayError("");
+            displayError("");
 
             // self.newTransaction.signatureIndex = self.signatureIndex;
             // console.log(JSON.stringify(self.newTransaction))
-            // if(!self.newTransaction.signature)
-               self.newTransaction.signature = JSON.stringify(self.newTransaction).hashCode();
+            
+            if(self.newTransaction.signature)
+               return false
+            let sen = self.newTransaction.sender;
+            let acc = self.objectsPerAddress[sen];
+            // console.log("sign",acc)
+            if(acc.owner != 0){
+               return taskStrings.cantSign
+            }
+            self.newTransaction.signature = JSON.stringify(self.newTransaction).hashCode();
+            return false
             // $("#sign").off("click");
             // $("#sign").css("cursor","auto");
             // $("#sign").attr("disabled","true");
@@ -1376,12 +1440,13 @@ function Tezos(params) {
             return
          }
 
-         if(self.newTransaction == undefined)
+         if(self.newTransaction == undefined){
             self.newTransaction = { amount: 0, counter: 1 };
+            delete self.newTransaction.signature;
+            self.newTransaction.storage = 0;
+         }
          if(!params)
             params = self.newTransaction.params || { simple: true };
-         delete self.newTransaction.signature;
-         self.newTransaction.storage = 0;
 
          fields = ["sender","recipient","amount","counter",/*"signature",*/"bakerFee"]
          if(!params.simple){
@@ -1397,9 +1462,6 @@ function Tezos(params) {
 
          let view = $("<div id=view></div>");
          let back = $("<div id=back></div>");
-
-         
-
 
          let form = displayTransactionForm();
          view.append(back,form);
@@ -1457,7 +1519,7 @@ function Tezos(params) {
                      for(let iA = 0; iA < self.nbCreatedAccounts; iA++){
                         let dat = self.accounts[iA];
                         // console.log(dat)
-                        if(field == "sender" && dat.owner > 0){
+                        if(field == "sender" && dat.owner > 0 && self.newTransaction[field] != dat.address){
                            continue;
                         }
                         html += "<option value="+dat.address+" "+((self.newTransaction[field] == dat.address) ? "selected" : "")+">"+dat.alias+"</option>";
@@ -1610,17 +1672,27 @@ function Tezos(params) {
          if(!isTransactionValid())
             return
          if(!params.simple){
-         //    self.newTransaction.storage = 0;
-         // }else{
-            // if(self.newTransaction.amont_ep){
-            //    $("#amount_ep").val(self.newTransaction.amount_ep);
-            // }
             if(self.newTransaction.minTezExpected){
                $("#minTezExpected").val(self.newTransaction.minTezExpected);
             }
             let sc = self.objectsPerAddress[params.sc_address];
             self.newTransaction.storage = sc[params.storage]();
             self.newTransaction.storageChange = sc[params.storageChange]();
+         }
+         if(copied != null){
+            let ori = self.transactions[copied];
+            let same = true;
+            for(let key of fields){
+               if(ori[key] != self.newTransaction[key]){
+                  // console.log("diff",key,ori[key],self.newTransaction[key])
+                  same = false
+               }
+            }
+            if(!same){
+               delete self.newTransaction.signature;
+            }else{
+               self.newTransaction.signature = ori.signature;
+            }
          }
          // console.log(params)
          viewTransaction(null,true)();
@@ -1711,6 +1783,7 @@ function Tezos(params) {
       self.transactions[id] = Beav.Object.clone(tr);
       // console.log(JSON.stringify(tr))
       self.newTransaction = undefined;
+      copied = null;
       if(mempoolMode != "none"){
          self.mempool.push(id);
          updateMemPool();
