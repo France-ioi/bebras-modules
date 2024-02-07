@@ -2183,6 +2183,7 @@ var getContext = function(display, infos, curLevel) {
             mirrorZ: { num: 7, img: "mirrorZ.png", isMirror: true, mirrorFunction: function(dir) { return (10 - dir) % 8; }, side: 60 },
             mirrorH: { num: 8, img: "mirrorH.png", isMirror: true, mirrorFunction: function(dir) { return (12 - dir) % 8; }, side: 60 },
             mirrorI: { num: 9, img: "mirrorI.png", isMirror: true, mirrorFunction: function(dir) { return (8 - dir) % 8; }, side: 60 },
+            fuse: { num:10, img: "fuse.png", isFuse: true, side:60, state: 0, nbStates: 2},
             number: { side: 60, zOrder: 1 },
             board_background: { num: 4, color: "#685aa6", side: 60, zOrder: 0 },
          },
@@ -2442,6 +2443,7 @@ var getContext = function(display, infos, curLevel) {
                   return item.isContainer === true;
                })[0].containerSize;
             }, side: 60, isWritable: true, fontColor: "#4a90e2", fontBold: true, zOrder: 1, offsetX: -20, offsetY: -17},
+            mask: {num: 8, img: "mask.png", side: 60, isMask: true, zOrder: 2 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -3407,6 +3409,9 @@ var getContext = function(display, infos, curLevel) {
          var dirToState = [0, 2, 4, 6];
          x = x - (dirToState[item.dir] * item.side * scale);
       }
+      else if (item.state != undefined) {
+         x = x - item.state * item.side * scale;
+      }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
          x += item.side * scale / 2;
@@ -3940,7 +3945,7 @@ var getContext = function(display, infos, curLevel) {
       context.setIndexes();
       context.items.splice(item.index, 1);
 
-      if(context.display) {
+      if(context.display && item.element !== undefined) {
          item.element.remove();
       }
    };
@@ -4011,6 +4016,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var item = context.getRobot();
       var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
+      context.destroyMask(item.row, item.col);
       if(withdrawables.length == 0) {
          if(errorWhenEmpty)
          context.leave(context.strings.messages.nothingToPickUp);
@@ -4332,7 +4338,17 @@ var getContext = function(display, infos, curLevel) {
       var lights = context.getItemsOn(lig, col, function(obj) {
          return obj.isLight === true;
       });
+
+      var fuses = context.getItemsOn(lig, col, function(obj) {
+         return obj.isFuse === true;
+      });
       
+      if (fuses.length != 0) {
+         fuses[0].state = 1;
+         redisplayItem(fuses[0]);
+         context.leave("caboum");
+      }
+
       for(var light in lights) {
          lights[light].state = 1;
          lights[light].img = lights[light].states[lights[light].state];
@@ -4346,6 +4362,19 @@ var getContext = function(display, infos, curLevel) {
       var taille = infos.cellSide;
       
       var findRobot = false;
+
+      var dx = (taille * dirs[dir][1]) * scale;
+      var dy = (taille * dirs[dir][0]) * scale;
+      
+      if(context.display && paper != undefined) {
+         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+         
+         segment.attr({'stroke-width': 5, 'stroke': '#fab9c7'});
+         
+         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+            segment.remove();
+         }, infos.actionDelay * 2);
+      }
       
       var plig = lig + dirs[dir][0];
       var pcol = col + dirs[dir][1];
@@ -4366,19 +4395,6 @@ var getContext = function(display, infos, curLevel) {
          if(context.shoot(plig, pcol, pdir)) {
             findRobot = true;
          }
-      }
-      
-      var dx = (taille * dirs[dir][1]) * scale;
-      var dy = (taille * dirs[dir][0]) * scale;
-      
-      if(context.display && paper != undefined) {
-         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
-         
-         segment.attr({'stroke-width': 5, 'stroke': '#fab9c7'});
-         
-         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
-            segment.remove();
-         }, infos.actionDelay * 2);
       }
       
       return findRobot;
