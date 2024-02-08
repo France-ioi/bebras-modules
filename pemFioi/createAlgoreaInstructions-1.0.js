@@ -1,5 +1,5 @@
 function createAlgoreaInstructions(subTask) {
-   var level = displayHelper.taskLevel;
+   var level = window.displayHelper && displayHelper.taskLevel;
    if(level){
       // var lang = conceptViewer.selectedLanguage;
       var lang = window.modulesLanguage;
