@@ -222,7 +222,8 @@ var getContext = function(display, infos, curLevel) {
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case.",
                noContainer: "Il n'y a pas de conteneur ici !",
-               failureLineBreak: "Le robot ne peut pas changer de ligne."
+               failureLineBreak: "Le robot ne peut pas changer de ligne.",
+               failureFuse: "Le robot a tiré sur un fusible !"
             },
             cardinals: {
                north: "Nord",
@@ -2183,6 +2184,7 @@ var getContext = function(display, infos, curLevel) {
             mirrorZ: { num: 7, img: "mirrorZ.png", isMirror: true, mirrorFunction: function(dir) { return (10 - dir) % 8; }, side: 60 },
             mirrorH: { num: 8, img: "mirrorH.png", isMirror: true, mirrorFunction: function(dir) { return (12 - dir) % 8; }, side: 60 },
             mirrorI: { num: 9, img: "mirrorI.png", isMirror: true, mirrorFunction: function(dir) { return (8 - dir) % 8; }, side: 60 },
+            fuse: { num:10, img: "fuse.png", states: ["fuse.png", "dispersion.png"], isFuse: true, side:60, state: 0},
             number: { side: 60, zOrder: 1 },
             board_background: { num: 4, color: "#685aa6", side: 60, zOrder: 0 },
          },
@@ -3408,6 +3410,7 @@ var getContext = function(display, infos, curLevel) {
          var dirToState = [0, 2, 4, 6];
          x = x - (dirToState[item.dir] * item.side * scale);
       }
+
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
          x += item.side * scale / 2;
@@ -4334,7 +4337,19 @@ var getContext = function(display, infos, curLevel) {
       var lights = context.getItemsOn(lig, col, function(obj) {
          return obj.isLight === true;
       });
-      
+
+      var fuses = context.getItemsOn(lig, col, function(obj) {
+         return obj.isFuse === true;
+      });
+
+      for(var fuse in fuses) {
+         fuses[fuse].state = 1;
+         fuses[fuse].img = fuses[fuse].states[fuses[fuse].state];
+         if(context.display)
+            redisplayItem(fuses[fuse]);
+         context.leave(strings.messages.failureFuse);
+      }
+
       for(var light in lights) {
          lights[light].state = 1;
          lights[light].img = lights[light].states[lights[light].state];
@@ -4348,6 +4363,19 @@ var getContext = function(display, infos, curLevel) {
       var taille = infos.cellSide;
       
       var findRobot = false;
+
+      var dx = (taille * dirs[dir][1]) * scale;
+      var dy = (taille * dirs[dir][0]) * scale;
+      
+      if(context.display && paper != undefined) {
+         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+         
+         segment.attr({'stroke-width': 5, 'stroke': '#fab9c7'});
+         
+         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+            segment.remove();
+         }, infos.actionDelay * 2);
+      }
       
       var plig = lig + dirs[dir][0];
       var pcol = col + dirs[dir][1];
@@ -4368,19 +4396,6 @@ var getContext = function(display, infos, curLevel) {
          if(context.shoot(plig, pcol, pdir)) {
             findRobot = true;
          }
-      }
-      
-      var dx = (taille * dirs[dir][1]) * scale;
-      var dy = (taille * dirs[dir][0]) * scale;
-      
-      if(context.display && paper != undefined) {
-         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
-         
-         segment.attr({'stroke-width': 5, 'stroke': '#fab9c7'});
-         
-         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
-            segment.remove();
-         }, infos.actionDelay * 2);
       }
       
       return findRobot;
