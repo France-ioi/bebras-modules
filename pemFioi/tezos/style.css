@@ -42,7 +42,6 @@ html {
 #transaction_table .block_header .timestamp {
    margin-left: 20px;
 }
-/*#transaction_table_cont,*/
 #accounts_table,
 #smartContractsCont {
    margin-bottom: 20px;
@@ -77,9 +76,14 @@ html {
 #smart_contracts_table td {
    text-align: center;
 }
-
-#sub_transaction_table {
-/*   margin: 0 20px;*/
+#mainPage table#sub_transaction_table {
+/*   width: auto;*/
+   table-layout: auto;
+}
+#sub_transaction_table th,
+#sub_transaction_table td {
+   min-width: 100px;
+   max-width: 150px;
 }
 
 /*** BUTTONS ***/
@@ -96,15 +100,18 @@ html {
 
 /*** VIEW ***/
 
-#view, #simView {
+#view, #simView, #subView  {
    position: absolute;
    left: 0;
    top: 0;
    width: 100%;
    height: 100%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }
 
-#back, #simBack {
+#back, #simBack, #subBack {
    background: black;
    opacity: 0.5;
    position: absolute;
@@ -116,10 +123,11 @@ html {
 
 .view {
    background: white;
-   position: absolute;
+   z-index: 2;
+   /*position: absolute;
    transform: translate(-50%,-50%);
    left: 50%;
-   top: 50%;
+   top: 50%;*/
    max-height: 100%;
    max-width: 100%;
    width: fit-content;
@@ -144,6 +152,13 @@ html {
    padding: 5px 10px;
    margin: 0;
 }
+.view #content .error {
+   border: 1px solid red;
+   border-radius: 5px;
+   background-color: rgb(255,120,120);
+   margin: 20px 0;
+   white-space: normal;
+}
 .view #content .line .label {
    margin-right: 5px;
 }
@@ -166,6 +181,22 @@ html {
    margin-top: 10px;
    display: flex;
    flex-direction: row;
+}
+.view .signature {
+   margin: 10px 0;
+   padding: 5px 10px;
+   display: flex;
+   justify-content: space-between;
+}
+.view .unsigned {
+   border: 1px solid red;
+   border-radius: 5px;
+   background-color: rgb(255,120,120);
+}
+.view .signed {
+   border: 1px solid green;
+   border-radius: 5px;
+   background-color: rgb(120,255,120);
 }
 #view button {
    margin-top: 10px;
@@ -230,6 +261,17 @@ html {
    padding: 20px;
    border: solid 1px black;  
 }
+.view hr {
+   border-top: 1px solid grey;
+   border-bottom: none;
+   border-left: none;
+   border-right: none;
+   width: 90%;
+}
+.view .input {
+   width: 100px;
+}
+
 /*** FORM ***/
 
 .form {
@@ -273,7 +315,8 @@ html {
    width: 100px;
 }
 
-.form .highlight {
+.form .highlight,
+.view .highlight {
    border: 2px solid red;
    border-radius: 5px;
    background: rgba(255,0,0,0.2);
