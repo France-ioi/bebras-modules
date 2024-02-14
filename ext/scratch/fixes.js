@@ -1283,7 +1283,7 @@ Blockly.JavaScript['data_listrepeat'] = function(block) {
   var assignCode = 'var ' + varName + ' = ' + code + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return assignCode + reportCode;
 };
@@ -1347,7 +1347,7 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   var assignCode = 'var ' + varName + ' = ' + argument0 + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return assignCode + reportCode;
 };
@@ -1365,7 +1365,7 @@ Blockly.JavaScript['data_changevariableby'] = function(block) {
   var incrCode = varName + ' += ' + argument0 + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return incrCode + reportCode;
 };
