@@ -172,7 +172,7 @@ var getContext = function(display, infos, curLevel) {
                west: "ouest() déplace le robot d'une case vers l'ouest",
                north: "nord() déplace le robot d'une case vers le nord",
                south: "sud() déplace le robot d'une case vers le sud",
-               shoot: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
+               shoot: "tirerLaser(direction) fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
             },
