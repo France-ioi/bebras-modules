@@ -29,16 +29,17 @@
                 'placeholder_regexp': 'Enter text',
                 'error_regexp': 'Invalid format',
                 'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.',
-                'feedback_score_binary_correct': 'Congratulations, everything is correct',
-                'feedback_score_binary_mistake': 'There is at least one mistake'
+                'feedback_score_binary_correct': 'Congratulations, everything is correct.',
+                'feedback_score_binary_mistake': 'There is at least one mistake.'
             },
             fr: {
                 'score': 'Score',
                 'grader_msg': 'Votre score est ',
                 'wrong_answer_msg': 'Vous avez au moins une erreur.',
                 'wrong_answer_msg_partial_feedback': 'Vous avez au moins une erreur. Voici un indice :',
-                'wrong_answer_msg_not_answered': 'Vous n\'avez pas répondu à cette question',
-                'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
+                'wrong_answer_msg_not_answered': "Vous n'avez pas répondu à cette question.",
+                'wrong_fill_gaps_msg': 'Vous avez %% réponses incorrectes pour cette question, surlignées en rouge.',
+                'wrong_partial': "Vous n'avez pas répondu entièrement à cette question.",
                 'validate': 'Valider',
                 'solution': 'Voir la réponse',
                 'restart': 'Recommencer',
@@ -54,8 +55,8 @@
                 'placeholder_regexp': 'Entrez du texte.',
                 'error_regexp': 'Format invalide',
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.',
-                'feedback_score_binary_correct': 'Congratulations, everything is correct',
-                'feedback_score_binary_mistake': 'There is at least one mistake'
+                'feedback_score_binary_correct': 'Félicitations, tout est correct.',
+                'feedback_score_binary_mistake': 'Il y a au moins une erreur.'
             },
         },
 

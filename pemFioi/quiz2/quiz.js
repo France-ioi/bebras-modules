@@ -45,15 +45,20 @@ Quiz.common = {
     },
 
 
-    toggleAlertMessage: function(parent, msg, type) {
+    toggleAlertMessage: function(parent, msg, type, whole_question) {
         var el = parent.find('.error-message');
         el.remove();
-        msg && parent.append(
-            '<div class="alert-message ' + type + '-message">' +
-            '<i class="fas fa-bell icon"></i>' + msg +
-            '</div>');
-    }
+        if(!msg) { return; }
 
+        var html = '<div class="alert-message ' + type + '-message">' +
+            '<i class="fas fa-bell icon"></i>' + msg +
+            '</div>';
+        if(!whole_question && parent.parents("question.horizontal").length) {
+            parent.find('.answer-code').before(html);
+        } else {
+            parent.append(html);
+        }
+    }
 }
 
 
@@ -258,6 +263,9 @@ Quiz.UI = function(params) {
                     continue;
                 }
                 questions[i].displayFeedback(feedback[i]);
+            }
+            if(feedback.partial) {
+
             }
             this.toggleFeedback(true);
         },
