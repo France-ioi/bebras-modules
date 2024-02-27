@@ -1,10 +1,11 @@
 function AssortElements(params) {
-   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback, ordered, displayHelper } = params;
+   let { paper, elemW, elemH, elements, dropZones, attr, dropCallback, ordered, ghostBackOpacity, drawElement, displayHelper } = params;
    let zoneIDs = [];
    let elementsObject = {};
    
    this.dragAndDrop;
    this.test = 3;
+   drawElement = drawElement || defaultDrawElement;
    let self = this;
    init();
 
@@ -37,6 +38,8 @@ function AssortElements(params) {
             }
          },
          actionIfDropped : function(srcCont, srcPos, dstCont, dstPos, dropType) {
+            let id = this.getObjects(srcCont)[srcPos];
+            // console.log(id)
             if(!ordered && zoneIDs.includes(dstCont)){
                let currObj = this.getObjects(dstCont);
                for(var pos = 0; pos <= dstPos; pos++){
@@ -44,10 +47,13 @@ function AssortElements(params) {
                      if(srcCont == dstCont){
                         return DragAndDropSystem.action(dstCont,pos - 1,'replace');
                      }
-
                      return DragAndDropSystem.action(dstCont,pos,'replace');
                   }
                }
+            }else if(dstCont == null){
+               return DragAndDropSystem.action(id,0,'replace');
+            }else if(!zoneIDs.includes(dstCont)){
+               return false
             }
             return true
          },
@@ -67,6 +73,9 @@ function AssortElements(params) {
          let cx = elem.pos.x + w/2;
          let cy = elem.pos.y + h/2;
          let background = (attr.srcCont) ? paper.rect(-w/2,-h/2,w,h).attr(attr.srcCont) : null;
+         if(ghostBackOpacity){
+            background = drawElement(elem,0,0).attr("opacity",ghostBackOpacity);
+         }
          self.dragAndDrop.addContainer({
             ident: id, cx, cy,
             widthPlace : w,
@@ -125,7 +134,7 @@ function AssortElements(params) {
       }
    };
 
-   function drawElement(elem,cx,cy) {
+   function defaultDrawElement(elem,cx,cy) {
       let w = elemW, h = elemH;
       let x = cx - w/2;
       let y = cy - h/2;
