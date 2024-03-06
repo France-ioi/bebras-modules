@@ -2325,13 +2325,13 @@ var getContext = function(display, infos) {
          })();
       }
    }
-
+/*
    context.customConstants = { processing: [] };
    for (var constName in strings.constant) {
       context.customConstants.processing.push({ name: constName, value: context.processing.internalInstance[constName] });
    }
 
-
+*/
    context.docGenerator = {
 
       variants_cache: null,
