@@ -959,6 +959,7 @@ function VertexDragAndConnect(settings) {
    }
 
    this.startHandler = function(x, y, event) { 
+      // console.log("startHandler")
       if(self.unselectAllEdges){
          self.unselectAllEdges();
       }
@@ -2827,11 +2828,13 @@ function GraphEditor(settings) {
       });
    };
 
-   this.writeContent = function(id) {
+   this.writeContent = function(id,cont) {
       // console.log(id);
       var info = graph.getVertexInfo(id);
       var oldContent = info.content || "";
       var newContent = (self.textEditor) ? self.textEditor.val().trim() : "";
+      if(cont)
+         newContent = cont;
 
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldContent !== newContent){

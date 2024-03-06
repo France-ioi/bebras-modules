@@ -384,9 +384,10 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var h = boxSize.h;
          var x = pos.x - w/2;
          var y = pos.y - h/2;
+         var labelShiftX = visualInfo.labelShiftX || 0;
          var labelHeight = 2*vertexLabelAttr["font-size"];
          var node = this.paper.rect(x,y,w,h).attr(this.rectAttr);
-         var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(vertexLabelAttr);
+         var labelRaph = this.paper.text(pos.x + labelShiftX, y + labelHeight/2, label).attr(vertexLabelAttr);
          var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.boxLineAttr);
          var textAlign = this.vertexContentAttr["text-anchor"] || "middle";
          switch(textAlign){

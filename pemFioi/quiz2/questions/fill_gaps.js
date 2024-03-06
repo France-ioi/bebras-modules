@@ -29,6 +29,7 @@
             words_order[text] = i;
             el.draggable({
                 scope: uid,
+                scroll: false,
                 revert: 'invalid',
                 revertDuration: 200,
                 zIndex: 100
@@ -131,6 +132,8 @@
 
 
             displayFeedback: function(feedback) {
+                feedback.partial && Quiz.common.toggleAlertMessage(parent, lang.translate("wrong_partial"), 'error');
+
                 var correct = feedback.mistakes.length == 0;
                 if((Quiz.params.show_solutions == 'all') || (Quiz.params.show_solutions == 'correct_only' && correct)) {
                     parent.find('solution').show();

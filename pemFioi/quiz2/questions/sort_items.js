@@ -77,6 +77,8 @@
 
 
             displayFeedback: function(feedback) {
+                feedback.partial && Quiz.common.toggleAlertMessage(parent, lang.translate("wrong_partial"), 'error');
+
                 var validAnswer = true;
                 for(var mist of feedback.mistakes){
                     if(mist != null){

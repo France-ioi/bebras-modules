@@ -3657,7 +3657,7 @@ var getContext = function (display, infos, curLevel) {
         if (area < 218700)
         {
             context.compactLayout = true;
-        }
+        }        
 
         if (context.sensorDivisions) {
             context.sensorDivisions.remove();
@@ -3801,6 +3801,9 @@ var getContext = function (display, infos, curLevel) {
                 geometry = squareSize(paper.width, paper.height, nSensors, 2);
             else
                 geometry = squareSize(paper.width, paper.height, nSensors, 1);
+            
+            // console.log(geometry)
+            var cellW = paper.width / geometry.rows;
 
             context.sensorSize = geometry.size * .10;
 
@@ -3822,7 +3825,7 @@ var getContext = function (display, infos, curLevel) {
                 });
 
                 for (var row = 0; row < geometry.rows; row++) {
-                    var x = paper.width / geometry.rows * row;
+                    var x = cellW * row;
                     var y1 = y + geometry.size / 4;
                     var y2 = y + geometry.size * 3 / 4;
                     var cells = 1;
@@ -3902,8 +3905,9 @@ var getContext = function (display, infos, curLevel) {
                         sensor.drawInfo = {
                                 x: x,
                                 y: y,
-                                width: (paper.width / geometry.rows) * cells,
-                                height: geometry.size
+                                width: cellW * cells,
+                                height: geometry.size,
+                                // cellW: cellW
                         }
 
                         drawSensor(sensor);
@@ -6487,6 +6491,13 @@ var getContext = function (display, infos, curLevel) {
             state1y = imgy; 
             stateanchor = 'start';
         }
+        if(sensor.type == "buzzer"){
+            var sizeRatio = imgw/sensor.drawInfo.width;
+            if(sizeRatio > 0.75){
+                imgw = 0.75*sensor.drawInfo.width;
+                imgh = imgw;
+            }
+        }
 
 
         var portx = state1x;
@@ -6504,6 +6515,9 @@ var getContext = function (display, infos, curLevel) {
             var statesize = sensor.drawInfo.height * 0.10;
 
         var namesize = sensor.drawInfo.height * 0.15;
+        
+        var maxNameSize = 25;
+        var maxStateSize = 20;
 
         
 
@@ -6512,17 +6526,18 @@ var getContext = function (display, infos, curLevel) {
 
         drawPortText = false;
 
-        if (!sensor.focusrect || isElementRemoved(sensor.focusrect))
+        if (!sensor.focusrect || isElementRemoved(sensor.focusrect)){
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
+        }
 
         sensor.focusrect.attr({
-                "fill": "468DDF",
-                "fill-opacity": 0,
-                "opacity": 0,
-                "x": imgx,
-                "y": imgy,
-                "width": imgw,
-                "height": imgh,
+            "fill": "468DDF",
+            "fill-opacity": 0,
+            "opacity": 0,
+            "x": imgx,
+            "y": imgy,
+            "width": imgw,
+            "height": imgh,
         });
 
         if (context.autoGrading) {
@@ -6551,6 +6566,9 @@ var getContext = function (display, infos, curLevel) {
             namesize = portsize;
             nameanchor = "start";
         }
+        namesize = Math.min(namesize,maxNameSize);
+        statesize = Math.min(statesize,maxStateSize);
+
 
 
         if (sensor.type == "led") {
@@ -6635,8 +6653,7 @@ var getContext = function (display, infos, curLevel) {
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
 
-        } else if (sensor.type == "buzzer") {           
-
+        } else if (sensor.type == "buzzer") { 
             if(typeof sensor.state == 'number' &&
                sensor.state != 0 &&
                sensor.state != 1) {
@@ -6653,10 +6670,11 @@ var getContext = function (display, infos, curLevel) {
                 }
                 
 
-                var muteBtnSize = sensor.drawInfo.width * 0.15;
+                // var muteBtnSize = sensor.drawInfo.width * 0.15;
+                var muteBtnSize = imgw * 0.3;
                 sensor.muteBtn = paper.text(
-                    imgx + imgw, 
-                    imgy + (imgh / 2), 
+                    imgx + imgw*0.8, 
+                    imgy + imgh*0.8, 
                     buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028"
                 );
                 sensor.muteBtn.node.style.fontWeight = "bold";           
@@ -6667,8 +6685,11 @@ var getContext = function (display, infos, curLevel) {
                     "font-size": muteBtnSize + "px",                
                     fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
                     "font-family": '"Font Awesome 5 Free"',
-                    'text-anchor': 'start'
-                });            
+                    'text-anchor': 'start',
+                    "cursor": "pointer"
+                });     
+                var bbox = sensor.muteBtn.getBBox();
+
                 sensor.muteBtn.click(function () {
                     if(buzzerSound.isMuted(sensor.name)) {
                         buzzerSound.unmute(sensor.name)
@@ -6677,6 +6698,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                     drawSensor(sensor);
                 });
+                sensor.muteBtn.toFront();
             }            
 
 
@@ -8271,6 +8293,14 @@ var getContext = function (display, infos, curLevel) {
                 sensor.nameText = paper.text(namex, namey, sensor.name );
                 sensor.nameText.attr({ "font-size": namesize + "px", 'text-anchor': nameanchor, fill: "#7B7B7B" });
                 sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+                var bbox = sensor.nameText.getBBox();
+                if(bbox.width > sensor.drawInfo.width - 20){
+                    namesize = namesize*(sensor.drawInfo.width - 20)/bbox.width;
+                    namey += namesize*(1 - (sensor.drawInfo.width - 20)/bbox.width);
+                    sensor.nameText.attr({ 
+                        "font-size":namesize,
+                        y: namey });
+                }
             }
         }
 
@@ -8278,6 +8308,8 @@ var getContext = function (display, infos, curLevel) {
         if (!donotmovefocusrect) {
             // This needs to be in front of everything
             sensor.focusrect.toFront();
+            if(sensor.muteBtn)
+                sensor.muteBtn.toFront();
         }
 
         saveSensorStateIfNotRunning(sensor);
@@ -10652,6 +10684,9 @@ function hideSlider(sensor) {
     }
 
 
-    if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas)
+    if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas){
         sensor.focusrect.toFront();
+        if(sensor.muteBtn)
+            sensor.muteBtn.toFront();
+    }
 };
