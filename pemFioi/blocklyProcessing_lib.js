@@ -1461,7 +1461,6 @@ var getContext = function(display, infos) {
       context.waitDelay(callback, buffer.pixels().toArray());
    };
 
-
    context.customBlocks = {
       processing: {
          environment: [
@@ -2252,6 +2251,12 @@ var getContext = function(display, infos) {
          ]
       }
    };
+
+   if(context.infos.includeBlocks.customBlocks) {
+      for(var lib in context.infos.includeBlocks.customBlocks) {
+         context.customBlocks.processing[lib] = context.customBlocks.processing[lib].concat(context.infos.includeBlocks.customBlocks[lib]);
+      }
+   }
 
    var typeData = {
       'Number': { bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
