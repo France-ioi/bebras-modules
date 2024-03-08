@@ -725,6 +725,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          hideInitialDrawing: "Cacher le motif de départ",
+         exportAsSvg: "Exporter en SVG",
          messages: {
             redCoveredGreenNotCovered: "Vous avez bien recouvert tout le rouge sans toucher au vert.",
             redNotCovered: "Recouvrez bien toute la partie rouge.",
@@ -1141,6 +1142,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Program",
          hideInitialDrawing: "Hide initial drawing",
+         exportAsSvg: "Export to SVG",
          messages: {
              // google translate :)
             redCoveredGreenNotCovered: "You covered all the red without touching the green.",
@@ -1339,6 +1341,14 @@ var getContext = function(display, infos) {
          });
       }
 
+      if (infos.buttonExportAsSvg) {
+        var exportButton = $('<button id="exportAsSvg" style="margin-top: 10px">' + strings.exportAsSvg + '</button>');
+        $('#grid').append(exportButton);
+        $('#exportAsSvg').click(function(e) {
+          context.exportAsSvg();
+        });
+      }
+
       context.processing.previewInstance = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
             processing.size(
@@ -1412,8 +1422,59 @@ var getContext = function(display, infos) {
       }
    };
 
+   context.exportAsSvg = function () {
+     if (!window.C2S) {
+       alert("The library canvas2svg is not loaded");
+       return;
+     }
 
+     // Canvas2SVG library is loaded, we create the SVG at the same time
+     var canvasContext = new window.C2S(
+       context.processing.getCanvasSize(constants.SCALED).width,
+       context.processing.getCanvasSize(constants.SCALED).height
+     );
 
+     var canvas = document.createElement('canvas');
+     canvas.getContext = function () {
+       return canvasContext;
+     };
+
+     var processingInstance = new Processing(canvas, function(processing) {
+       processing.setup = function() {
+         processing.size(
+           context.processing.getCanvasSize(constants.SCALED).width,
+           context.processing.getCanvasSize(constants.SCALED).height,
+           infos['processing3D'] ? processing.P3D : processing.P2D
+         );
+         processing.background(constants.BACKGROUND);
+         processing.noLoop();
+       };
+       processing.draw = function() {
+         initGraphics(processing);
+         if (!infos['processing3D']) {
+           processing.pushStyle();
+         }
+         drawOps(processing);
+         if (!infos['processing3D']) {
+           processing.popStyle();
+         }
+       };
+     });
+
+     processingInstance.redraw();
+
+     var svg = canvasContext.getSvg();
+
+     var svgData = svg.outerHTML;
+     var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+     var svgUrl = URL.createObjectURL(svgBlob);
+     var downloadLink = document.createElement("a");
+     downloadLink.href = svgUrl;
+     downloadLink.download = "processing.svg";
+     document.body.appendChild(downloadLink);
+     downloadLink.click();
+     document.body.removeChild(downloadLink);
+   };
 
 
    function drawOnBuffer(mode) {
