@@ -35,6 +35,7 @@ var importableModules = function () {
       'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
       'static-task': {src: modulesPath+"/pemFioi/static-task.js"},
       'fonts-loader-1.0': {src: modulesPath+"/pemFioi/fontsLoader-1.0.js", id: "fonts-loader"},
+      'canvas2svg': { src: modulesPath + "/ext/canvas2svg/canvas2svg.js", id: "canvas2svg" },
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'acorn-walk': {src: modulesPath+"/ext/acorn/walk.js", id: "acorn-walk"},
