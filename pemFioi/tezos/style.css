@@ -214,6 +214,13 @@ html {
    padding: 10px;
    overflow: auto;
 }
+.view#view_contract #content1 {
+   background: lightgrey;
+   flex-shrink: 1;
+}
+.view#view_contract #content2 {
+   flex-shrink: 2;
+}
 .view#view_contract .storage_line {
    padding: 0 20px;
    margin: 5px 0;

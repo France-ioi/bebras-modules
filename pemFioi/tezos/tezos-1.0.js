@@ -15,6 +15,7 @@ const taskStrings = {
    newAccount: "New Account",
    newTransaction: "New Transaction",
    nextBlock: "Next Block",
+   nextXBlocks: "Next X Blocks",
    alias: "Alias",
    publicKey: "Public key",
    privateKey: "Private key",
@@ -52,6 +53,10 @@ const taskStrings = {
    subTransactions: "Sub-transactions",
    operator: "operator",
    source: "source",
+   randomNumber: "random number",
+   hash: "hash",
+   nbBlocks: "Number of blocks",
+   timeShift: "Time shift",
 
    error: "Error",
    maxAccounts: "Vous ne pouvez pas créer d'autre compte.",
@@ -67,7 +72,9 @@ const taskStrings = {
    wrongAdditionalFee: "The additional fee must be a positive number",
    amountWrongFormat: "Le format du montant de tez est incorrect.",
    amountUnwanted: "Le transfert de tez est rejeté par cet entrypoint.",
+   amountWrongValue: "Le montant doit être égal à la somme de la mise et du dépôt.",
    wrongNbOfTokens: "Le nombre de jetons doit être un nombre entier positif.",
+   wrongNumber: "Le nombre aléatoire doit être un nombre entier positif.",
    amountTooHigh: function(ba) {
       return "Le solde du compte émetteur est insuffisant. (Solde actuel = "+Number.parseFloat(ba)+" tez)"
    },
@@ -129,8 +136,18 @@ function roundTezAmount(val) {
    return Math.round(val*Math.pow(10,6))/Math.pow(10,6)
 };
 
-function addressEllipsis(address) {
-   return address+("...")
+function addressEllipsis(address,nbChar,alias) {
+   let str = "";
+   if(nbChar){
+      str = address.substring(0,nbChar);
+   }else{
+      str = address;
+   }
+   str += "...";
+   if(alias){
+      str += " ("+alias+")"
+   }
+   return str
 };
 
 
@@ -161,6 +178,7 @@ class SmartContract {
    }
 
    display() {
+      let self = this;
       // console.log(this)
       displayError("");
 
@@ -198,7 +216,8 @@ class SmartContract {
          for(let key in self.storage){
             let type = self.storage[key].type;
             if(type != "big-map"){
-               html1 += "<p class='storage_line line'><span class=label>"+key+":</span> "+self.storage[key].val+"</p>";
+               // html1 += "<p class='storage_line line'><span class=label>"+key+":</span> "+self.storage[key].val+"</p>";
+               html1 += "<p class='storage_line line'>"+getStorageLine(type,key,self.storage[key].val)+"</p>";
             }else{
                html1 += getBigMapHTML(key,self.storage,0);
             }
@@ -237,11 +256,24 @@ class SmartContract {
                if(obj[k].type == "big-map"){
                   html += getBigMapHTML(k,obj,level + 1);
                }else{
-                  html += "<p class='storage_line level_"+(level + 1)+"'><span class=label>"+k+":</span> "+obj[k].val+"</p>";
+                  // html += "<p class='storage_line level_"+(level + 1)+"'><span class=label>"+k+":</span> "+obj[k].val+"</p>";
+                  html += "<p class='storage_line level_"+(level + 1)+"'>"+getStorageLine(obj[k].type,k,obj[k].val)+"</p>";
                }
             }
             return html
          }
+
+         function getStorageLine(type,key,val) {
+            let str = val;
+            if(type == "timestamp"){
+               let date = new Date(val);
+               str = date.toLocaleString();
+            }else if(type == "address"){
+               let alias = self.tezos.objectsPerAddress[val].alias;
+               str = addressEllipsis(val,7,alias);
+            }
+            return "<span class=label>"+key+":</span> "+str
+         };
       }
 
       function clickEntrypoint(id,self) {
@@ -914,6 +946,7 @@ class Raffle extends SmartContract {
          "bid": { 
             text: "<span class=ep_name>bid(hash):</span><ul>"+
                "<li>check that amount == bid_amount + deposit_amount</li>"+
+               "<li>check that now < deadline_commit</li>"+
                "<li>set players[nb_players] = { address: sender, hash, revealed: false }</li>"+
                "<li>nb_players++</li>"+
                "<li>total_bids += bid_amount</li>"+
@@ -953,28 +986,244 @@ class Raffle extends SmartContract {
       //    }
       // };       
       params.storage = {
-         bid_amount: { val: 0, type: "nat" },
-         deposit_amount: { val: 0, type: "nat" },
+         bid_amount: { val: params.bid_amount, type: "nat" },
+         deposit_amount: { val: params.deposit_amount, type: "nat" },
          players: { type: "big-map" },
-         nb_players: { type: "big-map" },
-         total_bids: { val: 0, val: "nat" },
-         total_deposits: { val: 0, val: "nat" },
-         total: { val: 0, val: "nat" },
-         nb_revealed: { val: 0, val: "nat" }
+         nb_players: { val: 0, type: "nat" },
+         total_bids: { val: 0, type: "tez" },
+         total_deposits: { val: 0, type: "tez" },
+         total: { val: 0, type: "nat" },
+         nb_revealed: { val: 0, type: "nat" },
+         deadline_commit: { type: "timestamp" },
+         deadline_reveal: { type: "timestamp" }
       };
+      let now = Date.now();
+      let dc = params.delayCommit || 1000;
+      let dr = params.delayReveal || 2000;
+      params.storage.deadline_commit.val = now + dc*1000;
+      params.storage.deadline_reveal.val = now + dr*1000;
       super(params);
+   }
+
+   bid() {
+      let params = { 
+         id: "bid",
+         sc_address: this.address,
+         fields: ["hash"],
+         gas: "computeTransactionGas",
+         storage: "computeTransactionStorage",
+         storageChange: "getStorageChange",
+         isTransactionValid: "isTransactionValid",
+         findTransactionError: "findTransactionError",
+      };
+      this.tezos.newTransaction = undefined;
+      this.tezos.createNewTransaction(params)();
+   }
+
+   applyTransaction(trans) {
+      let id = trans.params.id;
+      let sID = trans.sender;
+      let sAcc = this.tezos.objectsPerAddress[sID];
+      if(id == "bid"){
+         let player = { 
+            type: "big-map", 
+            address: { val:sAcc.address, type: "address" },
+            hash: { val: trans.hash, type: "string" },
+            revealed: { val: 0, type: "nat" }
+         };
+         this.storage.players[this.storage.nb_players.val] = player;
+         this.storage.nb_players.val++;
+         let ba = this.storage.bid_amount.val;
+         let da = this.storage.deposit_amount.val;
+         this.storage.total_bids.val += ba;
+         this.storage.total_deposits.val += da;
+         // this.balance += ba + da;
+      }
+      // else if(id == "sell_tokens"){
+      //    let nb = trans.nbTokensSold;
+      //    let amo = this.getAmountOfTezBought(nb);
+      //    // console.log(nb,amo,sAcc.balance)
+      //    sAcc.balance += amo;
+      //    sAcc.balance = roundTezAmount(sAcc.balance);
+      //    this.balance -= amo;
+      //    // console.log(nb,amo,sAcc.balance)
+      //    this.storage.tokens_owned.val += nb;
+      // }
+      // this.tezos.ledger.applyTransaction(trans.subTransactions[0]);
+   }
+
+   createBidTransaction(address,num) {
+      let params = { 
+         id: "bid",
+         sc_address: this.address,
+         fields: ["hash"],
+         gas: "computeTransactionGas",
+         storage: "computeTransactionStorage",
+         storageChange: "getStorageChange",
+         isTransactionValid: "isTransactionValid",
+         findTransactionError: "findTransactionError",
+      };
+      let trans = {
+         sender: address,
+         recipient: this.address,
+         amount: this.storage.bid_amount.val + this.storage.deposit_amount.val,
+         randomNumber: num,
+         hash: String(num).hashCode(),
+         params
+      };
+      this.tezos.computeGasAndStorage(trans);
+      this.tezos.signTransaction(trans,true);
+      this.tezos.createTransaction(trans);
+   }
+
+   computeTransactionGas() {
+      let gas = Math.round(this.tezos.defaultGasPerTransaction*1.5);
+      return gas
+   }
+
+   computeTransactionStorage(trans) {
+      let tr = trans || this.tezos.newTransaction;
+      let id = tr.params.id;
+      let blob;
+      if(id == "bid"){
+         blob = new Blob([tr.sender+""+tr.hash]);
+      }
+      let sto = blob.size;
+
+      return sto
+   }
+
+   getStorageChange(trans) {
+      let tr = trans || this.tezos.newTransaction;
+      let id = tr.params.id;
+      let text = "";
+      if(id == "bid"){
+         text += "- set players["+this.storage.nb_players.val+"] = { address, hash, revealed: 0 }";
+         text += "</br>";
+         text += "- nb_players++";
+         text += "</br>";
+         text += "- total_bids += "+this.storage.bid_amount.val;
+         text += "</br>";
+         text += "- total_deposits += "+this.storage.deposit_amount.val;
+      }
+      return text
+   }
+
+   isTransactionValid(trans) {
+      // console.log(trans)
+      let dat = trans || this.tezos.newTransaction;
+      let id = dat.params.id;
+      // console.log(dat)
+      if(dat.sender === ""){
+         $("#select_sender").addClass("highlight");
+         return taskStrings.noSender
+      }
+      if(isNaN(dat.amount)){
+         $("#amount").addClass("highlight");
+         return taskStrings.amountWrongFormat
+      }
+      if(id == "bid"){
+         let num = dat.randomNumber;
+         if(isNaN(num) || num < 0 || !Number.isInteger(num)) {
+            $("#randomNumber").addClass("highlight");
+            return taskStrings.wrongNumber
+         }
+      }
+      
+      return false
+   }
+
+   findTransactionError(trans) {
+      // // console.log(trans)
+      let dat = trans || this.tezos.newTransaction;
+      let id = dat.params.id;
+      // // console.log(dat)
+      
+      if(id == "bid"){
+         let amo = dat.amount;
+         if(amo != this.storage.bid_amount.val + this.storage.deposit_amount.val){
+            return taskStrings.amountWrongValue
+         }
+         let sen = dat.sender;
+         let acc = this.tezos.objectsPerAddress[sen];
+         if(acc.balance < amo){
+            return taskStrings.amountTooHigh(acc.balance)
+         }
+      }
+      // if(dat.params.id == "buy_tokens"){
+      //    if(!dat.amount || isNaN(dat.amount) || dat.amount < 0) {
+      //       if(trans === undefined){
+      //          // $("#amount").addClass("highlight");
+      //       }
+      //       return taskStrings.wrongAmount
+      //    }
+      //    let acc = this.tezos.objectsPerAddress[dat.sender];
+      //    if(acc.balance < dat.amount){
+      //       // $("#amount").addClass("highlight");
+      //       return taskStrings.amountTooHigh(acc.balance)
+      //    }
+
+      //    let nbTok = this.getNbOfTokensBought(dat.amount);
+      //    // console.log(nbTok,dat.minTokensExpected)
+      //    if(nbTok < dat.minTokensExpected){
+      //       // $("#minTokensExpected").addClass("highlight");
+      //       return taskStrings.minTokensExpectedTooHigh
+      //    }
+      //    if(nbTok > this.storage.tokens_owned.val){
+      //       // $("#amount").addClass("highlight");
+      //       return taskStrings.nbOfTokensBoughtTooHigh
+      //    }
+      // }else if(dat.params.id == "sell_tokens"){
+         
+      //    if(dat.amount){
+      //       // $("#amount").addClass("highlight");
+      //       return taskStrings.amountUnwanted
+      //    }
+      //    if(!dat.nbTokensSold || isNaN(dat.nbTokensSold) || dat.nbTokensSold < 0) {
+      //       // $("#nbTokensSold").addClass("highlight");
+      //       return taskStrings.wrongNbOfTokens
+      //    }
+
+      //    let bal = this.tezos.ledger.getUserBalance(dat.sender);
+      //    if(bal < dat.nbTokensSold){
+      //       // $("#nbTokensSold").addClass("highlight");
+      //       return taskStrings.nbOfTokensTooHigh(bal)
+      //    }
+      //    let amo = this.getAmountOfTezBought(dat.nbTokensSold);
+      //    // console.log(nbTok,dat.minTokensExpected)
+      //    if(amo < dat.minTezExpected){
+      //       // $("#minTezExpected").addClass("highlight");
+      //       return taskStrings.minTezExpectedTooHigh
+      //    }
+      //    if(amo > this.balance){
+      //       // $("#nbTokensSold").addClass("highlight");
+      //       return taskStrings.nbOfTezBoughtTooHigh
+      //    }
+      // }
+      // let subID = "transfer_tokens";
+      // let sub = (trans) ? trans.subTransactions[0] : this.getSubtransaction(subID,dat.params.id);
+      // let subError = this.tezos.ledger.findTransactionError(sub);
+      // if(subError){
+      //    return subError
+      // }
+      // // if(!dat.sub && !dat.signature){
+      // //    return taskStrings.signatureMissing
+      // // }
+      
+      return false
    }
 }
 
 
 function Tezos(params) {
    let { accounts, transactions, mempool, mempoolMode, nbCreatedAccounts, 
-      counterEnabled, ledgerEnabled, createAccountEnabled, transactionTableLength,
-      smartContracts, liquidityPools, pageW, pageH, saveAnswer } = params;
+      counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, delayBetweenBlocks,
+      transactionTableLength, smartContracts, liquidityPools, raffles, pageW, pageH, saveAnswer } = params;
    let self = this;
 
    transactionTableLength = transactionTableLength || 7;
    mempoolMode = mempoolMode || "auto"; // "none", "auto", "manual"
+   delayBetweenBlocks = delayBetweenBlocks || 1000;
    
    const marginX = 20;
    const marginY = 20;
@@ -1013,6 +1262,7 @@ function Tezos(params) {
    let nbSmartContracts;
    let fields;
    let copied = null;
+   let timeShift = 0;
 
 
 
@@ -1020,12 +1270,16 @@ function Tezos(params) {
       initMainPage();
       initObjectsPerAddress();
       initHandlers();
-      updateMemPool();
+
       if(transactions.length > 0){
          for(let tr of transactions){
-            createTransaction(tr);
+            self.createTransaction(tr);
          }
       }
+
+      updateMemPool();
+      updateAccountsTable();
+      updateTransactionTable();
 
       let transH = (transactionTableLength + 1)*30;
       let mempoolH = (mempoolLength + 1)*30;
@@ -1107,6 +1361,7 @@ function Tezos(params) {
             }else if(nbCreatedAccounts >= row){
                entry = accounts[row - 1][k];
                if(k == "address")
+                  self.objectsPerAddress[entry] = accounts[row - 1];
                   entry = addressEllipsis(entry);
                if(k == "balance")
                   entry += " tez";
@@ -1143,6 +1398,21 @@ function Tezos(params) {
             self.ledger.changeUserBalance(lp.address,lpData.token_balance,1);
          }
       }
+      if(raffles && raffles.length > 0){
+         for(let lpData of raffles){
+            lpData.tezos = self;
+            let lp = new Raffle(lpData);
+            // lp.setTokenBalance(lpData.token_balance);
+            self.smartContracts.push(lp);
+            self.objectsPerAddress[lp.address] = lp;
+            for(let iP = 0; iP < lpData.playerNumbers.length; iP++){
+               let num = lpData.playerNumbers[iP];
+               let add = accounts[iP].address;
+               lp.createBidTransaction(add,num);
+            }
+         }
+      }
+
       nbSmartContracts = self.smartContracts.length;
 
       let scDiv = $("<div id='smartContractsCont'></div>");
@@ -1179,9 +1449,11 @@ function Tezos(params) {
       if(createAccountEnabled){
          ids.unshift("newAccount");
       }
-      // if(mempoolMode != "none"){
-      ids.push("nextBlock");
-      // }
+      if(nextXBlocksEnabled){
+         ids.push("nextXBlocks");
+      }else{
+         ids.push("nextBlock");
+      }
       for(let iB = 0; iB < ids.length; iB++){
          buttons.append("<button type=button id="+ids[iB]+">"+taskStrings[ids[iB]]+"</button>");
       } 
@@ -1190,7 +1462,7 @@ function Tezos(params) {
 
    function initObjectsPerAddress() {
       for(let acc of self.accounts){
-         self.objectsPerAddress[acc.address] = acc;
+         // self.objectsPerAddress[acc.address] = acc;
       }
       for(let sc of self.smartContracts){
          // self.objectsPerAddress[sc.address] = sc;
@@ -1218,7 +1490,10 @@ function Tezos(params) {
       $("#newTransaction").css("cursor","pointer");  
 
       $("#nextBlock").on("click",createNextBlock);
-      $("#nextBlock").css("cursor","pointer");   
+      $("#nextBlock").css("cursor","pointer"); 
+
+      $("#nextXBlocks").on("click",createNextXBlocks);
+      $("#nextXBlocks").css("cursor","pointer");   
    };
 
    function clickMemPool(row) {
@@ -1310,7 +1585,7 @@ function Tezos(params) {
          if(type == 1){
             err = findTransactionError();
             if(!err){
-               computeGasAndStorage();
+               self.computeGasAndStorage(trans);
             }
          }
 
@@ -1374,24 +1649,24 @@ function Tezos(params) {
             return error
          }
 
-         function computeGasAndStorage() {
-            if(!params.simple){
-               let sc = self.objectsPerAddress[params.sc_address];
-               self.newTransaction.storage = sc[params.storage]();
-               self.newTransaction.storageChange = sc[params.storageChange]();
-            }
+         // function computeGasAndStorage() {
+         //    if(!params.simple){
+         //       let sc = self.objectsPerAddress[params.sc_address];
+         //       self.newTransaction.storage = sc[params.storage]();
+         //       self.newTransaction.storageChange = sc[params.storageChange]();
+         //    }
 
-            let fee, gas;
-            if(params.simple){
-               gas = self.defaultGasPerTransaction;
-            }else{
-               let sc = self.objectsPerAddress[params.sc_address];
-               gas = sc[params.gas]();  
-            }
-            self.newTransaction.gas = gas;
-            fee = roundTezAmount(gas*gasCostPerUnit + feeConstant);
-            self.newTransaction.bakerFee = fee;
-         };
+         //    let fee, gas;
+         //    if(params.simple){
+         //       gas = self.defaultGasPerTransaction;
+         //    }else{
+         //       let sc = self.objectsPerAddress[params.sc_address];
+         //       gas = sc[params.gas]();  
+         //    }
+         //    self.newTransaction.gas = gas;
+         //    fee = roundTezAmount(gas*gasCostPerUnit + feeConstant);
+         //    self.newTransaction.bakerFee = fee;
+         // };
 
          function displayTransaction() {
             let cont = $("<div id=view_transaction class=view></div>");
@@ -1491,6 +1766,7 @@ function Tezos(params) {
                case "nbTokensSold":
                case "minTokensExpected":
                case "minTezExpected":
+               case "hash":
                   html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+dat[key]+"</p>";
                   break;
                case "subTransactions":
@@ -1578,7 +1854,7 @@ function Tezos(params) {
 
          function validateTransaction() {
             if(!self.newTransaction.signature){
-               let err = signTransaction();
+               let err = self.signTransaction();
                if(err){
                   displayError(err);
                }else{
@@ -1602,27 +1878,65 @@ function Tezos(params) {
             }
             $("#additionalFee").val(self.additionalFee);
             self.newTransaction.bakerFee += self.additionalFee;
-            createTransaction();
+            self.createTransaction();
             deleteView()();
          };
 
-         function signTransaction() {
-            displayError("");
-
-            let sen = self.newTransaction.sender;
-            let acc = self.objectsPerAddress[sen];
-            // console.log("sign",acc)
-            if(acc.owner != 0){
-               return taskStrings.cantSign
-            }
-            let clone = Beav.Object.clone(self.newTransaction);
-            delete clone.storageChange;
-            delete clone.subTransactions;
-            delete clone.bakerFee;
-            self.newTransaction.signature = JSON.stringify(clone).hashCode();
-            return false
-         };
+         // function signTransaction(trans) {
+         //    displayError("");
+         //    let tr = trans || self.newTransaction;
+         //    let sen = tr.sender;
+         //    let acc = self.objectsPerAddress[sen];
+         //    // console.log("sign",acc)
+         //    if(acc.owner != 0){
+         //       return taskStrings.cantSign
+         //    }
+         //    let clone = Beav.Object.clone(tr);
+         //    delete clone.storageChange;
+         //    delete clone.subTransactions;
+         //    delete clone.bakerFee;
+         //    tr.signature = JSON.stringify(clone).hashCode();
+         //    return false
+         // };
       }
+   };
+
+   this.signTransaction = function(trans,noOwner) {
+      displayError("");
+      let tr = trans || self.newTransaction;
+      let sen = tr.sender;
+      let acc = self.objectsPerAddress[sen];
+      // console.log("sign",acc)
+      if(!noOwner && acc.owner != 0){
+         return taskStrings.cantSign
+      }
+      let clone = Beav.Object.clone(tr);
+      delete clone.storageChange;
+      delete clone.subTransactions;
+      delete clone.bakerFee;
+      tr.signature = JSON.stringify(clone).hashCode();
+      return false
+   };
+
+   this.computeGasAndStorage = function(trans) {
+      let tr = trans || self.newTransaction;
+      let params = tr.params;
+      if(!params.simple){
+         let sc = self.objectsPerAddress[params.sc_address];
+         tr.storage = sc[params.storage](tr);
+         tr.storageChange = sc[params.storageChange](tr);
+      }
+
+      let fee, gas;
+      if(params.simple){
+         gas = self.defaultGasPerTransaction;
+      }else{
+         let sc = self.objectsPerAddress[params.sc_address];
+         gas = sc[params.gas]();  
+      }
+      tr.gas = gas;
+      fee = roundTezAmount(gas*gasCostPerUnit + feeConstant);
+      tr.bakerFee = fee;
    };
 
    function createNewAccount() {
@@ -1713,8 +2027,11 @@ function Tezos(params) {
                   html += "</div>";
                   continue;
                }
-
-               html += "<p class=field>"+name;
+               if(field == "hash"){
+                  html += "<p class=field>"+taskStrings.randomNumber;
+               }else{
+                  html += "<p class=field>"+name;
+               }
                switch(field){
                case "sender":
                case "recipient":
@@ -1766,6 +2083,13 @@ function Tezos(params) {
                   let sig = (self.newTransaction[field]) ? addressEllipsis(self.newTransaction[field]) : taskStrings.notSigned;
                   html += "<span id=signature>"+sig+"</span>";
                   break;
+               case "hash":
+                  let num = self.newTransaction.randomNumber || 0;
+                  self.newTransaction.randomNumber = num;
+                  html += "<input type=text id=randomNumber class=input value="+num+" /></p>";
+                  html += "<p class=field>"+name+"<span id=hash>"+updateHash(num)+"</span>";
+                  break;
+
                // case "bakerFee":
                //    let fee, gas;
                //    if(params.simple){
@@ -1814,7 +2138,7 @@ function Tezos(params) {
             // console.log(self.newTransaction)
          });
 
-         $("#amount, #nbOfTokens, #nbTokensSold, #minTokensExpected, #minTezExpected, #counter").on("keyup",function() {
+         $("#amount, #nbOfTokens, #nbTokensSold, #minTokensExpected, #minTezExpected, #counter, #randomNumber").on("keyup",function() {
             displayError("");
             if(isNaN(this.value)){
                $(this).addClass("highlight");
@@ -1825,6 +2149,8 @@ function Tezos(params) {
             let val = Number(this.value);
             if(id == "amount" || id == "minTezExpected")
                val = roundTezAmount(val);
+            if(id == "randomNumber")
+               updateHash(val);
             if(self.newTransaction[id] != val){
                self.newTransaction[id] = val;
                delete self.newTransaction.signature
@@ -1843,6 +2169,13 @@ function Tezos(params) {
 
          $("#cancel").on("click",deleteView());
          $("#cancel").css("cursor","pointer");
+      };
+
+      function updateHash(val) {
+         var h = String(val).hashCode();
+         $("#hash").text(h);
+         self.newTransaction.hash = h;
+         return h
       };
 
       function simulate() {
@@ -1968,7 +2301,7 @@ function Tezos(params) {
       }
    };
 
-   function createTransaction(trans) {
+   this.createTransaction = function(trans) {
       let tr = trans || self.newTransaction;
       let id = self.transactions.length; 
       self.transactions[id] = Beav.Object.clone(tr);
@@ -2003,10 +2336,10 @@ function Tezos(params) {
       let gas = trans.gas;
       let sto = trans.storage;
       let par = trans.params;
-      if(par.simple){
-         self.objectsPerAddress[sID].balance -= (amo + fee + gas*gasCostPerUnit + sto*storageCostPerUnit);
-         self.objectsPerAddress[rID].balance += amo;
-      }else{
+      self.objectsPerAddress[sID].balance -= (amo + fee + gas*gasCostPerUnit + sto*storageCostPerUnit);
+      self.objectsPerAddress[rID].balance += amo;
+      if(!par.simple){
+         // console.log(trans)
          let sc = self.objectsPerAddress[rID];
          sc.applyTransaction(trans);
       }
@@ -2072,7 +2405,7 @@ function Tezos(params) {
       }
       let block = {
          id: self.blockIndex,
-         timestamp: Date.now(),
+         timestamp: Date.now() + timeShift*1000,
          transactions: blockTrans
       };
       self.blockIndex++;
@@ -2109,6 +2442,26 @@ function Tezos(params) {
          
          return true
       };
+   };
+
+   function createNextXBlocks() {
+      displayError("");
+      let view = $("<div id=simView></div>");
+      let back = $("<div id=simBack></div>");
+      let dis = displayNextXBlocks();
+      view.append(back,dis);
+      $("#mainPage").append(view);
+
+      function displayNextXBlocks() {
+         let cont = $("<div id=view_transaction class=view></div>");
+         let header = $("<div id=header>"+taskStrings.nextXBlocks+"<img src="+self.crossSrc+" class=icon /></div>");
+         let content = $("<div id=content></div>");
+         let html = "<p class=field><span class=label>"+taskStrings.nbBlocks+"</span> <input type=number id=nbBlocks class=input value=1 min=1 /></p>";
+         html += "<p class=field><span class=label>"+taskStrings.timeShift+"</span> <span id=timeShift ></span></p>";
+         content.append(html);
+         cont.append(header,content);
+         return cont
+      }
    };
 
    function updateAccountsTable() {
