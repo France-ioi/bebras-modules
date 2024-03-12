@@ -36,8 +36,15 @@ html {
 #mainPage th {
    background: var(--header-col);
 }
+#transaction_table {
+   position: relative;
+}
 #transaction_table_cont {
    overflow-y: auto;
+}
+#transaction_table_cont_clone {
+   position: absolute;
+   top: 50px;
 }
 #transaction_table .block_header .timestamp {
    margin-left: 20px;
@@ -209,6 +216,7 @@ html {
    border: solid black 1px;
    display: flex;
    padding: 0;
+/*   max-height: 100%;*/
 }
 .view#view_contract #content > * {
    padding: 10px;
