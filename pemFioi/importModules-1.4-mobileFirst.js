@@ -142,6 +142,9 @@
          'codecast7.4_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.4/index.css", id: "codecast7.4_css"},
          'codecast7.4_js': {src: modulesPath+"/ext/codecast/7.4/index.js", id: "codecast7.4_js"},
          'codecast7.4_loader': {src: modulesPath+"/ext/codecast/7.4/codecast-loader.js", id: "codecast7.4_loader"},
+         'codecast_html_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/html/index.css", id: "codecast_html_css"},
+         'codecast_html_js': {src: modulesPath+"/ext/codecast/html/index.js", id: "codecast_html_js"},
+         'codecast_html_loader': {src: modulesPath+"/ext/codecast/html/codecast-loader.js", id: "codecast_html_loader"},
 
          'smart_contract_config': {src: modulesPath+"/pemFioi/smartContractConfig.js", id: "smart_contract_config"},
 
@@ -338,6 +341,7 @@
          {name: 'codecast-7.2', included: ['codecast7.2_css', 'codecast7.2_js', 'codecast7.2_loader']},
          {name: 'codecast-7.3', included: ['codecast7.3_css', 'codecast7.3_js', 'codecast7.3_loader']},
          {name: 'codecast-7.4', included: ['codecast7.4_css', 'codecast7.4_js', 'codecast7.4_loader']},
+         {name: 'codecast-html', included: ['codecast_html_css', 'codecast_html_js', 'codecast_html_loader']},
          {name: 'smart-contract', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'codecast-7.3', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0', 'platform-pr', 'beav-1.0', 'installationAPI.01', 'miniPlatform', 'conceptDisplay-1.0', 'conceptViewer-1.0', 'conceptViewer_css-1.0', 'taskStyles-mobileFirst']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
