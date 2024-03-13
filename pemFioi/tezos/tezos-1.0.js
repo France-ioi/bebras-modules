@@ -82,6 +82,7 @@ const taskStrings = {
    wrongHash: "Le hash ne correspond pas",
    alreadyRevealed: "Ce joueur a déjà révélé son nombre aléatoire",
    winnerNotRevealed: "Le gagnant n'a pas révélé son nombre aléatoire",
+   playerNotRevealed: "Le joueur n'a pas révélé son nombre aléatoire",
    pastDeadlineCommit: "L'échéance pour miser est dépassée",
    pastDeadlineReveal: "L'échéance pour révéler son nombre aléatoire est dépassée",
    beforeDeadlineReveal: "L'échéance pour révéler son nombre aléatoire n'est pas encore dépassée",
@@ -983,12 +984,26 @@ class Raffle extends SmartContract {
                "<li>check that time > deadline_reveal</li>"+
                "<li>idWinner = total%nb_players</li>"+
                "<li>winner = players[idWinner]</li>"+
-               "<li>check that player.revealed = true</li>"+
-               "<li>send player total_bids + total_deposits/nb_revealed</li>"+
-               "<li>delete player</li></ul>",
+               "<li>check that winner.revealed = true</li>"+
+               "<li>send winner total_bids + total_deposits/nb_revealed</li>"+
+               "<li>delete players[idWinner]</li></ul>",
             clickable: true,
             fct: "claimPrize"
-         }  
+         },
+         "claim_deposit": {
+            text: "<span class=ep_name>claim_deposit(id_player):</span><ul>"+
+               "<li>check that time > deadline_reveal</li>"+
+               "<li>idWinner = total%nb_players</li>"+
+               "<li>check that id_player != idWinner</li>"+
+               "<li>player = players[id_player]</li>"+
+               "<li>check that player.revealed = true</li>"+
+               "<li>amountToShare = total_deposits</li>"+
+               "<li>if players[idWinner] && !players[idWinner].revealed, amountToShare += total_bids</li>"+
+               "<li>send player amountToShare/nb_revealed</li>"+
+               "<li>delete player</li></ul>",
+            clickable: true,
+            fct: "claimDeposit"
+         }   
       };
          
       // params.views = {
@@ -1063,11 +1078,26 @@ class Raffle extends SmartContract {
       this.tezos.createNewTransaction(params)();
    }
 
+   claimDeposit() {
+      let params = { 
+         id: "claim_deposit",
+         sc_address: this.address,
+         fields: ["idPlayer"],
+         gas: "computeTransactionGas",
+         storage: "computeTransactionStorage",
+         storageChange: "getStorageChange",
+         isTransactionValid: "isTransactionValid",
+         findTransactionError: "findTransactionError",
+      };
+      this.tezos.newTransaction = undefined;
+      this.tezos.createNewTransaction(params)();
+   }
+
    applyTransaction(trans) {
       let id = trans.params.id;
-      let sID = trans.sender;
-      let sAcc = this.tezos.objectsPerAddress[sID];
       if(id == "bid"){
+         let sID = trans.sender;
+         let sAcc = this.tezos.objectsPerAddress[sID];
          let player = { 
             type: "big-map", 
             address: { val:sAcc.address, type: "address" },
@@ -1090,11 +1120,25 @@ class Raffle extends SmartContract {
          let idWin = this.storage.total.val%this.storage.nb_players.val;
          let win = this.storage.players[idWin];
          let acc = this.tezos.objectsPerAddress[win.address.val];
-         console.log(idWin,win)
+         // console.log(idWin,win)
          let amo = this.storage.total_bids.val + this.storage.total_deposits.val/this.storage.nb_revealed.val;
          acc.balance = roundTezAmount(acc.balance + amo);
          this.balance = roundTezAmount(this.balance - amo);
          delete this.storage.players[idWin];
+      }
+      else if(id == "claim_deposit"){
+         let player = this.storage.players[trans.idPlayer];
+         let amo = this.storage.total_deposits.val;
+         let idWin = this.storage.total.val%this.storage.nb_players.val;
+         let win = this.storage.players[idWin];
+         if(win && win.revealed.val == 0){
+            amo += this.storage.total_bids.val;
+         }
+         amo = amo/this.storage.nb_revealed.val;
+         let acc = this.tezos.objectsPerAddress[player.address.val];
+         acc.balance = roundTezAmount(acc.balance + amo);
+         this.balance = roundTezAmount(this.balance - amo);
+         delete this.storage.players[trans.idPlayer];
       }
    }
 
@@ -1164,7 +1208,7 @@ class Raffle extends SmartContract {
       else if(id == "reveal"){
          blob = new Blob(["1"+(this.storage.total.val + tr.numberValue)+""+(this.storage.nb_revealed.val + 1)]);
       }
-      else if(id == "claim_prize"){
+      else if(id == "claim_prize" || id == "claim_deposit"){
          blob = new Blob([""]);
       }
       let sto = blob.size;
@@ -1192,7 +1236,7 @@ class Raffle extends SmartContract {
          text += "</br>";
          text += "- total += value";
       }
-      else if(id == "claim_prize"){
+      else if(id == "claim_prize" || id == "claim_deposit"){
          text += "- delete players[id_winner]";
       }
       return text
@@ -1228,6 +1272,13 @@ class Raffle extends SmartContract {
          if(isNaN(num) || num < 0 || !Number.isInteger(num)) {
             $("#randomNumber").addClass("highlight");
             return taskStrings.wrongNumber
+         }
+      }
+      else if(id == "claim_deposit"){
+         let p = dat.idPlayer;
+         if(isNaN(p) || p < 0 || !Number.isInteger(p)) {
+            $("#randomNumber").addClass("highlight");
+            return taskStrings.wrongIdPlayer
          }
       }
       
@@ -1289,6 +1340,22 @@ class Raffle extends SmartContract {
          }
          if(win.revealed.val == 0){
             return taskStrings.winnerNotRevealed
+         }
+      }
+      else if(id == "claim_deposit"){
+         let t = this.tezos.getCurrentTime();
+         if(t < this.storage.deadline_reveal.val){
+            return taskStrings.beforeDeadlineReveal
+         }
+         if(dat.amount){
+            return taskStrings.amountUnwanted
+         }
+         let player = this.storage.players[dat.idPlayer];
+         if(!player){
+            return taskStrings.playerUnknown
+         }
+         if(player.revealed.val == 0){
+            return taskStrings.playerNotRevealed
          }
       }
       return false
