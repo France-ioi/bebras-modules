@@ -2506,6 +2506,8 @@ var processingEndConditions = {
          );
       }
 
+      context.success = true;
+
       throw(window.languageStrings.messages.taskCompleted);
    },
 
