@@ -164,6 +164,7 @@ function addressEllipsis(address,nbChar,alias) {
 
 String.prototype.hashCode = function() {
    // stackoverflow
+   // let b = base || 32;
    var hash = 0,
     i, chr;
    if (this.length === 0) return hash;
@@ -172,8 +173,9 @@ String.prototype.hashCode = function() {
       hash = ((hash << 5) - hash) + chr;
       hash |= 0; // Convert to 32bit integer
    }
-   // return hash
-   return (hash*hash).toString(32);
+   return hash
+   // console.log(b)
+   // return (hash*hash).toString(32);
 };
 
 class SmartContract {
@@ -284,6 +286,8 @@ class SmartContract {
             }else if(type == "address"){
                let alias = self.tezos.objectsPerAddress[val].alias;
                str = addressEllipsis(val,7,alias);
+            }else if(type == "bytes"){
+               str = addressEllipsis(val);
             }
             return "<span class=label>"+key+":</span> "+str
          };
@@ -1101,7 +1105,7 @@ class Raffle extends SmartContract {
          let player = { 
             type: "big-map", 
             address: { val:sAcc.address, type: "address" },
-            hash: { val: trans.hash, type: "string" },
+            hash: { val: trans.hash, type: "bytes" },
             revealed: { val: 0, type: "nat" }
          };
          this.storage.players[this.storage.nb_players.val] = player;
@@ -1158,7 +1162,7 @@ class Raffle extends SmartContract {
          recipient: this.address,
          amount: this.storage.bid_amount.val + this.storage.deposit_amount.val,
          randomNumber: num,
-         hash: String(num).hashCode(),
+         hash: this.generateHash(num),
          params
       };
       this.tezos.computeGasAndStorage(trans);
@@ -1191,6 +1195,11 @@ class Raffle extends SmartContract {
          self.tezos.signTransaction(trans,true);
          self.tezos.createTransaction(trans);
       }
+   }
+
+   generateHash(num) {
+      let hash = String(num+"abcdef").hashCode();
+      return hash.toString(16)
    }
 
    computeTransactionGas() {
@@ -1321,7 +1330,8 @@ class Raffle extends SmartContract {
          if(p.revealed.val > 0){
             return taskStrings.alreadyRevealed
          }
-         if(p.hash.val != String(dat.numberValue).hashCode()){
+         // if(p.hash.val != String(dat.numberValue).hashCode()){
+         if(p.hash.val != this.generateHash(dat.numberValue)){
             return taskStrings.wrongHash
          }
       }
@@ -1928,10 +1938,12 @@ function Tezos(params) {
                case "nbTokensSold":
                case "minTokensExpected":
                case "minTezExpected":
-               case "hash":
                case "idPlayer":
                case "numberValue":
                   html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+dat[key]+"</p>";
+                  break;
+               case "hash":
+                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+addressEllipsis(dat[key])+"</p>";
                   break;
                case "subTransactions":
                   html += "<p class=line><span class=label>"+taskStrings.subTransactions+":</span></p>";
@@ -2074,11 +2086,12 @@ function Tezos(params) {
       if(!noOwner && acc.owner != 0){
          return taskStrings.cantSign
       }
-      let clone = Beav.Object.clone(tr);
-      delete clone.storageChange;
-      delete clone.subTransactions;
-      delete clone.bakerFee;
-      tr.signature = JSON.stringify(clone).hashCode();
+      tr.signature = this.generateSignature(tr);
+      // let clone = Beav.Object.clone(tr);
+      // delete clone.storageChange;
+      // delete clone.subTransactions;
+      // delete clone.bakerFee;
+      // tr.signature = JSON.stringify(clone).hashCode();
       return false
    };
 
@@ -2101,6 +2114,16 @@ function Tezos(params) {
       tr.gas = gas;
       fee = roundTezAmount(gas*gasCostPerUnit + feeConstant);
       tr.bakerFee = fee;
+   };
+
+   this.generateSignature = function(tr) {
+      let clone = Beav.Object.clone(tr);
+      delete clone.storageChange;
+      delete clone.subTransactions;
+      delete clone.bakerFee;
+      let hash = JSON.stringify(clone).hashCode();
+      // tr.signature = hash;
+      return (hash*hash).toString(32);
    };
 
    function createNewAccount() {
@@ -2253,7 +2276,7 @@ function Tezos(params) {
                   let num = self.newTransaction.randomNumber || 0;
                   self.newTransaction.randomNumber = num;
                   html += "<input type=text id=randomNumber class=input value="+num+" /></p>";
-                  html += "<p class=field>"+name+"<span id=hash>"+updateHash(num)+"</span>";
+                  html += "<p class=field>"+name+"<span id=hash>"+addressEllipsis(updateHash(num))+"</span>";
                   break;
 
                // case "bakerFee":
@@ -2339,8 +2362,11 @@ function Tezos(params) {
       };
 
       function updateHash(val) {
-         var h = String(val).hashCode();
-         $("#hash").text(h);
+         let sc_address = params.sc_address;
+         let sc = self.objectsPerAddress[sc_address];
+         let h = sc.generateHash(val);
+         // var h = String(val).hashCode();
+         $("#hash").text(addressEllipsis(h));
          self.newTransaction.hash = h;
          return h
       };
