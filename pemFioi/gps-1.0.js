@@ -187,6 +187,12 @@ function GPS(settings) {
          var dR = Beav.Geometry.distance(xMouseGps,yMouseGps,towerData.x,towerData.y) - r0;
          var maxR = Math.max(Math.abs(towerData.x),Math.abs(towerData.x - w),Math.abs(towerData.y),Math.abs(towerData.y - h));
          var newR = Math.min(maxR,Math.max(minR,ri + dR));
+         if(towerData.snapTo){
+            var m = towerData.snapMargin || 10;
+            if(Math.abs(newR - towerData.snapTo) < m)
+               newR = towerData.snapTo;
+         }
+         // console.log(newR,towerData)
          self.towers[id].raphObj[2].attr("r",newR);
          if(continuity){
             self.towers[id].continuityCircles.attr("r",newR);
