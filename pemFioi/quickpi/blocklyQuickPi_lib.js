@@ -371,6 +371,7 @@ var quickPiLocalLanguageStrings = {
             irreceiver: "IR Receiver",
             cloudstore: "Cloud Store",
             addcomponent: "Ajouter un composant",
+            add: "ajouter",
             selectcomponent: "Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.",
             add: "Ajouter",
             builtin: "(builtin)",
@@ -408,12 +409,17 @@ var quickPiLocalLanguageStrings = {
             validate2: "Valider 2",
             validate3: "Valider 3",
 
-            sensorNameBuzzer: "buzzer",
+            // sensorNameBuzzer: "buzzer",
+            sensorNameBuzzer: "buzz",
             sensorNameLed: "led",
-            sensorNameRedLed: "redled",
-            sensorNameGreenLed: "greenled",
-            sensorNameBlueLed: "blueled",
-            sensorNameOrangeLed: "orangeled",
+            // sensorNameRedLed: "redled",
+            sensorNameRedLed: "Rled",
+            // sensorNameGreenLed: "greenled",
+            sensorNameGreenLed: "Gled",
+            // sensorNameBlueLed: "blueled",
+            sensorNameBlueLed: "Bled",
+            // sensorNameOrangeLed: "orangeled",
+            sensorNameOrangeLed: "Oled",
             sensorNameScreen: "screen",
             sensorNameIrTrans: "irtran",
             sensorNameIrRecv: "irrec",
@@ -421,9 +427,11 @@ var quickPiLocalLanguageStrings = {
             sensorNameTemperature: "temp",
             sensorNameGyroscope: "gyroscope",
             sensorNameMagnetometer: "magneto",
-            sensorNameDistance: "distance",
+            // sensorNameDistance: "distance",
+            sensorNameDistance: "dist",
             sensorNameAccelerometer: "accel",
-            sensorNameButton: "button",
+            // sensorNameButton: "button",
+            sensorNameButton: "but",
             sensorNameLight: "light",
             sensorNameStick: "stick",
             sensorNameServo: "servo",
@@ -861,7 +869,8 @@ var quickPiLocalLanguageStrings = {
             validate2: "Validar 2",
             validate3: "Validar 3",
 
-            sensorNameBuzzer: "timbre",
+            // sensorNameBuzzer: "timbre",
+            sensorNameBuzzer: "tim",
             sensorNameLed: "led",
             sensorNameRedLed: "ledrojo",
             sensorNameGreenLed: "ledverde",
@@ -873,7 +882,8 @@ var quickPiLocalLanguageStrings = {
             sensorNameTemperature: "temp",
             sensorNameGyroscope: "gyro",
             sensorNameMagnetometer: "magneto",
-            sensorNameDistance: "distancia",
+            // sensorNameDistance: "distancia",
+            sensorNameDistance: "dist",
             sensorNameAccelerometer: "acel",
             sensorNameButton: "boton",
             sensorNameLight: "luz",
@@ -1327,7 +1337,8 @@ var quickPiLocalLanguageStrings = {
             sensorNameTemperature: "temp",
             sensorNameGyroscope: "gyroscope",
             sensorNameMagnetometer: "magneto",
-            sensorNameDistance: "distance",
+            // sensorNameDistance: "distance",
+            sensorNameDistance: "dist",
             sensorNameAccelerometer: "accel",
             sensorNameButton: "button",
             sensorNameLight: "light",
@@ -1531,6 +1542,10 @@ var buzzerSound = {
             }
         }
     }
+}
+
+var colors = {
+    blue: "#4a90e2",
 }
 
 
@@ -3798,14 +3813,15 @@ var getContext = function (display, infos, curLevel) {
             // TODO : be carefull, the geometry is reversed for cols and rows I think
             var geometry = null;
             if (context.compactLayout)
-                geometry = squareSize(paper.width, paper.height, nSensors, 2);
+                // geometry = squareSize(paper.width, paper.height, nSensors, 2);
+                geometry = squareSize(paper.width, paper.height, nSensors, 1.5);
             else
                 geometry = squareSize(paper.width, paper.height, nSensors, 1);
             
             // console.log(geometry)
             var cellW = paper.width / geometry.rows;
 
-            context.sensorSize = geometry.size * .10;
+            // context.sensorSize = geometry.size * .10;
 
             var iSensor = 0;
 
@@ -3846,17 +3862,22 @@ var getContext = function (display, infos, curLevel) {
                     if (sensor && sensor.type === "screen" && cells > geometry.rows && cells == 3 && geometry.rows == 2)
                         cells = 2;
 
-                    line = paper.path(["M", x,
-                        y1,
-                        "L", x,
-                        y2]);
+                    // line = paper.path(["M", x, y1, "V", y2]);
+                    line = paper.rect(x,y1,1,y2 - y1,1);
                     context.sensorDivisions.push(line);
 
                     line.attr({
+                        stroke: "none",
                         "stroke-width": 1,
-                        "stroke": "lightgrey",
-                        "stroke-linecapstring": "round"
+                        // "stroke": "lightgrey",
+                        "fill": "lightgrey",
+                        // fill: "90-#fff-#000",
+                        // "stroke-linecap": "round"
                     });
+                    // line.attr({
+                    //     stroke: "none",
+                    //     fill: "0-#fff-#f00:20-#000"
+                    // });
 
                     var foundrows = false;
                     var bump = false;
@@ -3898,7 +3919,8 @@ var getContext = function (display, infos, curLevel) {
 
 
                     if (iSensor == infos.quickPiSensors.length && infos.customSensors) {
-                        drawCustomSensorAdder(x, y, geometry.size);
+                        drawCustomSensorAdder(x, y, cellW * cells, geometry.size);
+                        // drawCustomSensorAdder(x, y, geometry.size);
                     } else if (infos.quickPiSensors[iSensor]) {                        
                         row += cells - 1;
 
@@ -3907,7 +3929,6 @@ var getContext = function (display, infos, curLevel) {
                                 y: y,
                                 width: cellW * cells,
                                 height: geometry.size,
-                                // cellW: cellW
                         }
 
                         drawSensor(sensor);
@@ -4750,22 +4771,39 @@ var getContext = function (display, infos, curLevel) {
         return name + (maxvalue + 1);
     }
 
-    function drawCustomSensorAdder(x, y, size) {
+    function drawCustomSensorAdder(x, y, w, h) {
         if (context.sensorAdder) {
             context.sensorAdder.remove();
         }
+        // paper.rect(x,y,size,size)
+        var r = Math.min(w,h)*0.2;
+        var cx = x + w / 2;
+        var cy = y + h*0.4;
+        var plusSize = r*0.8;
+        var x1 = cx - plusSize/2;
+        var x2 = cx + plusSize/2;
+        var y1 = cy - plusSize/2;
+        var y2 = cy + plusSize/2;
+        var yText = y + h - (h/2 - r)/2;
+        var fontsize = h * .70;
 
-        var centerx = x + size / 2;
-        var centery = y + size / 2;
-        var fontsize = size * .70;
-
-        context.sensorAdder = paper.text(centerx, centery, "+");
-
-        context.sensorAdder.attr({
-            "font-size": fontsize + "px",
-            fill: "lightgray"
+        var circ = paper.circle(cx,cy,r).attr({
+            stroke: colors.blue,
+            "stroke-width": 2,
+            fill: "white"
         });
-        context.sensorAdder.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        var plus = paper.path(["M",cx,y1,"V",y2,"M",x1,cy,"H",x2]).attr({
+            stroke: colors.blue,
+            "stroke-width": 3
+        });
+        // context.sensorAdder = paper.text(cx, cy, "+");
+        context.sensorAdder = paper.set(circ,plus);
+
+        // context.sensorAdder.attr({
+        //     "font-size": fontsize + "px",
+        //     fill: "lightgray"
+        // });
+        // context.sensorAdder.node.style = "-moz-user-select: none; -webkit-user-select: none;";
 
         context.sensorAdder.click(function () {
 
@@ -5010,6 +5048,7 @@ var getContext = function (display, infos, curLevel) {
     function squareSize(x, y, n, ratio) {
         // Compute number of rows and columns, and cell size
         var ratio = x / y * ratio;
+        // console.log(ratio)
         var ncols_float = Math.sqrt(n * ratio);
         var nrows_float = n / ncols_float;
 
@@ -6353,6 +6392,11 @@ var getContext = function (display, infos, curLevel) {
             hideSlider(sensorWithSlider);
             sensorWithSlider = sensor;
 
+            var w = sensor.drawInfo.width;
+            var h = sensor.drawInfo.height;
+            var x = sensor.drawInfo.x;
+            var y = sensor.drawInfo.y;
+
             if (Array.isArray(sensor.state)) {
 
                 var offset = 0;
@@ -6370,10 +6414,10 @@ var getContext = function (display, infos, curLevel) {
                         var sliderobj = createSlider(sensor,
                             max,
                             min,
-                            sensor.drawInfo.x + offset + (sign * Math.abs(i + 1 - sensor.state.length) * sensor.drawInfo.height / 5),
+                            sensor.drawInfo.x + offset + (sign * Math.abs(i + 1 - sensor.state.length) * h / 5),
                             sensor.drawInfo.y,
-                            sensor.drawInfo.height,
-                            sensor.drawInfo.height,
+                            h,
+                            h,
                             i);
 
                         sensor.sliders.push(sliderobj);
@@ -6384,10 +6428,10 @@ var getContext = function (display, infos, curLevel) {
                         var sliderobj = createSlider(sensor,
                             max,
                             min,
-                            sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.height / 5),
+                            sensor.drawInfo.x + offset + (sign * i * h / 5),
                             sensor.drawInfo.y,
-                            sensor.drawInfo.height,
-                            sensor.drawInfo.height,
+                            h,
+                            h,
                             i);
 
                         sensor.sliders.push(sliderobj);
@@ -6399,8 +6443,8 @@ var getContext = function (display, infos, curLevel) {
                     min,
                     sensor.drawInfo.x,
                     sensor.drawInfo.y,
-                    sensor.drawInfo.height,
-                    sensor.drawInfo.height,
+                    h,
+                    h,
                     0);
                 sensor.sliders.push(sliderobj);
             }
@@ -6463,17 +6507,24 @@ var getContext = function (display, infos, curLevel) {
         var scrolloffset = 0;
         var fadeopacity = 1;
 
-        var imgw = sensor.drawInfo.width / 1.8;
-        var imgh = sensor.drawInfo.height / 2;
-        imgw = imgh;
+        var w = sensor.drawInfo.width;
+        var h = sensor.drawInfo.height;
+        var x = sensor.drawInfo.x;
+        var y = sensor.drawInfo.y;
+        var cx = x + w/2;
+        var cy = y + h/2;
 
-        var imgx = sensor.drawInfo.x - (imgw / 2) + (sensor.drawInfo.width / 2); 
+        var imgh = h / 2;
+        // var imgh = w / 3;
+        var imgw = imgh;
+
+        var imgx = sensor.drawInfo.x - (imgw / 2) + (w / 2); 
         var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
         var state1x =  (imgx + imgw) + 3;
         var state1y = imgy + imgh / 3;
 
-        var state1x = sensor.drawInfo.x + (sensor.drawInfo.width / 2)
+        var state1x = sensor.drawInfo.x + (w / 2)
         var state1y = imgy + imgh + 6;
         var stateanchor = "middle";
 
@@ -6485,16 +6536,19 @@ var getContext = function (display, infos, curLevel) {
             if (context.compactLayout)
                 imgx = sensor.drawInfo.x + 5;
             else
-                imgx = sensor.drawInfo.x - (imgw / 4) + (sensor.drawInfo.width / 4); 
+                imgx = sensor.drawInfo.x - (imgw / 4) + (w / 4); 
+
+            var dx = w*0.03;
+            imgx = cx - imgw - dx;
 
             state1x =  (imgx + imgw) + 10;
             state1y = imgy; 
             stateanchor = 'start';
         }
         if(sensor.type == "buzzer"){
-            var sizeRatio = imgw/sensor.drawInfo.width;
+            var sizeRatio = imgw/w;
             if(sizeRatio > 0.75){
-                imgw = 0.75*sensor.drawInfo.width;
+                imgw = 0.75*w;
                 imgh = imgw;
             }
         }
@@ -6503,7 +6557,7 @@ var getContext = function (display, infos, curLevel) {
         var portx = state1x;
         var porty = imgy;
 
-        var namex = sensor.drawInfo.x + (sensor.drawInfo.width / 2);
+        var namex = sensor.drawInfo.x + (w / 2);
         var namey = sensor.drawInfo.y + (imgh * 0.20);
         var nameanchor = "middle";
 
@@ -6547,7 +6601,7 @@ var getContext = function (display, infos, curLevel) {
             if (scrolloffset > 0)
                 fadeopacity = 0.3;
 
-            imgw = sensor.drawInfo.width * .80;
+            imgw = w * .80;
             imgh = sensor.drawInfo.height * .80;
 
             imgx = sensor.drawInfo.x + (imgw * 0.75) + scrolloffset;
@@ -6568,6 +6622,8 @@ var getContext = function (display, infos, curLevel) {
         }
         namesize = Math.min(namesize,maxNameSize);
         statesize = Math.min(statesize,maxStateSize);
+
+
 
 
 
@@ -6670,7 +6726,7 @@ var getContext = function (display, infos, curLevel) {
                 }
                 
 
-                // var muteBtnSize = sensor.drawInfo.width * 0.15;
+                // var muteBtnSize = w * 0.15;
                 var muteBtnSize = imgw * 0.3;
                 sensor.muteBtn = paper.text(
                     imgx + imgw*0.8, 
@@ -6858,10 +6914,10 @@ var getContext = function (display, infos, curLevel) {
             var borderSize = 5;
 
             var screenScale = 2;
-            if(sensor.drawInfo.width < 300) {
+            if(w < 300) {
                 screenScale = 1;
             }
-            if(sensor.drawInfo.width < 150) {
+            if(w < 150) {
                 screenScale = 0.5;
             }             
 
@@ -6873,7 +6929,7 @@ var getContext = function (display, infos, curLevel) {
 
             imgw = screenScalerSize.width + borderSize * 2;
             imgh = screenScalerSize.height + borderSize * 2;            
-            imgx = sensor.drawInfo.x - (imgw / 2) + (sensor.drawInfo.width / 2); 
+            imgx = sensor.drawInfo.x - (imgw / 2) + (w / 2); 
 
             imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
 
@@ -7151,7 +7207,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.img.attr({
                 "x": imgx,
-                "y": imgy,
+                "y": imgy - imgh*0.1,
                 "width": imgw,
                 "height": imgh,
                 "opacity": fadeopacity,
@@ -7180,24 +7236,17 @@ var getContext = function (display, infos, curLevel) {
                 rangew = firstpart + (remaining * (sensor.state) * 0.0015);
             }
 
-            var centerx = imgx + (imgw / 2);
-
-            sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
-                imgy + imgw,
-                "L", centerx + (rangew / 2),
-                imgy + imgw]);
-
+            var cx = imgx + (imgw / 2);
+            var cy = imgy + imgh*0.9;
+            var x1 = cx - rangew/2;
+            var x2 = cx + rangew/2;
             var markh = 16;
+            var y1 = cy - markh/2;
+            var y2 = cy + markh/2;
 
-            sensor.rangedistancestart = paper.path(["M", centerx - (rangew / 2),
-                imgy + imgw - (markh / 2),
-                "L", centerx - (rangew / 2),
-                imgy + imgw + (markh / 2)]);
-
-            sensor.rangedistanceend = paper.path(["M", centerx + (rangew / 2),
-                imgy + imgw - (markh / 2),
-                "L", centerx + (rangew / 2),
-                imgy + imgw + (markh / 2)]);
+            sensor.rangedistance = paper.path(["M",x1,cy,"H",x2]);
+            sensor.rangedistancestart = paper.path(["M",x1,y1,"V",y2]);
+            sensor.rangedistanceend = paper.path(["M",x2,y1,"V",y2]);
 
             sensor.rangedistance.attr({
                 "stroke-width": 4,
@@ -7323,6 +7372,7 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.img || isElementRemoved(sensor.img))
                 sensor.img = paper.image(getImg('accel.png'), imgx, imgy, imgw, imgh);
 
+            // paper.rect(x,y,w,h)
             sensor.img.attr({
                 "x": imgx,
                 "y": imgy,
@@ -7341,12 +7391,16 @@ var getContext = function (display, infos, curLevel) {
             }
 
             if (sensor.state) {
+                statesize = h*0.12;
                 try {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " m/s²\nY: " + sensor.state[1] + " m/s²\nZ: " + sensor.state[2] + " m/s²");
+                    var str = "X: " + sensor.state[0] + " m/s²\nY: " + sensor.state[1] + " m/s²\nZ: " + sensor.state[2] + " m/s²";
+                    sensor.stateText = paper.text(cx, state1y, str);
                 } catch (Err)
                 {
                     var a = 1;
                 }
+                // var bbox = sensor.stateText.getBBox();
+                // sensor.stateText.attr("y",cy - bbox.height/2);
             }
 
             if (!context.autoGrading && context.offLineMode) {
@@ -7365,7 +7419,9 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText) {
                 sensor.stateText.remove();
             }
-            sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
+            statesize = h*0.12;
+            var str = "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s";
+            sensor.stateText = paper.text(cx, state1y, str);
             if (!sensor.previousState)
                 sensor.previousState = [0, 0, 0];
 
@@ -7426,6 +7482,7 @@ var getContext = function (display, infos, curLevel) {
                 }
 
             } else {
+
                 if (!sensor.img || isElementRemoved(sensor.img)) {
                     sensor.img = paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
                 }
@@ -7488,7 +7545,9 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " μT\nY: " + sensor.state[1] + " μT\nZ: " + sensor.state[2] + " μT");
+                statesize = h*0.12;
+                var str = "X: " + sensor.state[0] + " μT\nY: " + sensor.state[1] + " μT\nZ: " + sensor.state[2] + " μT";
+                sensor.stateText = paper.text(cx, state1y, str);
             }
 
             if (!context.autoGrading && context.offLineMode) {
@@ -8185,7 +8244,7 @@ var getContext = function (display, infos, curLevel) {
                 "x": imgx,
                 "y": imgy,
                 "width": imgw,
-                "height": imgh,
+                "height": imgh*0.8,
                 "opacity": scrolloffset ? 0.3 : 1,
             });
             
@@ -8294,9 +8353,9 @@ var getContext = function (display, infos, curLevel) {
                 sensor.nameText.attr({ "font-size": namesize + "px", 'text-anchor': nameanchor, fill: "#7B7B7B" });
                 sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
                 var bbox = sensor.nameText.getBBox();
-                if(bbox.width > sensor.drawInfo.width - 20){
-                    namesize = namesize*(sensor.drawInfo.width - 20)/bbox.width;
-                    namey += namesize*(1 - (sensor.drawInfo.width - 20)/bbox.width);
+                if(bbox.width > w - 20){
+                    namesize = namesize*(w - 20)/bbox.width;
+                    namey += namesize*(1 - (w - 20)/bbox.width);
                     sensor.nameText.attr({ 
                         "font-size":namesize,
                         y: namey });
