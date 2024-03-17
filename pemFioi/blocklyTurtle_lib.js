@@ -163,6 +163,7 @@ var getContext = function(display, infos) {
             pendown: "baisser le pinceau",
             peneither: "%1",
             colour2: "setze Farbe",
+            colourRGB: "mettre la couleur RGB ( %1, %2, %3 )",
             colourvalue: "mettre la couleur %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -196,12 +197,13 @@ var getContext = function(display, infos) {
             pendown: "baisserPinceau",
             peneither: "stift",
             colour2: "setzeFarbe",
+            colourRGB: "couleurRGB",
             colourvalue: "couleur",
             turn: "drehe",
             alert: "alert",
             log: "log",
             inputvalue: "eingabewert",
-			jump: "jump"
+			   jump: "jump"
          },
          description: {
             moveamount: '@() la tortue avance du nombre de pas indiqué en paramètre. Exemple : @(50)',
@@ -272,6 +274,7 @@ var getContext = function(display, infos) {
             pendown: "setze Stift auf",
             peneither: "%1",
             colour2: "setze Farbe",
+            colourRGB: "setze Farbe RGB ( %1, %2, %3 )",
             colourvalue: "setze Farbe %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -314,6 +317,7 @@ var getContext = function(display, infos) {
             pendown: "stiftRunter",
             peneither: "stift",
             colour2: "setzeFarbe",
+            colourRGB: "setzeFarbeRGB",
             colourvalue: "setzeFarbe",
             turn: "drehe",
             alert: "alert",
@@ -363,6 +367,7 @@ var getContext = function(display, infos) {
             pendown: "lower the paintbrush",
             peneither: "%1",
             colour2: "setze Farbe",
+            colourRGB: "use color RGB ( %1, %2, %3 )",
             colourvalue: "use color %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -395,6 +400,7 @@ var getContext = function(display, infos) {
             pendown: "lowerBrush",
             peneither: "stift",
             colour2: "setzeFarbe",
+            colourRGB: "colorRGB",
             colourvalue: "color",
             turn: "drehe",
             alert: "alert",
@@ -440,6 +446,9 @@ var getContext = function(display, infos) {
       invisibleSolutionTurtle: new makeTurtle(infos.coords),
       svgTurtle: null
    };
+
+   if (context.infos.allowInfiniteLoop)
+      context.allowInfiniteLoop = true;
 
    switch (infos.blocklyColourTheme) {
       case "bwinf":
@@ -705,7 +714,6 @@ var getContext = function(display, infos) {
       callOnAllTurtles(function(turtle) {
 		  turtle.jump(x, y);
       });
-
       context.waitDelay(callback);
    }
 
@@ -789,6 +797,20 @@ var getContext = function(display, infos) {
    }
    context.turtle.colourvalue = context.turtle.colour2;
 
+   context.turtle.colourRGB = function(r, g, b, callback) {
+      colour = "rgb("+r+", "+g+", "+b+")";
+      if (typeof callback == "undefined") {
+         callback = colour;
+         colour = "#000000";
+      }
+
+      callOnAllTurtles(function(turtle) {
+         turtle.set_colour(colour);
+      })
+
+      context.waitDelay(callback);
+   }
+
    var defaultMoveAmount = 1;
    if(context.infos.defaultMoveAmount != undefined)
       defaultMoveAmount = context.infos.defaultMoveAmount;
@@ -799,7 +821,7 @@ var getContext = function(display, infos) {
             { name: "move" },
             { name: "moveamount", params: [null]},
             { name: "movebackamount", params: [null]},
-            { name: "jump", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 0},{"type": "field_number", "name": "PARAM_1", "value": 0}]}},
+            { name: "jump", params: [null, null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 0},{"type": "field_number", "name": "PARAM_1", "value": 0}]}},
             { name: "moveamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "movebackamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "turnleft" },
@@ -855,7 +877,8 @@ var getContext = function(display, infos) {
                {"type": "field_dropdown", "name": "PARAM_0", "options":
                  [[localLanguageStrings[window.stringsLanguage]["penup"],"up"],[localLanguageStrings[window.stringsLanguage]["pendown"],"down"]]}]}},
             { name: "colour2", params: [null]},
-            { name: "colourvalue", params: [null], blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
+            { name: "colourvalue", params: [null], blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}},
+            { name: "colourRGB", params: [null, null, null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 0},{"type": "field_number", "name": "PARAM_1", "value": 0},{"type": "field_number", "name": "PARAM_2", "value": 0}]}},
          ],
          turtleInput: [
             { name: "inputvalue", yieldsValue: true }
