@@ -233,6 +233,7 @@
          'quickpi-store': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_store.js", id: "quickpi-store" },
          'quickpi-outputgenerator': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_outputGenerator.js", id: "quickpi-outputgenerator" },
          'blockly-distributed': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPiDistributed_lib.js", id: "blockly-distributed" },
+         'quickpi_css': {type: "stylesheet", src: modulesPath+"/pemFioi/quickpi/quickpi.css", id: "quickpi_css"},
 
          'traceroute-context': { src: modulesPath + "/pemFioi/network/traceroute/context.js", id: "traceroute-context" },
          'scanip-context': { src: modulesPath + "/pemFioi/network/scanip/context.js", id: "scanip-context" },
@@ -336,6 +337,7 @@
          {name: 'js-interpreter', included: ['acorn', 'acorn-walk', 'interpreter']},
          {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
          {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
+         {name: 'quickpi-base', included: ['quickpi-board', 'quickpi-connection', 'quickpi-screen', 'blockly-quickpi', 'quickpi_css']},
          {name: 'codecast-7.0', included: ['codecast7.0_css', 'codecast7.0_js', 'codecast7.0_loader']},
          {name: 'codecast-7.1', included: ['codecast7.1_css', 'codecast7.1_js', 'codecast7.1_loader']},
          {name: 'codecast-7.2', included: ['codecast7.2_css', 'codecast7.2_js', 'codecast7.2_loader']},
