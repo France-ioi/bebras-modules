@@ -275,6 +275,7 @@ var quickPiLocalLanguageStrings = {
             piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
             cantConnect: "Impossible de se connecter à l'appareil.",
             wrongVersion: "Votre Raspberry Pi a une version trop ancienne, mettez le à jour.",
+            cardDisconnected: "La carte a été déconnectée.",
             sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
             actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
             cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
@@ -739,6 +740,7 @@ var quickPiLocalLanguageStrings = {
             piPlocked: "El dispositivo está bloqueado. Desbloquear o reiniciar.",
             cantConnect: "No puede conectarse al dispositivo.",
             wrongVersion: "El software en tu Raspberry Pi es demasiado antiguo, actualízalo.",
+            cardDisconnected: "La tarjeta ha sido desconectada.",
             sensorInOnlineMode: "No se pueden modificar sensores en modo conectado.",
             actuatorsWhenRunning: "No se pueden cambiar los actuadores mientras se ejecuta un programa",
             cantConnectoToUSB: 'Intentado conectarse por USB, conecta tu Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
@@ -1191,6 +1193,7 @@ var quickPiLocalLanguageStrings = {
             piPlocked: "L'unità è bloccata. Sbloccare o riavviare.",
             cantConnect: "Impossibile connettersi all'apparecchio.",
             wrongVersion: "Il tuo Raspberry Pi è una versione troppo vecchia, aggiornala.",
+            cardDisconnected: "La scheda è stata disconnessa.",
             sensorInOnlineMode: "Non è possibile agire sui sensori in modalità connessa.",
             actuatorsWhenRunning: "Impossibile modificare gli azionatori durante l'esecuzione di un programma",
             cantConnectoToUSB: 'Tentativo di connessione via USB in corso, si prega di collegare il Raspberry alla porta USB. <i class="fas fa-circle-notch fa-spin"></i>',
@@ -3119,6 +3122,7 @@ var getContext = function (display, infos, curLevel) {
 
    context.generatePythonSensorTable = function()
    {
+        return "";
         var pythonSensorTable = "sensorTable = [";
         var first = true;
 
@@ -3677,6 +3681,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         paper.setSize(($('#virtualSensors').width() * context.quickPiZoom), $('#virtualSensors').height());
+        $('#virtualBoard').height($('#virtualSensors').height());
 
         var area = paper.width * paper.height;
         context.compactLayout = false;
@@ -3994,12 +3999,32 @@ var getContext = function (display, infos, curLevel) {
         $('#introControls').html(piUi);
         $('#taskIntro').addClass('piui');
 
-        $('#grid').html("<div id=\"virtualSensors\" style=\"height: 100%; width: 100%;\">"
+        $('#grid').html("<div id=\"virtualBoard\"></div><div id=\"virtualSensors\" style=\"height: 100%; width: 100%;\">"
             + "</div>");
 
 
         if (!context.quickPiZoom || !context.autoGrading)
             context.quickPiZoom = 1;
+
+        if(["galaxia", "microbit"].includes(context.infos.quickPiBoard)) {
+            $('#grid').css('display', 'flex');
+            if(context.infos.quickPiBoard == "microbit") {
+                $('#grid').css('flex-direction', 'column');
+                $('#virtualBoard').css('flex', '0 0 200px').css('height', '200px');
+            } else {
+                $('#virtualBoard').css('flex', '1 0 40%');
+            }
+            function onUserEvent(sensorName, state) {
+                var sensor = findSensorByName('button ' + sensorName);
+                if(!sensor) { return; }
+                sensor.state = state;
+                warnClientSensorStateChanged(sensor);
+                drawSensor(sensor);
+            }
+            var board = context.infos.quickPiBoard == "galaxia" ? GalaxiaBoard : MicrobitBoard;
+            var galaxiaBoardUpdate = board.init('#virtualBoard', onUserEvent);
+            context.sensorStateListener = galaxiaBoardUpdate;
+        }
 
         this.raphaelFactory.destroyAll();
         paper = this.raphaelFactory.create(
@@ -4685,15 +4710,7 @@ var getContext = function (display, infos, curLevel) {
 
         });
 
-        $('#piinstall').click(function () {
-            context.blocklyHelper.reportValues = false;
-
-            var python_code = context.generatePythonSensorTable();
-            python_code += "\n\n";
-            python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
-
-            python_code = python_code.replace("from quickpi import *", "");
-
+        function installPythonCode(code) {
             if (context.runner)
                 context.runner.stop();
 
@@ -4701,11 +4718,30 @@ var getContext = function (display, infos, curLevel) {
             $('#piinstallprogresss').show();
             $('#piinstallcheck').hide();
 
-            context.quickPiConnection.installProgram(python_code, function () {
+            context.quickPiConnection.installProgram(code, function () {
                 context.justinstalled = true;
                 $('#piinstallprogresss').hide();
                 $('#piinstallcheck').show();
             });
+        }
+
+        $('#piinstall').click(function () {
+            context.blocklyHelper.reportValues = false;
+
+            var python_code = context.generatePythonSensorTable();
+            python_code += "\n\n";
+            if(context.blocklyHelper.getCode) {
+                python_code += context.blocklyHelper.getCode('python');
+                python_code = python_code.replace("from quickpi import *", "");
+                installPythonCode(python_code);
+            } else {
+                window.task.getAnswer(function (answer) {
+                    python_code += JSON.parse(answer).easy;
+                    python_code = python_code.replace("from quickpi import *", "");
+                    installPythonCode(python_code);
+                });
+            }
+
         });
 
 
@@ -4718,8 +4754,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     function warnClientSensorStateChanged(sensor) {
+        var sensorStateCopy = JSON.parse(JSON.stringify(sensor.state));
         if (context.dispatchContextEvent) {
-            var sensorStateCopy = JSON.parse(JSON.stringify(sensor.state));
             context.dispatchContextEvent({type: 'quickpi/changeSensorState', payload: [sensor.name, sensorStateCopy], onlyLog: true});
         }
     }
@@ -5139,6 +5175,10 @@ var getContext = function (display, infos, curLevel) {
         $('#piinstall').css('background-color', "#488FE1");
 
         $('#piconnecttext').hide();
+
+        if(context.sensorStateListener) {
+            context.sensorStateListener('connected');
+        }
     }
 
     function showasConnecting() {
@@ -5155,6 +5195,10 @@ var getContext = function (display, infos, curLevel) {
         $('#pihatsetup').hide();
         $('#piconnect').css('background-color', '#F9A423');
         $('#piconnecttext').show();
+
+        if(context.sensorStateListener) {
+            context.sensorStateListener('disconnected');
+        }
     }
 
 
@@ -5165,6 +5209,10 @@ var getContext = function (display, infos, curLevel) {
         $('#piinstall').css('background-color', 'gray');
         $('#piconnect').css('background-color', 'gray');
         $('#piconnecttext').hide();
+
+        if(context.sensorStateListener) {
+            context.sensorStateListener('disconnected');
+        }
     }
 
     function raspberryPiConnected() {
@@ -5200,6 +5248,9 @@ var getContext = function (display, infos, curLevel) {
             window.displayHelper.showPopupMessage(strings.messages.wrongVersion, 'blanket');
         } else if (!context.releasing && !wasConnected) {
             window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
+        } else if(wasConnected) {
+            window.displayHelper.showPopupMessage(strings.messages.cardDisconnected, 'blanket');
+            context.releasing = true;
         }
 
         clearSensorPollInterval();
@@ -6535,6 +6586,9 @@ var getContext = function (display, infos, curLevel) {
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         // console.log(sensor.type)
         saveSensorStateIfNotRunning(sensor);
+        if (context.sensorStateListener) {
+            context.sensorStateListener(sensor);
+        }
 
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -6918,6 +6972,58 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
                 sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
+            }
+        } else if (sensor.type == "galaxia") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.galaxia || isElementRemoved(sensor.galaxia))
+                sensor.galaxia = paper.image(getImg('galaxia.svg'), imgx, imgy, imgw, imgh);
+
+            if (sensor.state == null)
+                sensor.state = false;
+
+            sensor.galaxia.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            if (sensor.state) {
+                /*sensor.buttonon.attr({ "opacity": fadeopacity });
+                sensor.buttonoff.attr({ "opacity": 0 });*/
+            } else {
+                /*sensor.buttonon.attr({ "opacity": 0 });
+                sensor.buttonoff.attr({ "opacity": fadeopacity });*/
+            }
+
+            if (!context.autoGrading) {
+                // sensor.focusrect.node.onmousedown = function () {
+                //     if (context.offLineMode) {
+                //         sensor.state = true;
+                //         warnClientSensorStateChanged(sensor);
+                //         drawSensor(sensor);
+                //     } else
+                //         sensorInConnectedModeError();
+                // };
+
+
+                // sensor.focusrect.node.onmouseup = function () {
+                //     if (context.offLineMode) {
+                //         sensor.state = false;
+                //         sensor.wasPressed = true;
+                //         warnClientSensorStateChanged(sensor);
+                //         drawSensor(sensor);
+
+                //         if (sensor.onPressed)
+                //             sensor.onPressed();
+                //     } else
+                //         sensorInConnectedModeError();
+                // }
+
+                // sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
+                // sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
             }
         } else if (sensor.type == "screen") {
             if (sensor.stateText) {
@@ -10629,12 +10735,29 @@ var getContext = function (display, infos, curLevel) {
 
     // Color indexes of block categories (as a hue in the range 0–420)
     context.provideBlocklyColours = function () {
+        Blockly.HSV_SATURATION = 0.65;
+        Blockly.HSV_VALUE = 0.80;
+        Blockly.Blocks.inputs.HUE = 50;
         return {
             categories: {
-                actuator: 0,
-                sensors: 100,
+                //actuator: 0,
+                //sensors: 100,
+                actuator: 212,
+                sensors: 95,
                 internet: 200,
                 display: 300,
+
+                input: 50,
+                inputs: 50,
+                lists: 353,
+                logic: 298,
+                math: 176,
+                loops: 37,
+                texts: 312,
+                dicts: 52,
+                tables: 212,
+                variables: 30,
+                procedures: 180,
             }
         };
     };

@@ -234,6 +234,12 @@
          'quickpi-outputgenerator': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_outputGenerator.js", id: "quickpi-outputgenerator" },
          'blockly-distributed': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPiDistributed_lib.js", id: "blockly-distributed" },
 
+         'galaxia-connection': { src: modulesPath + "/pemFioi/galaxia/galaxia.js", id: "galaxia_connection" },
+         'galaxia-board': { src: modulesPath + "/pemFioi/galaxia/galaxia_board.js", id: "galaxia_board" },
+
+         'microbit-connection': { src: modulesPath + "/pemFioi/microbit/microbit.js", id: "microbit_connection" },
+         'microbit-board': { src: modulesPath + "/pemFioi/microbit/microbit_board.js", id: "microbit_board" },
+
          'traceroute-context': { src: modulesPath + "/pemFioi/network/traceroute/context.js", id: "traceroute-context" },
          'scanip-context': { src: modulesPath + "/pemFioi/network/scanip/context.js", id: "scanip-context" },
       }
