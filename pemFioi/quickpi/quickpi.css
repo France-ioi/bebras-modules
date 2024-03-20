@@ -51,11 +51,15 @@
 .menu_line {
     height: 34px;
 }
+.menu_line .fas {
+    color: #4a90e2;
+}
 .menu_line .label {
     margin-left: 10px
 }
 #dropdown_menu .clickable:hover {
     color: #4a90e2;
+    font-weight: bold;
 }
 
 /*** CONFIG ***/
