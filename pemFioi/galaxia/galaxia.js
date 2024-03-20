@@ -57,6 +57,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
 
     this.onConnect = _onConnect;
     this.onDisconnect = function() {
+        this.releaseLock();
         _onDisconnect.apply(this, arguments);
     }
     this.onChangeBoard = _onChangeBoard;
@@ -188,8 +189,10 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         if(!this.serial) { return; }
         var that = this;
         this.releasing = true;
-        function endRelease() {
+        async function endRelease() {
             if(!releaseTimeout) { return; }
+            that.reader.cancel().catch(() => {});
+            await new Promise(resolve => setTimeout(resolve, 100));
             that.serial.close();
             that.serial = null;
             that.connecting = null;
@@ -203,7 +206,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                 setTimeout(endRelease, 100);
             });
         });
-        releaseTimeout = setTimeout(endRelease, 10000);
+        releaseTimeout = setTimeout(endRelease, 5000);
     }
 
     this.startNewSession = function() {
