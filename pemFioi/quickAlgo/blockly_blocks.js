@@ -735,7 +735,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                  lists: 353,
                  logic: 298,
                  math: 176,
-                 loops: 37,
+                 loops: 200,
                  texts: 312,
                  dicts: 52,
                  tables: 212,
