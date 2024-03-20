@@ -4182,7 +4182,11 @@ var getContext = function (display, infos, curLevel) {
             "       <div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
             "           <div id=\"sensorGrid\" style=\"overflow: auto;\">" +
             "           </div>" +
-            "               <center><button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+            // "           <center><button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+            "           <div id='buttons' >"+
+            "               <button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+            "               <button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
+            "           </div>" +
             "       </div>" +
 
             "       <div id=\"qpi-uiblock-change-board\" class=\"hiddenContent viewerInlineContent\">" +
@@ -4325,6 +4329,11 @@ var getContext = function (display, infos, curLevel) {
                     );
             }
 
+            if(infos.customSensors){
+                $('#piaddsensor').click(clickAdder);
+            }else{
+                $('#piaddsensor').hide();
+            }
             $('#piremovesensor').click(function () {
                 //$('#popupMessage').hide();
                 //window.displayHelper.popupMessageShown = false;
@@ -5040,10 +5049,10 @@ var getContext = function (display, infos, curLevel) {
             infos.quickPiSensors.push(newSensor);
         }
         if(infos.customSensors){
-            infos.quickPiSensors.push({
-                type: "adder",
-                name: ""
-            })
+            // infos.quickPiSensors.push({
+            //     type: "adder",
+            //     name: ""
+            // })
         }
         // console.log(infos.quickPiSensors)
 
@@ -5117,227 +5126,447 @@ var getContext = function (display, infos, curLevel) {
         // });
         // context.sensorAdder.node.style = "-moz-user-select: none; -webkit-user-select: none;";
 
-        context.sensorAdder.click(function () {
+        context.sensorAdder.click(clickAdder);
 
-            window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
-                "   <div class=\"panel-heading\">" +
-                "       <h2 class=\"sectionTitle\">" +
-                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
-                            strings.messages.addcomponent +
-                "       </h2>" +
-                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
-                "   </div>" +
-                "   <div id=\"sensorPicker\" class=\"panel-body\">" +
-                "       <label>" + strings.messages.selectcomponent + "</label>" +
-                "       <div class=\"flex-container\">" +
-                "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
-                "               <img id=\"selector-sensor-image\">" +
-                "           </div>" +
-                "           <div class=\"flex-col half\">" +
-                "               <div class=\"form-group\">" +
-                "                   <div class=\"input-group\">" +
-                "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
-                "                   </div>" +
-                "              </div>" +
-                "              <div class=\"form-group\">" +
-                "                   <div class=\"input-group\">" +
-                "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
-                "                   </div>" +
-                "                   <label id=\"selector-label\"></label>" +
-                "               </div>" +
-                "           </div>" +
-                "       </div>" +
-                "   </div>" +
-                "   <div class=\"singleButton\">" +
-                "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
-                "   </div>" +
-                "</div>");
+        //     window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
+        //         "   <div class=\"panel-heading\">" +
+        //         "       <h2 class=\"sectionTitle\">" +
+        //         "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+        //                     strings.messages.addcomponent +
+        //         "       </h2>" +
+        //         "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+        //         "   </div>" +
+        //         "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+        //         "       <label>" + strings.messages.selectcomponent + "</label>" +
+        //         "       <div class=\"flex-container\">" +
+        //         "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
+        //         "               <img id=\"selector-sensor-image\">" +
+        //         "           </div>" +
+        //         "           <div class=\"flex-col half\">" +
+        //         "               <div class=\"form-group\">" +
+        //         "                   <div class=\"input-group\">" +
+        //         "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
+        //         "                   </div>" +
+        //         "              </div>" +
+        //         "              <div class=\"form-group\">" +
+        //         "                   <div class=\"input-group\">" +
+        //         "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
+        //         "                   </div>" +
+        //         "                   <label id=\"selector-label\"></label>" +
+        //         "               </div>" +
+        //         "           </div>" +
+        //         "       </div>" +
+        //         "   </div>" +
+        //         "   <div class=\"singleButton\">" +
+        //         "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
+        //         "   </div>" +
+        //         "</div>");
 
-            var select = document.getElementById("selector-sensor-list");
-            for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
-                var sensorDefinition = sensorDefinitions[iSensorDef];
+        //     var select = document.getElementById("selector-sensor-list");
+        //     for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
+        //         var sensorDefinition = sensorDefinitions[iSensorDef];
 
-                if (sensorDefinition.subTypes) {
-                    for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
+        //         if (sensorDefinition.subTypes) {
+        //             for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
 
-                        if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
-                            continue;
+        //                 if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
+        //                     continue;
 
 
-                        var el = document.createElement("option");
-                        el.textContent = sensorDefinition.description;
+        //                 var el = document.createElement("option");
+        //                 el.textContent = sensorDefinition.description;
 
-                        if (sensorDefinition.subTypes[iSubType].description)
-                            el.textContent = sensorDefinition.subTypes[iSubType].description;
+        //                 if (sensorDefinition.subTypes[iSubType].description)
+        //                     el.textContent = sensorDefinition.subTypes[iSubType].description;
 
-                        el.value = sensorDefinition.name;
-                        el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
-                        select.appendChild(el);
-                    }
-                } else {
-                    if (!sensorDefinition.pluggable)
+        //                 el.value = sensorDefinition.name;
+        //                 el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
+        //                 select.appendChild(el);
+        //             }
+        //         } else {
+        //             if (!sensorDefinition.pluggable)
+        //                 continue;
+
+        //             var el = document.createElement("option");
+        //             el.textContent = sensorDefinition.description;
+        //             el.value = sensorDefinition.name;
+
+        //             select.appendChild(el);
+        //         }
+        //     }
+
+        //     var board = getCurrentBoard();
+        //     if (board.builtinSensors) {
+        //         for (var i = 0; i < board.builtinSensors.length; i++) {
+        //             var sensor = board.builtinSensors[i];
+        //             var sensorDefinition = findSensorDefinition(sensor);
+
+        //             if (context.findSensor(sensor.type, sensor.port, false))
+        //                 continue;
+
+        //             var el = document.createElement("option");
+
+        //             el.textContent = sensorDefinition.description + strings.messages.builtin;
+        //             el.value = sensorDefinition.name + "-";
+
+        //             if (sensor.subType)
+        //                 el.value += sensor.subType;
+
+        //             el.value += "-" + sensor.port;
+
+        //             select.appendChild(el);
+        //         }
+        //     }
+
+        //     $('#selector-sensor-list').on('change', function () {
+        //         var values = this.value.split("-");
+        //         var builtinport = false;
+
+        //         var dummysensor = { type: values[0] };
+
+        //         if (values.length >= 2)
+        //             if (values[1])
+        //                 dummysensor.subType = values[1];
+
+        //         if (values.length >= 3)
+        //             builtinport = values[2];
+
+        //         var sensorDefinition = findSensorDefinition(dummysensor);
+
+        //         var imageContainer = document.getElementById("selector-image-container");
+        //         while (imageContainer.firstChild) {
+        //             imageContainer.removeChild(imageContainer.firstChild);
+        //         }
+        //         for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
+        //             var image = document.createElement('img');
+
+        //             image.src = getImg(sensorDefinition.selectorImages[i]);
+
+        //             imageContainer.appendChild(image);
+
+        //             //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
+        //         }
+
+
+        //         var portSelect = document.getElementById("selector-sensor-port");
+        //         $('#selector-sensor-port').empty();
+        //         var hasPorts = false;
+        //         if (builtinport) {
+        //             var option = document.createElement('option');
+        //             option.innerText = builtinport;
+        //             option.value = builtinport;
+        //             portSelect.appendChild(option);
+        //             hasPorts = true;
+        //         } else {
+        //             var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
+        //             if (sensorDefinition.portType == "i2c")
+        //             {
+        //                 ports = ["i2c"];
+        //             }
+
+        //             for (var iPort = 0; iPort < ports.length; iPort++) {
+        //                 var port = sensorDefinition.portType + ports[iPort];
+        //                 if (sensorDefinition.portType == "i2c")
+        //                     port = "i2c";
+
+        //                 if (!isPortUsed(sensorDefinition.name, port)) {
+        //                     var option = document.createElement('option');
+        //                     option.innerText = port;
+        //                     option.value = port;
+        //                     portSelect.appendChild(option);
+        //                     hasPorts = true;
+        //                 }
+        //             }
+        //         }
+
+
+
+        //         if (!hasPorts) {
+        //             $('#selector-add-button').attr("disabled", true);
+
+        //             var object_function = strings.messages.actuator;
+        //             if (sensorDefinition.isSensor)
+        //                 object_function = strings.messages.sensor;
+
+        //             $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
+        //             $('#selector-label').show();
+        //         }
+        //         else {
+        //             $('#selector-add-button').attr("disabled", false);
+        //             $('#selector-label').hide();
+        //         }
+        //     });
+
+        //     $('#selector-add-button').click(function () {
+        //         var sensorType = $("#selector-sensor-list option:selected").val();
+        //         var values = sensorType.split("-");
+
+        //         var dummysensor = { type: values[0] };
+        //         if (values.length == 2)
+        //             dummysensor.subType = values[1];
+
+        //         var sensorDefinition = findSensorDefinition(dummysensor);
+
+
+        //         var port = $("#selector-sensor-port option:selected").text();
+        //         var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
+
+        //         // if(name == 'screen1') {
+        //             // prepend screen because squareSize func can't handle cells wrap
+        //             infos.quickPiSensors.unshift({
+        //                 type: sensorDefinition.name,
+        //                 subType: sensorDefinition.subType,
+        //                 port: port,
+        //                 name: name
+        //             });                    
+
+        //         // } else {
+        //         //     infos.quickPiSensors.push({
+        //         //         type: sensorDefinition.name,
+        //         //         subType: sensorDefinition.subType,
+        //         //         port: port,
+        //         //         name: name
+        //         //     });                    
+        //         // }
+
+
+
+        //         $('#popupMessage').hide();
+        //         window.displayHelper.popupMessageShown = false;
+
+        //         context.resetSensorTable();
+        //         context.resetDisplay();
+        //     });
+
+
+        //     $("#selector-sensor-list").trigger("change");
+
+        //     $('#picancel').click(function () {
+        //         $('#popupMessage').hide();
+        //         window.displayHelper.popupMessageShown = false;
+        //     });
+        // });
+    };
+
+    function clickAdder() {
+        window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
+            "   <div class=\"panel-heading\">" +
+            "       <h2 class=\"sectionTitle\">" +
+            "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                        strings.messages.addcomponent +
+            "       </h2>" +
+            "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+            "   </div>" +
+            "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+            "       <label>" + strings.messages.selectcomponent + "</label>" +
+            "       <div class=\"flex-container\">" +
+            "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
+            "               <img id=\"selector-sensor-image\">" +
+            "           </div>" +
+            "           <div class=\"flex-col half\">" +
+            "               <div class=\"form-group\">" +
+            "                   <div class=\"input-group\">" +
+            "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
+            "                   </div>" +
+            "              </div>" +
+            "              <div class=\"form-group\">" +
+            "                   <div class=\"input-group\">" +
+            "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
+            "                   </div>" +
+            "                   <label id=\"selector-label\"></label>" +
+            "               </div>" +
+            "           </div>" +
+            "       </div>" +
+            "   </div>" +
+            "   <div class=\"singleButton\">" +
+            "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
+            "   </div>" +
+            "</div>");
+
+        var select = document.getElementById("selector-sensor-list");
+        for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
+            var sensorDefinition = sensorDefinitions[iSensorDef];
+
+            if (sensorDefinition.subTypes) {
+                for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
+
+                    if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
                         continue;
+
 
                     var el = document.createElement("option");
                     el.textContent = sensorDefinition.description;
+
+                    if (sensorDefinition.subTypes[iSubType].description)
+                        el.textContent = sensorDefinition.subTypes[iSubType].description;
+
                     el.value = sensorDefinition.name;
-
+                    el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
                     select.appendChild(el);
                 }
+            } else {
+                if (!sensorDefinition.pluggable)
+                    continue;
+
+                var el = document.createElement("option");
+                el.textContent = sensorDefinition.description;
+                el.value = sensorDefinition.name;
+
+                select.appendChild(el);
             }
+        }
 
-            var board = getCurrentBoard();
-            if (board.builtinSensors) {
-                for (var i = 0; i < board.builtinSensors.length; i++) {
-                    var sensor = board.builtinSensors[i];
-                    var sensorDefinition = findSensorDefinition(sensor);
+        var board = getCurrentBoard();
+        if (board.builtinSensors) {
+            for (var i = 0; i < board.builtinSensors.length; i++) {
+                var sensor = board.builtinSensors[i];
+                var sensorDefinition = findSensorDefinition(sensor);
 
-                    if (context.findSensor(sensor.type, sensor.port, false))
-                        continue;
+                if (context.findSensor(sensor.type, sensor.port, false))
+                    continue;
 
-                    var el = document.createElement("option");
+                var el = document.createElement("option");
 
-                    el.textContent = sensorDefinition.description + strings.messages.builtin;
-                    el.value = sensorDefinition.name + "-";
+                el.textContent = sensorDefinition.description + strings.messages.builtin;
+                el.value = sensorDefinition.name + "-";
 
-                    if (sensor.subType)
-                        el.value += sensor.subType;
+                if (sensor.subType)
+                    el.value += sensor.subType;
 
-                    el.value += "-" + sensor.port;
+                el.value += "-" + sensor.port;
 
-                    select.appendChild(el);
-                }
+                select.appendChild(el);
             }
+        }
 
-            $('#selector-sensor-list').on('change', function () {
-                var values = this.value.split("-");
-                var builtinport = false;
+        $('#selector-sensor-list').on('change', function () {
+            var values = this.value.split("-");
+            var builtinport = false;
 
-                var dummysensor = { type: values[0] };
+            var dummysensor = { type: values[0] };
 
-                if (values.length >= 2)
-                    if (values[1])
-                        dummysensor.subType = values[1];
-
-                if (values.length >= 3)
-                    builtinport = values[2];
-
-                var sensorDefinition = findSensorDefinition(dummysensor);
-
-                var imageContainer = document.getElementById("selector-image-container");
-                while (imageContainer.firstChild) {
-                    imageContainer.removeChild(imageContainer.firstChild);
-                }
-                for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
-                    var image = document.createElement('img');
-
-                    image.src = getImg(sensorDefinition.selectorImages[i]);
-
-                    imageContainer.appendChild(image);
-
-                    //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
-                }
-
-
-                var portSelect = document.getElementById("selector-sensor-port");
-                $('#selector-sensor-port').empty();
-                var hasPorts = false;
-                if (builtinport) {
-                    var option = document.createElement('option');
-                    option.innerText = builtinport;
-                    option.value = builtinport;
-                    portSelect.appendChild(option);
-                    hasPorts = true;
-                } else {
-                    var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
-                    if (sensorDefinition.portType == "i2c")
-                    {
-                        ports = ["i2c"];
-                    }
-
-                    for (var iPort = 0; iPort < ports.length; iPort++) {
-                        var port = sensorDefinition.portType + ports[iPort];
-                        if (sensorDefinition.portType == "i2c")
-                            port = "i2c";
-
-                        if (!isPortUsed(sensorDefinition.name, port)) {
-                            var option = document.createElement('option');
-                            option.innerText = port;
-                            option.value = port;
-                            portSelect.appendChild(option);
-                            hasPorts = true;
-                        }
-                    }
-                }
-
-
-
-                if (!hasPorts) {
-                    $('#selector-add-button').attr("disabled", true);
-
-                    var object_function = strings.messages.actuator;
-                    if (sensorDefinition.isSensor)
-                        object_function = strings.messages.sensor;
-
-                    $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
-                    $('#selector-label').show();
-                }
-                else {
-                    $('#selector-add-button').attr("disabled", false);
-                    $('#selector-label').hide();
-                }
-            });
-
-            $('#selector-add-button').click(function () {
-                var sensorType = $("#selector-sensor-list option:selected").val();
-                var values = sensorType.split("-");
-
-                var dummysensor = { type: values[0] };
-                if (values.length == 2)
+            if (values.length >= 2)
+                if (values[1])
                     dummysensor.subType = values[1];
 
-                var sensorDefinition = findSensorDefinition(dummysensor);
+            if (values.length >= 3)
+                builtinport = values[2];
+
+            var sensorDefinition = findSensorDefinition(dummysensor);
+
+            var imageContainer = document.getElementById("selector-image-container");
+            while (imageContainer.firstChild) {
+                imageContainer.removeChild(imageContainer.firstChild);
+            }
+            for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
+                var image = document.createElement('img');
+
+                image.src = getImg(sensorDefinition.selectorImages[i]);
+
+                imageContainer.appendChild(image);
+
+                //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
+            }
 
 
-                var port = $("#selector-sensor-port option:selected").text();
-                var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
+            var portSelect = document.getElementById("selector-sensor-port");
+            $('#selector-sensor-port').empty();
+            var hasPorts = false;
+            if (builtinport) {
+                var option = document.createElement('option');
+                option.innerText = builtinport;
+                option.value = builtinport;
+                portSelect.appendChild(option);
+                hasPorts = true;
+            } else {
+                var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
+                if (sensorDefinition.portType == "i2c")
+                {
+                    ports = ["i2c"];
+                }
 
-                // if(name == 'screen1') {
-                    // prepend screen because squareSize func can't handle cells wrap
-                    infos.quickPiSensors.unshift({
-                        type: sensorDefinition.name,
-                        subType: sensorDefinition.subType,
-                        port: port,
-                        name: name
-                    });                    
+                for (var iPort = 0; iPort < ports.length; iPort++) {
+                    var port = sensorDefinition.portType + ports[iPort];
+                    if (sensorDefinition.portType == "i2c")
+                        port = "i2c";
 
-                // } else {
-                //     infos.quickPiSensors.push({
-                //         type: sensorDefinition.name,
-                //         subType: sensorDefinition.subType,
-                //         port: port,
-                //         name: name
-                //     });                    
-                // }
+                    if (!isPortUsed(sensorDefinition.name, port)) {
+                        var option = document.createElement('option');
+                        option.innerText = port;
+                        option.value = port;
+                        portSelect.appendChild(option);
+                        hasPorts = true;
+                    }
+                }
+            }
 
 
 
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
+            if (!hasPorts) {
+                $('#selector-add-button').attr("disabled", true);
 
-                context.resetSensorTable();
-                context.resetDisplay();
-            });
+                var object_function = strings.messages.actuator;
+                if (sensorDefinition.isSensor)
+                    object_function = strings.messages.sensor;
 
-
-            $("#selector-sensor-list").trigger("change");
-
-            $('#picancel').click(function () {
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-            });
+                $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
+                $('#selector-label').show();
+            }
+            else {
+                $('#selector-add-button').attr("disabled", false);
+                $('#selector-label').hide();
+            }
         });
-    };
+
+        $('#selector-add-button').click(function () {
+            var sensorType = $("#selector-sensor-list option:selected").val();
+            var values = sensorType.split("-");
+
+            var dummysensor = { type: values[0] };
+            if (values.length == 2)
+                dummysensor.subType = values[1];
+
+            var sensorDefinition = findSensorDefinition(dummysensor);
+
+
+            var port = $("#selector-sensor-port option:selected").text();
+            var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
+
+            // if(name == 'screen1') {
+                // prepend screen because squareSize func can't handle cells wrap
+                infos.quickPiSensors.unshift({
+                    type: sensorDefinition.name,
+                    subType: sensorDefinition.subType,
+                    port: port,
+                    name: name
+                });                    
+
+            // } else {
+            //     infos.quickPiSensors.push({
+            //         type: sensorDefinition.name,
+            //         subType: sensorDefinition.subType,
+            //         port: port,
+            //         name: name
+            //     });                    
+            // }
+
+
+
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+
+            context.resetSensorTable();
+            context.resetDisplay();
+        });
+
+
+        $("#selector-sensor-list").trigger("change");
+
+        $('#picancel').click(function () {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+        });
+    }; 
 
     function isPortUsed(type, port) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
