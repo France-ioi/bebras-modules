@@ -3994,7 +3994,7 @@ var getContext = function (display, infos, curLevel) {
         // "   </span>" +
         "   <div id=\"dropdown_menu\">"+
         "       <span class='menu_line' id='toggle_menu'><span class=\"fas fa-exchange-alt\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
-        "       <span class='menu_line clickable'><span class=\"fas fa-desktop\"></span><span class='label'>"+strings.messages.simulator+"</span></span>"+
+        "       <span class='menu_line clickable' id='simulator'><span class=\"fas fa-desktop\"></span><span class='label'>"+strings.messages.simulator+"</span></span>"+
         "       <span class='menu_line clickable' id='remote_control'><span class=\"fas fa-plug\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
         "       <span class='menu_line clickable' id='install'><span class=\"fas fa-upload\"></span><span class='label'>"+strings.messages.install+"</span></span>"+
         "   </div>"+
@@ -4093,7 +4093,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         var showMenu = false;
-        $('#toggle_menu').click(function() {
+        $('#toggle_menu, #simulator').click(function() {
             showMenu = !showMenu;
             updateMenu();
         });
@@ -4273,6 +4273,7 @@ var getContext = function (display, infos, curLevel) {
             
             window.displayHelper.showPopupDialog(connectionDialogHTML);
 
+            $(".simple-dialog").addClass("config");
             $('#popupMessage .navigationContent ul li').removeClass('selected');
             $('#popupMessage .navigationContent ul li[id=qpi-connection]').addClass('selected');
             $('#showNavigationContent').prop('checked', false);

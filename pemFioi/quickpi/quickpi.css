@@ -1,3 +1,5 @@
+/*** MENU ***/
+
 #introControls {
     height: 40px;
     position: relative;
@@ -44,8 +46,8 @@
     justify-content: space-around;
     gap: 10px;
     cursor: pointer;
+    color: gray
 }
-
 .menu_line {
     height: 34px;
 }
@@ -56,40 +58,43 @@
     color: #4a90e2;
 }
 
+/*** CONFIG ***/
+
+.simple-dialog.config {
+    padding: 0;
+    margin: 0;
+}
+.simple-dialog.config #popupMessage {
+    background: none;
+}
+.simple-dialog.config #popupMessage .iconTag {
+    margin: 0;
+    margin-right: 20px;
+}
 #quickpiViewer {
-    /*position: fixed;*/
     left: 0px;
     top: 0px;
     z-index: 100;
     width: 100%;
     height: 100%;
     overflow: auto;
-    /*background: rgba(241, 242, 247, .9);*/
 }
 #quickpiViewer .content {
-    /*position: absolute;
-    top: calc(51% - (90vh / 2));
-    left: calc(50% - (90vw / 2));*/
-    
-    /*width: 90vw;
-    height: 90vh;*/
-
-    width: 620px;
-    height: 640px;
-    
-
-
+    width: auto;
+/*    height: 640px;*/
+    height: 80vh;
     background-color: #fff;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     justify-content: stretch;
 }
-#quickpiViewer .panel-heading {
+.config #quickpiViewer .panel-heading {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 0;
+    margin: 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 #quickpiViewer .section-external-exit {
@@ -97,17 +102,19 @@
 }
 #quickpiViewer .exit {
     cursor: pointer;
-    margin: 0 3px 0 16px;
+/*    margin: 0 16px;*/
+    padding: 20px;
 }
 #quickpiViewer .exit .icon {
     font-size: 18px;
     color: #4a90e2;
 }
-#quickpiViewer .panel-body {
+.config #quickpiViewer .panel-body {
     display: flex;
     justify-content: stretch;
     height: 100%;
     min-height: 0;
+    margin-left: 0;
 }
 @media screen and (min-width: 481px){
     #quickpiViewer .navigationContent {
@@ -120,6 +127,13 @@
     border-right: 1px solid rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+}
+#quickpiViewer #boardlist {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 #quickpiViewer .navigationLanguage {
