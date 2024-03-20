@@ -722,19 +722,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
 
       getDefaultColours: function() {
+         Blockly.HSV_SATURATION = 0.65;
+         Blockly.HSV_VALUE = 0.80;
          var colours = {
             categories: {
-               logic: 210,
-               loops: 120,
-               control: 120,
-               math: 230,
-               operator: 230,
-               texts: 160,
-               lists: 260,
-               colour: 20,
-               variables: 330,
-               functions: 290,
-               _default: 65
+                 actuator: 212,
+                 sensors: 95,
+                 internet: 200,
+                 display: 300,
+                 input: 50,
+                 inputs: 50,
+                 lists: 353,
+                 logic: 298,
+                 math: 176,
+                 loops: 37,
+                 texts: 312,
+                 dicts: 52,
+                 tables: 212,
+                 variables: 30,
+                 procedures: 180,
+                 _default: 65
             },
             blocks: {}
          };
