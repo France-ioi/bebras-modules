@@ -3846,22 +3846,22 @@ var getContext = function (display, infos, curLevel) {
             // context.sensorSize = geometry.size * .10;
             reorganizeSensors(geometry);
 
+            var lineAttr = {
+                "stroke-width": 1,
+                "stroke": "black",
+                opacity: 0.1
+            };
+            var x1 = cellW*0.2;
+            var x2 = paper.width - cellW*0.2;
             var iSensor = 0;
-
             for (var row = 0; row < nbRows; row++) {
                 var y = geometry.size * row;
-
-                var line = paper.path(["M", 0,
-                    y,
-                    "L", paper.width,
-                    y]);
-                context.sensorDivisions.push(line);
-
-                line.attr({
-                    "stroke-width": 1,
-                    "stroke": "lightgrey",
-                    "stroke-linecapstring": "round"
-                });
+                
+                if(row > 0){
+                    var line = paper.path(["M", x1,y,"L", x2,y]);
+                    context.sensorDivisions.push(line);
+                    line.attr(lineAttr);
+                }
 
                 for (var col = 0; col < nbCol; col++) {
                     var x = cellW * col;
@@ -3887,22 +3887,10 @@ var getContext = function (display, infos, curLevel) {
                     if (sensor && sensor.type === "screen" && cells > nbCol && cells == 3 && nbCol == 2)
                         cells = 2;
 
-                    line = paper.path(["M", x, y1, "V", y2]);
-                    // line = paper.rect(x,y1,1,y2 - y1,1);
-                    context.sensorDivisions.push(line);
-
-                    line.attr({
-                        stroke: "none",
-                        "stroke-width": 1,
-                        "stroke": "lightgrey",
-                        // "fill": "lightgrey",
-                        // fill: "90-#fff-#000",
-                        "stroke-linecap": "round"
-                    });
-                    // line.attr({
-                    //     stroke: "none",
-                    //     fill: "0-#fff-#f00:20-#000"
-                    // });
+                    if(col > 0){
+                        var line = paper.path(["M", x, y1, "V", y2]).attr(lineAttr);
+                        context.sensorDivisions.push(line);
+                    }
 
                     var foundcols = false;
                     var bump = false;
@@ -5080,7 +5068,7 @@ var getContext = function (display, infos, curLevel) {
         return name + (maxvalue + 1);
     }
 
-    function drawCustomSensorAdder(x, y, w, h) {
+    function drawCustomSensorAdder(x, y, w, h, fontsize) {
         if (context.sensorAdder) {
             context.sensorAdder.remove();
         }
@@ -5094,7 +5082,7 @@ var getContext = function (display, infos, curLevel) {
         var y1 = cy - plusSize/2;
         var y2 = cy + plusSize/2;
         var yText = y + h - (h/2 - r)/2;
-        var fontsize = h * .15;
+        // var fontsize = h * .15;
         var sSize1 = 2*h/100;
         var sSize2 = 3*h/100;
         // console.log(h)
@@ -6834,6 +6822,8 @@ var getContext = function (display, infos, curLevel) {
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         // console.log(sensor.type)
         saveSensorStateIfNotRunning(sensor);
+        var sameFont = true;
+        var sideTextSmall = true;
 
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -6963,6 +6953,10 @@ var getContext = function (display, infos, curLevel) {
         }
         namesize = Math.min(namesize,maxNameSize);
         statesize = Math.min(statesize,maxStateSize);
+        if(sameFont){
+            // namesize = h*0.12;
+            statesize = namesize;
+        }
 
         var sensorAttr = {
             "x": imgx,
@@ -7255,8 +7249,6 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.img || isElementRemoved(sensor.img)) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
             }
-               
-
 
             sensor.img.attr({
                 "x": imgx,
@@ -7265,7 +7257,6 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
                 "opacity": fadeopacity,
             });
-
 
             if (sensor.state) {
                 if (sensor.state.isDrawingData) {
@@ -7697,7 +7688,8 @@ var getContext = function (display, infos, curLevel) {
             }
 
             if (sensor.state) {
-                statesize = h*0.12;
+                if(sideTextSmall)
+                    statesize = h*0.12;
                 try {
                     var str = "X: " + sensor.state[0] + " m/s²\nY: " + sensor.state[1] + " m/s²\nZ: " + sensor.state[2] + " m/s²";
                     sensor.stateText = paper.text(cx, state1y, str);
@@ -7725,7 +7717,9 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText) {
                 sensor.stateText.remove();
             }
-            statesize = h*0.12;
+            if(sideTextSmall)
+                statesize = h*0.12;
+
             var str = "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s";
             sensor.stateText = paper.text(cx, state1y, str);
             if (!sensor.previousState)
@@ -7851,7 +7845,9 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                statesize = h*0.12;
+                if(sideTextSmall)
+                    statesize = h*0.12;
+
                 var str = "X: " + sensor.state[0] + " μT\nY: " + sensor.state[1] + " μT\nZ: " + sensor.state[2] + " μT";
                 sensor.stateText = paper.text(cx, state1y, str);
             }
@@ -8249,25 +8245,34 @@ var getContext = function (display, infos, curLevel) {
 
             // var stateString = "\n";
             var stateString = "";
+            var click = false;
             if (sensor.state[0]) {
                 stateString += strings.messages.up.toUpperCase() + "\n";
                 sensor.imgup.attr({ "opacity": 1 });
+                click = true;
             }
             if (sensor.state[1]) {
                 stateString += strings.messages.down.toUpperCase() + "\n";
                 sensor.imgdown.attr({ "opacity": 1 });
+                click = true;
             }
             if (sensor.state[2]) {
                 stateString += strings.messages.left.toUpperCase() + "\n";
                 sensor.imgleft.attr({ "opacity": 1 });
+                click = true;
             }
             if (sensor.state[3]) {
                 stateString += strings.messages.right.toUpperCase() + "\n";
                 sensor.imgright.attr({ "opacity": 1 });
+                click = true;
             }
             if (sensor.state[4]) {
                 stateString += strings.messages.center.toUpperCase() + "\n";
                 sensor.imgcenter.attr({ "opacity": 1 });
+                click = true;
+            }
+            if(!click){
+                stateString += "...";
             }
 
             sensor.stateText = paper.text(state1x, state1y, stateString);
@@ -8525,60 +8530,9 @@ var getContext = function (display, infos, curLevel) {
             drawPortText = false;
             drawName = false;
         }else if(sensor.type == "adder"){
-            drawCustomSensorAdder(x,y,w,h);
+            drawCustomSensorAdder(x,y,w,h,namesize);
             return
         }
-
-
-        // sensor.focusrect.mousedown(function () {
-        //     var fsize = 30;
-        //     // var xCross = x + w - fsize;
-        //     var xCross = portx;
-        //     // console.log(xCross,x,w)
-        //     if (infos.customSensors && !context.autoGrading) {
-        //         if (context.removerect) {
-        //             context.removerect.remove();
-        //         }
-
-        //         if (!context.runner || !context.runner.isRunning()) {
-        //         context.removerect = paper.text(xCross, imgy, "\uf00d"); // fa-times char
-        //         removeRect = context.removerect;
-        //         sensorWithRemoveRect = sensor;
-
-        //         context.removerect.attr({
-        //             "font-size": fsize + "px",
-        //             fill: "lightgray",
-        //             "font-family": "Font Awesome 5 Free",
-        //             'text-anchor': 'start',
-        //             "x": xCross,
-        //             "y": imgy,
-        //         });
-
-        //         context.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-        //         context.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
-        //         context.removerect.node.style.fontWeight = "bold";
-
-
-        //         context.removerect.click(function (element) {
-
-        //             window.displayHelper.showPopupMessage(strings.messages.removeConfirmation,
-        //                 'blanket',
-        //                 strings.messages.remove,
-        //                 function () {
-        //                     for (var i = 0; i < infos.quickPiSensors.length; i++) {
-        //                         if (infos.quickPiSensors[i] === sensor) {
-        //                             sensor.removed = true;
-        //                             infos.quickPiSensors.splice(i, 1);
-        //                         }
-        //                     }
-        //                     context.recreateDisplay = true;
-        //                     context.resetDisplay();
-        //                 },
-        //                 strings.messages.keep);
-        //         });
-        //     }
-        //     }
-        // });
 
 
         if (sensor.stateText) {
