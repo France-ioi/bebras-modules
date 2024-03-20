@@ -17,6 +17,7 @@ var quickPiLocalLanguageStrings = {
 
             setLedBrightness: "mettre la luminosité de %1 à %2",
             getLedBrightness: "lire la luminosité de %1",
+            setLedColors: "mettre la couleur de %1 à r:%2 g:%3 b:%4",
 
             turnBuzzerOn: "allumer le buzzer",
             turnBuzzerOff: "éteindre le buzzer",
@@ -118,6 +119,7 @@ var quickPiLocalLanguageStrings = {
             getBuzzerNote: "getBuzzerNote",
             setLedBrightness: "setLedBrightness",
             getLedBrightness: "getLedBrightness",
+            setLedColors: "setLedColors",
             getServoAngle: "getServoAngle",
 
             setBuzzerState: "setBuzzerState",
@@ -198,6 +200,7 @@ var quickPiLocalLanguageStrings = {
 
             setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
             getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
+            setLedColors: "setLedColors(led, r, g, b) règle la couleur de la LED",
             getServoAngle: "getServoAngle(servo) retourne l'angle du servomoteur",
 
             isLedOn: "isLedOn() retourne True si la LED est allumée, False si elle est éteinte",
@@ -1403,6 +1406,7 @@ var quickPiLocalLanguageStrings = {
             getBuzzerNote: "Get buzzer note",
             setLedBrightness: "Set Led Brightness",
             getLedBrightness: "Get Led Brightness",
+            setLedColors: "Set Led Colors",
             getServoAngle: "Get Servo Angle",
             isLedOn: "Get led state",
             isLedOnWithName: "Get led state",
@@ -4736,7 +4740,7 @@ var getContext = function (display, infos, curLevel) {
                 installPythonCode(python_code);
             } else {
                 window.task.getAnswer(function (answer) {
-                    python_code += JSON.parse(answer).easy;
+                    python_code += JSON.parse(answer).easy.document.lines.join("\n");
                     python_code = python_code.replace("from quickpi import *", "");
                     installPythonCode(python_code);
                 });
@@ -9082,6 +9086,35 @@ var getContext = function (display, infos, curLevel) {
                 cb(returnVal);
 
             });
+        }
+    };
+
+    context.quickpi.setLedColors = function (name, r, g, b, callback) {
+        var sensor = findSensorByName(name, true);
+
+        if (typeof r == "object")
+        {
+            r = r.valueOf();
+        }
+        if (typeof g == "object")
+        {
+            g = g.valueOf();
+        }
+        if (typeof b == "object")
+        {
+            b = b.valueOf();
+        }
+
+        var command = "setLedColors(\"" + name + "\"," + r + "," + g + "," + b + ")";
+
+        context.registerQuickPiEvent(name, {r: r, g: g, b: b});
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, cb);
         }
     };
 

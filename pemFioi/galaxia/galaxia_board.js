@@ -126,8 +126,8 @@ const GalaxiaBoard = {
         } else if(sensor === 'disconnected') {
             this.innerState.connected = false;
             this.setConnected(false);
-        } else if(sensor.name.split(' ')[0] == 'button') {
-            var button = sensor.name.split(' ')[1];
+        } else if(sensor.name.substring(0, 3) == 'btn') {
+            var button = sensor.name.substring(3).toLowerCase();
             this.innerState[button] = sensor.state;
             if(!this.initialized) { return; }
             this.buttonStatesUpdators[button][sensor.state ? 'down' : 'up'](true);
