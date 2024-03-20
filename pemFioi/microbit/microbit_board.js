@@ -96,10 +96,14 @@ const MicrobitBoard = {
         this.buttonStatesUpdators[buttonId] = {'down': buttonDown, 'up': buttonUp};
     },
 
-    setLed: function(color) {
+    setLedMatrix: function(state) {
         if(!this.initialized) { return; }
-        var led = this.galaxiaSvg.find('#led');
-        led.css('fill', color);
+        for(var i=0; i<5; i++) {
+            for(var j=0; j<5; j++) {
+                var led = this.galaxiaSvg.find('#ledmatrix-' + i + '-' + j);
+                led.toggle(!!state[i][j]);
+            }
+        }
     },
 
     setConnected: function(isConnected) {
@@ -115,18 +119,14 @@ const MicrobitBoard = {
         } else if(sensor === 'disconnected') {
             this.innerState.connected = false;
             this.setConnected(false);
-        } else if(sensor.name.split(' ')[0] == 'button') {
-            var button = sensor.name.split(' ')[1];
+        } else if(sensor.name.substring(0, 3) == 'btn') {
+            var button = sensor.name.substring(3).toLowerCase();
             this.innerState[button] = sensor.state;
             if(!this.initialized) { return; }
             this.buttonStatesUpdators[button][sensor.state ? 'down' : 'up'](true);
-        } else if(sensor.type === 'led') {
-            if(sensor.state) {
-                this.innerState.led = sensor.subType || 'green';
-            } else {
-                this.innerState.led = 'transparent';
-            }
-            this.setLed(this.innerState.led);
+        } else if(sensor.type === 'ledmatrix') {
+            this.innerState.ledmatrix = sensor.state;
+            this.setLedMatrix(sensor.state);
         }
     },
 
@@ -135,7 +135,7 @@ const MicrobitBoard = {
         for(var id in this.buttonStatesUpdators) {
             this.buttonStatesUpdators[id][this.innerState[id] ? 'down' : 'up'](true);
         }
-        this.setLed(this.innerState.led || 'transparent');
+        this.setLedMatrix(this.innerState.ledmatrix || 'transparent');
         this.setConnected(this.innerState.connected);
     }
 }

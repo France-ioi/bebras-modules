@@ -11,6 +11,7 @@ var quickPiLocalLanguageStrings = {
 
             setLedState: "passer la LED %1 à %2 ",
             toggleLedState: "inverser la LED %1",
+            setLedMatrixOne: "passer la LED %1 en position %2, %3 à %4",
 
             isLedOn: "LED allumée",
             isLedOnWithName: "LED %1 allumée",
@@ -93,6 +94,7 @@ var quickPiLocalLanguageStrings = {
             turnLedOn: "turnLedOn",
             turnLedOff: "turnLedOff",
             setLedState: "setLedState",
+            setLedMatrixOne: "setLedMatrixOne",
 
             isButtonPressed: "isButtonPressed",
             isButtonPressedWithName : "isButtonPressed",
@@ -186,6 +188,7 @@ var quickPiLocalLanguageStrings = {
             waitForButton: "waitForButton(button) met en pause l'exécution jusqu'à ce que le bouton soit appuyé",
             buttonWasPressed: "buttonWasPressed(button) indique si le bouton a été appuyé depuis le dernier appel à cette fonction",
             setLedState: "setLedState(led, state) modifie l'état de la LED : True pour l'allumer, False pour l'éteindre",
+            setLedMatrixOne: "setLedMatrixOne(x, y, state) modifie l'état d'une LED de la matrice",
             toggleLedState: "toggleLedState(led) inverse l'état de la LED",
             displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
             displayText2Lines: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
@@ -1013,6 +1016,7 @@ var quickPiLocalLanguageStrings = {
             turnLedOn: "turnLedOn",
             turnLedOff: "turnLedOff",
             setLedState: "setLedState",
+            setLedMatrixOne: "setLedMatrixOne",
 
             isButtonPressed: "isButtonPressed",
             isButtonPressedWithName : "isButtonPressed",
@@ -1387,6 +1391,7 @@ var quickPiLocalLanguageStrings = {
             waitForButton: "Stops program execution until a button is pressed",
             buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
             setLedState: "Change led state in the given port",
+            setLedMatrixOne: "Change led state in the given port",
             toggleLedState: "If led is on, turns it off, if it's off turns it on",
             isButtonPressedWithName: "Returns the state of a button, Pressed means True and not pressed means False",
             displayText: "Display text in LCD screen",
@@ -1970,6 +1975,46 @@ var getContext = function (display, infos, curLevel) {
                 suggestedName: strings.messages.sensorNameRedLed,
             }
             ],
+        },
+        {
+            name: "ledmatrix",
+            suggestedName: strings.messages.sensorNameLedMatrix,
+            description: strings.messages.ledmatrix,
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            getInitialState: function (sensor) {
+                return [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+            },
+            selectorImages: ["ledon-red.png"],
+            valueType: "boolean",
+            pluggable: true,
+            getPercentageFromState: function (state) {
+                if (state) {
+                    var total = 0;
+                    state.forEach(function(substate) {
+                        substate.forEach(function(v) {
+                            total += v;
+                        });
+                    });
+                    return total / 25;
+                }
+                return 0;
+            },
+            getStateFromPercentage: function (percentage) {
+                if(percentage > 0) {
+                    return [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]];
+                }
+                return [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+            },
+            setLiveState: function (sensor, state, callback) {
+                var command = "setLedMatrixState(\"" + sensor.name + "\"," + JSON.stringify(state) + ")";
+
+                context.quickPiConnection.sendCommand(command, callback);
+            },
+            getStateString: function(state) {
+                return '';
+            },
         },
         {
             name: "buzzer",
@@ -3685,7 +3730,9 @@ var getContext = function (display, infos, curLevel) {
         }
 
         paper.setSize(($('#virtualSensors').width() * context.quickPiZoom), $('#virtualSensors').height());
-        $('#virtualBoard').height($('#virtualSensors').height());
+        if($('#virtualBoard').html() != '') {
+            $('#virtualBoard').height($('#virtualSensors').height());
+        }
 
         var area = paper.width * paper.height;
         context.compactLayout = false;
@@ -5238,7 +5285,6 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function raspberryPiDisconnected(wasConnected, wrongversion) {
-
         if (context.releasing || !wasConnected)
             showasReleased();
         else
@@ -5255,6 +5301,7 @@ var getContext = function (display, infos, curLevel) {
         } else if(wasConnected) {
             window.displayHelper.showPopupMessage(strings.messages.cardDisconnected, 'blanket');
             context.releasing = true;
+            showasReleased();
         }
 
         clearSensorPollInterval();
@@ -6800,7 +6847,55 @@ var getContext = function (display, infos, curLevel) {
 
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
+        } else if (sensor.type == "ledmatrix") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+            
+            if (!sensor.state || !sensor.state.length)
+                sensor.state = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
 
+            var ledmatrixOnAttr = {
+                "fill": "red",
+                "stroke": "darkgray"
+            };
+            var ledmatrixOffAttr = {
+                "fill": "lightgray",
+                "stroke": "darkgray"
+            };
+
+            if (!sensor.ledmatrix || isElementRemoved(sensor.ledmatrix[0][0])) {
+                sensor.ledmatrix = [];
+                for(var i = 0; i < 5; i++) {
+                    sensor.ledmatrix[i] = [];
+                    for(var j = 0; j < 5; j++) {
+                        sensor.ledmatrix[i][j] = paper.rect(imgx + (imgw/5)*i, imgy + (imgh/5)*j, imgw/5, imgh/5);
+                        sensor.ledmatrix[i][j].attr(ledmatrixOffAttr);
+                    }
+                }
+            }
+
+            for(var i = 0; i < 5; i++) {
+                for(var j = 0; j < 5; j++) {
+                    if(sensor.state[i][j]) {
+                        sensor.ledmatrix[i][j].attr(ledmatrixOnAttr);
+                    } else {
+                        sensor.ledmatrix[i][j].attr(ledmatrixOffAttr);
+                    }
+                }
+            }
+
+            function ledMatrixListener(imgx, imgy, imgw, imgh, sensor) {
+                return function(e) {
+                    var i = Math.floor((e.offsetX - imgx) / (imgw/5));
+                    var j = Math.floor((e.offsetY - imgy) / (imgh/5));
+                    sensor.state[i][j] = !sensor.state[i][j] ? 1 : 0;
+                    findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
+                    drawSensor(sensor);
+                }
+            }
+
+            sensor.focusrect.unclick();
+            sensor.focusrect.click(ledMatrixListener(imgx, imgy, imgw, imgh, sensor));
         } else if (sensor.type == "buzzer") { 
             if(typeof sensor.state == 'number' &&
                sensor.state != 0 &&
@@ -8820,6 +8915,25 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.setLedMatrixOne = function (name, i, j, state, callback) {
+        var sensor = findSensorByName(name, true);
+
+        if(i < 0 || i > 5 || j < 0 || j > 5) {
+            throw "invalid led position";
+        }
+
+        sensor.state[i][j] = state ? 1 : 0;
+
+        context.registerQuickPiEvent(name, sensor.state);
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var command = "setLedMatrixState(\"" + name + "\"," + JSON.stringify(sensor.state) + ")";
+            cb = context.runner.waitCallback(callback);
+            context.quickPiConnection.sendCommand(command, cb);
+        }
+    };
+
     context.quickpi.turnBuzzerOn = function (callback) {
 
         context.registerQuickPiEvent("buzzer1", true);
@@ -10402,6 +10516,18 @@ var getContext = function (display, infos, curLevel) {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
                             },
                             { "type": "field_dropdown", "name": "PARAM_1", "options": [[strings.messages.on.toUpperCase(), "1"], [strings.messages.off.toUpperCase(), "0"]] },
+                        ]
+                    }
+                },
+                {
+                    name: "setLedMatrixOne", params: ["String", "Number", "Number", "Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                            { "type": "input_value", "name": "PARAM_1" },
+                            { "type": "input_value", "name": "PARAM_2" },
+                            { "type": "field_dropdown", "name": "PARAM_3", "options": [[strings.messages.on.toUpperCase(), "1"], [strings.messages.off.toUpperCase(), "0"]] },
                         ]
                     }
                 },
