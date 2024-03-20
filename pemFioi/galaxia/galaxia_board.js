@@ -20,7 +20,7 @@ const GalaxiaBoard = {
     },
 
     importGalaxia: function(selector) {
-        const svgPath = '../bebras-modules/img/quickpi/galaxia.svg';
+        const svgPath = (window.modulesPath || '') + 'img/quickpi/galaxia.svg';
 
         fetch(svgPath)
             .then(response => response.text())
