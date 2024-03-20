@@ -3730,7 +3730,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         paper.setSize(($('#virtualSensors').width() * context.quickPiZoom), $('#virtualSensors').height());
-        if($('#virtualBoard').html() != '') {
+        if(context.infos.quickPiBoard) {
             $('#virtualBoard').height($('#virtualSensors').height());
         }
 

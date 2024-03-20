@@ -43,15 +43,24 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         return g_instance;
     }
 
-    this.connecting = false;
-    this.connected = false;
-    this.releasing = false;
+    this.resetProperties = function() {
+        this.connecting = false;
+        this.connected = false;
+        this.releasing = false;
+        this.serial = null;
+        this.currentOutput = "";
+        this.outputCallback = null;
+        this.executionQueue = [];
+        this.executing = false;
+    }
+    this.resetProperties();
+
     this.onConnect = _onConnect;
-    this.onDisconnect = _onDisconnect;
+    this.onDisconnect = function() {
+        _onDisconnect.apply(this, arguments);
+    }
     this.onChangeBoard = _onChangeBoard;
 
-    this.currentOutput = "";
-    this.outputCallback = null;
     this.processGalaxiaOutput = function(data) {
         var text = new TextDecoder().decode(data);
         this.currentOutput += text;
@@ -71,11 +80,9 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         }
     }
     
-    
-    this.serial = null;
     this.connect = async function(url) {
+        this.resetProperties();
         this.connecting = true;
-        this.releasing = false;
         try {
             this.serial = await getSerial([{usbProductId: 0x4003, usbVendorId: 0x303A}]);
         } catch(e) {
@@ -91,7 +98,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
             this.onDisconnect(true);
         });
 
-        this.serialStartRead(this.serial, this.processGalaxiaOutput.bind(this));
+        this.serialStartRead(this.serial);
         await this.transferPythonLib();
         this.onConnect();
     }
@@ -100,15 +107,14 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         this.reader = port.readable.getReader();
         while (true) {
             const { value, done } = await reader.read();
-            callback(value);
+            this.processGalaxiaOutput(value);
             if (done || this.releasing) {
                 reader.cancel();
                 break;
             }
         }
     }
-    
-    
+
 
     this.transferPythonLib = async function() {
         await serialWrite(this.serial, "f = open(\"fioilib.py\", \"w\")\r\nf.write(" + JSON.stringify(pythonLib).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n");
@@ -213,34 +219,32 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     }
 
 
-
-    var executionQueue = [];
-    var executing = false;
     var currentExecutionCallback = null;
     var currentOutputId = "";
     var nbCommandsExecuted = 0;
     function executeSerial(command, callback) {
-        if(executing) {
-            executionQueue.push([command, callback]);
+        if(this.executing) {
+            this.executionQueue.push([command, callback]);
             return;
         }
-        executing = true;
+        this.executing = true;
+        var that = this;
         nbCommandsExecuted += 1;
         if(nbCommandsExecuted > 500) {
-            executionQueue.push(["\x04", () => {}]);
-            executionQueue.push(["exec(open(\"fioilib.py\", \"r\").read())\r\n", () => {}]);
+            this.executionQueue.push(["\x04", () => {}]);
+            this.executionQueue.push(["exec(open(\"fioilib.py\", \"r\").read())\r\n", () => {}]);
             nbCommandsExecuted = 0;
         }
         currentOutputId = Math.random().toString(36).substring(7);
         currentExecutionCallback = callback;
         serialWrite(this.serial, command + "\r\nprint(\"" + currentOutputId + "\")\r\n").then(() => {
-            this.outputCallback = function(data) {
+            that.outputCallback = function(data) {
                 if(currentExecutionCallback) {
                     currentExecutionCallback(data);
                 }
-                executing = false;
-                if(executionQueue.length > 0) {
-                    var [command, callback] = executionQueue.shift();
+                that.executing = false;
+                if(that.executionQueue.length > 0) {
+                    var [command, callback] = that.executionQueue.shift();
                     executeSerial(command, callback);
                 }
             }
