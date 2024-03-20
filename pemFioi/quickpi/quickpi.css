@@ -1,3 +1,61 @@
+#introControls {
+    height: 40px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+#piui {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    padding: 0 10px;
+}
+#piui.hide {
+    height: 44px;
+    overflow: hidden;
+}
+#piui.show {
+    height: auto;
+    overflow: hidden;
+}
+.btn#pichangehat {
+    background-color: #f5a623;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+#pichangehatui {
+    margin: 0;
+}
+#dropdown_menu {
+    width: 200px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.menu_line {
+    height: 34px;
+}
+.menu_line .label {
+    margin-left: 10px
+}
+#dropdown_menu .clickable:hover {
+    color: #4a90e2;
+}
+
 #quickpiViewer {
     /*position: fixed;*/
     left: 0px;

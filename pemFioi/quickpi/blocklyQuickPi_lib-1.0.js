@@ -297,6 +297,8 @@ var quickPiLocalLanguageStrings = {
             connect: "Connecter",
             install: "Installer",
             config: "Config",
+            remoteControl: "Contrôle à distance",
+            simulator: "Simulateur",
 
      
             raspiConfig: "Configuration du Raspberry Pi",
@@ -1556,6 +1558,7 @@ var buzzerSound = {
 
 var colors = {
     blue: "#4a90e2",
+    orange: "#f5a623"
 }
 
 
@@ -3825,14 +3828,9 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
 
-            // if (infos.customSensors) {
-                // nSensors++;
-            // }
-
             if (nSensors < 4)
                 nSensors = 4;
 
-            // TODO : be carefull, the geometry is reversed for cols and rows I think
             var geometry = null;
             if (context.compactLayout)
                 // geometry = squareSize(paper.width, paper.height, nSensors, 2);
@@ -3846,11 +3844,12 @@ var getContext = function (display, infos, curLevel) {
             var cellW = paper.width / nbCol;
 
             // context.sensorSize = geometry.size * .10;
+            reorganizeSensors(geometry);
 
             var iSensor = 0;
 
-            for (var col = 0; col < nbRows; col++) {
-                var y = geometry.size * col;
+            for (var row = 0; row < nbRows; row++) {
+                var y = geometry.size * row;
 
                 var line = paper.path(["M", 0,
                     y,
@@ -3864,8 +3863,8 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecapstring": "round"
                 });
 
-                for (var row = 0; row < nbCol; row++) {
-                    var x = cellW * row;
+                for (var col = 0; col < nbCol; col++) {
+                    var x = cellW * col;
                     // var y1 = y + geometry.size / 4;
                     var y1 = y;
                     // var y2 = y + geometry.size * 3 / 4;
@@ -3905,17 +3904,19 @@ var getContext = function (display, infos, curLevel) {
                     //     fill: "0-#fff-#f00:20-#000"
                     // });
 
-                    var foundrows = false;
+                    var foundcols = false;
                     var bump = false;
 
-                    while (!foundrows && !bump)
+                    while (!foundcols && !bump)
                     {
-                        var rowsleft = nbCol - row;
-                        if (cells > rowsleft)
+                        var colsleft = nbCol - col;
+                        if (cells > colsleft)
                         {
                             for (var iNewSensor = iSensor + 1; iNewSensor < infos.quickPiSensors.length; iNewSensor++)
                             {
                                 var newSensor = infos.quickPiSensors[iNewSensor];
+                                // if(newSensor.type == "adder")
+                                    // continue
 
                                 cells = 1;
                                 cellsAmount = findSensorDefinition(newSensor).cellsAmount;
@@ -3928,7 +3929,7 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors[iNewSensor] = sensor;
                                     infos.quickPiSensors[iSensor] = newSensor;
                                     sensor = newSensor;
-                                    foundrows = true;
+                                    foundcols = true;
                                     break;
                                 }
                             }
@@ -3936,7 +3937,7 @@ var getContext = function (display, infos, curLevel) {
                         }
                         else
                         {
-                            foundrows = true;
+                            foundcols = true;
                         }
                     }
 
@@ -3948,7 +3949,7 @@ var getContext = function (display, infos, curLevel) {
                         // drawCustomSensorAdder(x, y, cellW * cells, geometry.size);
                         // drawCustomSensorAdder(x, y, geometry.size);
                     } else if (infos.quickPiSensors[iSensor]) {                        
-                        row += cells - 1;
+                        col += cells - 1;
 
                         sensor.drawInfo = {
                                 x: x,
@@ -3965,6 +3966,19 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
+    function reorganizeSensors(geo) {
+        // console.log(geo)
+        // var nbRows = geo.rows;
+        // var nbCol = geo.cols;
+        // var newSensors = [];
+        // var sensors = Beav.Object.clone(infos.quickPiSensors);
+        //  sensors.map()
+        // var row = 0, col = 0;
+        // do{
+        //     for(var sen of sensors)
+        // }while(newSensors.length < infos.quickPiSensors.length)
+    }
+
     // Reset the context's display
     context.createDisplay = function () {
         // Do something here
@@ -3978,25 +3992,35 @@ var getContext = function (display, infos, curLevel) {
             return;
 
 
-        var connectionHTML = "<div id=\"piui\">" +
-            "   <button type=\"button\" id=\"piconnect\" class=\"btn\">" +
-            "       <span class=\"fa fa-wifi\"></span><span id=\"piconnecttext\" class=\"btnText\">" + strings.messages.connect + "</span> " +
-            "   </button>" +
-            "   <span id=\"piinstallui\">" +
-            "       <span class=\"fa fa-exchange-alt\"></span>" +
-            "       <button type=\"button\" id=\"piinstall\" class=\"btn\">" +
-            "           <span class=\"fa fa-upload\"></span><span>" + strings.messages.install + "</span><span id=piinstallprogresss class=\"fas fa-spinner fa-spin\"></span><span id=\"piinstallcheck\" class=\"fa fa-check\"></span>" +
-            "       </button>" +
-            "   </span>" +
-            "   <span id=\"pichangehatui\">" +
-            "       <button type=\"button\" id=\"pichangehat\" class=\"btn\">" +
-            "           <span class=\"fas fa-hat-wizard\"></span><span>" + strings.messages.changeBoard + "</span></span></span>" +
-            "       </button>" +
-            "       <button type=\"button\" id=\"pihatsetup\" class=\"btn\">" +
-            "           <span class=\"fas fa-cog\"></span><span>" + strings.messages.config + "</span></span></span>" +
-            "       </button>" +
-            "   </span>" +
-            "</div>";
+        var connectionHTML = 
+        "<div id=\"piui\" class='hide' >" +
+        // "   <button type=\"button\" id=\"piconnect\" class=\"btn\">" +
+        // // "       <span class=\"fa fa-wifi\"></span><span id=\"piconnecttext\" class=\"btnText\">" + strings.messages.connect + "</span> " +
+        // "       <span class=\"fas fa-exchange-alt\"></span><span id=\"piconnecttext\" class=\"btnText\">" + strings.messages.connect + "</span> " +
+        // "   </button>" +
+        // "   <span id=\"piinstallui\">" +
+        // "       <span class=\"fa fa-exchange-alt\"></span>" +
+        // "       <button type=\"button\" id=\"piinstall\" class=\"btn\">" +
+        // "           <span class=\"fa fa-upload\"></span><span>" + strings.messages.install + "</span><span id=piinstallprogresss class=\"fas fa-spinner fa-spin\"></span><span id=\"piinstallcheck\" class=\"fa fa-check\"></span>" +
+        // "       </button>" +
+        // "   </span>" +
+        "   <div id=\"dropdown_menu\">"+
+        "       <span class='menu_line' id='toggle_menu'><span class=\"fas fa-exchange-alt\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
+        "       <span class='menu_line clickable'><span class=\"fas fa-desktop\"></span><span class='label'>"+strings.messages.simulator+"</span></span>"+
+        "       <span class='menu_line clickable' id='remote_control'><span class=\"fas fa-plug\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
+        "       <span class='menu_line clickable' id='install'><span class=\"fas fa-upload\"></span><span class='label'>"+strings.messages.install+"</span></span>"+
+        "   </div>"+
+
+        "   <span id=\"pichangehatui\">" +
+        "       <button type=\"button\" id=\"pichangehat\" class=\"btn\">" +
+        // "           <span class=\"fas fa-hat-wizard\"></span><span>" + strings.messages.changeBoard + "</span></span></span>" +
+        "           <span class=\"fas fa-cog\"></span>"+
+        "       </button>" +
+        // "       <button type=\"button\" id=\"pihatsetup\" class=\"btn\">" +
+        // "           <span class=\"fas fa-cog\"></span><span>" + strings.messages.config + "</span></span></span>" +
+        // "       </button>" +
+        "   </span>" +
+        "</div>";
 
         var piUi = getQuickPiOption('disableConnection') ? '' : connectionHTML;
 
@@ -4080,120 +4104,188 @@ var getContext = function (display, infos, curLevel) {
             context.offLineMode = false;
         }
 
-        $('#piconnect').click(function () {
-            var connectionDialogHTML = 
-            "<div id=\"quickpiViewer\" class=\"content connectPi qpi\" style=\"display: block;\">" +
-                "<div class=\"content\">"+
-            // var connectionDialogHTML = "<div class=\"content connectPi qpi\">" +
-                "   <div class=\"panel-heading\">" +
-                "       <h2 class=\"sectionTitle\">" +
-                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
-                            strings.messages.raspiConfig +
-                "       </h2>" +
-                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
-                "   </div>" +
-                "   <div class=\"panel-body\">" +
-                // "       <div id=\"piconnectionmainui\">" +
-                "<div class=\"navigation\">" +
-                "<div class=\"navigationContent\"> " +
-                "<label for=\"showNavigationContent\" class=\"showNavigationContent\">" + strings.messages.selectOption + "</label>" +
-                "<input type=\"checkbox\" id=\"showNavigationContent\" role=\"button\">" +
+        var showMenu = false;
+        $('#toggle_menu').click(function() {
+            showMenu = !showMenu;
+            updateMenu();
+        });
+        $("#dropdown_menu #remote_control").click(function() {
+            if(!context.quickPiConnection.isConnected()) { 
+                showConfig(); 
+            }else{
+                showasConnected();
+                context.offLineMode = false;
+            }
+        });
+        $("#dropdown_menu #install").click(function() {
+            if(!context.quickPiConnection.isConnected()) { 
+                showConfig(); 
+            }else{
+                context.blocklyHelper.reportValues = false;
 
-                "      <ul>" +
-                "<li id=\"qpi-portsnames\">" + strings.messages.display + "</li>" +
-                "<li id=\"qpi-components\">" + strings.messages.components  + "</li>" +
-                "<li id=\"qpi-connection\" class=\"selected\">" + strings.messages.connection + "</li>" +
-                "     </ul>" +
-                "   </div>" +
-                "</div> " +
-                " <div class=\"viewer\">"+
-                "       <div id=\"qpi-uiblock-portsnames\" class=\"hiddenContent viewerInlineContent\" >" +
-                             strings.messages.displayPrompt +
-                "           <div class=\"switchRadio btn-group\" id=\"pi-displayconf\">" +
-                "               <button type=\"button\" class=\"btn active\" id=\"picomponentname\"><i class=\"fas fa-microchip icon\"></i>" + strings.messages.componentNames + "</button>" +
-                "               <button type=\"button\" class=\"btn\" id=\"piportname\"><i class=\"fas fa-plug icon\"></i>" + strings.messages.portNames + "</button>" +
-                "           </div>" +
+                var python_code = context.generatePythonSensorTable();
+                python_code += "\n\n";
+                python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
 
-                "       </div>" +
+                python_code = python_code.replace("from quickpi import *", "");
 
-                "       <div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
-                "           <div id=\"sensorGrid\" style=\"overflow: auto;\">" +
-                "           </div>" +
-                "               <center><button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
-                "       </div>" +
-                "       <div id=\"qpi-uiblock-connection\" class=\"hiddenContent viewerInlineContent\">" +
+                if (context.runner)
+                    context.runner.stop();
 
-                "           <div class=\"switchRadio btn-group\" id=\"piconsel\">" +
-                "               <button type=\"button\" class=\"btn\" id=\"piconlocal\"><i class=\"fas fa-location-arrow icon\"></i>" + strings.messages.local + "</button>" +
-                "               <button type=\"button\" class=\"btn active\" id=\"piconwifi\"><i class=\"fa fa-wifi icon\"></i>WiFi</button>" +
-                "               <button type=\"button\" class=\"btn\" id=\"piconusb\"><i class=\"fab fa-usb icon\"></i>USB</button>" +
-                "               <button type=\"button\" class=\"btn\" id=\"piconbt\"><i class=\"fab fa-bluetooth-b icon\"></i>Bluetooth</button>" +
-                "           </div>" +
-                "           <div id=\"pischoolcon\">" +
-                "               <div class=\"form-group\">" +
-                "                   <label id=\"pischoolkeylabel\">" + strings.messages.schoolKey + "</label>" +
-                "                   <div class=\"input-group\">" +
-                "                       <div class=\"input-group-prepend\">Aa</div>" +
-                "                       <input type=\"text\" id=\"schoolkey\" class=\"form-control\">" +
-                "                   </div>" +
-                "               </div>" +
-                "               <div class=\"form-group\">" +
-                "                   <label id=\"pilistlabel\">" + strings.messages.connectList + "</label>" +
-                "                   <div class=\"input-group\">" +
-                "                       <button class=\"input-group-prepend\" id=pigetlist disabled>" + strings.messages.getPiList + "</button>" +
-                "                       <select id=\"pilist\" class=\"custom-select\" disabled>" +
-                "                       </select>" +
-                "                   </div>" +
-                "               </div>" +
-                "               <div class=\"form-group\">" +
-                "                   <label id=\"piiplabel\">" + strings.messages.enterIpAddress + "</label>" +
-                "                   <div class=\"input-group\">" +
-                "                       <div class=\"input-group-prepend\">123</div>" +
-                "                       <input id=piaddress type=\"text\" class=\"form-control\">" +
-                "                   </div>" +
-                "               </div>" +
-                "               <div>" +
-                "                   <input id=\"piusetunnel\" disabled type=\"checkbox\">" + strings.messages.connectTroughtTunnel +
-                "               </div>" +
-                "           </div>" +
-                "           <div id=\"panel-body-usbbt\">" +
-                "               <label id=\"piconnectionlabel\"></label>" +
-                "           </div>" +
-                "           <div id=\"panel-body-local\">" +
-                "               <label id=\"piconnectionlabellocal\"></label>" +
-                "               <div id=\"piconnectolocalhost\">" +
-                "                   <input type=\"radio\" id=\"piconnectolocalhostcheckbox\" name=\"pilocalconnectiontype\" value=\"localhost\">" +
-                                        strings.messages.connectToLocalhost +
-                "               </div>" +
-                "               <div id=\"piconnectocurrenturl\">" +
-                "                   <input type=\"radio\" id=\"piconnectocurrenturlcheckbox\" name=\"pilocalconnectiontype\" value=\"currenturl\">" +
-                                        strings.messages.connectToWindowLocation +
-                "               </div>" +
-                "           </div>" +
-                // "       </div>" +
-                // "       <div class=\"inlineButtons\">" +
-                // "           <button id=\"piconnectok\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.connectToDevice + "</button>" +
-                // "           <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
-                "           <div class=\"inlineButtons\">" +
-                "               <button id=\"piconnectok\" class=\"btn\">" +
-                "               <i id=\"piconnectprogressicon\" class=\"fas fa-spinner fa-spin icon\"></i>" +
-                "               <i id=\"piconnectwifiicon\" class=\"fa fa-wifi icon\"></i>" + 
-                                    strings.messages.connectToDevice +
-                "               </button>" +
-                "               <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
-                "           </div>" +
+                context.installing = true;
+                $('#piinstallprogresss').show();
+                $('#piinstallcheck').hide();
 
-                "       </div>" +
-                "   </div>" +
+                context.quickPiConnection.installProgram(python_code, function () {
+                    context.justinstalled = true;
+                    $('#piinstallprogresss').hide();
+                    $('#piinstallcheck').show();
+                });
+            }
+        });
+        $('#pichangehat').click(showConfig);
 
-                 "   </div>" +
-                "   </div>" +
+        function updateMenu() {
+            if(showMenu){
+                $("#piui").addClass("show");
+                $("#piui").removeClass("hide");
+            }else{
+                $("#piui").addClass("hide");
+                $("#piui").removeClass("show");
+            }
+        };
 
-                "</div>";
+        function getConnectionDialogHTML() {
+            var html = "<div id=\"quickpiViewer\" class=\"content connectPi qpi\" style=\"display: block;\">" +
+            "<div class=\"content\">"+
+        // var connectionDialogHTML = "<div class=\"content connectPi qpi\">" +
+            "   <div class=\"panel-heading\">" +
+            "       <h2 class=\"sectionTitle\">" +
+            "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                        strings.messages.raspiConfig +
+            "       </h2>" +
+            "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+            "   </div>" +
+            "   <div class=\"panel-body\">" +
+            // "       <div id=\"piconnectionmainui\">" +
+            "<div class=\"navigation\">" +
+            "<div class=\"navigationContent\"> " +
+            // "<label for=\"showNavigationContent\" class=\"showNavigationContent\">" + strings.messages.selectOption + "</label>" +
+            "<input type=\"checkbox\" id=\"showNavigationContent\" role=\"button\">" +
 
+            "<ul>" +
+            "   <li id=\"qpi-portsnames\">" + strings.messages.display + "</li>" +
+            "   <li id=\"qpi-components\">" + strings.messages.components  + "</li>" +
+            "   <li id=\"qpi-change-board\">" + strings.messages.changeBoard  + "</li>" +
+            "   <li id=\"qpi-connection\" class=\"selected\">" + strings.messages.connection + "</li>" +
+            "</ul>" +
+            "   </div>" +
+            "</div> " +
+            " <div class=\"viewer\">"+
+            "       <div id=\"qpi-uiblock-portsnames\" class=\"hiddenContent viewerInlineContent\" >" +
+                         strings.messages.displayPrompt +
+            "           <div class=\"switchRadio btn-group\" id=\"pi-displayconf\">" +
+            "               <button type=\"button\" class=\"btn active\" id=\"picomponentname\"><i class=\"fas fa-microchip icon\"></i>" + strings.messages.componentNames + "</button>" +
+            "               <button type=\"button\" class=\"btn\" id=\"piportname\"><i class=\"fas fa-plug icon\"></i>" + strings.messages.portNames + "</button>" +
+            "           </div>" +
+
+            "       </div>" +
+
+            "       <div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
+            "           <div id=\"sensorGrid\" style=\"overflow: auto;\">" +
+            "           </div>" +
+            "               <center><button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+            "       </div>" +
+
+            "       <div id=\"qpi-uiblock-change-board\" class=\"hiddenContent viewerInlineContent\">" +
+            "           <div class=\"panel-body\">" +
+            "               <div id=boardlist>" +
+            "               </div>" +
+            "               <div panel-body-usbbt>" +
+            "                   <label id=\"piconnectionlabel\"></label>" +
+            "               </div>" +
+            "           </div>" +
+            "       </div>" +
+
+
+            "       <div id=\"qpi-uiblock-connection\" class=\"hiddenContent viewerInlineContent\">" +
+
+            "           <div class=\"switchRadio btn-group\" id=\"piconsel\">" +
+            "               <button type=\"button\" class=\"btn\" id=\"piconlocal\"><i class=\"fas fa-location-arrow icon\"></i>" + strings.messages.local + "</button>" +
+            "               <button type=\"button\" class=\"btn active\" id=\"piconwifi\"><i class=\"fa fa-wifi icon\"></i>WiFi</button>" +
+            "               <button type=\"button\" class=\"btn\" id=\"piconusb\"><i class=\"fab fa-usb icon\"></i>USB</button>" +
+            "               <button type=\"button\" class=\"btn\" id=\"piconbt\"><i class=\"fab fa-bluetooth-b icon\"></i>Bluetooth</button>" +
+            "           </div>" +
+            "           <div id=\"pischoolcon\">" +
+            "               <div class=\"form-group\">" +
+            "                   <label id=\"pischoolkeylabel\">" + strings.messages.schoolKey + "</label>" +
+            "                   <div class=\"input-group\">" +
+            "                       <div class=\"input-group-prepend\">Aa</div>" +
+            "                       <input type=\"text\" id=\"schoolkey\" class=\"form-control\">" +
+            "                   </div>" +
+            "               </div>" +
+            "               <div class=\"form-group\">" +
+            "                   <label id=\"pilistlabel\">" + strings.messages.connectList + "</label>" +
+            "                   <div class=\"input-group\">" +
+            "                       <button class=\"input-group-prepend\" id=pigetlist disabled>" + strings.messages.getPiList + "</button>" +
+            "                       <select id=\"pilist\" class=\"custom-select\" disabled>" +
+            "                       </select>" +
+            "                   </div>" +
+            "               </div>" +
+            "               <div class=\"form-group\">" +
+            "                   <label id=\"piiplabel\">" + strings.messages.enterIpAddress + "</label>" +
+            "                   <div class=\"input-group\">" +
+            "                       <div class=\"input-group-prepend\">123</div>" +
+            "                       <input id=piaddress type=\"text\" class=\"form-control\">" +
+            "                   </div>" +
+            "               </div>" +
+            "               <div>" +
+            "                   <input id=\"piusetunnel\" disabled type=\"checkbox\">" + strings.messages.connectTroughtTunnel +
+            "               </div>" +
+            "           </div>" +
+            "           <div id=\"panel-body-usbbt\">" +
+            "               <label id=\"piconnectionlabel\"></label>" +
+            "           </div>" +
+            "           <div id=\"panel-body-local\">" +
+            "               <label id=\"piconnectionlabellocal\"></label>" +
+            "               <div id=\"piconnectolocalhost\">" +
+            "                   <input type=\"radio\" id=\"piconnectolocalhostcheckbox\" name=\"pilocalconnectiontype\" value=\"localhost\">" +
+                                    strings.messages.connectToLocalhost +
+            "               </div>" +
+            "               <div id=\"piconnectocurrenturl\">" +
+            "                   <input type=\"radio\" id=\"piconnectocurrenturlcheckbox\" name=\"pilocalconnectiontype\" value=\"currenturl\">" +
+                                    strings.messages.connectToWindowLocation +
+            "               </div>" +
+            "           </div>" +
+            // "       </div>" +
+            // "       <div class=\"inlineButtons\">" +
+            // "           <button id=\"piconnectok\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.connectToDevice + "</button>" +
+            // "           <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
+            "           <div class=\"inlineButtons\">" +
+            "               <button id=\"piconnectok\" class=\"btn\">" +
+            "               <i id=\"piconnectprogressicon\" class=\"fas fa-spinner fa-spin icon\"></i>" +
+            "               <i id=\"piconnectwifiicon\" class=\"fa fa-wifi icon\"></i>" + 
+                                strings.messages.connectToDevice +
+            "               </button>" +
+            "               <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
+            "           </div>" +
+
+            "       </div>" +
+            "   </div>" +
+
+             "   </div>" +
+            "   </div>" +
+
+            "</div>";
+            return html
+        }
+
+        function showConfig() {
+            var connectionDialogHTML = getConnectionDialogHTML();
+            
             window.displayHelper.showPopupDialog(connectionDialogHTML);
 
-                        $('#popupMessage .navigationContent ul li').removeClass('selected');
+            $('#popupMessage .navigationContent ul li').removeClass('selected');
             $('#popupMessage .navigationContent ul li[id=qpi-connection]').addClass('selected');
             $('#showNavigationContent').prop('checked', false);
 
@@ -4201,6 +4293,21 @@ var getContext = function (display, infos, curLevel) {
             $('#qpi-uiblock-connection').removeClass("hiddenContent");
 
             $("#piconnectprogressicon").hide();
+
+            for (var i = 0; i < boardDefinitions.length; i++) {
+                let board = boardDefinitions[i];
+                var image = document.createElement('img');
+                image.src = getImg(board.image);
+
+                $('#boardlist').append(image).append("&nbsp;&nbsp;");
+
+                image.onclick = function () {
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+
+                    context.changeBoard(board.name);
+                }
+            }
 
 
 
@@ -4273,9 +4380,11 @@ var getContext = function (display, infos, curLevel) {
             $('#qpi-portsnames').click(function () {
                 showMenu("portsnames");
             });
-
             $('#qpi-components').click(function () {
                 showMenu("components");
+            });
+            $('#qpi-change-board').click(function () {
+                showMenu("change-board");
             });
             $('#qpi-connection').click(function () {
                 showMenu("connection");
@@ -4705,48 +4814,49 @@ var getContext = function (display, infos, curLevel) {
                 //context.recreateDisplay = true;
                 context.resetDisplay();
             });
-        });
+        }
 
 
-        $('#pichangehat').click(function () {
-            window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
-                "   <div class=\"panel-heading\">" +
-                "       <h2 class=\"sectionTitle\">" +
-                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
-                            strings.messages.chooseBoard +
-                "       </h2>" +
-                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
-                "   </div>" +
-                "   <div class=\"panel-body\">" +
-                "       <div id=boardlist>" +
-                "       </div>" +
-                "       <div panel-body-usbbt>" +
-                "           <label id=\"piconnectionlabel\"></label>" +
-                "       </div>" +
-                "   </div>" +
-                "</div>");
+        // $('#pichangehat').click(function () {
+        //     console.log("chooseBoard")
+        //     window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
+        //         "   <div class=\"panel-heading\">" +
+        //         "       <h2 class=\"sectionTitle\">" +
+        //         "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+        //                     strings.messages.chooseBoard +
+        //         "       </h2>" +
+        //         "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+        //         "   </div>" +
+        //         "   <div class=\"panel-body\">" +
+        //         "       <div id=boardlist>" +
+        //         "       </div>" +
+        //         "       <div panel-body-usbbt>" +
+        //         "           <label id=\"piconnectionlabel\"></label>" +
+        //         "       </div>" +
+        //         "   </div>" +
+        //         "</div>");
 
-            $('#picancel').click(function () {
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-            });
+        //     $('#picancel').click(function () {
+        //         $('#popupMessage').hide();
+        //         window.displayHelper.popupMessageShown = false;
+        //     });
 
 
-            for (var i = 0; i < boardDefinitions.length; i++) {
-                let board = boardDefinitions[i];
-                var image = document.createElement('img');
-                image.src = getImg(board.image);
+        //     for (var i = 0; i < boardDefinitions.length; i++) {
+        //         let board = boardDefinitions[i];
+        //         var image = document.createElement('img');
+        //         image.src = getImg(board.image);
 
-                $('#boardlist').append(image).append("&nbsp;&nbsp;");
+        //         $('#boardlist').append(image).append("&nbsp;&nbsp;");
 
-                image.onclick = function () {
-                    $('#popupMessage').hide();
-                    window.displayHelper.popupMessageShown = false;
+        //         image.onclick = function () {
+        //             $('#popupMessage').hide();
+        //             window.displayHelper.popupMessageShown = false;
 
-                    context.changeBoard(board.name);
-                }
-            }
-        });
+        //             context.changeBoard(board.name);
+        //         }
+        //     }
+        // });
 
 
         $('#pihatsetup').click(function () {
@@ -4934,8 +5044,9 @@ var getContext = function (display, infos, curLevel) {
             }
 
             var newSensor = {
-                "type": "cloudstore",
-                "name": "cloud1",
+                type: "cloudstore",
+                name: "cloud1",
+                port: "D5"
             };
             infos.quickPiSensors.push(newSensor);
         }
