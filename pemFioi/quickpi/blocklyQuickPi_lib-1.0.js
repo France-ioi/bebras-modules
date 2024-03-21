@@ -6717,8 +6717,8 @@ var getContext = function (display, infos, curLevel) {
         return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
     }
 
-    function createSlider(sensor, max, min, x, y, w, h, index)
-    {
+    function createSlider(sensor, max, min, x, y, w, h, index) {
+        // console.log("createSlider")
         var sliderobj = {};
         sliderobj.sliderdata = {};
 
@@ -6874,11 +6874,14 @@ var getContext = function (display, infos, curLevel) {
             }
         );
 
+        sliderobj.slider.toFront();
+
         return sliderobj;
     }
 
 
     function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max, triaxial) {
+        // console.log("setSlider",juststate)
         if (juststate) {
 
             if (Array.isArray(sensor.state)) {
@@ -6894,6 +6897,7 @@ var getContext = function (display, infos, curLevel) {
                         (percentage * sensor.sliders[i].sliderdata.scale);
 
                     sensor.sliders[i].thumb.attr('y', thumby);
+                    sensor.sliders[i].slider.toFront();
                 }
             } else {
                 var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state, sensor);
