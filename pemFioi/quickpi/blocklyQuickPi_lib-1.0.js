@@ -2614,7 +2614,8 @@ var getContext = function (display, infos, curLevel) {
             description: strings.messages.cloudstore,
             isAnalog: false,
             isSensor: false,
-            portType: "none",
+            // portType: "none",
+            portType: "D",
             valueType: "object",
             selectorImages: ["cloudstore.png"],
             /*getInitialState: function(sensor) {
@@ -3993,7 +3994,7 @@ var getContext = function (display, infos, curLevel) {
         // "       </button>" +
         // "   </span>" +
         "   <div id=\"dropdown_menu\">"+
-        "       <span class='menu_line' id='toggle_menu'><span class=\"fas fa-exchange-alt\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
+        "       <span class='menu_line' id='toggle_menu'><span class=\"fas fa-exchange-alt\"></span><span class='label'>"+strings.messages.simulator+"</span></span>"+
         "       <span class='menu_line clickable' id='simulator'><span class=\"fas fa-desktop\"></span><span class='label'>"+strings.messages.simulator+"</span></span>"+
         "       <span class='menu_line clickable' id='remote_control'><span class=\"fas fa-plug\"></span><span class='label'>"+strings.messages.remoteControl+"</span></span>"+
         "       <span class='menu_line clickable' id='install'><span class=\"fas fa-upload\"></span><span class='label'>"+strings.messages.install+"</span></span>"+
@@ -4171,12 +4172,16 @@ var getContext = function (display, infos, curLevel) {
             "</div> " +
             " <div class=\"viewer\">"+
             "       <div id=\"qpi-uiblock-portsnames\" class=\"hiddenContent viewerInlineContent\" >" +
-                         strings.messages.displayPrompt +
+                        strings.messages.displayPrompt +
             "           <div class=\"switchRadio btn-group\" id=\"pi-displayconf\">" +
             "               <button type=\"button\" class=\"btn active\" id=\"picomponentname\"><i class=\"fas fa-microchip icon\"></i>" + strings.messages.componentNames + "</button>" +
             "               <button type=\"button\" class=\"btn\" id=\"piportname\"><i class=\"fas fa-plug icon\"></i>" + strings.messages.portNames + "</button>" +
             "           </div>" +
-
+            "           <div id='example_sensor'>" +
+            "               <span id='name'>"+sensorDefinitions[17].suggestedName+"1</span>"+
+            "               <span id='port'>"+sensorDefinitions[17].portType+"5</span>"+
+            "               <img src="+getImg(sensorDefinitions[17].selectorImages[0])+"></span>"+
+            "           </div>" +
             "       </div>" +
 
             "       <div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
@@ -4313,22 +4318,29 @@ var getContext = function (display, infos, curLevel) {
 
 
                 $('#sensorGrid').append(
-                    "<span class=\"sensorElement\"" +
-                    "id=\"qpi-remove-sensor-parent-" + sensor.name + "\">" +
-                    "<div style=\"text-align: center; font-weight: bold;\">" +
-                    sensor.name +
-                    "</div><img class=\"sensorImage\" src=" +
-                    getImg(sensorDefinition.selectorImages[0]) +
-                    ">" + 
-                    "<div class=\"sensorInfo\">" +
-                    sensor.port +
-                    "<input type=\"checkbox\" id=\"qpi-remove-sensor-" +
-                    sensor.name +
-                    "\"></input></div>" +
+                    "<span class=\"sensorElement\" id=\"qpi-remove-sensor-parent-" + sensor.name + "\">" +
+                        "<div style=\"text-align: center; font-weight: bold;\">" +
+                            sensor.name +
+                        "</div>"+
+                        "<img class=\"sensorImage\" src=" +getImg(sensorDefinition.selectorImages[0]) +">" + 
+                        "<div class=\"sensorInfo\">" +
+                            sensor.port +
+                            "<input type=\"checkbox\" id=\"qpi-remove-sensor-"+sensor.name +"\"></input>"+
+                        "</div>" +
                     "</span>"
                     );
             }
 
+            $("#sensorGrid .sensorElement").click(function() {
+                var chi = $(this).children(".sensorInfo").children("input");
+                if($(this).hasClass("selected")){
+                    $(this).removeClass("selected");
+                    chi.prop("checked",false);
+                }else{
+                    $(this).addClass("selected");
+                    chi.prop("checked",true);
+                }
+            })
             if(infos.customSensors){
                 $('#piaddsensor').click(clickAdder);
             }else{
@@ -4370,6 +4382,7 @@ var getContext = function (display, infos, curLevel) {
                 $('#popupMessage .navigationContent ul li').removeClass('selected');
                 $('#popupMessage .navigationContent ul li[id=qpi-'+ id +']').addClass('selected');
                 $('#showNavigationContent').prop('checked', false);
+                $('#piconnectionlabel').hide();
 
                 $('[id^=qpi-uiblock]').addClass("hiddenContent");
                 $('#qpi-uiblock-' + id).removeClass("hiddenContent");
@@ -4785,33 +4798,35 @@ var getContext = function (display, infos, curLevel) {
                 $("#piaddress").val(this.value);
             });
 
-            $('#pi-displayconf .btn').removeClass('active');
-            if (context.useportforname) {
-                $('#piportname').addClass('active');
-            } else {
-                $('#picomponentname').addClass('active');
-            }
-
-            $('#pi-displayconf .btn').click(function () {
-                if (!$(this).hasClass('active')) {
-                        $('#pi-displayconf .btn').removeClass('active');
-                        $(this).addClass('active');
-                }
-            });
+            updatePiComponentButtons();
 
             $('#picomponentname').click(function () {
                 context.useportforname = false;
-
+                updatePiComponentButtons();
                 //context.recreateDisplay = true;
                 context.resetDisplay();
             });
 
             $('#piportname').click(function () {
                 context.useportforname = true;
-
+                updatePiComponentButtons();
                 //context.recreateDisplay = true;
                 context.resetDisplay();
             });
+
+            function updatePiComponentButtons() {
+                if (context.useportforname) {
+                    $('#piportname').addClass('active');
+                    $('#picomponentname').removeClass('active');
+                    $('#example_sensor #port').show();
+                    $('#example_sensor #name').hide();
+                } else {
+                    $('#picomponentname').addClass('active');
+                    $('#piportname').removeClass('active');
+                    $('#example_sensor #name').show();
+                    $('#example_sensor #port').hide();
+                }
+            }
         }
 
 

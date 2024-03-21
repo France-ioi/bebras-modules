@@ -25,6 +25,7 @@
 #piui.show {
     height: auto;
     overflow: hidden;
+    border-bottom: solid 5px lightgray;
 }
 .btn#pichangehat {
     background-color: #f5a623;
@@ -46,7 +47,7 @@
     justify-content: space-around;
     gap: 10px;
     cursor: pointer;
-    color: gray
+    color: gray;
 }
 .menu_line {
     height: 34px;
@@ -311,7 +312,8 @@
 }
 
 #quickpiViewer .viewerInlineContent {
-    margin: 15px;
+/*    margin: 15px;*/
+    padding: 15px;
 }
 /*
 .connectPi {
@@ -332,6 +334,15 @@
   width: 150px;
   height: 150px;
   position: relative;
+  border: none;
+}
+.sensorElement:hover {
+    background-color: lightgray;
+}
+.sensorElement.selected {
+    background-color: #ffd9de;
+    border: 2px solid #bc1f30;
+    color: #bc1f30;
 }
 
 .sensorImage {
@@ -351,7 +362,23 @@
   left: 90%;
   transform: translate(-50%, -50%);
 }
-
+.config #qpi-uiblock-portsnames {
+    margin-top: 40px;
+    text-align: center;
+}
+.config #example_sensor {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    color: gray;
+    align-items: center;
+    gap: 20px;
+    font-weight: bold;
+    font-size: 16px;
+}
+/*.config #example_sensor img {
+    flex-grow: 0;
+}*/
 .config #buttons {
     display: flex;
     justify-content: space-around;
