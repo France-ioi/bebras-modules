@@ -16,7 +16,7 @@
     top: 0;
     left: 0;
     background-color: white;
-    padding: 0 10px;
+    padding: 5px 10px;
 }
 #piui.hide {
     height: 44px;
@@ -51,6 +51,8 @@
 }
 .menu_line {
     height: 34px;
+    display: flex;
+    align-items: center;
 }
 .menu_line .fas {
     color: #4a90e2;
@@ -376,9 +378,7 @@
     font-weight: bold;
     font-size: 16px;
 }
-/*.config #example_sensor img {
-    flex-grow: 0;
-}*/
+
 .config #buttons {
     display: flex;
     justify-content: space-around;
