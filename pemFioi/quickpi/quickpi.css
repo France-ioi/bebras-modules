@@ -1,3 +1,7 @@
+html {
+    --colors-blue: #4a90e2;
+}
+
 /*** MENU ***/
 
 #introControls {
@@ -323,47 +327,11 @@
     height: 80vh;
 }*/
 
-
 #popupMessage .qpi .hiddenContent {
-	display: none !important;
+    display: none !important;
 }
+/*** config portsname ***/
 
-
-
-.sensorElement {
-  text-align: center;
-  display: inline-block;
-  width: 150px;
-  height: 150px;
-  position: relative;
-  border: none;
-}
-.sensorElement:hover {
-    background-color: lightgray;
-}
-.sensorElement.selected {
-    background-color: #ffd9de;
-    border: 2px solid #bc1f30;
-    color: #bc1f30;
-}
-
-.sensorImage {
-  max-width: 100px;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.sensorInfo {
-  max-width: 100px;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 90%;
-  transform: translate(-50%, -50%);
-}
 .config #qpi-uiblock-portsnames {
     margin-top: 40px;
     text-align: center;
@@ -379,7 +347,163 @@
     font-size: 16px;
 }
 
+/*** config components ***/
+
+#qpi-uiblock-components #tabs {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    position: relative;
+}
+#qpi-uiblock-components #tabs_back {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-bottom: 2px solid var(--colors-blue);
+}
+#qpi-uiblock-components .tab {
+    width: 150px;
+    background-color: lightgray;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid gray;
+    border-bottom: 2px solid var(--colors-blue);
+    color: gray;
+    font-weight: normal;
+    font-size: 16px;
+    padding: 5px 10px;
+    z-index: 2;
+    cursor: pointer;
+}
+#qpi-uiblock-components .tab.selected {
+    border: 2px solid var(--colors-blue);
+    border-bottom: 2px solid white;
+    font-weight: bold;
+    color: var(--colors-blue);
+    background-color: white;
+}
+#remove_cont, #add_cont {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+ }
+ #sensorGrid, #addSensorGrid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+/*    justify-content: space-around;*/
+/*    align-items: center;*/
+ }
+.sensorElement {
+    text-align: center;
+/*    display: inline-block;*/
+    width: 150px;
+    height: 150px;
+    position: relative;
+    border: none;
+/*    display: flex;
+    flex-direction: column;
+    justify-content: space-around;*/
+
+}
+.sensorElement:hover {
+    background-color: lightgray;
+}
+#sensorGrid .sensorElement.selected {
+    background-color: #ffd9de;
+    border: 2px solid #bc1f30;
+    color: #bc1f30;
+}
+#addSensorGrid .sensorElement.selected {
+    background-color: #a5e6ae;
+    border: 2px solid #1cb52f;
+    color: #1cb52f;
+}
+.sensorElement .name {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 10%;
+}
+.sensorElement .sensor_element_container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.sensorImage {
+  max-width: 90px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-60%, -30%);
+}
+
+.sensorInfo {
+  max-width: 100px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 90%;
+  transform: translate(-50%, -30%);
+}
+
 .config #buttons {
     display: flex;
     justify-content: space-around;
 }
+
+/*** add sensor port dialog ***/
+
+#port_dialog_back {
+    background-color: black;
+    opacity: 30%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+}
+#port_dialog {
+    background-color: white;
+    padding: 20px;
+    color: grey;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 201;
+}
+#port_dialog #port_field {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+#port_dialog #port_field select {
+    min-width: 100px;
+}
+#port_dialog #buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+}
+#port_dialog button {
+    background-color: var(--colors-blue);
+    color: white;
+    font-weight: bold;
+    width: 120px;
+    height: 30px;
+    border: none;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+#port_dialog button:disabled {
+    opacity: 20%;
+}
+

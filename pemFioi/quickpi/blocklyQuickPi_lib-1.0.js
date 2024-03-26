@@ -412,6 +412,7 @@ var quickPiLocalLanguageStrings = {
             validate1: "Valider 1",
             validate2: "Valider 2",
             validate3: "Valider 3",
+            cancel: "Annuler",
 
             // sensorNameBuzzer: "buzzer",
             sensorNameBuzzer: "buzz",
@@ -4171,28 +4172,44 @@ var getContext = function (display, infos, curLevel) {
             "   </div>" +
             "</div> " +
             " <div class=\"viewer\">"+
-            "       <div id=\"qpi-uiblock-portsnames\" class=\"hiddenContent viewerInlineContent\" >" +
-                        strings.messages.displayPrompt +
-            "           <div class=\"switchRadio btn-group\" id=\"pi-displayconf\">" +
-            "               <button type=\"button\" class=\"btn active\" id=\"picomponentname\"><i class=\"fas fa-microchip icon\"></i>" + strings.messages.componentNames + "</button>" +
-            "               <button type=\"button\" class=\"btn\" id=\"piportname\"><i class=\"fas fa-plug icon\"></i>" + strings.messages.portNames + "</button>" +
-            "           </div>" +
-            "           <div id='example_sensor'>" +
-            "               <span id='name'>"+sensorDefinitions[17].suggestedName+"1</span>"+
-            "               <span id='port'>"+sensorDefinitions[17].portType+"5</span>"+
-            "               <img src="+getImg(sensorDefinitions[17].selectorImages[0])+"></span>"+
-            "           </div>" +
-            "       </div>" +
+                "<div id=\"qpi-uiblock-portsnames\" class=\"hiddenContent viewerInlineContent\" >" +
+                    strings.messages.displayPrompt +
+                    "<div class=\"switchRadio btn-group\" id=\"pi-displayconf\">" +
+                        "<button type=\"button\" class=\"btn active\" id=\"picomponentname\"><i class=\"fas fa-microchip icon\"></i>" + strings.messages.componentNames + "</button>" +
+                        "<button type=\"button\" class=\"btn\" id=\"piportname\"><i class=\"fas fa-plug icon\"></i>" + strings.messages.portNames + "</button>" +
+                    "</div>" +
+                    "<div id='example_sensor'>" +
+                        "<span id='name'>"+sensorDefinitions[17].suggestedName+"1</span>"+
+                        "<span id='port'>"+sensorDefinitions[17].portType+"5</span>"+
+                        "<img src="+getImg(sensorDefinitions[17].selectorImages[0])+"></span>"+
+                    "</div>" +
+                "</div>" +
 
-            "       <div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
-            "           <div id=\"sensorGrid\" style=\"overflow: auto;\">" +
-            "           </div>" +
-            // "           <center><button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
-            "           <div id='buttons' >"+
-            "               <button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
-            "               <button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
-            "           </div>" +
-            "       </div>" +
+                "<div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
+                    // "<div id=\"sensorGrid\">" +
+                    // "</div>" +
+                    // "<div id='buttons' >"+
+                    //     "<button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+                    //     "<button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
+                    // "</div>" +
+                    
+
+                    "<div id=\"tabs\">" +
+                        "<div id=\"tabs_back\"></div>" +
+                        "<div id='remove_tab' class='tab selected'>"+strings.messages.removeSensor+"</div>"+
+                        "<div id='add_tab' class='tab'>"+strings.messages.add+"</div>"+
+                    "</div>" +
+                    "<div id=\"remove_cont\">" +
+                        "<div id=\"sensorGrid\">" +
+                        "</div>" +
+                        "<button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+                    "</div>" +
+                    "<div id=\"add_cont\" class='hiddenContent' >" +
+                        "<div id=\"addSensorGrid\">" +
+                        "</div>" +
+                        "<button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
+                    "</div>"+
+                "</div>" +
 
             "       <div id=\"qpi-uiblock-change-board\" class=\"hiddenContent viewerInlineContent\">" +
             "           <div class=\"panel-body\">" +
@@ -4307,30 +4324,114 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-
-
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
-            //for (var i = 0; i < 4; i++) {
                 var sensor = infos.quickPiSensors[i];
                 var sensorDefinition = findSensorDefinition(sensor) ;
                 if(sensor.type == "adder")
                     continue
 
-
-                $('#sensorGrid').append(
-                    "<span class=\"sensorElement\" id=\"qpi-remove-sensor-parent-" + sensor.name + "\">" +
-                        "<div style=\"text-align: center; font-weight: bold;\">" +
-                            sensor.name +
-                        "</div>"+
-                        "<img class=\"sensorImage\" src=" +getImg(sensorDefinition.selectorImages[0]) +">" + 
-                        "<div class=\"sensorInfo\">" +
-                            sensor.port +
-                            "<input type=\"checkbox\" id=\"qpi-remove-sensor-"+sensor.name +"\"></input>"+
-                        "</div>" +
-                    "</span>"
-                    );
+                addGridElement("sensorGrid",0,sensor.name,sensor.name,sensorDefinition.selectorImages[0],sensor.port);
             }
 
+            updateAddGrid();
+
+            function updateAddGrid() {
+                // console.log("updateAddGrid")
+                $("#addSensorGrid").empty();
+                for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
+                    var sensorDefinition = sensorDefinitions[iSensorDef];
+                    var id = sensorDefinition.name;
+                    // console.log("new",id)
+                    var name = sensorDefinition.description;
+                    if (sensorDefinition.subTypes) {
+                        for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
+                            var sub = sensorDefinition.subTypes[iSubType];
+                            if (!sensorDefinition.pluggable && !sub.pluggable)
+                                continue;
+                            id = sensorDefinition.name+"_"+sub.subType;
+                            var name = sub.description;
+                            var img = (sub.selectorImages) ? sub.selectorImages[0] : sensorDefinition.selectorImages[0]
+                            // console.log(1,id)
+                            addGridElement("addSensorGrid",1,id,name,img,"");
+                            // console.log("+",id)
+                        }
+                    } else {
+                        if (!sensorDefinition.pluggable || !sensorDefinition.selectorImages)
+                            continue;
+
+                            // console.log("+",id)
+                        addGridElement("addSensorGrid",1,id,name,sensorDefinition.selectorImages[0],"");
+                    }
+                }
+
+                var board = getCurrentBoard();
+                if (board.builtinSensors) {
+                    for (var i = 0; i < board.builtinSensors.length; i++) {
+                        var sensor = board.builtinSensors[i];
+                        var sensorDefinition = findSensorDefinition(sensor);
+
+                        if (context.findSensor(sensor.type, sensor.port, false))
+                            continue;
+                        
+                        var id = sensorDefinition.name + "_";
+                        if (sensor.subType)
+                            id += sensor.subType;
+                        id += "_" + sensor.port;
+
+                        var name = sensorDefinition.description + " " + strings.messages.builtin;
+                        var img = sensorDefinition.selectorImages[0];
+                        addGridElement("addSensorGrid",1,id,name,img,"");
+                            // console.log(3,id)
+                    }
+                }
+
+                $("#addSensorGrid .sensorElement").click(function() {
+                    var chi = $(this).children(".sensorInfo").children("input");
+                    var sensorID = $(this).attr('id').replace("qpi-add-sensor-parent-", "");
+                    if($(this).hasClass("selected")){
+                        $(this).removeClass("selected");
+                        chi.prop("checked",false);
+                    }else{
+                        $(this).addClass("selected");
+                        chi.prop("checked",true);
+                        showPortDialog(sensorID);
+                    }
+                });
+            };
+
+            function addGridElement(gridID,add,idName,name,img,port) {
+                // console.log(add,idName)
+                var idType = (add) ? "add" : "remove";
+                $('#'+gridID).append(
+                    "<span class=\"sensorElement\" id=\"qpi-"+idType+"-sensor-parent-" + idName + "\">" +
+                        "<div class='name'>" +name +"</div>"+
+                        "<img class=\"sensorImage\" src=" +getImg(img) +">" + 
+                        "<div class=\"sensorInfo\">" +
+                            port +
+                            "<input type=\"checkbox\" id=\"qpi-"+idType+"-sensor-"+idName +"\"></input>"+
+                        "</div>" +
+                    "</span>"
+                );
+            };
+
+
+            $("#tabs .tab").click(function() {
+                var id = $(this).attr("id");
+                if($(this).hasClass("selected")){
+                    return
+                }
+                $(this).addClass("selected");
+                if(id == "remove_tab"){
+                    $("#add_tab").removeClass("selected");
+                    $("#remove_cont").removeClass("hiddenContent");
+                    $("#add_cont").addClass("hiddenContent");
+                }else{
+                    $("#remove_tab").removeClass("selected");
+                    $("#add_cont").removeClass("hiddenContent");
+                    $("#remove_cont").addClass("hiddenContent");
+                }
+                // console.log(id)
+            });
             $("#sensorGrid .sensorElement").click(function() {
                 var chi = $(this).children(".sensorInfo").children("input");
                 if($(this).hasClass("selected")){
@@ -4340,7 +4441,8 @@ var getContext = function (display, infos, curLevel) {
                     $(this).addClass("selected");
                     chi.prop("checked",true);
                 }
-            })
+            });
+
             if(infos.customSensors){
                 $('#piaddsensor').click(clickAdder);
             }else{
@@ -4368,13 +4470,14 @@ var getContext = function (display, infos, curLevel) {
                         }
 
                         removed = true;
-                        console.log(sensorName);
+                        // console.log(sensorName);
                     }
                 });
 
                 if (removed) {
                     context.recreateDisplay = true;
                     context.resetDisplay();
+                    updateAddGrid();
                 }
             });
 
@@ -4386,7 +4489,88 @@ var getContext = function (display, infos, curLevel) {
 
                 $('[id^=qpi-uiblock]').addClass("hiddenContent");
                 $('#qpi-uiblock-' + id).removeClass("hiddenContent");
-            }
+            };
+
+            function showPortDialog(id) {
+                removePortDialog();
+                var back = $("<div id='port_dialog_back'></div>");
+                var dial = $("<div id='port_dialog'></div>");
+
+                var params = id.split("_");
+                var builtinport = false;
+                var dummysensor = { type: params[0] };
+                if (params.length >= 2)
+                    if (params[1])
+                        dummysensor.subType = params[1];
+                if (params.length >= 3)
+                    builtinport = params[2];
+                var sensorDefinition = findSensorDefinition(dummysensor);
+                // console.log(params);
+                
+                var html = "<div id='port_field'><span>"+strings.messages.port+"</span><select id='port_select' class=\"custom-select\">";
+                // var portSelect = document.getElementById("selector-sensor-port");
+                // $('#selector-sensor-port').empty();
+                var hasPorts = false;
+                if (builtinport) {
+                    html += "<option value="+builtinport+">"+builtinport+"</option>";
+                    hasPorts = true;
+                } else {
+                    var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
+                    // console.log(id,ports)
+                    if (sensorDefinition.portType == "i2c")
+                    {
+                        ports = ["i2c"];
+                    }
+
+                    for (var iPort = 0; iPort < ports.length; iPort++) {
+                        var port = sensorDefinition.portType + ports[iPort];
+                        if (sensorDefinition.portType == "i2c")
+                            port = "i2c";
+
+                        if (!isPortUsed(sensorDefinition.name, port)) {
+                            html += "<option value="+port+">"+port+"</option>";
+                            // var option = document.createElement('option');
+                            hasPorts = true;
+                        }
+                    }
+                }
+                html += "</select><label id=\"selector-label\"></label></div>";
+                html += "<div id='buttons'><button id=\"validate\"><i class='icon fas fa-check'></i>"+strings.messages.validate+"</button>";
+                html += "<button id=\"cancel\"><i class='icon fas fa-times'></i>"+strings.messages.cancel+"</button></div>";
+                dial.html(html)
+                $("body").append(back,dial);
+
+                if (!hasPorts) {
+                    $('#buttons #validate').attr("disabled", true);
+
+                    var object_function = strings.messages.actuator;
+                    if (sensorDefinition.isSensor)
+                        object_function = strings.messages.sensor;
+
+                    $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
+                    $('#selector-label').show();
+                    $('#port_field span, #port_field select').hide();
+                }
+                else {
+                    $('#buttons #validate').attr("disabled", false);
+                    $('#selector-label').hide();
+                    $('#port_field span, #port_field select').show();
+                }
+
+                $("#port_dialog #cancel").click(function() {
+                    removePortDialog();
+                    var elID = "qpi-add-sensor-parent-"+id;
+                    var el = $("#"+elID);
+                    var chi = el.children(".sensorInfo").children("input");
+                    el.removeClass("selected");
+                    chi.prop("checked",false);
+                    // console.log(elID)
+                })
+            };
+
+            function removePortDialog() {
+                $("#port_dialog_back, #port_dialog").remove();
+            };
 
             $('#qpi-portsnames').click(function () {
                 showMenu("portsnames");
@@ -5401,7 +5585,7 @@ var getContext = function (display, infos, curLevel) {
         var select = document.getElementById("selector-sensor-list");
         for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
             var sensorDefinition = sensorDefinitions[iSensorDef];
-
+            // console.log("adder",sensorDefinition.name)
             if (sensorDefinition.subTypes) {
                 for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
 
@@ -5418,6 +5602,7 @@ var getContext = function (display, infos, curLevel) {
                     el.value = sensorDefinition.name;
                     el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
                     select.appendChild(el);
+                    // console.log("+",el.value)
                 }
             } else {
                 if (!sensorDefinition.pluggable)
@@ -5426,7 +5611,8 @@ var getContext = function (display, infos, curLevel) {
                 var el = document.createElement("option");
                 el.textContent = sensorDefinition.description;
                 el.value = sensorDefinition.name;
-
+                // console.log("+",el.value)
+                
                 select.appendChild(el);
             }
         }
@@ -5456,6 +5642,7 @@ var getContext = function (display, infos, curLevel) {
 
         $('#selector-sensor-list').on('change', function () {
             var values = this.value.split("-");
+            console.log(values)
             var builtinport = false;
 
             var dummysensor = { type: values[0] };
@@ -5495,6 +5682,7 @@ var getContext = function (display, infos, curLevel) {
                 hasPorts = true;
             } else {
                 var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
+                console.log(ports)
                 if (sensorDefinition.portType == "i2c")
                 {
                     ports = ["i2c"];
