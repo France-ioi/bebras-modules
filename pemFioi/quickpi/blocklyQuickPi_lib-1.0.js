@@ -4335,6 +4335,8 @@ var getContext = function (display, infos, curLevel) {
 
             updateAddGrid();
 
+            var usedPorts = [];
+
             function updateAddGrid() {
                 // console.log("updateAddGrid")
                 $("#addSensorGrid").empty();
@@ -4386,14 +4388,17 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 $("#addSensorGrid .sensorElement").click(function() {
-                    var chi = $(this).children(".sensorInfo").children("input");
+                    var inp = $(this).children(".sensorInfo").children("input");
+                    var por = $(this).children(".sensorInfo").children(".port");
                     var sensorID = $(this).attr('id').replace("qpi-add-sensor-parent-", "");
                     if($(this).hasClass("selected")){
                         $(this).removeClass("selected");
-                        chi.prop("checked",false);
+                        inp.prop("checked",false);
+                        changePort(sensorID,false);
+                        // por.text("");
                     }else{
                         $(this).addClass("selected");
-                        chi.prop("checked",true);
+                        inp.prop("checked",true);
                         showPortDialog(sensorID);
                     }
                 });
@@ -4407,7 +4412,7 @@ var getContext = function (display, infos, curLevel) {
                         "<div class='name'>" +name +"</div>"+
                         "<img class=\"sensorImage\" src=" +getImg(img) +">" + 
                         "<div class=\"sensorInfo\">" +
-                            port +
+                            "<span class='port'>"+port +"</span>"+
                             "<input type=\"checkbox\" id=\"qpi-"+idType+"-sensor-"+idName +"\"></input>"+
                         "</div>" +
                     "</span>"
@@ -4417,6 +4422,7 @@ var getContext = function (display, infos, curLevel) {
 
             $("#tabs .tab").click(function() {
                 var id = $(this).attr("id");
+                // console.log("click tab"+id)
                 if($(this).hasClass("selected")){
                     return
                 }
@@ -4444,7 +4450,8 @@ var getContext = function (display, infos, curLevel) {
             });
 
             if(infos.customSensors){
-                $('#piaddsensor').click(clickAdder);
+                // $('#piaddsensor').click(clickAdder);
+                $('#piaddsensor').click(addSensors);
             }else{
                 $('#piaddsensor').hide();
             }
@@ -4481,6 +4488,48 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
 
+            function addSensors() {
+                var added = false;
+
+                $('[id^=qpi-add-sensor-]').each(function(index) {
+                    if ($(this).is(':checked'))
+                    {
+                        var id = $(this).attr('id');
+                        var sensorID = id.replace("qpi-add-sensor-", "");
+                        var params = sensorID.split("_");
+                        // console.log(params)
+                        var dummysensor = { type: params[0] };
+                        if (params.length == 2)
+                            dummysensor.subType = params[1];
+                
+                        var sensorDefinition = findSensorDefinition(dummysensor);
+                        
+                        var port = $("#qpi-add-sensor-parent-"+sensorID+" .port").text();
+                        var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
+
+                        infos.quickPiSensors.push({
+                            type: sensorDefinition.name,
+                            subType: sensorDefinition.subType,
+                            port: port,
+                            name: name
+                        });
+
+                        added = true;
+
+
+                    }
+                });
+
+                if (added) {
+                    context.resetSensorTable();
+                    // context.recreateDisplay = true;
+                    context.resetDisplay();
+                    updateAddGrid();
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+                }
+            };
+
             function showMenu (id) {
                 $('#popupMessage .navigationContent ul li').removeClass('selected');
                 $('#popupMessage .navigationContent ul li[id=qpi-'+ id +']').addClass('selected');
@@ -4492,7 +4541,7 @@ var getContext = function (display, infos, curLevel) {
             };
 
             function showPortDialog(id) {
-                removePortDialog();
+                // removePortDialog();
                 var back = $("<div id='port_dialog_back'></div>");
                 var dial = $("<div id='port_dialog'></div>");
 
@@ -4527,7 +4576,7 @@ var getContext = function (display, infos, curLevel) {
                         if (sensorDefinition.portType == "i2c")
                             port = "i2c";
 
-                        if (!isPortUsed(sensorDefinition.name, port)) {
+                        if (!isPortUsed(sensorDefinition.name, port) && !usedPorts.includes(port)) {
                             html += "<option value="+port+">"+port+"</option>";
                             // var option = document.createElement('option');
                             hasPorts = true;
@@ -4538,7 +4587,7 @@ var getContext = function (display, infos, curLevel) {
                 html += "<div id='buttons'><button id=\"validate\"><i class='icon fas fa-check'></i>"+strings.messages.validate+"</button>";
                 html += "<button id=\"cancel\"><i class='icon fas fa-times'></i>"+strings.messages.cancel+"</button></div>";
                 dial.html(html)
-                $("body").append(back,dial);
+                $("#popupMessage").after(back,dial);
 
                 if (!hasPorts) {
                     $('#buttons #validate').attr("disabled", true);
@@ -4564,13 +4613,45 @@ var getContext = function (display, infos, curLevel) {
                     var chi = el.children(".sensorInfo").children("input");
                     el.removeClass("selected");
                     chi.prop("checked",false);
+                    changePort(id,false);
+                    // removePort(elID);
                     // console.log(elID)
-                })
+                });
+
+                $("#port_dialog #validate").click(function() {
+                    var port = $("#port_select").val();
+                    var elID = "qpi-add-sensor-parent-"+id;
+                    changePort(id,port);
+                    removePortDialog();
+                    // console.log(port)
+                });
+
+                // $("#port_select").focusout(function(){console.log("focusout")})
+                // $("#port_select").change(function(){console.log("change")})
+            };
+
+            function changePort(id,port) {
+                var elID = "qpi-add-sensor-parent-"+id;
+                if(port){
+                    $("#"+elID+" .port").text(port);
+                    if(!usedPorts.includes(port)){
+                        usedPorts.push(port);
+                    }
+                }else{
+                    var currPort = $("#"+elID+" .port").text();
+                    var ind = usedPorts.indexOf(currPort);
+                    if(ind >= 0){
+                        usedPorts.splice(ind,1);
+                    }
+                    $("#"+elID+" .port").text("");
+                }
             };
 
             function removePortDialog() {
                 $("#port_dialog_back, #port_dialog").remove();
             };
+
+
 
             $('#qpi-portsnames').click(function () {
                 showMenu("portsnames");
@@ -5642,7 +5723,7 @@ var getContext = function (display, infos, curLevel) {
 
         $('#selector-sensor-list').on('change', function () {
             var values = this.value.split("-");
-            console.log(values)
+            // console.log(values)
             var builtinport = false;
 
             var dummysensor = { type: values[0] };
@@ -5682,7 +5763,7 @@ var getContext = function (display, infos, curLevel) {
                 hasPorts = true;
             } else {
                 var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
-                console.log(ports)
+                // console.log(ports)
                 if (sensorDefinition.portType == "i2c")
                 {
                     ports = ["i2c"];
