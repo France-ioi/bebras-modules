@@ -299,7 +299,6 @@ var quickPiLocalLanguageStrings = {
             config: "Config",
             remoteControl: "Contrôle à distance",
             simulator: "Simulateur",
-
      
             raspiConfig: "Configuration du Raspberry Pi",
             local: "Local",
@@ -317,7 +316,6 @@ var quickPiLocalLanguageStrings = {
 
             removeSensor: "Supprimer",
        
-
             irReceiverTitle: "Recevoir des codes infrarouges",
             directIrControl: "Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons",
             getIrCode: "Recevoir un code",
@@ -413,6 +411,10 @@ var quickPiLocalLanguageStrings = {
             validate2: "Valider 2",
             validate3: "Valider 3",
             cancel: "Annuler",
+
+            areYouSure: "Vous êtes sûr ?",
+            yes: "Oui",
+            no: "Non",
 
             // sensorNameBuzzer: "buzzer",
             sensorNameBuzzer: "buzz",
@@ -4185,14 +4187,7 @@ var getContext = function (display, infos, curLevel) {
                     "</div>" +
                 "</div>" +
 
-                "<div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +
-                    // "<div id=\"sensorGrid\">" +
-                    // "</div>" +
-                    // "<div id='buttons' >"+
-                    //     "<button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
-                    //     "<button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
-                    // "</div>" +
-                    
+                "<div id=\"qpi-uiblock-components\" class=\"hiddenContent viewerInlineContent\" >" +                    
 
                     "<div id=\"tabs\">" +
                         "<div id=\"tabs_back\"></div>" +
@@ -4202,12 +4197,16 @@ var getContext = function (display, infos, curLevel) {
                     "<div id=\"remove_cont\">" +
                         "<div id=\"sensorGrid\">" +
                         "</div>" +
-                        "<button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button></center>" +
+                        "<div class='buttonContainer' >"+
+                            "<button id=\"piremovesensor\" class=\"btn\"><i class=\"fas fa-trash icon\"></i>" + strings.messages.removeSensor + "</button>" +
+                        "</div>" +
                     "</div>" +
                     "<div id=\"add_cont\" class='hiddenContent' >" +
                         "<div id=\"addSensorGrid\">" +
                         "</div>" +
-                        "<button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button></center>" +
+                        "<div class='buttonContainer' >"+
+                            "<button id=\"piaddsensor\" class=\"btn\"><i class=\"fas fa-plus icon\"></i>" + strings.messages.add + "</button>" +
+                        "</div>" +
                     "</div>"+
                 "</div>" +
 
@@ -4271,10 +4270,6 @@ var getContext = function (display, infos, curLevel) {
                                     strings.messages.connectToWindowLocation +
             "               </div>" +
             "           </div>" +
-            // "       </div>" +
-            // "       <div class=\"inlineButtons\">" +
-            // "           <button id=\"piconnectok\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.connectToDevice + "</button>" +
-            // "           <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
             "           <div class=\"inlineButtons\">" +
             "               <button id=\"piconnectok\" class=\"btn\">" +
             "               <i id=\"piconnectprogressicon\" class=\"fas fa-spinner fa-spin icon\"></i>" +
@@ -4336,6 +4331,8 @@ var getContext = function (display, infos, curLevel) {
             updateAddGrid();
 
             var usedPorts = [];
+            var toRemove = [];
+            var toAdd = [];
 
             function updateAddGrid() {
                 // console.log("updateAddGrid")
@@ -4388,29 +4385,24 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 $("#addSensorGrid .sensorElement").click(function() {
-                    var inp = $(this).children(".sensorInfo").children("input");
-                    var por = $(this).children(".sensorInfo").children(".port");
-                    var sensorID = $(this).attr('id').replace("qpi-add-sensor-parent-", "");
+                    var id = $(this).attr('id');
+                    var sensorID = id.replace("qpi-add-sensor-parent-", "");
                     if($(this).hasClass("selected")){
-                        $(this).removeClass("selected");
-                        inp.prop("checked",false);
                         changePort(sensorID,false);
-                        // por.text("");
                     }else{
-                        $(this).addClass("selected");
-                        inp.prop("checked",true);
                         showPortDialog(sensorID);
                     }
+                    changeSelect(id);
                 });
             };
 
             function addGridElement(gridID,add,idName,name,img,port) {
-                // console.log(add,idName)
+                // console.log(add,idName,name,img)
                 var idType = (add) ? "add" : "remove";
                 $('#'+gridID).append(
                     "<span class=\"sensorElement\" id=\"qpi-"+idType+"-sensor-parent-" + idName + "\">" +
                         "<div class='name'>" +name +"</div>"+
-                        "<img class=\"sensorImage\" src=" +getImg(img) +">" + 
+                        getSensorImg(img)+
                         "<div class=\"sensorInfo\">" +
                             "<span class='port'>"+port +"</span>"+
                             "<input type=\"checkbox\" id=\"qpi-"+idType+"-sensor-"+idName +"\"></input>"+
@@ -4419,35 +4411,99 @@ var getContext = function (display, infos, curLevel) {
                 );
             };
 
+            function getSensorImg(img) {
+                var html = "";
+                html += "<img class=\"sensorImage\" src=" +getImg(img) +">";
+                switch(img){
+                case "servo.png":
+                    html += "<img class=\"sensorImage\" src=" +getImg("servo-pale.png") +">";
+                    html += "<img class=\"sensorImage\" src=" +getImg("servo-center.png") +">";
+                    break;
+                case "potentiometer.png":
+                    html += "<img class=\"sensorImage\" src=" +getImg("potentiometer-pale.png") +">";
+                    break;
+                case "mag.png":
+                    html += "<img class=\"sensorImage\" src=" +getImg("mag-needle.png") +">";
+                    break;
+                }
+                return html
+            };
+
 
             $("#tabs .tab").click(function() {
                 var id = $(this).attr("id");
+                clickTab(id);
+            });
+            function clickTab(id) {
                 // console.log("click tab"+id)
-                if($(this).hasClass("selected")){
+                var el = $("#"+id);
+                if(el.hasClass("selected")){
                     return
                 }
-                $(this).addClass("selected");
+                if(id == "remove_tab" && toAdd.length > 0 ||
+                    id == "add_tab" && toRemove.length > 0){
+                    showConfirmDialog(function() { 
+                        unselectSensors();
+                        clickTab(id) 
+                    });
+                    return
+                }
+                el.addClass("selected");
                 if(id == "remove_tab"){
                     $("#add_tab").removeClass("selected");
                     $("#remove_cont").removeClass("hiddenContent");
                     $("#add_cont").addClass("hiddenContent");
+                    unselectSensors("add");
                 }else{
                     $("#remove_tab").removeClass("selected");
                     $("#add_cont").removeClass("hiddenContent");
                     $("#remove_cont").addClass("hiddenContent");
+                    unselectSensors("remove");
                 }
-                // console.log(id)
-            });
+            };
             $("#sensorGrid .sensorElement").click(function() {
-                var chi = $(this).children(".sensorInfo").children("input");
-                if($(this).hasClass("selected")){
-                    $(this).removeClass("selected");
-                    chi.prop("checked",false);
-                }else{
-                    $(this).addClass("selected");
-                    chi.prop("checked",true);
-                }
+                var id = $(this).attr('id');
+                changeSelect(id);
             });
+
+            function changeSelect(id) {
+                var add = id.includes("qpi-add");
+                var arr = (add) ? toAdd : toRemove;
+                var ele = $("#"+id);
+                var inp = ele.children(".sensorInfo").children("input");
+                if(ele.hasClass("selected")){
+                    ele.removeClass("selected");
+                    inp.prop("checked",false);
+                    if(arr.includes(id)){
+                        var index = arr.indexOf(id);
+                        arr.splice(index,1);
+                    }
+                }else{
+                    ele.addClass("selected");
+                    inp.prop("checked",true);
+                    if(!arr.includes(id)){
+                        arr.push(id);
+                    }
+                }
+                // console.log(arr)
+            };
+
+            function unselectSensors(type) {
+                if(!type){
+                    unselectSensors("add");
+                    unselectSensors("remove");
+                    return
+                }
+                var arr = (type == "add") ? toAdd : toRemove;
+                var clone = Beav.Object.clone(arr);
+                for(var id of clone){
+                    changeSelect(id);
+                    if(type == "add"){
+                        var elID = id.replace("qpi-add-sensor-parent-","");
+                        changePort(elID,false);
+                    }
+                }
+            };
 
             if(infos.customSensors){
                 // $('#piaddsensor').click(clickAdder);
@@ -4586,7 +4642,7 @@ var getContext = function (display, infos, curLevel) {
                 html += "</select><label id=\"selector-label\"></label></div>";
                 html += "<div id='buttons'><button id=\"validate\"><i class='icon fas fa-check'></i>"+strings.messages.validate+"</button>";
                 html += "<button id=\"cancel\"><i class='icon fas fa-times'></i>"+strings.messages.cancel+"</button></div>";
-                dial.html(html)
+                dial.html(html);
                 $("#popupMessage").after(back,dial);
 
                 if (!hasPorts) {
@@ -4609,13 +4665,8 @@ var getContext = function (display, infos, curLevel) {
                 $("#port_dialog #cancel").click(function() {
                     removePortDialog();
                     var elID = "qpi-add-sensor-parent-"+id;
-                    var el = $("#"+elID);
-                    var chi = el.children(".sensorInfo").children("input");
-                    el.removeClass("selected");
-                    chi.prop("checked",false);
+                    changeSelect(elID);
                     changePort(id,false);
-                    // removePort(elID);
-                    // console.log(elID)
                 });
 
                 $("#port_dialog #validate").click(function() {
@@ -4651,20 +4702,45 @@ var getContext = function (display, infos, curLevel) {
                 $("#port_dialog_back, #port_dialog").remove();
             };
 
+            function showConfirmDialog(cb) {
+                var back = $("<div id='port_dialog_back'></div>");
+                var dial = $("<div id='port_dialog'></div>");
+                html = "<span>"+strings.messages.areYouSure+"</span>";
+                html += "<div id='buttons'><button id=\"yes\">"+strings.messages.yes+"</button>";
+                html += "<button id=\"no\">"+strings.messages.no+"</button></div>";
+                dial.html(html);
 
+                $("#popupMessage").after(back,dial);  
 
-            $('#qpi-portsnames').click(function () {
-                showMenu("portsnames");
-            });
-            $('#qpi-components').click(function () {
-                showMenu("components");
-            });
-            $('#qpi-change-board').click(function () {
-                showMenu("change-board");
-            });
-            $('#qpi-connection').click(function () {
-                showMenu("connection");
-            });
+                $("#port_dialog #no").click(function() {
+                    removePortDialog();
+                });
+                $("#port_dialog #yes").click(function() {
+                    if(cb)
+                        cb();
+                    removePortDialog();
+                });
+            };
+
+            $('#qpi-portsnames').click(clickMenu("portsnames"));
+            $('#qpi-components').click(clickMenu("components"));
+            $('#qpi-change-board').click(clickMenu("change-board"));
+            $('#qpi-connection').click(clickMenu("connection"));
+
+            function clickMenu(id) {
+                return function() {
+                    if(id != "components"){
+                       if(toAdd.length > 0 || toRemove.length > 0){
+                            showConfirmDialog(function() { 
+                                unselectSensors();
+                                clickMenu(id)();
+                            });
+                            return
+                        } 
+                    }
+                    showMenu(id);
+                }
+            };
 
             if (context.offLineMode) {
                 $('#pirelease').attr('disabled', true);
@@ -4864,13 +4940,22 @@ var getContext = function (display, infos, curLevel) {
                 context.quickPiConnection.releaseLock();
             });
 
-            $('#picancel').click(function () {
+            $('#picancel').click(exitConfig);
+
+            function exitConfig() {
+                if(toAdd.length > 0 || toRemove.length > 0){
+                    showConfirmDialog(function() { 
+                        unselectSensors();
+                        exitConfig();
+                    });
+                    return
+                }
                 context.inUSBConnection = false;
                 context.inBTConnection = false;
 
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
-            });
+            }
 
             $('#schoolkey').on('input', function (e) {
                 var schoolkey = $('#schoolkey').val();
@@ -7341,7 +7426,8 @@ var getContext = function (display, infos, curLevel) {
         // console.log(sensor.type)
         saveSensorStateIfNotRunning(sensor);
         var sameFont = true;
-        var sideTextSmall = true;
+        var fontWeight = "normal";
+        var sideTextSmall = false;
 
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -7417,6 +7503,7 @@ var getContext = function (display, infos, curLevel) {
 
         var namesize = sensor.drawInfo.height * 0.15;
         statesize = namesize;
+        portsize = namesize;
         
         var maxNameSize = 25;
         var maxStateSize = 20;
@@ -7474,6 +7561,7 @@ var getContext = function (display, infos, curLevel) {
         if(sameFont){
             // namesize = h*0.12;
             statesize = namesize;
+            // console.log(statesize)
         }
 
         var sensorAttr = {
@@ -7512,7 +7600,6 @@ var getContext = function (display, infos, curLevel) {
                     imagename += "red";
 
                 imagename += ".png";
-
                 sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
             }
 
@@ -7554,7 +7641,8 @@ var getContext = function (display, infos, curLevel) {
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
 
-        } else if (sensor.type == "buzzer") { 
+        } 
+        else if (sensor.type == "buzzer") { 
             if(typeof sensor.state == 'number' &&
                sensor.state != 0 &&
                sensor.state != 1) {
@@ -7675,7 +7763,8 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-        } else if (sensor.type == "button") {
+        } 
+        else if (sensor.type == "button") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -7730,7 +7819,8 @@ var getContext = function (display, infos, curLevel) {
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
                 sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
             }
-        } else if (sensor.type == "screen") {
+        } 
+        else if (sensor.type == "screen") {
             if (sensor.stateText) {
                 sensor.stateText.remove();
                 sensor.stateText = null;
@@ -7836,7 +7926,8 @@ var getContext = function (display, infos, curLevel) {
                     sensor.stateText.attr("")
                 }
             }
-        } else if (sensor.type == "temperature") {
+        } 
+        else if (sensor.type == "temperature") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -7901,7 +7992,8 @@ var getContext = function (display, infos, curLevel) {
                 removeSlider(sensor);
             }
 
-        } else if (sensor.type == "servo") {
+        } 
+        else if (sensor.type == "servo") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -7969,7 +8061,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "potentiometer") {
+        } 
+        else if (sensor.type == "potentiometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8013,7 +8106,8 @@ var getContext = function (display, infos, curLevel) {
                 removeSlider(sensor);
             }
 
-        } else if (sensor.type == "range") {
+        }
+        else if (sensor.type == "range") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8095,7 +8189,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "light") {
+        } 
+        else if (sensor.type == "light") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8152,7 +8247,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "humidity") {
+        } 
+        else if (sensor.type == "humidity") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8180,7 +8276,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "accelerometer") {
+        } 
+        else if (sensor.type == "accelerometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8228,7 +8325,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "gyroscope") {
+        } 
+        else if (sensor.type == "gyroscope") {
             if (!sensor.state) {
                 sensor.state = [0, 0, 0];
             }
@@ -8321,7 +8419,8 @@ var getContext = function (display, infos, curLevel) {
                     removeSlider(sensor);
                 }                            
             }            
-        } else if (sensor.type == "magnetometer") {
+        } 
+        else if (sensor.type == "magnetometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8379,7 +8478,8 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
-        } else if (sensor.type == "sound") {
+        } 
+        else if (sensor.type == "sound") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8413,7 +8513,8 @@ var getContext = function (display, infos, curLevel) {
                 removeSlider(sensor);
             }
 
-        } else if (sensor.type == "irtrans") {
+        } 
+        else if (sensor.type == "irtrans") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8535,7 +8636,8 @@ var getContext = function (display, infos, curLevel) {
 
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
-        } else if (sensor.type == "irrecv") {
+        } 
+        else if (sensor.type == "irrecv") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -8718,7 +8820,8 @@ var getContext = function (display, infos, curLevel) {
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
                 sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
             }*/
-        } else if (sensor.type == "stick") {
+        } 
+        else if (sensor.type == "stick") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -9017,7 +9120,8 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
             sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
-        } else if (sensor.type == "cloudstore") {
+        } 
+        else if (sensor.type == "cloudstore") {
             if (!sensor.img || isElementRemoved(sensor.img))
                 sensor.img = paper.image(getImg('cloudstore.png'), imgx, imgy, imgw, imgh);
 
@@ -9032,7 +9136,8 @@ var getContext = function (display, infos, curLevel) {
             drawPortText = false;
             // drawName = false;
 
-        } else if (sensor.type == "clock") {
+        } 
+        else if (sensor.type == "clock") {
             if (!sensor.img || isElementRemoved(sensor.img))
                 sensor.img = paper.image(getImg('clock.png'), imgx, imgy, imgw, imgh);
 
@@ -9047,7 +9152,8 @@ var getContext = function (display, infos, curLevel) {
 
             drawPortText = false;
             drawName = false;
-        }else if(sensor.type == "adder"){
+        }
+        else if(sensor.type == "adder"){
             drawCustomSensorAdder(x,y,w,h,namesize);
             return
         }
@@ -9058,8 +9164,12 @@ var getContext = function (display, infos, curLevel) {
                 var statecolor = "gray";
                 // if (context.compactLayout)
                 //     statecolor = "black";
-
-                sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': stateanchor, 'font-weight': 'bold', fill: statecolor });
+                // console.log(statesize)
+                sensor.stateText.attr({ 
+                    "font-size": statesize, 
+                    'text-anchor': stateanchor, 
+                    'font-weight': fontWeight, 
+                    fill: statecolor });
                 // var b = sensor.stateText._getBBox();
                 // sensor.stateText.translate(0, b.height/2);
                 sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
@@ -9092,7 +9202,11 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.nameText = paper.text(namex, namey, sensorId );
                 // sensor.nameText = paper.text(namex, namey, sensor.name );
-                sensor.nameText.attr({ "font-size": namesize + "px", 'text-anchor': nameanchor, fill: "#7B7B7B" });
+                sensor.nameText.attr({ 
+                    "font-size": namesize,
+                    "font-weight": fontWeight, 
+                    'text-anchor': nameanchor, 
+                    fill: "#7B7B7B" });
                 sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
                 var bbox = sensor.nameText.getBBox();
                 if(bbox.width > w - 20){

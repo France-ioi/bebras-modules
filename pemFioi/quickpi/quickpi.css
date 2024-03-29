@@ -126,14 +126,16 @@ html {
     height: 100%;
     min-height: 0;
     margin-left: 0;
+    transform: translate(0px);
+    position: relative;
 }
-@media screen and (min-width: 481px){
+/*@media screen and (min-width: 481px){*/
     #quickpiViewer .navigationContent {
         overflow-x: hidden;
         overflow-y: auto;
         height: 100%;
     }
-}
+/*}*/
 #quickpiViewer .navigation {
     border-right: 1px solid rgba(0,0,0,0.1);
     display: flex;
@@ -145,7 +147,71 @@ html {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap;
+    row-gap: 20px;
 }
+@media (max-width: 720px) {
+    #quickpiViewer #piconsel {
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+        gap: 5px;
+        margin-top: 1em;
+    }
+    #quickpiViewer #piconsel button {
+        background-color: #e5e5e5;
+        border-radius: 50px;
+    }
+    #quickpiViewer #piconsel button.active {
+        background-color: var(--colors-blue);
+    }
+    #quickpiViewer .inlineButtons {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    #quickpiViewer .inlineButtons button {
+        margin: 0!important;
+        width: 300px;
+    }
+}
+@media (max-width: 600px) {
+    #quickpiViewer #boardlist {
+        flex-direction: column;
+    }
+}
+@media (max-width: 684px) {
+    #quickpiViewer #pi-displayconf {
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+    }
+    #quickpiViewer #pi-displayconf button {
+        background-color: #e5e5e5;
+        border-radius: 50px;
+    }
+    #quickpiViewer #pi-displayconf button.active {
+        background-color: var(--colors-blue);
+    }
+}
+@media (max-width: 460px) {
+    #quickpiViewer .sectionTitle {
+        font-size: 0.9rem!important;
+        display: flex;
+        align-items: center;
+    }
+    #quickpiViewer #pi-displayconf button,
+    #quickpiViewer #piconsel button {
+        padding: 6px;
+        font-size: 0.6rem!important;
+    }
+    #quickpiViewer .inlineButtons #piconnectok, 
+    #quickpiViewer .inlineButtons #pirelease {
+        width: auto;
+        font-size: 0.6rem!important;
+    }
+}
+
 
 #quickpiViewer .navigationLanguage {
     border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -236,7 +302,7 @@ html {
 #quickpiViewer #showNavigationContent {
     display: none;
 }
-@media screen and (max-width: 480px) and (orientation: portrait) {
+/*@media screen and (max-width: 480px) and (orientation: portrait) {
     #quickpiViewer .panel-body {
         flex-direction: column;
     }
@@ -297,9 +363,12 @@ html {
     #quickpiViewer .navigationContent ul li {
         line-height: 2em;
     }
-}
+}*/
+
 #quickpiViewer .viewer {
     flex-grow: 1;
+    overflow-y: auto;
+/*    position: relative;*/
 }
 #quickpiViewer .viewerContent { /* iframe */
     width: 100%;
@@ -348,7 +417,10 @@ html {
 }
 
 /*** config components ***/
-
+#qpi-uiblock-components {
+/*    position: relative;*/
+    margin-bottom: 30px;
+}
 #qpi-uiblock-components #tabs {
     display: flex;
     flex-direction: row;
@@ -446,6 +518,18 @@ html {
   top: 50%;
   left: 90%;
   transform: translate(-50%, -30%);
+}
+
+#qpi-uiblock-components .buttonContainer {
+    position: absolute;
+    padding: 10px;
+    bottom: 0px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+#qpi-uiblock-components .buttonContainer button {
+    margin: 0!important;
 }
 
 .config #buttons {
