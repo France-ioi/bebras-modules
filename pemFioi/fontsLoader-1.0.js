@@ -33,6 +33,11 @@ var importableFonts = function () {
             check: '12px "Icons16"',
             src: mp+"/fonts/blueprint-16/blueprint-icons-16.css",
             cdn: "https://static4.castor-informatique.fr/modules/fonts/blueprint-16/blueprint-icons-16.css"
+        },
+        'blueprint-16-new': {
+            check: '12px "blueprint-icons-16"',
+            src: mp+"/fonts/blueprint-16-new/blueprint-icons-16.css",
+            cdn: "https://static4.castor-informatique.fr/modules/fonts/blueprint-16-new/blueprint-icons-16.css"
         }
     };
 }
