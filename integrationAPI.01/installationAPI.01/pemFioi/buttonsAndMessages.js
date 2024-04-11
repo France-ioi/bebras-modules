@@ -732,6 +732,7 @@ window.displayHelper = {
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
+      this.loading = true;
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
@@ -756,6 +757,7 @@ window.displayHelper = {
          if (!document.getElementById('displayHelperAnswering')) {
             $(self.taskSelector).append(addTaskHTML);
          }
+         self.loading = false;
          self.loaded = true;
          self.timeLoaded = new Date().getTime();
          if (self.popupMessageShown) {
@@ -781,6 +783,7 @@ window.displayHelper = {
       }
       clearInterval(this.checkAnswerInterval);
       this.checkAnswerInterval = null;
+      this.loading = false;
       this.loaded = false;
       this.prevAnswer = '';
       this.readOnly = false;
@@ -1616,6 +1619,10 @@ window.displayHelper = {
    // Checks task.getAnswer() against previously recorded result, and calls
    // displayHelper.updateMessages() accordingly.
    checkAnswerChanged: function() {
+      if (this.loading) {
+         // Avoid cancelling the interval while the task is loading
+         return;
+      }
       if (!this.loaded) {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
          return;
