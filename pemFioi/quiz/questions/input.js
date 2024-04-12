@@ -32,7 +32,7 @@
                 });
             }
         }
-        input.attr('placeholder', lang.translate('placeholder_' + format));
+        input.attr('placeholder', parent.attr('placeholder') || lang.translate('placeholder_' + format));
         answer.append(input);
 
         answer.wrapAll('<div class="answers"></div>');
