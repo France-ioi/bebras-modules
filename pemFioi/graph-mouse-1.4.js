@@ -303,8 +303,14 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
    this.clickHandler = function(event) {
       // var offset = $(self.paper.canvas).offset();
       var offset = $("#"+paperElementID).offset();
-      var xPos = event.pageX - offset.left;
-      var yPos = event.pageY - offset.top;
+      
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      var xPos = (event.pageX - offset.left)/scale;
+      var yPos = (event.pageY - offset.top)/scale;
       callback(xPos, yPos, event);
    };
 
@@ -992,7 +998,6 @@ function VertexDragAndConnect(settings) {
          // self.isDragging = false;
          return;
       }
-      // console.log('clickHandler',self.elementID)
       self.clickHandler(self.elementID,event.pageX,event.pageY);  // because drag event interferes with click event on chrome
    };
 
