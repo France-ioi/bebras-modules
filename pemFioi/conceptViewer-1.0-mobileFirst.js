@@ -493,6 +493,8 @@ function conceptsFill(baseConcepts, allConcepts) {
       }
       delete baseConceptsById[fullConcept.id];
     } else if((fullConcept.isBase && baseConceptsById['base']) || fullConcept.isCategory) {
+      // Translate concept name if available
+      fullConcept.name = conceptNames[fullConcept.id] || fullConcept.name;
       concepts.push(fullConcept);
     }
   }
