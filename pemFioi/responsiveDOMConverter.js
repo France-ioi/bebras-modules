@@ -20,8 +20,11 @@ function convertDOM() {
    var consigne = $("<div class='consigne'></div>");
    $("<h3><i class='far fa-sticky-not'></i>"+taskStrings.introTitle.toUpperCase()+"</h3>").appendTo(consigne);
    var text = $("<div id='text'></div>");
+   var example = $("#zone_1 #example");
    $("#zone_1").children().detach().appendTo(text);
    text.appendTo(consigne);    
+   example.appendTo(consigne);
+   // console.log("test",example)
    consigne.append("<div class='spacer' style='clear: both;'></div>");       
    consigne.appendTo("#zone_1");
 
