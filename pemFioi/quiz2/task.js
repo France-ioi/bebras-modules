@@ -21,6 +21,7 @@
                 'restart_scratch': 'Restart from scratch',
                 'restart_current': 'Restart from current answer',
                 'return_to_top': 'Return to the list of questions',
+                'move_to_next': 'Next question',
                 'placeholder_text': 'Enter text',
                 'placeholder_number': 'Enter number',
                 'error_number': 'Must be a number',
@@ -46,6 +47,7 @@
                 'restart_scratch': 'Recommencer au début',
                 'restart_current': 'Modifier ma réponse',
                 'return_to_top': 'Retour à la liste des questions',
+                'move_to_next': 'Question suivante',
                 'cancel' : 'Annuler',
                 'placeholder_text': 'Entrez du texte',
                 'placeholder_number': 'Entrez un nombre',
@@ -170,9 +172,11 @@
             this.validated = !!validated;
             if(validated) {
                 this.buttons.validate.hide();
+                this.buttons.move_to_next && this.buttons.move_to_next.show();
                 this.buttons.solution && this.buttons.solution.show();
             } else {
                 this.buttons.validate.show();
+                this.buttons.move_to_next && this.buttons.move_to_next.hide();
                 this.buttons.solution && this.buttons.solution.hide();
             }
         },
@@ -217,6 +221,12 @@
                 this.addButton(this.holder, 'restart', function() {
                     self.showPopup();
                 });
+            }
+            if(quiz_settings.display_move_to_next) {
+                this.addButton(this.holder, 'move_to_next', function() {
+                    platform.validate('next');
+                });
+                this.buttons.move_to_next.hide();
             }
             if(quiz_settings.display_return_to_top) {
                 this.holder.append('<br><br>');
