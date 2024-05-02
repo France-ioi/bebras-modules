@@ -275,13 +275,16 @@
     };
 
     task.getMetaData = function(success, error) {
+        var metadata = {
+            disablePlatformProgress: true,
+            minWidth: 'auto',
+            nbHints: 0,
+            usesTokens: true
+        };
         if (typeof json !== 'undefined') {
-            json.disablePlatformProgress = true;
-            json.usesTokens = true;
-            success(json);
-        } else {
-            success({nbHints: 0, disablePlatformProgress: true});
+            Object.assign(metadata, json);
         }
+        success(metadata);
     };
 
     task.reloadState = function(state, success, error) { success() }
