@@ -465,6 +465,9 @@
                 var new_format = answer !== null && typeof answer === 'object' && 'data' in answer;
                 function onGrade(result) {
                     q.displayFeedback(result.feedback);
+                    if(Quiz.params.save_only_mode) {
+                        result.score = taskParams.maxScore;
+                    }
                     displayScore(result.score, taskParams.maxScore);
                     //displayMessages(result.messages);
                     callback(result.score, lang.translate('grader_msg') + result.score, null);
@@ -479,11 +482,6 @@
                     score_calculation: 'score_calculation' in quiz_settings ? quiz_settings.score_calculation : {},
                     questions_info: q.getQuestionsInfo()
                 };
-
-                if(Quiz.params.save_only_mode) {
-                    onGrade({score: taskParams.maxScore, feedback: []});
-                    return;
-                }
 
                 var token = task_token.get()
                 if(token) {
