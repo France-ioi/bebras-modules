@@ -479,6 +479,12 @@
                     score_calculation: 'score_calculation' in quiz_settings ? quiz_settings.score_calculation : {},
                     questions_info: q.getQuestionsInfo()
                 };
+
+                if(Quiz.params.save_only_mode) {
+                    onGrade({score: taskParams.maxScore, feedback: []});
+                    return;
+                }
+
                 var token = task_token.get()
                 if(token) {
                     useGraderUrl(

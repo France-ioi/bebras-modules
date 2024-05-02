@@ -124,9 +124,19 @@ Quiz.UI = function(params) {
         feedback_on_correct_choices: "all", //  none | selected_only | all
         show_solutions: "all", // none | correct_only | all
         alert_if_no_answer: true, // bool
-        keypad_input_only: false // bool, if true, only keypad input is allowed for number inputs
+        keypad_input_only: false, // bool, if true, only keypad input is allowed for number inputs
+        save_only_mode: false // bool, if true, behave as a task which only saves the answer and gives 100
     }
     var params = Object.assign(default_params, params);
+
+    // save only mode
+    if (params.save_only_mode) {
+        params.feedback_score = "saved";
+        params.feedback_on_wrong_choices = "none";
+        params.feedback_on_correct_choices = "none";
+        params.show_solutions = "none";
+    }
+
     Quiz.params = params;
     //console.log('Quiz.params', Quiz.params)
 
