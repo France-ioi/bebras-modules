@@ -31,7 +31,8 @@
                 'error_regexp': 'Invalid format',
                 'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.',
                 'feedback_score_binary_correct': 'Congratulations, everything is correct.',
-                'feedback_score_binary_mistake': 'There is at least one mistake.'
+                'feedback_score_binary_mistake': 'There is at least one mistake.',
+                'feedback_answer_saved': 'Your answer has been saved.'
             },
             fr: {
                 'score': 'Score',
@@ -58,7 +59,8 @@
                 'error_regexp': 'Format invalide',
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.',
                 'feedback_score_binary_correct': 'Félicitations, tout est correct.',
-                'feedback_score_binary_mistake': 'Il y a au moins une erreur.'
+                'feedback_score_binary_mistake': 'Il y a au moins une erreur.',
+                'feedback_answer_saved': 'Votre réponse a été enregistrée.'
             },
         },
 
@@ -436,6 +438,8 @@
                         '<span class="scoreLabel">' + lang.translate('score') + '</span>' +
                         '<span class="value">' + score + '</span>' +
                         '<span class="max-value">/' + max_score + '</span>';
+                } else if(Quiz.params.feedback_score == 'saved') {
+                    var msg = '<span class="scoreLabel">' + lang.translate('feedback_answer_saved') + '</span>';
                 } else {
                     return;
                 }
