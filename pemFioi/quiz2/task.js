@@ -207,7 +207,13 @@
             this.addButton(this.holder, 'validate', function () {
                 self.freezeTask();
                 self.setValidated(true);
-                platform.validate('done');
+                var cb = null;
+                if(Quiz.params.feedback_score == 'saved') {
+                    cb = function() {
+                        displayScore();
+                    }
+                }
+                platform.validate('done', cb);
             });
             var hasSolution = false;
             $('solution, .solution, #solution').each(function() {
@@ -304,6 +310,33 @@
     task.reloadStateObject = function(obj) { }
     task.getStateObject = function() { return {} }
     task.getDefaultStateObject = function() { return {} }
+
+
+    function displayScore(score, max_score) {
+        if(Quiz.params.feedback_score == 'binary') {
+            var msg = '<span class="scoreLabel">';
+            if(score == max_score) {
+                msg += lang.translate('feedback_score_binary_correct');
+            } else {
+                msg += lang.translate('feedback_score_binary_mistake');
+            }
+            msg += '</span>';
+        } else if(Quiz.params.feedback_score == 'exact') {
+            var msg =
+                '<span class="scoreLabel">' + lang.translate('score') + '</span>' +
+                '<span class="value">' + score + '</span>' +
+                '<span class="max-value">/' + max_score + '</span>';
+        } else if(Quiz.params.feedback_score == 'saved') {
+            var msg = '<span class="scoreLabel">' + lang.translate('feedback_answer_saved') + '</span>';
+        } else {
+            return;
+        }
+        if($('#score').length == 0) {
+            var div = '<div id="score"></div>';
+            $('.taskContent').first().append(div);
+        }
+        $('#score').html(msg);
+    }
 
 
     $('.grader').hide();
@@ -422,33 +455,6 @@
                 lastReloadedAnswer = answerObj;
             }
 
-
-
-            function displayScore(score, max_score) {
-                if(Quiz.params.feedback_score == 'binary') {
-                    var msg = '<span class="scoreLabel">';
-                    if(score == max_score) {
-                        msg += lang.translate('feedback_score_binary_correct');
-                    } else {
-                        msg += lang.translate('feedback_score_binary_mistake');
-                    }
-                    msg += '</span>';
-                } else if(Quiz.params.feedback_score == 'exact') {
-                    var msg =
-                        '<span class="scoreLabel">' + lang.translate('score') + '</span>' +
-                        '<span class="value">' + score + '</span>' +
-                        '<span class="max-value">/' + max_score + '</span>';
-                } else if(Quiz.params.feedback_score == 'saved') {
-                    var msg = '<span class="scoreLabel">' + lang.translate('feedback_answer_saved') + '</span>';
-                } else {
-                    return;
-                }
-                if($('#score').length == 0) {
-                    var div = '<div id="score"></div>';
-                    $('.taskContent').first().append(div);
-                }
-                $('#score').html(msg);
-            }
 
 
             function displayMessages(messages) {
