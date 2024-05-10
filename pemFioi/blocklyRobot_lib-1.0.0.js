@@ -2444,7 +2444,8 @@ var getContext = function(display, infos, curLevel) {
                   return item.isContainer === true;
                })[0].containerSize;
             }, side: 60, isWritable: true, fontColor: "#4a90e2", fontBold: true, zOrder: 1, offsetX: -20, offsetY: -17},
-            mask: {num: 8, img: "mask.png", side: 60, isMask: true, zOrder: 2 }
+            mask: {num: 8, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
+            number: { num: 9, side: 60, zOrder: 1 }  
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
