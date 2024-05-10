@@ -4,10 +4,6 @@
 *
 */
 
-body {
-  max-width: 1200px;
-  margin: auto;
-}
 #task {
   position: relative;
   overflow-x: hidden;
@@ -15,14 +11,19 @@ body {
   color: #333;
   padding-top: 2em;
   counter-reset: questions-counter;
+  max-width: 1200px;
+  margin: auto;
 }
+
 #task * {
   box-sizing: border-box;
 }
+
 #task .intro,
 #displayHelperAnswering {
   padding: 20px 60px;
 }
+
 #task .intro p.dropcap::first-letter {
   color: #4a90e2;
   font-size: 2.5em;
@@ -31,6 +32,7 @@ body {
   padding-top: 5px;
   float: left;
 }
+
 #task .title {
   font-size: 22px;
   font-weight: 100;
@@ -41,9 +43,11 @@ body {
 question {
   display: block;
 }
-question > * {
+
+question>* {
   padding: 0 60px;
 }
+
 /* Old alternating colors
 question:nth-child(odd) {
   background: rgba(74,144,226,0.2);
@@ -59,6 +63,7 @@ question .error-message, .quiz-toolbar .error-message {
   /*font-size: 14px;*/
   margin: 10px 60px;
 }
+
 question .error-message .icon,
 .quiz-toolbar .error-message .icon {
   color: #fff;
@@ -80,6 +85,7 @@ question .success-message, .quiz-toolbar .success-message {
   /*font-size: 14px;*/
   margin: 10px 60px;
 }
+
 question .success-message .icon,
 .quiz-toolbar .success-message .icon {
   color: #fff;
@@ -116,14 +122,17 @@ statement {
   font-weight: bold;
   display: block;
 }
+
 statement p {
   margin: 0;
   font-weight: normal;
 }
+
 statement p:first-child {
   /* because we get <p> wraps here by taskeditor tinymce */
   display: inline;
 }
+
 .questions-numeration-enabled statement::before {
   counter-increment: questions-counter;
   content: counter(questions-counter);
@@ -152,18 +161,22 @@ answer {
   border-color: #e1e1e1;
   padding: 5px 0;
 }
+
 answer p {
   margin: 0;
 }
+
 answer p:first-child {
   display: inline;
 }
+
 /*question:nth-child(odd) answer {
   border-color: #d2d2d2;
 }*/
 answer:first-child {
   border-top: none;
 }
+
 answer .answer-block {
   display: flex;
   margin-left: -15px;
@@ -173,17 +186,21 @@ answer .answer-block {
   transition: all linear 50ms;
   justify-content: space-between;
 }
+
 answer.selected .answer-block {
   color: #4a90e2;
   border-color: #4a90e2;
 }
+
 answer .answer-label {
   line-height: 1.5em;
   transition: all linear 50ms;
 }
+
 answer.selected .answer-label {
   font-weight: bold;
 }
+
 answer .answer-code {
   border: 1px solid #4a90e2;
   border-radius: 20px;
@@ -196,10 +213,12 @@ answer .answer-code {
   align-self: center;
   transition: all linear 50ms;
 }
+
 answer.selected .answer-code {
   color: #fff;
   background-color: #4a90e2;
 }
+
 answer .answer-code::before {
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
@@ -208,9 +227,11 @@ answer .answer-code::before {
   top: 7px;
   top: calc(50% - 0.5em);
 }
+
 answer.selected .answer-code::before {
   content: "\f00c";
 }
+
 /*
 *
 * QUESTION HORIZONTAL LAYOUT: TYPE SINGLE ANSWERS
@@ -221,15 +242,18 @@ question.horizontal .answers {
   justify-content: space-between;
   margin: 0 -20px;
 }
+
 question.horizontal answer {
   border-top: none;
   flex: 1 0 0;
   padding: 0 20px;
   border-left: 1px solid;
 }
+
 question.horizontal answer:first-child {
   border-left: none;
 }
+
 question.horizontal answer .answer-block {
   display: flex;
   flex-direction: column;
@@ -237,10 +261,12 @@ question.horizontal answer .answer-block {
   margin-left: 0;
   padding-left: 0;
 }
+
 question.horizontal answer .answer-label {
   text-align: center;
   padding: 1em 10px;
 }
+
 question.horizontal answer .answer-code {
   flex: 0 0 0;
   align-self: stretch;
@@ -255,9 +281,9 @@ question.horizontal answer .answer-code {
 */
 .answer-switch {
   display: inline-block;
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 20px;
-  box-shadow: inset 0 1px 0 0 rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.05);
   height: 26px;
   width: 100px;
   position: relative;
@@ -267,6 +293,7 @@ question.horizontal answer .answer-code {
   box-shadow: 0 1px 0 0 #727273 inset;
   flex: 0 0 auto;
 }
+
 .answer-switch::before,
 .answer-switch::after {
   font-family: "Font Awesome 5 Free";
@@ -276,16 +303,19 @@ question.horizontal answer .answer-code {
   top: calc(50% - 0.5em);
   color: #9B9B9B;
 }
+
 .answer-switch::before {
   content: "\f00d";
   right: auto;
   left: 20px;
 }
+
 .answer-switch::after {
   content: "\f00c";
   right: 20px;
   left: auto;
 }
+
 .answer-switch .cursor {
   position: absolute;
   left: 0;
@@ -297,10 +327,12 @@ question.horizontal answer .answer-code {
   transition: all 250ms;
   z-index: 1;
 }
+
 answer.selected .answer-switch .cursor {
   background-color: #4a90e2;
   left: 45px;
 }
+
 .answer-switch .cursor::before {
   content: "\f00d";
   font-family: "Font Awesome 5 Free";
@@ -311,6 +343,7 @@ answer.selected .answer-switch .cursor {
   left: 20px;
   color: #fff;
 }
+
 answer.selected .answer-switch .cursor::before {
   content: "\f00c";
   right: auto;
@@ -336,9 +369,11 @@ input[type=text] {
   color: #555555;
   font-size: 16px;
 }
+
 input[type=text]:focus {
   box-shadow: 0 1px 3px #333 inset;
 }
+
 ::placeholder,
 :placeholder-shown {
   font-style: italic;
@@ -356,41 +391,51 @@ solution {
   border-top: 1px solid #e1e1e1;
   margin-top: 30px;
 }
+
 #solution, .solution {
   display: none;
 }
+
 .displaySolution solution, .displaySolution .solution, .displaySolution #solution {
   display: block;
 }
+
 /*question:nth-child(odd) solution {
   border-color: #d2d2d2;
 }*/
 .displayFeedback answer.correct:not(.selected) .answer-block {
   border-color: #ff001f;
 }
+
 .displayFeedback answer.correct .answer-block {
   font-weight: bold;
 }
+
 .displayFeedback answer.correct:not(.selected) .answer-code::before {
   content: "\f0a4";
   color: white;
 }
+
 .displayFeedback .horizontal answer.correct:not(.selected) .answer-code::before {
   content: "\f0a6";
   color: white;
 }
+
 .displayFeedback answer.mistake .answer-block {
   color: #797979;
   border-color: #ff001f;
 }
+
 .displayFeedback answer.mistake .answer-code {
   background-color: #ff001f;
   border-color: #ff001f;
 }
+
 .displayFeedback answer.mistake .answer-code::before {
   content: "\f00d";
   color: white;
 }
+
 .displayFeedback answer.mistake input[type=text] {
   border-color: #ff001f;
   border-width: 2px;
@@ -400,10 +445,12 @@ solution {
   border-color: #00aa1f;
   border-width: 2px;
 }
+
 .displayFeedback answer.correct .answer-block {
   color: #797979;
   border-color: #00aa1f;
 }
+
 .displayFeedback answer.correct .answer-code {
   background-color: #00aa1f;
   border-color: #00aa1f;
@@ -424,12 +471,15 @@ solution {
   color: #4a90e2;
   display: flex;
 }
+
 #score .scoreLabel {
   flex-grow: 1;
 }
+
 #score .max-value {
   color: #9b9b9b;
 }
+
 /*
 *
 * INTERFACE CONTROLS
@@ -442,17 +492,21 @@ solution {
   padding: 10px 0;
   font-size: 1rem;
 }
+
 #displayHelper_validate,
 #displayHelper_cancel {
   display: inline-block;
   width: 50%;
 }
+
 #displayHelper_validate {
   padding-right: 20px;
 }
+
 #displayHelper_cancel {
   padding-left: 20px;
 }
+
 input[type=button],
 button,
 .btn {
@@ -465,18 +519,22 @@ button,
   letter-spacing: 0.1em;
   padding: 7px 20px;
 }
+
 #displayHelper_validate input[type=button],
 #displayHelper_cancel input[type=button] {
   margin: 0;
   width: 100%;
 }
+
 #displayHelper_validate input[type=button] {
   background-color: #4a90e2;
 }
+
 #displayHelper_cancel input[type=button],
 #showSolutionButton .btn {
   background-color: #9b9b9b;
 }
+
 .btn:hover {
   color: #fff;
 }
@@ -493,22 +551,25 @@ button,
   background-color: gray;
   background: rgba(241, 242, 247, .9);
 }
+
 #popupMessage.floatingMessage .container {
   min-height: 100px;
   width: 94%;
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
-  color:#787878;
+  color: #787878;
   background: #fff;
   border: none;
   border-radius: 5px;
   top: 50%;
-  transform: translate(0,-50%);
+  transform: translate(0, -50%);
 }
+
 #popupMessage.floatingMessage .container img {
   display: none;
 }
+
 #popupMessage .message {
   font-size: 1em;
   margin: 60px;
@@ -517,20 +578,25 @@ button,
   padding: 0;
   max-width: none;
 }
+
 #popupMessage p {
   margin: .5em 0 0;
 }
+
 #popupMessage p:first-child {
   margin-top: 0;
 }
+
 #popupMessage .buttonsWrapper {
   margin: 2em auto 0;
   text-align: center;
 }
+
 #popupMessage button {
   margin: 0 auto;
   background-color: #4a90e2;
 }
+
 #popupMessage button.buttonYes::before {
   content: "\f00c";
   font-family: "Font Awesome 5 Free";
@@ -605,7 +671,7 @@ button,
   top: 0;
   right: 0;
   bottom: 0;
-  background:transparent;
+  background: transparent;
   z-index: 1;
 }
 
@@ -642,7 +708,7 @@ button,
   background: #AAA;
   min-width: 60px;
   padding: 5px 0px;
-  color : #4a90e2;
+  color: #4a90e2;
   font-weight: bold;
 }
 
@@ -658,8 +724,10 @@ button,
 
 
 .fill-gaps-text .correct span {
-  color: #00aa1f;;
-  border-color: #00aa1f;;
+  color: #00aa1f;
+  ;
+  border-color: #00aa1f;
+  ;
 }
 
 .fill-gaps-text .mistake span {
@@ -673,20 +741,23 @@ question[type="sort_list"] .list-group {
   display: flex;
   flex-direction: column;
 }
+
 question[type="sort_list"] .list-group-item {
   padding: .75rem 1.25rem;
   margin-bottom: -1px;
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,.125);
+  border: 1px solid rgba(0, 0, 0, .125);
   cursor: grab;
 }
+
 question[type="sort_list"] .list-group-item:first-child {
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
 }
+
 question[type="sort_list"] .list-group-item:last-child {
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+  border-bottom-left-radius: .25rem;
 }
 
 /***** SORT ITEMS *****/
@@ -694,6 +765,7 @@ question[type="sort_list"] .list-group-item:last-child {
 question[type="sort_items"] .src {
   min-height: 68px;
 }
+
 question[type="sort_items"] .src::after {
   content: '';
   display: block;
@@ -708,7 +780,7 @@ question[type="sort_items"] .src .list-group-item {
   padding: .5rem 1rem;
   margin: 10px;
   background-color: #f1f2f7;
-  border: 1px solid rgba(0,0,0,.125);
+  border: 1px solid rgba(0, 0, 0, .125);
   cursor: grab;
   min-width: 90px;
   min-height: 30px;
@@ -732,6 +804,7 @@ question[type="sort_items"] .dest {
   justify-content: space-around;
   text-align: center;
 }
+
 question[type="sort_items"] .dest label {
   display: block;
   font-weight: bold;
@@ -744,30 +817,34 @@ question[type="sort_items"] .dest .list-group {
   flex-direction: column;
   min-height: 100px;
   min-width: 100px;
-  border: 1px solid rgba(0,0,0,.125);
+  border: 1px solid rgba(0, 0, 0, .125);
   border-radius: .25rem;
   background: #f2f2f2;
 }
+
 question[type="sort_items"] .dest .list-group-item {
   padding: .75rem 1.25rem;
   margin-bottom: -1px;
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,.125);
+  border: 1px solid rgba(0, 0, 0, .125);
   cursor: grab;
 }
+
 question[type="sort_items"] .dest .list-group-item:first-child {
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
 }
+
 question[type="sort_items"] .dest .list-group-item:last-child {
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+  border-bottom-left-radius: .25rem;
 }
 
-.blue-background-class{
+.blue-background-class {
   background-color: lightblue !important;
 }
-.lightgrey-background-class{
+
+.lightgrey-background-class {
   background-color: lightgrey !important;
 }
 
