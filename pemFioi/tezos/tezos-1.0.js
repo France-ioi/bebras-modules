@@ -708,8 +708,6 @@ class LiquidityPool extends SmartContract {
       if(id == "buy_tokens"){
          let amo = trans.amount;
          let nb = this.getNbOfTokensBought(amo);
-         sAcc.balance -= amo;
-         this.balance += amo;
          this.storage.tokens_owned.val -= nb;
       }else if(id == "sell_tokens"){
          let nb = trans.nbTokensSold;
@@ -2529,15 +2527,18 @@ function Tezos(params) {
       let gas = trans.gas;
       let sto = trans.storage;
       let par = trans.params;
+      // console.log(self.objectsPerAddress[sID].balance)
       self.objectsPerAddress[sID].balance -= (amo + fee + gas*gasCostPerUnit + sto*storageCostPerUnit);
       self.objectsPerAddress[rID].balance += amo;
       self.objectsPerAddress[sID].balance = roundTezAmount(self.objectsPerAddress[sID].balance);
       self.objectsPerAddress[rID].balance = roundTezAmount(self.objectsPerAddress[rID].balance);
+      // console.log(self.objectsPerAddress[sID].balance)
       if(!par.simple){
          // console.log(trans)
          let sc = self.objectsPerAddress[rID];
          sc.applyTransaction(trans);
       }
+      // console.log(self.objectsPerAddress[sID].balance)
       self.objectsPerAddress[sID].transactionNum++;
       self.bakerBalance += (fee + gas*gasCostPerUnit);
       saveAnswer(self);
