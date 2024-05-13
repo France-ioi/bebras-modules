@@ -298,6 +298,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             this.reportValues = false;
          }
 
+         // Put other blocks than robot_start first so that they execute before the main loop
+         var blockPriority = function (a) {
+             return a.type === 'robot_start' ? -1 : 1;
+         };
+         blocks.sort(function (a, b) {
+             return blockPriority(b) - blockPriority(a);
+         });
+
          var code = [];
          var comments = [];
          for (var b = 0; b < blocks.length; b++) {
