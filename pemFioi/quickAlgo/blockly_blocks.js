@@ -298,6 +298,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             this.reportValues = false;
          }
 
+         // Put other blocks than robot_start first so that they execute before the main loop
+         var blockPriority = function (a) {
+             return a.type === 'robot_start' ? -1 : 1;
+         };
+         blocks.sort(function (a, b) {
+             return blockPriority(b) - blockPriority(a);
+         });
+
          var code = [];
          var comments = [];
          for (var b = 0; b < blocks.length; b++) {
@@ -497,7 +505,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+
+                           if (blockParams && blockParams[iArgs0] == 'Statement') {
+                               params += "function () {\n  " + Blockly.JavaScript.statementToCode(block, 'PARAM_' + iParam) + "}";
+                           } else {
+                               params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                           }
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_number"
