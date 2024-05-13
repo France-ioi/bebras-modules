@@ -31,6 +31,9 @@ var quickPiLocalLanguageStrings = {
             isButtonPressedWithName: "bouton  %1 enfoncé",
             waitForButton: "attendre une pression sur le bouton",
             buttonWasPressed: "le bouton a été enfoncé",
+            onButtonPressed: "quand le bouton",
+            onButtonPressedEnd: "est enfoncé",
+            onButtonPressedDo: "faire",
 
             displayText: "afficher %1",
             displayText2Lines: "afficher Ligne 1 : %1 Ligne 2 : %2",
@@ -97,6 +100,7 @@ var quickPiLocalLanguageStrings = {
             isButtonPressedWithName : "isButtonPressed",
             waitForButton: "waitForButton",
             buttonWasPressed: "buttonWasPressed",
+            onButtonPressed: "onButtonPressed",
 
             toggleLedState: "toggleLedState",
             displayText: "displayText",
@@ -183,6 +187,7 @@ var quickPiLocalLanguageStrings = {
             isButtonPressedWithName: "isButtonPressed(button) retourne True si le bouton est enfoncé, False sinon",
             waitForButton: "waitForButton(button) met en pause l'exécution jusqu'à ce que le bouton soit appuyé",
             buttonWasPressed: "buttonWasPressed(button) indique si le bouton a été appuyé depuis le dernier appel à cette fonction",
+            onButtonPressed: "onButtonPressed(button, fonction) appelle la fonction indiquée lorsque le bouton est appuyé",
             setLedState: "setLedState(led, state) modifie l'état de la LED : True pour l'allumer, False pour l'éteindre",
             toggleLedState: "toggleLedState(led) inverse l'état de la LED",
             displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
@@ -1735,7 +1740,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_button',
                 order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed']
+                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed', 'onButtonPressed']
             },  
             {   
                 id: 'quickpi_screen',
@@ -9681,6 +9686,16 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.onButtonPressed = function (name, func, callback) {
+        var sensor = findSensorByName(name, true);
+
+        context.waitForEvent(function (callback) {
+            context.quickpi.isButtonPressed(name, callback)
+        }, func);
+
+        context.waitDelay(callback);
+    };
+
 
     //// Gyroscope
     context.quickpi.readAngularVelocity = function (axis, callback) {
@@ -10121,6 +10136,29 @@ var getContext = function (display, infos, curLevel) {
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
                             }
+                        ]
+                    }
+                },
+                {
+                    name: "onButtonPressed", params: ["String", "Statement"], blocklyInit() {
+                        return function () {
+                            this.setColour(context.blocklyHelper.getDefaultColours().categories["sensors"]);
+                            this.appendDummyInput("PARAM_0")
+                                .appendField(strings.label.onButtonPressed)
+                                .appendField(new window.Blockly.FieldDropdown(getSensorNames("button")), 'PARAM_0')
+                                .appendField(strings.label.onButtonPressedEnd);
+                            this.appendStatementInput("PARAM_1")
+                                .setCheck(null)
+                                .appendField(strings.label.onButtonPressedDo);
+                            this.setPreviousStatement(false);
+                            this.setNextStatement(false);
+                            this.setOutput(null);
+                        };
+                    },
+                    blocklyJson: {
+                        "args0": [
+                            {"type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")},
+                            { "type": "input_value", "name": "PARAM_1"},
                         ]
                     }
                 },
