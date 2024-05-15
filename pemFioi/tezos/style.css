@@ -86,6 +86,7 @@ html {
 #mainPage table#sub_transaction_table {
 /*   width: auto;*/
    table-layout: auto;
+   margin-right: 20px;
 }
 #sub_transaction_table th,
 #sub_transaction_table td {
