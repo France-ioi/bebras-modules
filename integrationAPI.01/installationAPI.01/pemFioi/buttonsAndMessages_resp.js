@@ -2240,7 +2240,10 @@ window.displayHelper = {
             }
          }
       }
-      scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
+      scoreDiffMsg += " " + this.graderScore;
+      if(this.taskParams && this.taskParams.maxScore) {
+         scoreDiffMsg += this.strings.outOf + this.taskParams.maxScore + ".";
+      }
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' +  this.strings.reloadValidAnswer + '</a>';
