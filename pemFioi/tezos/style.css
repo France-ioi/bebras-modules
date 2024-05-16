@@ -337,3 +337,38 @@ html {
    border-radius: 5px;
    background: rgba(255,0,0,0.2);
 }
+
+/*** CUSTOM POPUP ***/
+
+#custom_popup {
+   padding: 20px;
+   width: 100%;
+   position: absolute;
+   top: 0;
+   left: 0;
+   border: 1px solid grey;
+   border-radius: 5px;
+   background: lightgrey;
+   display: flex;
+/*   flex-direction: column;*/
+   justify-content: space-around;
+   align-items: center;
+   gap: 20px;
+}
+#custom_popup #custom_mode {
+   font-weight: bold;
+   flex-shrink: 0;
+}
+#custom_popup #cont {
+   display: flex;
+   justify-content: space-around;
+   align-items: center;
+   gap: 40px;
+}
+#custom_popup #ava_cred {
+   flex-shrink: 0;
+}
+#custom_popup #quit_custom {
+/*   flex-shrink: 0;*/
+   min-width: 120px;
+}
