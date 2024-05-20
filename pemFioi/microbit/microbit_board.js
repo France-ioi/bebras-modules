@@ -11,19 +11,32 @@ const MicrobitBoard = {
         return this.updateState.bind(this);
     },
 
-    importGalaxia: function(selector) {
-        const svgPath = '../bebras-modules/img/quickpi/microbit.svg';
+    fetchGalaxiaCard: function (callback) {
+        // Cache results
+        if (this.galaxiaSvgInline) {
+            callback(this.galaxiaSvgInline);
+            return;
+        }
+
+        const svgPath = (window.modulesPath || '') + 'img/quickpi/microbit.svg';
 
         fetch(svgPath)
             .then(response => response.text())
             .then(svgData => {
-                $(selector).html(svgData).css('user-select', 'none');
-                this.galaxiaSvg = $(selector + ' svg');
-
-                this.initInteraction();
-                this.displayInnerState();
-                this.initialized = true;
+                this.galaxiaSvgInline = svgData;
+                callback(svgData);
             })
+    },
+
+    importGalaxia: function(selector) {
+        this.fetchGalaxiaCard((svgData) => {
+            $(selector).html(svgData).css('user-select', 'none');
+            this.galaxiaSvg = $(selector + ' svg');
+
+            this.initInteraction();
+            this.displayInnerState();
+            this.initialized = true;
+        })
     },
 
     initInteraction: function() {

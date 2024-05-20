@@ -1,6 +1,7 @@
 const GalaxiaBoard = {
     buttonStatesUpdators: {},
     galaxiaSvg: null,
+    galaxiaSvgInline: null,
     initialized: false,
     innerState: {},
     onUserEvent: function() {},
@@ -19,19 +20,32 @@ const GalaxiaBoard = {
         return this.updateState.bind(this);
     },
 
-    importGalaxia: function(selector) {
+    fetchGalaxiaCard: function (callback) {
+        // Cache results
+        if (this.galaxiaSvgInline) {
+            callback(this.galaxiaSvgInline);
+            return;
+        }
+
         const svgPath = (window.modulesPath || '') + 'img/quickpi/galaxia.svg';
 
         fetch(svgPath)
             .then(response => response.text())
             .then(svgData => {
-                $(selector).html(svgData).css('user-select', 'none');
-                this.galaxiaSvg = $(selector + ' svg');
-
-                this.initInteraction();
-                this.displayInnerState();
-                this.initialized = true;
+                this.galaxiaSvgInline = svgData;
+                callback(svgData);
             })
+    },
+
+    importGalaxia: function(selector) {
+        this.fetchGalaxiaCard((svgData) => {
+            $(selector).html(svgData).css('user-select', 'none');
+            this.galaxiaSvg = $(selector + ' svg');
+
+            this.initInteraction();
+            this.displayInnerState();
+            this.initialized = true;
+        })
     },
 
     initInteraction: function() {
