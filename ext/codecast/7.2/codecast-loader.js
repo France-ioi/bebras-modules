@@ -29,6 +29,7 @@ $(document).ready(function() {
       platform: 'python',
       canChangePlatform: true,
       canChangeLanguage: true,
+      canDownload: true,
       controls: {},
       audioWorkerUrl: window.modulesPath + "ext/codecast/7.2/index.worker.worker.js",
       baseUrl: "https://codecast.france-ioi.org/v7",

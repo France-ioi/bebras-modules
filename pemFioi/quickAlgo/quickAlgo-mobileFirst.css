@@ -1918,3 +1918,4 @@ button.showLongIntro .icon {
 .fas {
   font-family: 'Font Awesome 5 Free', Arial, sans-serif;
 }
+:not(.tralalere) .blocklyToolboxDiv{background-color:#f1f2f7 !important;user-select:none}:not(.tralalere) .blocklyTreeLabel{color:#787878;font-family:"Open Sans",sans-serif !important;font-weight:bold}:not(.tralalere) div[role=treeitem]{border-bottom:1px solid #e2e3e8;height:2em}:not(.tralalere) .blocklyTreeRow{height:2em !important;line-height:1.6em !important}html{margin:0 !important;font-size:18px}

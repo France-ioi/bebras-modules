@@ -21,6 +21,7 @@
                 'restart_scratch': 'Restart from scratch',
                 'restart_current': 'Restart from current answer',
                 'return_to_top': 'Return to the list of questions',
+                'move_to_next': 'Next question',
                 'placeholder_text': 'Enter text',
                 'placeholder_number': 'Enter number',
                 'error_number': 'Must be a number',
@@ -30,7 +31,8 @@
                 'error_regexp': 'Invalid format',
                 'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.',
                 'feedback_score_binary_correct': 'Congratulations, everything is correct.',
-                'feedback_score_binary_mistake': 'There is at least one mistake.'
+                'feedback_score_binary_mistake': 'There is at least one mistake.',
+                'feedback_answer_saved': 'Your answer has been saved.'
             },
             fr: {
                 'score': 'Score',
@@ -46,6 +48,7 @@
                 'restart_scratch': 'Recommencer au début',
                 'restart_current': 'Modifier ma réponse',
                 'return_to_top': 'Retour à la liste des questions',
+                'move_to_next': 'Question suivante',
                 'cancel' : 'Annuler',
                 'placeholder_text': 'Entrez du texte',
                 'placeholder_number': 'Entrez un nombre',
@@ -56,7 +59,8 @@
                 'error_regexp': 'Format invalide',
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.',
                 'feedback_score_binary_correct': 'Félicitations, tout est correct.',
-                'feedback_score_binary_mistake': 'Il y a au moins une erreur.'
+                'feedback_score_binary_mistake': 'Il y a au moins une erreur.',
+                'feedback_answer_saved': 'Votre réponse a été enregistrée.'
             },
         },
 
@@ -170,9 +174,11 @@
             this.validated = !!validated;
             if(validated) {
                 this.buttons.validate.hide();
+                this.buttons.move_to_next && this.buttons.move_to_next.show();
                 this.buttons.solution && this.buttons.solution.show();
             } else {
                 this.buttons.validate.show();
+                this.buttons.move_to_next && this.buttons.move_to_next.hide();
                 this.buttons.solution && this.buttons.solution.hide();
             }
         },
@@ -201,7 +207,13 @@
             this.addButton(this.holder, 'validate', function () {
                 self.freezeTask();
                 self.setValidated(true);
-                platform.validate('done');
+                var cb = null;
+                if(Quiz.params.feedback_score == 'saved') {
+                    cb = function() {
+                        displayScore();
+                    }
+                }
+                platform.validate('done', cb);
             });
             var hasSolution = false;
             $('solution, .solution, #solution').each(function() {
@@ -217,6 +229,12 @@
                 this.addButton(this.holder, 'restart', function() {
                     self.showPopup();
                 });
+            }
+            if(quiz_settings.display_move_to_next) {
+                this.addButton(this.holder, 'move_to_next', function() {
+                    platform.validate('next');
+                });
+                this.buttons.move_to_next.hide();
             }
             if(quiz_settings.display_return_to_top) {
                 this.holder.append('<br><br>');
@@ -275,13 +293,16 @@
     };
 
     task.getMetaData = function(success, error) {
+        var metadata = {
+            disablePlatformProgress: true,
+            minWidth: 'auto',
+            nbHints: 0,
+            usesTokens: true
+        };
         if (typeof json !== 'undefined') {
-            json.disablePlatformProgress = true;
-            json.usesTokens = true;
-            success(json);
-        } else {
-            success({nbHints: 0, disablePlatformProgress: true});
+            Object.assign(metadata, json);
         }
+        success(metadata);
     };
 
     task.reloadState = function(state, success, error) { success() }
@@ -289,6 +310,33 @@
     task.reloadStateObject = function(obj) { }
     task.getStateObject = function() { return {} }
     task.getDefaultStateObject = function() { return {} }
+
+
+    function displayScore(score, max_score) {
+        if(Quiz.params.feedback_score == 'binary') {
+            var msg = '<span class="scoreLabel">';
+            if(score == max_score) {
+                msg += lang.translate('feedback_score_binary_correct');
+            } else {
+                msg += lang.translate('feedback_score_binary_mistake');
+            }
+            msg += '</span>';
+        } else if(Quiz.params.feedback_score == 'exact') {
+            var msg =
+                '<span class="scoreLabel">' + lang.translate('score') + '</span>' +
+                '<span class="value">' + score + '</span>' +
+                '<span class="max-value">/' + max_score + '</span>';
+        } else if(Quiz.params.feedback_score == 'saved') {
+            var msg = '<span class="scoreLabel">' + lang.translate('feedback_answer_saved') + '</span>';
+        } else {
+            return;
+        }
+        if($('#score').length == 0) {
+            var div = '<div id="score"></div>';
+            $('.taskContent').first().append(div);
+        }
+        $('#score').html(msg);
+    }
 
 
     $('.grader').hide();
@@ -409,31 +457,6 @@
 
 
 
-            function displayScore(score, max_score) {
-                if(Quiz.params.feedback_score == 'binary') {
-                    var msg = '<span class="scoreLabel">';
-                    if(score == max_score) {
-                        msg += lang.translate('feedback_score_binary_correct');
-                    } else {
-                        msg += lang.translate('feedback_score_binary_mistake');
-                    }
-                    msg += '</span>';
-                } else if(Quiz.params.feedback_score == 'exact') {
-                    var msg =
-                        '<span class="scoreLabel">' + lang.translate('score') + '</span>' +
-                        '<span class="value">' + score + '</span>' +
-                        '<span class="max-value">/' + max_score + '</span>';
-                } else {
-                    return;
-                }
-                if($('#score').length == 0) {
-                    var div = '<div id="score"></div>';
-                    $('.taskContent').first().append(div);
-                }
-                $('#score').html(msg);
-            }
-
-
             function displayMessages(messages) {
                 if($('#grader-messages').length == 0) {
                     var div = '<div id="grader-messages"></div>';
@@ -448,6 +471,9 @@
                 var new_format = answer !== null && typeof answer === 'object' && 'data' in answer;
                 function onGrade(result) {
                     q.displayFeedback(result.feedback);
+                    if(Quiz.params.save_only_mode) {
+                        result.score = taskParams.maxScore;
+                    }
                     displayScore(result.score, taskParams.maxScore);
                     //displayMessages(result.messages);
                     callback(result.score, lang.translate('grader_msg') + result.score, null);
@@ -462,6 +488,7 @@
                     score_calculation: 'score_calculation' in quiz_settings ? quiz_settings.score_calculation : {},
                     questions_info: q.getQuestionsInfo()
                 };
+
                 var token = task_token.get()
                 if(token) {
                     useGraderUrl(

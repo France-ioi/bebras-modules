@@ -13,6 +13,7 @@ function PythonInterpreter(context, msgCallback) {
   this.context.runner = this;
   this._maxIterations = 4000;
   this._maxIterWithoutAction = 50;
+  this._maxSlowSteps = 10;
   this._resetCallstackOnNextStep = false;
   this._paused = false;
   this._isRunning = false;
@@ -289,6 +290,7 @@ function PythonInterpreter(context, msgCallback) {
 
   this.waitDelay = function (callback, value, delay) {
     this._paused = true;
+    this._lastStepTimestamp = null;
     if (delay > 0) {
       var _noDelay = this.noDelay.bind(this, callback, value);
       this._setTimeout(_noDelay, delay);
@@ -301,6 +303,7 @@ function PythonInterpreter(context, msgCallback) {
 
   this.waitEvent = function (callback, target, eventName, func) {
     this._paused = true;
+    this._lastStepTimestamp = null;
     var listenerFunc = null;
     var that = this;
     listenerFunc = function(e) {
@@ -313,6 +316,7 @@ function PythonInterpreter(context, msgCallback) {
   this.waitCallback = function (callback) {
     // Returns a callback to be called once we can continue the execution
     this._paused = true;
+    this._lastStepTimestamp = null;
     var that = this;
     return function(value) {
       that.noDelay(callback, value);
@@ -328,6 +332,7 @@ function PythonInterpreter(context, msgCallback) {
       this.reportValue(value);
     }
     this._paused = false;
+    this._lastStepTimestamp = null;
     callback(primitive);
     this._setTimeout(this._continue.bind(this), 10);
   };
@@ -518,6 +523,19 @@ function PythonInterpreter(context, msgCallback) {
         return;
       }
     }
+
+    // Check for very slow steps (only checks internal Skulpt steps, not library functions)
+    // Note : when the tab is in the background, Chrome and Firefox seem to have 1000ms-long steps
+    if (!this.context.allowInfiniteLoop && this._lastStepTimestamp && new Date().getTime() - this._lastStepTimestamp > 1500) {
+      this._slowSteps += 1;
+      if(this._slowSteps >= this._maxSlowSteps) {
+        return this._onStepError(window.languageStrings.tooLongExecution);
+      }
+    } else {
+      this._slowSteps = Math.max(0, this._slowSteps - 1);
+    }
+    this._lastStepTimestamp = null;
+
     if (!this.context.allowInfiniteLoop && this._steps >= this._maxIterations) {
       this._onStepError(window.languageStrings.tooManyIterations);
     } else if (!this.context.allowInfiniteLoop && this._stepsWithoutAction >= this._maxIterWithoutAction) {
@@ -551,6 +569,9 @@ function PythonInterpreter(context, msgCallback) {
     }
     if(typeof this.context.infos.maxIterWithoutAction !== 'undefined') {
       this._maxIterWithoutAction = Math.ceil(this.context.infos.maxIterWithoutAction/10);
+    }
+    if(typeof this.context.infos.maxSlowSteps !== 'undefined') {
+      this._maxSlowSteps = this.context.infos.maxSlowSteps;
     }
     if(!this._hasActions) {
       // No limit on
@@ -738,6 +759,8 @@ function PythonInterpreter(context, msgCallback) {
   this._resetInterpreterState = function () {
     this._steps = 0;
     this._stepsWithoutAction = 0;
+    this._slowSteps = 0;
+    this._lastStepTimestamp = null;
     this._lastNbActions = 0;
     this._nbActions = 0;
     this._allowStepsWithoutDelay = 0;
@@ -776,6 +799,7 @@ function PythonInterpreter(context, msgCallback) {
   this.step = function () {
     this._resetCallstack();
     this._stepInProgress = true;
+    this._lastStepTimestamp = new Date().getTime();
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? Math.floor(this.context.infos.actionDelay/4) : 0;
     if(this.context.display && (this.stepMode || markDelay > 30)) {

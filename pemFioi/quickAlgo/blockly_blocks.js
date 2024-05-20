@@ -298,6 +298,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             this.reportValues = false;
          }
 
+         // Put other blocks than robot_start first so that they execute before the main loop
+         var blockPriority = function (a) {
+             return a.type === 'robot_start' ? -1 : 1;
+         };
+         blocks.sort(function (a, b) {
+             return blockPriority(b) - blockPriority(a);
+         });
+
          var code = [];
          var comments = [];
          for (var b = 0; b < blocks.length; b++) {
@@ -497,7 +505,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+
+                           if (blockParams && blockParams[iArgs0] == 'Statement') {
+                               params += "function () {\n  " + Blockly.JavaScript.statementToCode(block, 'PARAM_' + iParam) + "}";
+                           } else {
+                               params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                           }
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_number"
@@ -722,19 +735,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
 
       getDefaultColours: function() {
+         Blockly.HSV_SATURATION = 0.65;
+         Blockly.HSV_VALUE = 0.80;
          var colours = {
             categories: {
-               logic: 210,
-               loops: 120,
-               control: 120,
-               math: 230,
-               operator: 230,
-               texts: 160,
-               lists: 260,
-               colour: 20,
-               variables: 330,
-               functions: 290,
-               _default: 65
+                 actuator: 212,
+                 sensors: 95,
+                 internet: 200,
+                 display: 300,
+                 input: 50,
+                 inputs: 50,
+                 lists: 353,
+                 logic: 298,
+                 math: 176,
+                 loops: 200,
+                 texts: 312,
+                 dicts: 52,
+                 tables: 212,
+                 variables: 30,
+                 procedures: 180,
+                 _default: 65
             },
             blocks: {}
          };
