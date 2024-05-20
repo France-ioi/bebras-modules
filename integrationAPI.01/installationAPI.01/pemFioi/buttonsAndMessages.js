@@ -1139,7 +1139,7 @@ window.displayHelper = {
    },
 
 
-   showPopupDialog: function(message) {
+   showPopupDialog: function(message, callback) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -1155,6 +1155,7 @@ window.displayHelper = {
       $('#popupMessage').html(popupHtml).show();
 
       this.popupMessageShown = true;
+      if (callback) callback();
       try {
          $(parent.document).scrollTop(0);
       } catch (e) {

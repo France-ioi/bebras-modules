@@ -4214,399 +4214,399 @@ var getContext = function (display, infos, curLevel) {
                 "   </div>" +
                 "</div>";
 
-            window.displayHelper.showPopupDialog(connectionDialogHTML);
-
-            if (context.offLineMode) {
-                $('#pirelease').attr('disabled', true);
-            }
-            else {
-                $('#pirelease').attr('disabled', false);
-            }
-
-            $('#piconnectok').attr('disabled', true);
-
-            $('#piconnectionlabel').hide();
-
-            if (context.quickPiConnection.isConnected()) {
-                if (getSessionStorage('connectionMethod') == "USB") {
-                    $('#piconwifi').removeClass('active');
-                    $('#piconusb').addClass('active');
-                    $('#pischoolcon').hide();
-                    $('#piaddress').val("192.168.233.1");
-
-                    $('#piconnectok').attr('disabled', true);
-                    $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
-
-                    context.inUSBConnection = true;
-                    context.inBTConnection = false;
-                } else if (getSessionStorage('connectionMethod') == "BT") {
-                    $('#piconwifi').removeClass('active');
-                    $('#piconbt').addClass('active');
-                    $('#pischoolcon').hide();
-
-                    $('#piaddress').val("192.168.233.2");
-
-                    $('#piconnectok').attr('disabled', true);
-                    $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
-
-                    context.inUSBConnection = false;
-                    context.inBTConnection = true;
-                } else if (getSessionStorage('connectionMethod') == "LOCAL") {
-                    $('#piconlocal').trigger("click");
+            window.displayHelper.showPopupDialog(connectionDialogHTML, function () {
+                if (context.offLineMode) {
+                    $('#pirelease').attr('disabled', true);
                 }
-            } else {
-                setSessionStorage('connectionMethod', "WIFI");
-            }
-
-            $('#piaddress').on('input', function (e) {
-
-                if (context.offLineMode)
-                {
-                    var content = $('#piaddress').val();
-
-                    if (content)
-                        $('#piconnectok').attr('disabled', false);
-                    else
+                else {
+                    $('#pirelease').attr('disabled', false);
+                }
+    
+                $('#piconnectok').attr('disabled', true);
+    
+                $('#piconnectionlabel').hide();
+    
+                if (context.quickPiConnection.isConnected()) {
+                    if (getSessionStorage('connectionMethod') == "USB") {
+                        $('#piconwifi').removeClass('active');
+                        $('#piconusb').addClass('active');
+                        $('#pischoolcon').hide();
+                        $('#piaddress').val("192.168.233.1");
+    
                         $('#piconnectok').attr('disabled', true);
-                }
-            });
-
-
-            if (getSessionStorage('pilist')) {
-                populatePiList(JSON.parse(getSessionStorage('pilist')));
-            }
-
-            if (getSessionStorage('raspberryPiIpAddress')) {
-                $('#piaddress').val(getSessionStorage('raspberryPiIpAddress'));
-                $('#piaddress').trigger("input");
-            }
-
-            if (getSessionStorage('schoolkey')) {
-                $('#schoolkey').val(getSessionStorage('schoolkey'));
-                $('#pigetlist').attr("disabled", false);
-            }
-
-            function setLocalIp()
-            {
-                var localvalue = $('input[name=pilocalconnectiontype]:checked').val()
-
-                if (localvalue == "localhost") {
-                    $('#piaddress').val("localhost");
-                    $('#piaddress').trigger("input");
+                        $('#piconnectionlabel').show();
+                        $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+    
+                        context.inUSBConnection = true;
+                        context.inBTConnection = false;
+                    } else if (getSessionStorage('connectionMethod') == "BT") {
+                        $('#piconwifi').removeClass('active');
+                        $('#piconbt').addClass('active');
+                        $('#pischoolcon').hide();
+    
+                        $('#piaddress').val("192.168.233.2");
+    
+                        $('#piconnectok').attr('disabled', true);
+                        $('#piconnectionlabel').show();
+                        $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
+    
+                        context.inUSBConnection = false;
+                        context.inBTConnection = true;
+                    } else if (getSessionStorage('connectionMethod') == "LOCAL") {
+                        $('#piconlocal').trigger("click");
+                    }
                 } else {
-                    $('#piaddress').val(window.location.hostname);
+                    setSessionStorage('connectionMethod', "WIFI");
+                }
+    
+                $('#piaddress').on('input', function (e) {
+    
+                    if (context.offLineMode)
+                    {
+                        var content = $('#piaddress').val();
+    
+                        if (content)
+                            $('#piconnectok').attr('disabled', false);
+                        else
+                            $('#piconnectok').attr('disabled', true);
+                    }
+                });
+    
+    
+                if (getSessionStorage('pilist')) {
+                    populatePiList(JSON.parse(getSessionStorage('pilist')));
+                }
+    
+                if (getSessionStorage('raspberryPiIpAddress')) {
+                    $('#piaddress').val(getSessionStorage('raspberryPiIpAddress'));
                     $('#piaddress').trigger("input");
                 }
-            }
-
-            $('input[type=radio][name=pilocalconnectiontype]').change(function() {
-                setLocalIp();
-            });
-           
-            function cleanUSBBTIP()
-            {
-                var ipaddress = $('#piaddress').val();
-
-                if (ipaddress == "192.168.233.1" ||
-                    ipaddress == "192.168.233.2" ||
-                    ipaddress == "localhost" ||
-                    ipaddress == window.location.hostname)
-                {
-                        $('#piaddress').val("");
-                        $('#piaddress').trigger("input");
-                        
-                        var schoolkey = $('#schoolkey').val();
-                        if (schoolkey.length > 1)
-                            $('#pigetlist').trigger("click");
+    
+                if (getSessionStorage('schoolkey')) {
+                    $('#schoolkey').val(getSessionStorage('schoolkey'));
+                    $('#pigetlist').attr("disabled", false);
                 }
-            }
-
-            cleanUSBBTIP();
-
-            $('#panel-body-local').hide();
-
-            if (context.localhostAvailable || context.windowLocationAvailable)
-            {
-                if (!context.quickPiConnection.isConnected() ||
-                    getSessionStorage('connectionMethod') == "LOCAL")
+    
+                function setLocalIp()
                 {
-                    $('#piconsel .btn').removeClass('active');
-                    $('#piconlocal').addClass('active');
-
-                    
-                    $('#pischoolcon').hide();
-                    $('#piconnectionlabel').hide();
-                    $('#panel-body-local').show();
-                    setSessionStorage('connectionMethod', "LOCAL");
-
-                    if (context.localhostAvailable &&
-                        context.windowLocationAvailable)
-                    {
-                        $("#piconnectolocalhostcheckbox").prop("checked", true);
-
-                        setLocalIp();
-                    } else if (context.localhostAvailable) {
-                        $('#piconnectolocalhost').hide();
-                        $('#piconnectocurrenturlcheckbox').hide();
-
-                        setLocalIp();
-                    } else if (context.windowLocationAvailable) {
-                        $('#piconnectocurrenturl').hide();
-                        $('#piconnectolocalhostcheckbox').hide();
-
-                        setLocalIp();
+                    var localvalue = $('input[name=pilocalconnectiontype]:checked').val()
+    
+                    if (localvalue == "localhost") {
+                        $('#piaddress').val("localhost");
+                        $('#piaddress').trigger("input");
+                    } else {
+                        $('#piaddress').val(window.location.hostname);
+                        $('#piaddress').trigger("input");
                     }
                 }
-            }
-            else
-            {
-                $('#panel-body-local').hide();
-                $("#piconlocal").hide();
-            }
-
-
-            $('#piconnectok').click(function () {
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
-
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-
-                if ($('#piusetunnel').is(":checked")) {
-
-                    var piname = $("#pilist option:selected").text().split("-")[0].trim();
-
-                    var url = "ws://api.quick-pi.org/client/" +
-                        $('#schoolkey').val()  + "-" +
-                        piname +
-                        "/api/v1/commands";
-
-                    setSessionStorage('quickPiUrl', url);
-                    context.quickPiConnection.connect(url);
-
-                } else {
+    
+                $('input[type=radio][name=pilocalconnectiontype]').change(function() {
+                    setLocalIp();
+                });
+               
+                function cleanUSBBTIP()
+                {
                     var ipaddress = $('#piaddress').val();
-                    setSessionStorage('raspberryPiIpAddress', ipaddress);
-
-                    showasConnecting();
-                    var url = "ws://" + ipaddress + ":5000/api/v1/commands";
-                    setSessionStorage('quickPiUrl', url);
-
-                    context.quickPiConnection.connect(url);
+    
+                    if (ipaddress == "192.168.233.1" ||
+                        ipaddress == "192.168.233.2" ||
+                        ipaddress == "localhost" ||
+                        ipaddress == window.location.hostname)
+                    {
+                            $('#piaddress').val("");
+                            $('#piaddress').trigger("input");
+                            
+                            var schoolkey = $('#schoolkey').val();
+                            if (schoolkey.length > 1)
+                                $('#pigetlist').trigger("click");
+                    }
                 }
-            });
-
-            $('#pirelease').click(function () {
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
-
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-
-                // IF connected release lock
-                context.releasing = true;
-                context.quickPiConnection.releaseLock();
-            });
-
-            $('#picancel').click(function () {
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
-
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-            });
-
-            $('#schoolkey').on('input', function (e) {
-                var schoolkey = $('#schoolkey').val();
-                setSessionStorage('schoolkey', schoolkey);
-
-                if (schoolkey)
-                    $('#pigetlist').attr("disabled", false);
-                else
-                    $('#pigetlist').attr("disabled", true);
-            });
-
-
-            $('#pigetlist').click(function () {
-                var schoolkey = $('#schoolkey').val();
-
-                fetch('http://www.france-ioi.org/QuickPi/list.php?school=' + schoolkey)
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (jsonlist) {
-                        populatePiList(jsonlist);
-                    });
-            });
-
-            // Select device connexion methods
-            $('#piconsel .btn').click(function () {
-                if (!context.quickPiConnection.isConnected()) {
-                    if (!$(this).hasClass('active')) {
+    
+                cleanUSBBTIP();
+    
+                $('#panel-body-local').hide();
+    
+                if (context.localhostAvailable || context.windowLocationAvailable)
+                {
+                    if (!context.quickPiConnection.isConnected() ||
+                        getSessionStorage('connectionMethod') == "LOCAL")
+                    {
                         $('#piconsel .btn').removeClass('active');
+                        $('#piconlocal').addClass('active');
+    
+                        
+                        $('#pischoolcon').hide();
+                        $('#piconnectionlabel').hide();
+                        $('#panel-body-local').show();
+                        setSessionStorage('connectionMethod', "LOCAL");
+    
+                        if (context.localhostAvailable &&
+                            context.windowLocationAvailable)
+                        {
+                            $("#piconnectolocalhostcheckbox").prop("checked", true);
+    
+                            setLocalIp();
+                        } else if (context.localhostAvailable) {
+                            $('#piconnectolocalhost').hide();
+                            $('#piconnectocurrenturlcheckbox').hide();
+    
+                            setLocalIp();
+                        } else if (context.windowLocationAvailable) {
+                            $('#piconnectocurrenturl').hide();
+                            $('#piconnectolocalhostcheckbox').hide();
+    
+                            setLocalIp();
+                        }
+                    }
+                }
+                else
+                {
+                    $('#panel-body-local').hide();
+                    $("#piconlocal").hide();
+                }
+    
+    
+                $('#piconnectok').click(function () {
+                    context.inUSBConnection = false;
+                    context.inBTConnection = false;
+    
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+    
+                    if ($('#piusetunnel').is(":checked")) {
+    
+                        var piname = $("#pilist option:selected").text().split("-")[0].trim();
+    
+                        var url = "ws://api.quick-pi.org/client/" +
+                            $('#schoolkey').val()  + "-" +
+                            piname +
+                            "/api/v1/commands";
+    
+                        setSessionStorage('quickPiUrl', url);
+                        context.quickPiConnection.connect(url);
+    
+                    } else {
+                        var ipaddress = $('#piaddress').val();
+                        setSessionStorage('raspberryPiIpAddress', ipaddress);
+    
+                        showasConnecting();
+                        var url = "ws://" + ipaddress + ":5000/api/v1/commands";
+                        setSessionStorage('quickPiUrl', url);
+    
+                        context.quickPiConnection.connect(url);
+                    }
+                });
+    
+                $('#pirelease').click(function () {
+                    context.inUSBConnection = false;
+                    context.inBTConnection = false;
+    
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+    
+                    // IF connected release lock
+                    context.releasing = true;
+                    context.quickPiConnection.releaseLock();
+                });
+    
+                $('#picancel').click(function () {
+                    context.inUSBConnection = false;
+                    context.inBTConnection = false;
+    
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+                });
+    
+                $('#schoolkey').on('input', function (e) {
+                    var schoolkey = $('#schoolkey').val();
+                    setSessionStorage('schoolkey', schoolkey);
+    
+                    if (schoolkey)
+                        $('#pigetlist').attr("disabled", false);
+                    else
+                        $('#pigetlist').attr("disabled", true);
+                });
+    
+    
+                $('#pigetlist').click(function () {
+                    var schoolkey = $('#schoolkey').val();
+    
+                    fetch('http://www.france-ioi.org/QuickPi/list.php?school=' + schoolkey)
+                        .then(function (response) {
+                            return response.json();
+                        })
+                        .then(function (jsonlist) {
+                            populatePiList(jsonlist);
+                        });
+                });
+    
+                // Select device connexion methods
+                $('#piconsel .btn').click(function () {
+                    if (!context.quickPiConnection.isConnected()) {
+                        if (!$(this).hasClass('active')) {
+                            $('#piconsel .btn').removeClass('active');
+                            $(this).addClass('active');
+                        }
+                    }
+                });
+    
+                $('#piconlocal').click(function () {
+                    context.inUSBConnection = false;
+                    context.inBTConnection = false;
+    
+                    cleanUSBBTIP();
+    
+                    if (!context.quickPiConnection.isConnected()) {
+                        setLocalIp();
+                        setSessionStorage('connectionMethod', "LOCAL");
+                        $(this).addClass('active');
+                        $('#panel-body-local').show();
+                        $('#pischoolcon').hide();
+                        $('#piconnectionlabel').hide();
+    
                         $(this).addClass('active');
                     }
-                }
-            });
-
-            $('#piconlocal').click(function () {
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
-
-                cleanUSBBTIP();
-
-                if (!context.quickPiConnection.isConnected()) {
-                    setLocalIp();
-                    setSessionStorage('connectionMethod', "LOCAL");
-                    $(this).addClass('active');
-                    $('#panel-body-local').show();
-                    $('#pischoolcon').hide();
-                    $('#piconnectionlabel').hide();
-
-                    $(this).addClass('active');
-                }
-
-            });
-
-            $('#piconwifi').click(function () {
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
-
-                cleanUSBBTIP();
-
-                if (!context.quickPiConnection.isConnected()) {
-                    setSessionStorage('connectionMethod', "WIFI");
-                    $(this).addClass('active');
-                    $('#panel-body-local').hide();
-                    $('#pischoolcon').show();
-                    $('#piconnectionlabel').hide();
-                }
-
-            });
-
-            $('#piconusb').click(function () {
-                if (!context.quickPiConnection.isConnected()) {
-                    setSessionStorage('connectionMethod', "USB");
-                    $('#piconnectok').attr('disabled', true);
-                    $('#panel-body-local').hide();
-                    $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
-
-                    $(this).addClass('active');
-                    $('#pischoolcon').hide();
-                    $('#piaddress').val("192.168.233.1");
-
-                    context.inUSBConnection = true;
-                    context.inBTConnection = false;
-
-                    function updateUSBAvailability(available) {
-
-                        if  (context.inUSBConnection && context.offLineMode) {
-                            if (available) {
-                                $('#piconnectok').attr('disabled', false);
-
-                                $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
-                            } else {
-                                $('#piconnectok').attr('disabled', true);
-
-                                $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
-                            }
-
-                            setTimeout(function() { 
-                                context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
-                            }, 1000);
-                        }
-                    }
-
-                    updateUSBAvailability(false);
-
-
-                }
-            });
-
-            $('#piconbt').click(function () {
-                $('#piconnectionlabel').show();
-                if (!context.quickPiConnection.isConnected()) {
-                    setSessionStorage('connectionMethod', "BT");
-                    $('#piconnectok').attr('disabled', true);
-                    $('#panel-body-local').hide();
-                    $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
-
-                    $(this).addClass('active');
-                    $('#pischoolcon').hide();
-
-                    $('#piaddress').val("192.168.233.2");
-
+    
+                });
+    
+                $('#piconwifi').click(function () {
                     context.inUSBConnection = false;
-                    context.inBTConnection = true;
-
-                    function updateBTAvailability(available) {
-
-                        if  (context.inBTConnection && context.offLineMode) {
-                            if (available) {
-                                $('#piconnectok').attr('disabled', false);
-
-                                $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
-                            } else {
-                                $('#piconnectok').attr('disabled', true);
-
-                                $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
+                    context.inBTConnection = false;
+    
+                    cleanUSBBTIP();
+    
+                    if (!context.quickPiConnection.isConnected()) {
+                        setSessionStorage('connectionMethod', "WIFI");
+                        $(this).addClass('active');
+                        $('#panel-body-local').hide();
+                        $('#pischoolcon').show();
+                        $('#piconnectionlabel').hide();
+                    }
+    
+                });
+    
+                $('#piconusb').click(function () {
+                    if (!context.quickPiConnection.isConnected()) {
+                        setSessionStorage('connectionMethod', "USB");
+                        $('#piconnectok').attr('disabled', true);
+                        $('#panel-body-local').hide();
+                        $('#piconnectionlabel').show();
+                        $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
+    
+                        $(this).addClass('active');
+                        $('#pischoolcon').hide();
+                        $('#piaddress').val("192.168.233.1");
+    
+                        context.inUSBConnection = true;
+                        context.inBTConnection = false;
+    
+                        function updateUSBAvailability(available) {
+    
+                            if  (context.inUSBConnection && context.offLineMode) {
+                                if (available) {
+                                    $('#piconnectok').attr('disabled', false);
+    
+                                    $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+                                } else {
+                                    $('#piconnectok').attr('disabled', true);
+    
+                                    $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
+                                }
+    
+                                setTimeout(function() { 
+                                    context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
+                                }, 1000);
                             }
-
-                            setTimeout(function() { 
-                                context.quickPiConnection.isAvailable("192.168.233.2", updateBTAvailability);
-                            }, 1000);                            
+                        }
+    
+                        updateUSBAvailability(false);
+    
+    
+                    }
+                });
+    
+                $('#piconbt').click(function () {
+                    $('#piconnectionlabel').show();
+                    if (!context.quickPiConnection.isConnected()) {
+                        setSessionStorage('connectionMethod', "BT");
+                        $('#piconnectok').attr('disabled', true);
+                        $('#panel-body-local').hide();
+                        $('#piconnectionlabel').show();
+                        $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
+    
+                        $(this).addClass('active');
+                        $('#pischoolcon').hide();
+    
+                        $('#piaddress').val("192.168.233.2");
+    
+                        context.inUSBConnection = false;
+                        context.inBTConnection = true;
+    
+                        function updateBTAvailability(available) {
+    
+                            if  (context.inBTConnection && context.offLineMode) {
+                                if (available) {
+                                    $('#piconnectok').attr('disabled', false);
+    
+                                    $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
+                                } else {
+                                    $('#piconnectok').attr('disabled', true);
+    
+                                    $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
+                                }
+    
+                                setTimeout(function() { 
+                                    context.quickPiConnection.isAvailable("192.168.233.2", updateBTAvailability);
+                                }, 1000);                            
+                            }
+                        }
+    
+                        updateBTAvailability(false);
+                    }
+                });
+    
+                function populatePiList(jsonlist) {
+                    setSessionStorage('pilist', JSON.stringify(jsonlist));
+    
+                    var select = document.getElementById("pilist");
+                    var first = true;
+    
+                    $('#pilist').empty();
+                    $('#piusetunnel').attr('disabled', true);
+    
+                    for (var i = 0; i < jsonlist.length; i++) {
+                        var pi = jsonlist[i];
+    
+                        var el = document.createElement("option");
+    
+                        var minutes = Math.round(jsonlist[i].seconds_since_ping / 60);
+                        var timeago = "";
+    
+                        if (minutes < 60)
+                            timeago = strings.messages.minutesago.format(minutes);
+                        else
+                            timeago = strings.messages.hoursago;
+    
+    
+                        el.textContent = jsonlist[i].name + " - " + timeago;
+                        el.value = jsonlist[i].ip;
+    
+                        select.appendChild(el);
+    
+                        if (first) {
+                            $('#piaddress').val(jsonlist[i].ip);
+                            $('#piaddress').trigger("input");
+                            first = false;
+                            $('#pilist').prop('disabled', false);
+    
+                            $('#piusetunnel').attr('disabled', false);
                         }
                     }
-
-                    updateBTAvailability(false);
                 }
-            });
-
-            function populatePiList(jsonlist) {
-                setSessionStorage('pilist', JSON.stringify(jsonlist));
-
-                var select = document.getElementById("pilist");
-                var first = true;
-
-                $('#pilist').empty();
-                $('#piusetunnel').attr('disabled', true);
-
-                for (var i = 0; i < jsonlist.length; i++) {
-                    var pi = jsonlist[i];
-
-                    var el = document.createElement("option");
-
-                    var minutes = Math.round(jsonlist[i].seconds_since_ping / 60);
-                    var timeago = "";
-
-                    if (minutes < 60)
-                        timeago = strings.messages.minutesago.format(minutes);
-                    else
-                        timeago = strings.messages.hoursago;
-
-
-                    el.textContent = jsonlist[i].name + " - " + timeago;
-                    el.value = jsonlist[i].ip;
-
-                    select.appendChild(el);
-
-                    if (first) {
-                        $('#piaddress').val(jsonlist[i].ip);
-                        $('#piaddress').trigger("input");
-                        first = false;
-                        $('#pilist').prop('disabled', false);
-
-                        $('#piusetunnel').attr('disabled', false);
-                    }
-                }
-            }
-
-            $('#pilist').on('change', function () {
-                $("#piaddress").val(this.value);
+    
+                $('#pilist').on('change', function () {
+                    $("#piaddress").val(this.value);
+                });
             });
         });
 
@@ -4627,28 +4627,28 @@ var getContext = function (display, infos, curLevel) {
                 "           <label id=\"piconnectionlabel\"></label>" +
                 "       </div>" +
                 "   </div>" +
-                "</div>");
-
-            $('#picancel').click(function () {
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-            });
-
-
-            for (var i = 0; i < boardDefinitions.length; i++) {
-                let board = boardDefinitions[i];
-                var image = document.createElement('img');
-                image.src = getImg(board.image);
-
-                $('#boardlist').append(image).append("&nbsp;&nbsp;");
-
-                image.onclick = function () {
+                "</div>", function () {
+                $('#picancel').click(function () {
                     $('#popupMessage').hide();
                     window.displayHelper.popupMessageShown = false;
+                });
 
-                    context.changeBoard(board.name);
+
+                for (var i = 0; i < boardDefinitions.length; i++) {
+                    let board = boardDefinitions[i];
+                    var image = document.createElement('img');
+                    image.src = getImg(board.image);
+
+                    $('#boardlist').append(image).append("&nbsp;&nbsp;");
+
+                    image.onclick = function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+
+                        context.changeBoard(board.name);
+                    }
                 }
-            }
+            });
         });
 
 
@@ -4679,91 +4679,91 @@ var getContext = function (display, infos, curLevel) {
                     "       </div>" +
                     "   -->" +
                     "   </div>" +
-                    "</div>");
-
-                var table = document.getElementById("sensorTable");
-                for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
-                    var sensor = infos.quickPiSensors[iSensor];
-
-                    function addNewRow()
-                    {
-                        var row = table.insertRow();
-                        var type = row.insertCell();
-                        var name = row.insertCell();
-                        var port = row.insertCell();
-
-                        return [type, name, port];
+                    "</div>", function () {
+                    var table = document.getElementById("sensorTable");
+                    for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                        var sensor = infos.quickPiSensors[iSensor];
+    
+                        function addNewRow()
+                        {
+                            var row = table.insertRow();
+                            var type = row.insertCell();
+                            var name = row.insertCell();
+                            var port = row.insertCell();
+    
+                            return [type, name, port];
+                        }
+    
+                        
+                        if (sensor.type == "stick")
+                        {
+                            var gpios = findSensorDefinition(sensor).gpios;
+                            var cols = addNewRow();
+    
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name + ".up"));
+                            cols[2].appendChild(document.createTextNode("D" + gpios[0]));
+    
+                            var cols = addNewRow();
+    
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name + ".down"));
+                            cols[2].appendChild(document.createTextNode("D" + gpios[1]));
+                            var cols = addNewRow();
+    
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name + ".left"));
+                            cols[2].appendChild(document.createTextNode("D" + gpios[2]));
+                            var cols = addNewRow();
+    
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name + ".right"));
+                            cols[2].appendChild(document.createTextNode("D" + gpios[3]));
+                            var cols = addNewRow();
+    
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name + ".center"));
+                            cols[2].appendChild(document.createTextNode("D" + gpios[4]));
+    
+    /*
+                            $('#stickupname').text(sensor.name + ".up");
+    
+                            $('#stickdownname').text(sensor.name + ".down");
+                            $('#stickleftname').text(sensor.name + ".left");
+                            $('#stickrightname').text(sensor.name + ".right");
+                            $('#stickcentername').text(sensor.name + ".center");
+        
+                            $('#stickupport').text("D" + gpios[0]);
+                            $('#stickdownport').text("D" + gpios[1]);
+                            $('#stickleftport').text("D" + gpios[2]);
+                            $('#stickrightport').text("D" + gpios[3]);
+                            $('#stickcenterport').text("D" + gpios[4]);
+        
+                            $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
+                            $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
+                            $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
+                            $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
+                            $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+        */
+                        }
+                        else
+                        {          
+                            var cols = addNewRow();
+        
+        
+                            cols[0].appendChild(document.createTextNode(sensor.type));
+                            cols[1].appendChild(document.createTextNode(sensor.name));
+                            cols[2].appendChild(document.createTextNode(sensor.port));
+                        }
+               
                     }
-
-                    
-                    if (sensor.type == "stick")
-                    {
-                        var gpios = findSensorDefinition(sensor).gpios;
-                        var cols = addNewRow();
-
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name + ".up"));
-                        cols[2].appendChild(document.createTextNode("D" + gpios[0]));
-
-                        var cols = addNewRow();
-
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name + ".down"));
-                        cols[2].appendChild(document.createTextNode("D" + gpios[1]));
-                        var cols = addNewRow();
-
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name + ".left"));
-                        cols[2].appendChild(document.createTextNode("D" + gpios[2]));
-                        var cols = addNewRow();
-
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name + ".right"));
-                        cols[2].appendChild(document.createTextNode("D" + gpios[3]));
-                        var cols = addNewRow();
-
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name + ".center"));
-                        cols[2].appendChild(document.createTextNode("D" + gpios[4]));
-
-/*
-                        $('#stickupname').text(sensor.name + ".up");
-
-                        $('#stickdownname').text(sensor.name + ".down");
-                        $('#stickleftname').text(sensor.name + ".left");
-                        $('#stickrightname').text(sensor.name + ".right");
-                        $('#stickcentername').text(sensor.name + ".center");
     
-                        $('#stickupport').text("D" + gpios[0]);
-                        $('#stickdownport').text("D" + gpios[1]);
-                        $('#stickleftport').text("D" + gpios[2]);
-                        $('#stickrightport').text("D" + gpios[3]);
-                        $('#stickcenterport').text("D" + gpios[4]);
-    
-                        $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
-                        $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
-                        $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
-                        $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
-                        $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
-    */
-                    }
-                    else
-                    {          
-                        var cols = addNewRow();
-    
-    
-                        cols[0].appendChild(document.createTextNode(sensor.type));
-                        cols[1].appendChild(document.createTextNode(sensor.name));
-                        cols[2].appendChild(document.createTextNode(sensor.port));
-                    }
-           
-                }
+                    $('#picancel').click(function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                    });
 
-                $('#picancel').click(function () {
-                    $('#popupMessage').hide();
-                    window.displayHelper.popupMessageShown = false;
                 });
-
         });
 
         function installPythonCode(code) {
@@ -4965,190 +4965,190 @@ var getContext = function (display, infos, curLevel) {
                 "   <div class=\"singleButton\">" +
                 "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
                 "   </div>" +
-                "</div>");
-
-            var select = document.getElementById("selector-sensor-list");
-            for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
-                var sensorDefinition = sensorDefinitions[iSensorDef];
-
-                if (sensorDefinition.subTypes) {
-                    for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
-
-                        if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
+                "</div>", function () {
+                var select = document.getElementById("selector-sensor-list");
+                for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
+                    var sensorDefinition = sensorDefinitions[iSensorDef];
+    
+                    if (sensorDefinition.subTypes) {
+                        for (var iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
+    
+                            if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
+                                continue;
+    
+    
+                            var el = document.createElement("option");
+                            el.textContent = sensorDefinition.description;
+    
+                            if (sensorDefinition.subTypes[iSubType].description)
+                                el.textContent = sensorDefinition.subTypes[iSubType].description;
+    
+                            el.value = sensorDefinition.name;
+                            el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
+                            select.appendChild(el);
+                        }
+                    } else {
+                        if (!sensorDefinition.pluggable)
                             continue;
-
-
+    
                         var el = document.createElement("option");
                         el.textContent = sensorDefinition.description;
-
-                        if (sensorDefinition.subTypes[iSubType].description)
-                            el.textContent = sensorDefinition.subTypes[iSubType].description;
-
                         el.value = sensorDefinition.name;
-                        el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
+    
                         select.appendChild(el);
                     }
-                } else {
-                    if (!sensorDefinition.pluggable)
-                        continue;
-
-                    var el = document.createElement("option");
-                    el.textContent = sensorDefinition.description;
-                    el.value = sensorDefinition.name;
-
-                    select.appendChild(el);
                 }
-            }
-
-            var board = getCurrentBoard();
-            if (board.builtinSensors) {
-                for (var i = 0; i < board.builtinSensors.length; i++) {
-                    var sensor = board.builtinSensors[i];
-                    var sensorDefinition = findSensorDefinition(sensor);
-
-                    if (context.findSensor(sensor.type, sensor.port, false))
-                        continue;
-
-                    var el = document.createElement("option");
-
-                    el.textContent = sensorDefinition.description + strings.messages.builtin;
-                    el.value = sensorDefinition.name + "-";
-
-                    if (sensor.subType)
-                        el.value += sensor.subType;
-
-                    el.value += "-" + sensor.port;
-
-                    select.appendChild(el);
-                }
-            }
-
-            $('#selector-sensor-list').on('change', function () {
-                var values = this.value.split("-");
-                var builtinport = false;
-
-                var dummysensor = { type: values[0] };
-
-                if (values.length >= 2)
-                    if (values[1])
-                        dummysensor.subType = values[1];
-
-                if (values.length >= 3)
-                    builtinport = values[2];
-
-                var sensorDefinition = findSensorDefinition(dummysensor);
-
-                var imageContainer = document.getElementById("selector-image-container");
-                while (imageContainer.firstChild) {
-                    imageContainer.removeChild(imageContainer.firstChild);
-                }
-                for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
-                    var image = document.createElement('img');
-
-                    image.src = getImg(sensorDefinition.selectorImages[i]);
-
-                    imageContainer.appendChild(image);
-
-                    //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
-                }
-
-
-                var portSelect = document.getElementById("selector-sensor-port");
-                $('#selector-sensor-port').empty();
-                var hasPorts = false;
-                if (builtinport) {
-                    var option = document.createElement('option');
-                    option.innerText = builtinport;
-                    option.value = builtinport;
-                    portSelect.appendChild(option);
-                    hasPorts = true;
-                } else {
-                    var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
-                    if (sensorDefinition.portType == "i2c")
-                    {
-                        ports = ["i2c"];
+    
+                var board = getCurrentBoard();
+                if (board.builtinSensors) {
+                    for (var i = 0; i < board.builtinSensors.length; i++) {
+                        var sensor = board.builtinSensors[i];
+                        var sensorDefinition = findSensorDefinition(sensor);
+    
+                        if (context.findSensor(sensor.type, sensor.port, false))
+                            continue;
+    
+                        var el = document.createElement("option");
+    
+                        el.textContent = sensorDefinition.description + strings.messages.builtin;
+                        el.value = sensorDefinition.name + "-";
+    
+                        if (sensor.subType)
+                            el.value += sensor.subType;
+    
+                        el.value += "-" + sensor.port;
+    
+                        select.appendChild(el);
                     }
-
-                    for (var iPort = 0; iPort < ports.length; iPort++) {
-                        var port = sensorDefinition.portType + ports[iPort];
+                }
+    
+                $('#selector-sensor-list').on('change', function () {
+                    var values = this.value.split("-");
+                    var builtinport = false;
+    
+                    var dummysensor = { type: values[0] };
+    
+                    if (values.length >= 2)
+                        if (values[1])
+                            dummysensor.subType = values[1];
+    
+                    if (values.length >= 3)
+                        builtinport = values[2];
+    
+                    var sensorDefinition = findSensorDefinition(dummysensor);
+    
+                    var imageContainer = document.getElementById("selector-image-container");
+                    while (imageContainer.firstChild) {
+                        imageContainer.removeChild(imageContainer.firstChild);
+                    }
+                    for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
+                        var image = document.createElement('img');
+    
+                        image.src = getImg(sensorDefinition.selectorImages[i]);
+    
+                        imageContainer.appendChild(image);
+    
+                        //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
+                    }
+    
+    
+                    var portSelect = document.getElementById("selector-sensor-port");
+                    $('#selector-sensor-port').empty();
+                    var hasPorts = false;
+                    if (builtinport) {
+                        var option = document.createElement('option');
+                        option.innerText = builtinport;
+                        option.value = builtinport;
+                        portSelect.appendChild(option);
+                        hasPorts = true;
+                    } else {
+                        var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
                         if (sensorDefinition.portType == "i2c")
-                            port = "i2c";
-
-                        if (!isPortUsed(sensorDefinition.name, port)) {
-                            var option = document.createElement('option');
-                            option.innerText = port;
-                            option.value = port;
-                            portSelect.appendChild(option);
-                            hasPorts = true;
+                        {
+                            ports = ["i2c"];
+                        }
+    
+                        for (var iPort = 0; iPort < ports.length; iPort++) {
+                            var port = sensorDefinition.portType + ports[iPort];
+                            if (sensorDefinition.portType == "i2c")
+                                port = "i2c";
+    
+                            if (!isPortUsed(sensorDefinition.name, port)) {
+                                var option = document.createElement('option');
+                                option.innerText = port;
+                                option.value = port;
+                                portSelect.appendChild(option);
+                                hasPorts = true;
+                            }
                         }
                     }
-                }
-
-
-
-                if (!hasPorts) {
-                    $('#selector-add-button').attr("disabled", true);
-
-                    var object_function = strings.messages.actuator;
-                    if (sensorDefinition.isSensor)
-                        object_function = strings.messages.sensor;
-
-                    $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
-                    $('#selector-label').show();
-                }
-                else {
-                    $('#selector-add-button').attr("disabled", false);
-                    $('#selector-label').hide();
-                }
-            });
-
-            $('#selector-add-button').click(function () {
-                var sensorType = $("#selector-sensor-list option:selected").val();
-                var values = sensorType.split("-");
-
-                var dummysensor = { type: values[0] };
-                if (values.length == 2)
-                    dummysensor.subType = values[1];
-
-                var sensorDefinition = findSensorDefinition(dummysensor);
-
-
-                var port = $("#selector-sensor-port option:selected").text();
-                var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
-
-                if(name == 'screen1') {
-                    // prepend screen because squareSize func can't handle cells wrap
-                    infos.quickPiSensors.unshift({
-                        type: sensorDefinition.name,
-                        subType: sensorDefinition.subType,
-                        port: port,
-                        name: name
-                    });                    
-
-                } else {
-                    infos.quickPiSensors.push({
-                        type: sensorDefinition.name,
-                        subType: sensorDefinition.subType,
-                        port: port,
-                        name: name
-                    });                    
-                }
-
-
-
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
-
-                context.resetSensorTable();
-                context.resetDisplay();
-            });
-
-
-            $("#selector-sensor-list").trigger("change");
-
-            $('#picancel').click(function () {
-                $('#popupMessage').hide();
-                window.displayHelper.popupMessageShown = false;
+    
+    
+    
+                    if (!hasPorts) {
+                        $('#selector-add-button').attr("disabled", true);
+    
+                        var object_function = strings.messages.actuator;
+                        if (sensorDefinition.isSensor)
+                            object_function = strings.messages.sensor;
+    
+                        $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
+                        $('#selector-label').show();
+                    }
+                    else {
+                        $('#selector-add-button').attr("disabled", false);
+                        $('#selector-label').hide();
+                    }
+                });
+    
+                $('#selector-add-button').click(function () {
+                    var sensorType = $("#selector-sensor-list option:selected").val();
+                    var values = sensorType.split("-");
+    
+                    var dummysensor = { type: values[0] };
+                    if (values.length == 2)
+                        dummysensor.subType = values[1];
+    
+                    var sensorDefinition = findSensorDefinition(dummysensor);
+    
+    
+                    var port = $("#selector-sensor-port option:selected").text();
+                    var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
+    
+                    if(name == 'screen1') {
+                        // prepend screen because squareSize func can't handle cells wrap
+                        infos.quickPiSensors.unshift({
+                            type: sensorDefinition.name,
+                            subType: sensorDefinition.subType,
+                            port: port,
+                            name: name
+                        });                    
+    
+                    } else {
+                        infos.quickPiSensors.push({
+                            type: sensorDefinition.name,
+                            subType: sensorDefinition.subType,
+                            port: port,
+                            name: name
+                        });                    
+                    }
+    
+    
+    
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+    
+                    context.resetSensorTable();
+                    context.resetDisplay();
+                });
+    
+    
+                $("#selector-sensor-list").trigger("change");
+    
+                $('#picancel').click(function () {
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+                });
             });
         });
     };
@@ -7826,85 +7826,84 @@ var getContext = function (display, infos, curLevel) {
                             && !context.offLineMode) {
                             //sensor.state = !sensor.state;
                             //drawSensor(sensor);
-                            window.displayHelper.showPopupDialog(irRemoteDialog);
+                            window.displayHelper.showPopupDialog(irRemoteDialog, function () {
+                                $('#picancel').click(function () {
+                                    $('#popupMessage').hide();
+                                    window.displayHelper.popupMessageShown = false;
+                                });
 
-                            $('#picancel').click(function () {
-                                $('#popupMessage').hide();
-                                window.displayHelper.popupMessageShown = false;
-                            });
-        
-                            $('#picancel2').click(function () {
-                                $('#popupMessage').hide();
-                                window.displayHelper.popupMessageShown = false;
-                            });
-        
-                            var addedSomeButtons = false;
-                            var remotecontent = document.getElementById('piremotecontent');
-                            var parentdiv = document.createElement("DIV");
-                            parentdiv.className  = "form-group";
-        
-                            remotecontent.appendChild(parentdiv);
-                            var count = 0;
-                            for (var code in context.remoteIRcodes)
-                            {
-                                addedSomeButtons = true;
-                                context.remoteIRcodes[code];
-        
+                                $('#picancel2').click(function () {
+                                    $('#popupMessage').hide();
+                                    window.displayHelper.popupMessageShown = false;
+                                });
+
+                                var addedSomeButtons = false;
+                                var remotecontent = document.getElementById('piremotecontent');
+                                var parentdiv = document.createElement("DIV");
+                                parentdiv.className = "form-group";
+
+                                remotecontent.appendChild(parentdiv);
+                                var count = 0;
+                                for (var code in context.remoteIRcodes) {
+                                    addedSomeButtons = true;
+                                    context.remoteIRcodes[code];
+
+                                    var btn = document.createElement("BUTTON");
+                                    var t = document.createTextNode(code);
+
+                                    btn.className = "btn";
+                                    btn.appendChild(t);
+                                    parentdiv.appendChild(btn);
+
+                                    let capturedcode = code;
+                                    let captureddata = context.remoteIRcodes[code];
+                                    btn.onclick = function () {
+                                        $('#popupMessage').hide();
+                                        window.displayHelper.popupMessageShown = false;
+
+                                        //if (sensor.waitingForIrMessage)
+                                        //sensor.waitingForIrMessage(capturedcode);
+
+                                        context.quickPiConnection.sendCommand("presetIRMessage(\"" + capturedcode + "\", '" + captureddata + "')", function (returnVal) {
+                                        });
+                                        context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + capturedcode + "\")", function (returnVal) {
+                                        });
+
+                                    };
+
+                                    count += 1;
+
+                                    if (count == 4) {
+                                        count = 0;
+                                        parentdiv = document.createElement("DIV");
+                                        parentdiv.className = "form-group";
+                                        remotecontent.appendChild(parentdiv);
+                                    }
+                                }
+                                if (!addedSomeButtons) {
+                                    $('#piremotemessage').text(strings.messages.noIrPresets);
+                                }
+
                                 var btn = document.createElement("BUTTON");
-                                var t = document.createTextNode(code);
-        
+
+                                if (sensor.state)
+                                    var t = document.createTextNode(strings.messages.irDisableContinous);
+                                else
+                                    var t = document.createTextNode(strings.messages.irEnableContinous);
+
+
                                 btn.className = "btn";
                                 btn.appendChild(t);
                                 parentdiv.appendChild(btn);
-        
-                                let capturedcode = code;
-                                let captureddata = context.remoteIRcodes[code];
-                                btn.onclick = function() {
+                                btn.onclick = function () {
                                     $('#popupMessage').hide();
                                     window.displayHelper.popupMessageShown = false;
-            
-                                    //if (sensor.waitingForIrMessage)
-                                        //sensor.waitingForIrMessage(capturedcode);
 
-                                    context.quickPiConnection.sendCommand("presetIRMessage(\"" + capturedcode + "\", '" + captureddata + "')", function(returnVal) {});
-                                    context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + capturedcode + "\")", function(returnVal) {});
-                            
+                                    sensor.state = !sensor.state;
+                                    warnClientSensorStateChanged(sensor);
+                                    drawSensor(sensor);
                                 };
-        
-                                count += 1;
-        
-                                if (count == 4)
-                                {
-                                    count = 0;
-                                    parentdiv = document.createElement("DIV");
-                                    parentdiv.className  = "form-group";
-                                    remotecontent.appendChild(parentdiv);
-                                }
-                            }
-                            if (!addedSomeButtons)
-                            {
-                                $('#piremotemessage').text(strings.messages.noIrPresets);
-                            }
-        
-                            var btn = document.createElement("BUTTON");
-        
-                            if (sensor.state)
-                                var t = document.createTextNode(strings.messages.irDisableContinous);
-                            else
-                                var t = document.createTextNode(strings.messages.irEnableContinous);
-        
-                            
-                            btn.className = "btn";
-                            btn.appendChild(t);
-                            parentdiv.appendChild(btn);
-                            btn.onclick = function() {
-                                $('#popupMessage').hide();
-                                window.displayHelper.popupMessageShown = false;
-        
-                                sensor.state = !sensor.state;
-                                warnClientSensorStateChanged(sensor);
-                                drawSensor(sensor);
-                            };
+                            });
                         } else {
                             actuatorsInRunningModeError();
                         }
@@ -7959,81 +7958,80 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.focusrect.click(function () {
                 if (context.offLineMode) {
-                    window.displayHelper.showPopupDialog(irRemoteDialog);
-
-                    $('#picancel').click(function () {
-                        $('#popupMessage').hide();
-                        window.displayHelper.popupMessageShown = false;
-                    });
-
-                    $('#picancel2').click(function () {
-                        $('#popupMessage').hide();
-                        window.displayHelper.popupMessageShown = false;
-                    });
-
-                    var addedSomeButtons = false;
-                    var remotecontent = document.getElementById('piremotecontent');
-                    var parentdiv = document.createElement("DIV");
-                    parentdiv.className  = "form-group";
-
-                    remotecontent.appendChild(parentdiv);
-                    var count = 0;
-                    for (var code in context.remoteIRcodes)
-                    {
-                        addedSomeButtons = true;
-                        context.remoteIRcodes[code];
-
+                    window.displayHelper.showPopupDialog(irRemoteDialog, function () {
+                        $('#picancel').click(function () {
+                            $('#popupMessage').hide();
+                            window.displayHelper.popupMessageShown = false;
+                        });
+    
+                        $('#picancel2').click(function () {
+                            $('#popupMessage').hide();
+                            window.displayHelper.popupMessageShown = false;
+                        });
+    
+                        var addedSomeButtons = false;
+                        var remotecontent = document.getElementById('piremotecontent');
+                        var parentdiv = document.createElement("DIV");
+                        parentdiv.className  = "form-group";
+    
+                        remotecontent.appendChild(parentdiv);
+                        var count = 0;
+                        for (var code in context.remoteIRcodes)
+                        {
+                            addedSomeButtons = true;
+                            context.remoteIRcodes[code];
+    
+                            var btn = document.createElement("BUTTON");
+                            var t = document.createTextNode(code);
+    
+                            btn.className = "btn";
+                            btn.appendChild(t);
+                            parentdiv.appendChild(btn);
+    
+                            let capturedcode = code;
+                            btn.onclick = function() {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+        
+                                if (sensor.waitingForIrMessage)
+                                    sensor.waitingForIrMessage(capturedcode);
+                            };
+    
+                            count += 1;
+    
+                            if (count == 4)
+                            {
+                                count = 0;
+                                parentdiv = document.createElement("DIV");
+                                parentdiv.className  = "form-group";
+                                remotecontent.appendChild(parentdiv);
+                            }
+                        }
+                        if (!addedSomeButtons)
+                        {
+                            $('#piremotemessage').text(strings.messages.noIrPresets);
+                        }
+    
                         var btn = document.createElement("BUTTON");
-                        var t = document.createTextNode(code);
-
+    
+                        if (sensor.state)
+                            var t = document.createTextNode(strings.messages.irDisableContinous);
+                        else
+                            var t = document.createTextNode(strings.messages.irEnableContinous);
+    
+                        
                         btn.className = "btn";
                         btn.appendChild(t);
                         parentdiv.appendChild(btn);
-
-                        let capturedcode = code;
                         btn.onclick = function() {
                             $('#popupMessage').hide();
                             window.displayHelper.popupMessageShown = false;
     
-                            if (sensor.waitingForIrMessage)
-                                sensor.waitingForIrMessage(capturedcode);
+                            sensor.state = !sensor.state;
+                            warnClientSensorStateChanged(sensor);
+                            drawSensor(sensor);
                         };
-
-                        count += 1;
-
-                        if (count == 4)
-                        {
-                            count = 0;
-                            parentdiv = document.createElement("DIV");
-                            parentdiv.className  = "form-group";
-                            remotecontent.appendChild(parentdiv);
-                        }
-                    }
-                    if (!addedSomeButtons)
-                    {
-                        $('#piremotemessage').text(strings.messages.noIrPresets);
-                    }
-
-                    var btn = document.createElement("BUTTON");
-
-                    if (sensor.state)
-                        var t = document.createTextNode(strings.messages.irDisableContinous);
-                    else
-                        var t = document.createTextNode(strings.messages.irEnableContinous);
-
-                    
-                    btn.className = "btn";
-                    btn.appendChild(t);
-                    parentdiv.appendChild(btn);
-                    btn.onclick = function() {
-                        $('#popupMessage').hide();
-                        window.displayHelper.popupMessageShown = false;
-
-                        sensor.state = !sensor.state;
-                        warnClientSensorStateChanged(sensor);
-                        drawSensor(sensor);
-                    };
-
+                    });
                 }
                 else{
                     //sensorInConnectedModeError();
@@ -8062,32 +8060,31 @@ var getContext = function (display, infos, curLevel) {
                         "   </div>" +
                         "</div>";
 
-                    window.displayHelper.showPopupDialog(irLearnDialog);
-
-                    $('#picancel').click(function () {
+                    window.displayHelper.showPopupDialog(irLearnDialog, function () {
+                      $('#picancel').click(function () {
                         $('#popupMessage').hide();
                         window.displayHelper.popupMessageShown = false;
                         context.stopLiveUpdate = false;
-                    });
+                      });
 
-                    $('#picancel2').click(function () {
+                      $('#picancel2').click(function () {
                         $('#popupMessage').hide();
                         window.displayHelper.popupMessageShown = false;
                         context.stopLiveUpdate = false;
-                    });
+                      });
 
-                    $('#piirlearn').click(function () {
+                      $('#piirlearn').click(function () {
 
                         $('#piirlearn').attr('disabled', true);
 
                         $("#piircode").text("");
                         context.quickPiConnection.sendCommand("readIRMessageCode(\"irrec1\", 10000)", function(retval)
                         {
-                            $('#piirlearn').attr('disabled', false);
-                            $("#piircode").text(retval);
+                          $('#piirlearn').attr('disabled', false);
+                          $("#piircode").text(retval);
                         });
+                      });
                     });
-
                 }
             });
 /*
