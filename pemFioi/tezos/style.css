@@ -1,19 +1,39 @@
 html {
-   --header-col: lightGrey;
+   --light-grey: #eeeeee;
+   --grey: #bcc2ca;
+   --dark-grey: #627083;
+   --blue: #0f61ff;
+   --light-blue: #e7efff;
+   --red: #ff3d39;
+   --light-red: #ffe7e7;
+   --rowH: 35px;
 }
 
 #mainPage {
-   border: 1px solid black;
-   padding: 20px;
+/*   border: 1px solid black;*/
+/*   padding: 10px;*/
+/*   font-family: Arial, sans-serif;*/
    display: flex;
-   justify-content: space-between;
+   justify-content: space-around;
    overflow: hidden;
+   color: var(--dark-grey);
 }
 
 #mainPage h3 {
-   height: 30px;
-   text-align: center;
+   height: var(--rowH);
    margin: 0;
+   padding-left: 10px;
+   font-weight: normal;
+   font-size: 1.3rem;
+   display: flex;
+   align-items: center;
+   color: black;
+}
+
+#mainPage .container {
+   border: 2px solid var(--light-grey);
+   border-radius: 10px;
+   padding: 10px 5px;
 }
 
 /*** TABLES ***/
@@ -21,20 +41,22 @@ html {
 #mainPage table {
    table-layout: fixed;
    border-collapse: collapse;
-   border: 3px solid black;
    width: 100%;
 }
 
 #mainPage th, td {
-   height: 30px;
-   border: 1px solid black;
+   height: var(--rowH);
    overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
 }
 
 #mainPage th {
-   background: var(--header-col);
+   background: white;
+   font-weight: normal;
+   color: var(--grey);
+   text-align: left;
+   padding-left: 10px;
 }
 #transaction_table {
    position: relative;
@@ -44,12 +66,16 @@ html {
 }
 #transaction_table_cont_clone {
    position: absolute;
-   top: 50px;
+   top: 42px;
+   display: none;
 }
-#transaction_table .block_header .timestamp {
-   margin-left: 20px;
+#transaction_table .block_header {
+   background: var(--light-grey);
+   border-radius: 5px;
+   outline: 1px solid white;
 }
-#accounts_table,
+
+#accountsCont,
 #smartContractsCont {
    margin-bottom: 20px;
 }
@@ -59,30 +85,39 @@ html {
 
 #mem_pool_table td, 
 #transaction_table td,
-#sub_transaction_table td {
-   text-align: center;
-   background: white;
+#sub_transaction_table td,
+#accounts_table td,
+#smart_contracts_table td {
+/*   background: white;*/
+   padding-left: 10px;
 }
-
+#transaction_table .separation_line {
+   border-top: 1px solid var(--light-grey);
+}
+#sub_transaction_table{
+   border: 1px solid var(--grey);
+}
 #mem_pool_table .col_3,
 #sub_transaction_table .col_3,
- #transaction_table .col_3 {
+#transaction_table .col_3 {
    white-space: nowrap;
+}
+
+#accounts_table tr:nth-child(even),
+#smart_contracts_table tr:nth-child(even),
+#sub_transaction_table tr:nth-child(even) {
+   background: var(--light-grey);
+   border-radius: 5px;
 }
 
 #accounts_table .col_0 {
    width: 20%;
-   text-align: center;
 }
 
 #accounts_table .col_2 {
    width: 40%;
-   text-align: center;
 }
 
-#smart_contracts_table td {
-   text-align: center;
-}
 #mainPage table#sub_transaction_table {
 /*   width: auto;*/
    table-layout: auto;
@@ -102,8 +137,20 @@ html {
    gap: 20px;
 }
 
-#mainPage button {
+button {
    width: 100%;
+   background-color: var(--blue);
+   color: white;
+   border: none;
+   height: var(--rowH);
+   border-radius: var(--rowH);
+}
+.button-style-2 {
+   background-color: white;
+   color: var(--blue);
+   border: 1px solid var(--blue);
+   height: var(--rowH);
+   border-radius: var(--rowH);
 }
 
 /*** VIEW ***/
@@ -120,7 +167,7 @@ html {
 }
 
 #back, #simBack, #subBack {
-   background: black;
+   background: var(--grey);
    opacity: 0.5;
    position: absolute;
    left: 0;
@@ -132,40 +179,49 @@ html {
 .view {
    background: white;
    z-index: 2;
-   /*position: absolute;
-   transform: translate(-50%,-50%);
-   left: 50%;
-   top: 50%;*/
    max-height: 100%;
    max-width: 100%;
+   min-width: 50%;
    width: fit-content;
    overflow: auto;
    white-space: nowrap;
+   padding: 10px 20px;
+   border-radius: 5px;
 }
 
 .view #header {
-   border: solid black 1px;
-   padding: 10px 20px;
-   font-weight: bold;
+   height: var(--rowH);
+   margin: 0;
+   font-weight: normal;
+   font-size: 1.2rem;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   color: black;
 }
 .view #header .icon {
-   float: right;
-}
-.view #content {
-   border: solid black 1px;
-   padding: 10px;
+   width: var(--rowH);
+   height: var(--rowH);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: var(--blue);
 }
 
-.view #content .line {
-   padding: 5px 10px;
-   margin: 0;
-}
-.view #content .error {
-   border: 1px solid red;
+.view .error,
+.view .unsigned {
+   border: 1px solid var(--red);
+   color: red;
    border-radius: 5px;
-   background-color: rgb(255,120,120);
-   margin: 20px 0;
+   background-color: var(--light-red);
+   margin-top: 10px;
+   margin-bottom: 20px;
    white-space: normal;
+   padding: 10px;
+}
+.view .line.error {
+   margin: 10px 0 20px 0;
+   padding: 10px;
 }
 .view #content .line .label {
    margin-right: 5px;
@@ -177,34 +233,41 @@ html {
    padding-left: 20px;
 }
 .view #content .ep_cont {
-   border: 1px solid black;
+   border: none;
    border-radius: 5px;
-   background: lightgrey;
+   background: var(--light-grey);
    padding: 10px;
+   margin: 10px 0;
 }
 #simView #header .icon {
    display: none;
 }
-#simView #buttons {
-   margin-top: 10px;
-   display: flex;
-   flex-direction: row;
-}
+
 .view .signature {
-   margin: 10px 0;
-   padding: 5px 10px;
+   margin: 10px 0 20px 0;
+   padding: 10px;
    display: flex;
-   justify-content: space-between;
+/*   justify-content: space-between;*/
+   justify-content: left;
+   gap: 5px;
+}
+.view .signature i {
+   margin-right: 5px;
+   color: var(--red);
 }
 .view .unsigned {
-   border: 1px solid red;
-   border-radius: 5px;
-   background-color: rgb(255,120,120);
+   border: none;
+/*   justify-content: left;*/
+/*   gap: 5px;*/
+   color: var(--dark-grey);
 }
 .view .signed {
-   border: 1px solid green;
+   border: none;
    border-radius: 5px;
    background-color: rgb(120,255,120);
+}
+.view .signed i {
+   display: none;
 }
 #view button {
    margin-top: 10px;
@@ -278,24 +341,17 @@ html {
    border: solid 1px black;  
 }
 .view hr {
-   border-top: 1px solid grey;
+   border-top: 1px solid var(--grey);
    border-bottom: none;
    border-left: none;
    border-right: none;
-   width: 90%;
 }
-.view .input {
-   width: 100px;
-}
+
 
 /*** FORM ***/
 
 .form {
    width: auto;
-}
-
-.form #header{
-   text-align: center;
 }
 
 .form #content {
@@ -304,13 +360,15 @@ html {
    justify-content: space-around;
 }
 
-.form #content .field {
+.form .field,
+.view .line {
    margin: 0;
-   padding: 10px;
+   padding: 10px 0;
    display: flex;
    justify-content: space-between;
    gap: 20px;
    align-items: center;
+   position: relative;
 }
 .form #content button#sign {
    margin-top: 0;
@@ -318,16 +376,53 @@ html {
    max-width: 150px;
    align-self: center;
 }
-.form #content .field .input {
-   width: 100px;
+
+.view .input {
+   width: 150px;
+   height: var(--rowH);
+   border: none;
+   border-radius: 5px;
+   padding-left: 10px;
+   background-color: var(--light-grey);
+   color: var(--dark-grey);
+   flex-shrink: 0;
 }
-.form #content #buttons {
-   padding-top: 10px;
+.form select {
+   appearance: none;
+}
+.view input.tez {
+   padding-right: 25px;
+}
+.form .select-arrow,
+.view .tez_unit {
+   position: absolute;
+   right: 10px;
+   color: var(--blue);
+}
+
+.form .ep_cont .input {
+   background: white;
+}
+
+.form .field.signature {
+   background-color: var(--light-blue);
+   padding: 10px;
+   border-radius: 5px;
+   display: inline;
+   margin: 10px 0;
+}
+.form .field.signature i {
+   margin-right: 10px;
+   color: var(--blue);
+}
+.view #buttons {
+   margin-bottom: 10px;
    display: flex;
-   flex-direction: row;
-   justify-content: space-evenly;
+   flex-direction: row-reverse;
+   justify-content: right;
+   gap: 10px;
 }
-.form #content #buttons button {
+.view #buttons button {
    width: 100px;
 }
 

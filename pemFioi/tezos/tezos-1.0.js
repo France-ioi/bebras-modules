@@ -1844,14 +1844,14 @@ function Tezos(params) {
    const marginX = 20;
    const marginY = 20;
 
-   const transactionTableW = pageW*0.5;
-   const accountsTableW = pageW*0.4;
+   const transactionTableW = pageW*0.52;
+   const accountsTableW = pageW*0.42;
 
    const maxAccounts = accounts.length;
-   const cellH = 30;
+   const cellH = 35;
    const transactionTableH = cellH*(transactionTableLength + 1) + 3;
    const mempoolLength = 4;
-   const headerH = 30;
+   const headerH = cellH;
    const gasCostPerUnit = 0.0005;
    const storageCostPerUnit = 0.0004;
    const feeConstant = 0.0002;
@@ -1901,19 +1901,19 @@ function Tezos(params) {
       updateAccountsTable();
       updateTransactionTable();
 
-      let transH = (transactionTableLength + 1)*30;
-      let mempoolH = (mempoolLength + 1)*30;
+      let transH = (transactionTableLength + 1)*cellH;
+      let mempoolH = (mempoolLength + 1)*cellH;
       let leftColH = marginY + headerH + transH + marginY;
       if(mempoolMode != "none"){
          leftColH += mempoolH + marginY;
       }
-      let accountH = (maxAccounts + 1)*30;
-      let smartContractsH = (self.smartContracts.length + 1)*30;
+      let accountH = (maxAccounts + 1)*cellH;
+      let smartContractsH = (self.smartContracts.length + 1)*cellH;
       let nbButtons = 2;
       if(createAccountEnabled)
          nbButtons++;
 
-      let rightColH = marginY + headerH + accountH + marginY + headerH + smartContractsH + marginY + nbButtons*($("button").height() + marginY);
+      let rightColH = marginY + headerH + accountH + marginY + headerH + smartContractsH + marginY + nbButtons*(cellH + marginY);
       pageH = Math.max(leftColH,rightColH);
 
       displayHelper.taskH = pageH;
@@ -1932,7 +1932,7 @@ function Tezos(params) {
    };
 
    function initTransactionTable() {
-      let transDiv = $("<div id='transactions'></div>");
+      let transDiv = $("<div id='transactions' class='container'></div>");
       transDiv.append("<h3>"+taskStrings.transactions+"</h3>");
 
       let cont = $("<div id=transaction_table_cont></div>");
@@ -1965,7 +1965,7 @@ function Tezos(params) {
       clone.children("tr:not(.row_0)").remove();
       clone.css({
          height: "auto",
-         width: transactionTableW+"px"
+         // width: (transactionTableW - 20)+"px"
       })
       transDiv.append(clone);
 
@@ -1973,7 +1973,8 @@ function Tezos(params) {
    };
 
    function initAccountsTable() {
-      let accountDiv = $("<div id='accountsCont'></div>");
+      let colDiv = $("<div id='colCont'></div>");
+      let accountDiv = $("<div id='accountsCont' class='container'></div>");
       accountDiv.append("<h3>"+taskStrings.accounts+"</h3>");
 
       let table = $("<table id='accounts_table'></table>");
@@ -2000,14 +2001,15 @@ function Tezos(params) {
          table.append(line);
       }
       accountDiv.append(table);
-      accountDiv.css("width",accountsTableW+"px");
+      colDiv.append(accountDiv);
+      colDiv.css("width",accountsTableW+"px");
 
       let scDiv = initSmartContracts();
 
       let buttons = initButtons();
-      accountDiv.append(scDiv,buttons);
+      colDiv.append(scDiv,buttons);
 
-      return accountDiv
+      return colDiv
    };
 
    function initSmartContracts() {
@@ -2046,7 +2048,7 @@ function Tezos(params) {
 
       nbSmartContracts = self.smartContracts.length;
 
-      let scDiv = $("<div id='smartContractsCont'></div>");
+      let scDiv = $("<div id='smartContractsCont' class='container'></div>");
       scDiv.append("<h3>"+taskStrings.smartContracts+"</h3>");
 
       let table = $("<table id='smart_contracts_table'></table>");
@@ -2374,25 +2376,6 @@ function Tezos(params) {
             return error
          }
 
-         // function computeGasAndStorage() {
-         //    if(!params.simple){
-         //       let sc = self.objectsPerAddress[params.sc_address];
-         //       self.newTransaction.storage = sc[params.storage]();
-         //       self.newTransaction.storageChange = sc[params.storageChange]();
-         //    }
-
-         //    let fee, gas;
-         //    if(params.simple){
-         //       gas = self.defaultGasPerTransaction;
-         //    }else{
-         //       let sc = self.objectsPerAddress[params.sc_address];
-         //       gas = sc[params.gas]();  
-         //    }
-         //    self.newTransaction.gas = gas;
-         //    fee = roundTezAmount(gas*gasCostPerUnit + feeConstant);
-         //    self.newTransaction.bakerFee = fee;
-         // };
-
          function displayTransaction() {
             let cont = $("<div id=view_transaction class=view></div>");
             let header = $("<div id=header>"+headerStr+"<img src="+self.crossSrc+" class=icon /></div>");
@@ -2438,46 +2421,47 @@ function Tezos(params) {
                   let obj = self.objectsPerAddress[dat[key]];
                   // console.log(obj,dat[key])
                   let str = (obj.tezos) ? addressEllipsis(obj.address) : obj.alias;
-                  html += "<p class=line><span class=label>"+taskStrings[key]+":</span> "+str+"</p>";
+                  html += "<p class=line><span class=label>"+taskStrings[key]+"</span> "+str+"</p>";
                   break;
                case "amount":
                case "bakerFee":
-                  html += "<p class=line><span class=label>"+taskStrings[key]+":</span> "+dat[key]+" tez</p>";
+                  html += "<p class=line><span class=label>"+taskStrings[key]+"</span> "+dat[key]+" tez</p>";
                   break;
                case "additionalFee":
                   html += "<hr/>";
-                  html += "<p class=line><span class=label>"+taskStrings.additionalFee+"</span> <input type=text id=additionalFee class=input value="+self.additionalFee+" />";
+                  html += "<p class=line><span class=label>"+taskStrings.additionalFee+"</span>";
+                  html += " <input type=text id=additionalFee class='input tez' value="+self.additionalFee+" /><span class=tez_unit>ꜩ</span>";
                   break;
                case "gas":
                   let gCost = roundTezAmount(dat[key]*gasCostPerUnit);
                   html += "<hr/>";
-                  html += "<p class=line><span class=label>"+taskStrings[key]+":</span> "+dat[key]+" (cost = "+gCost+" tez)</p>";
+                  html += "<p class=line><span class=label>"+taskStrings[key]+"</span> "+dat[key]+" (cost = "+gCost+" tez)</p>";
                   break;
                case "storage":
                   // console.log(storageCostPerUnit);
                   let sCost = roundTezAmount(dat[key]*storageCostPerUnit);
-                  html += "<p class=line><span class=label>"+taskStrings[key]+":</span> "+dat[key]+" "+taskStrings.byte(dat[key])+" (cost = "+sCost+" tez)</p>";
+                  html += "<p class=line><span class=label>"+taskStrings[key]+"</span> "+dat[key]+" "+taskStrings.byte(dat[key])+" (cost = "+sCost+" tez)</p>";
                   break;
                case "counter":
                   if(counterEnabled)
-                     html += "<p class=line><span class=label>"+taskStrings.transactionNum+":</span> "+dat[key]+"</p>";
+                     html += "<p class=line><span class=label>"+taskStrings.transactionNum+"</span> "+dat[key]+"</p>";
                   break;
                case "signature":
                   let sig = (dat.signature) ? addressEllipsis(dat.signature) : taskStrings.notSigned;
                   if(type == 1){
                      let cla = (dat.signature) ? "signed" : "unsigned";
-                     html += "<div class='signature "+cla+"'>";
-                     html += "<span class=label>"+taskStrings[key]+":</span> <span class=value>"+sig+"</span></div>";
+                     html += "<div class='signature "+cla+"'>"+((dat.signature) ? "" : "<i class='fas fa-exclamation-circle'></i>");       
+                     html += "<span class=label>"+taskStrings[key]+"</span> : <span class=value>"+sig+"</span></div>";
                   }else{
                      html += "<hr/>";
-                     html += "<p class=line><span class=label>"+taskStrings[key]+":</span> <span class=value>"+sig+"</span></p>";
+                     html += "<p class=line><span class=label>"+taskStrings[key]+"</span> <span class=value>"+sig+"</span></p>";
                   }
                   break;
                case "id":
                   // ep = true;
                   html += "<div class=ep_cont>";
-                  html += "<p class=line><span class=label>"+taskStrings.entrypoint+":</span> "+params.id+"</p>";
-                  html += "<p class=line><span class=label>"+taskStrings.parameters+":</span></p>";
+                  html += "<p class=line><span class=label><b>"+taskStrings.entrypoint+"</b></span> "+params.id+"</p>";
+                  html += "<p class=line><span class=label><b>"+taskStrings.parameters+"</b></span></p>";
                   break;
                case "epEnd":
                   html += "</div>";
@@ -2485,7 +2469,7 @@ function Tezos(params) {
                case "source":
                case "operator":
                case "destination_ep":
-                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+self.objectsPerAddress[dat[key]].alias+"</p>";
+                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+"</span> "+self.objectsPerAddress[dat[key]].alias+"</p>";
                   break;
                case "nbOfTokens":
                case "nbTokensSold":
@@ -2493,17 +2477,17 @@ function Tezos(params) {
                case "minTezExpected":
                case "idPlayer":
                case "numberValue":
-                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+dat[key]+"</p>";
+                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+"</span> "+dat[key]+"</p>";
                   break;
                case "hash":
-                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+addressEllipsis(dat[key])+"</p>";
+                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+"</span> "+addressEllipsis(dat[key])+"</p>";
                   break;
                case "deadline":
                   let date = new Date(dat[key]);
-                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+":</span> "+date.toLocaleString()+"</p>";
+                  html += "<p class=line><span class='label parameter'>"+taskStrings[key]+"</span> "+date.toLocaleString()+"</p>";
                   break;
                case "subTransactions":
-                  html += "<p class=line><span class=label>"+taskStrings.subTransactions+":</span></p>";
+                  html += "<p class=line><span class=label><b>"+taskStrings.subTransactions+"</b></span></p>";
                   let colKeys = transactionTableColKeys;
                   let table = getTransactionTable("sub_transaction_table",dat[key].length,dat[key]);
                   let div = $("<div></div>");
@@ -2512,7 +2496,7 @@ function Tezos(params) {
                   break;
                case "storageChange":
                   html += "<hr/>";
-                  html += "<p class=line><span class='label'>"+taskStrings.storageChange+":</span></p>";
+                  html += "<p class=line><span class='label'><b>"+taskStrings.storageChange+"</b></span></p>";
                   html += "<p class=line id=storage_change>"+dat.storageChange+"</p>";
                   break;
                case "error":
@@ -2524,9 +2508,9 @@ function Tezos(params) {
             if(type == 1){
                if(!err){
                   let id = (dat.signature || self.customMode) ? "validate" : "sign";
-                  html += "<div id=buttons ><button id=validate>"+taskStrings[id]+"</button><button id=cancel>"+taskStrings.edit+"</button></div>";
+                  html += "<div id=buttons ><button id=validate>"+taskStrings[id]+"</button><button id=cancel class=button-style-2 >"+taskStrings.edit+"</button></div>";
                }else{
-                  html += "<button id=cancel>"+taskStrings.cancel+"</button>";
+                  html += "<button id=cancel class=button-style-2 >"+taskStrings.cancel+"</button>";
                }
             }else if(!type){
                html += "<button id=copy>"+taskStrings.copy+"</button>";
@@ -2638,11 +2622,7 @@ function Tezos(params) {
          return taskStrings.cantSign
       }
       tr.signature = this.generateSignature(tr);
-      // let clone = Beav.Object.clone(tr);
-      // delete clone.storageChange;
-      // delete clone.subTransactions;
-      // delete clone.bakerFee;
-      // tr.signature = JSON.stringify(clone).hashCode();
+
       return false
    };
 
@@ -2748,7 +2728,7 @@ function Tezos(params) {
             // console.log(params);
             let headerStr = (self.customMode) ? taskStrings.newSubTransaction : taskStrings.newTransaction;
             let cont = $("<div id=transaction_form class='view form'></div>");
-            let header = $("<div id=header>"+headerStr+"</div>");
+            let header = $("<div id=header>"+headerStr+"<div class=icon ><i class='fas fa-times'></i></div></div>");
             let content = $("<div id=content></div>");
 
             let html = "";
@@ -2761,8 +2741,6 @@ function Tezos(params) {
                if(field == "entrypoint"){
                   html += "<div class=ep_cont>";
                }
-               if(field == "signature")
-                  html += "<hr/>";
                if(field == "epEnd"){
                   html += "</div>";
                   continue;
@@ -2771,6 +2749,10 @@ function Tezos(params) {
                   html += "<p class=field>"+taskStrings.randomNumber;
                }else if(field == "deadline"){
                   html += "<p class=field>"+taskStrings.delay;
+               }else if(field == "signature"){
+                  html += "<p class='field signature' ><i class='fas fa-pen-fancy'></i>"+name+" : ";
+               }else if(field == "entrypoint"){
+                  html += "<p class=field><b>"+name+"</b>";
                }else{
                   html += "<p class=field>"+name;
                }
@@ -2812,7 +2794,7 @@ function Tezos(params) {
                         html += "<option value="+dat.address+" "+((self.newTransaction[field] == dat.address) ? "selected" : "")+">"+dat.alias+"</option>";
                      }
                   }
-                  html += "</select>";
+                  html += "</select><i class='fas fa-chevron-down select-arrow'></i>";
                   break;
                case "amount":
                case "nbOfTokens":
@@ -2823,7 +2805,14 @@ function Tezos(params) {
                case "numberValue":
                   let val = self.newTransaction[field] || 0;
                   self.newTransaction[field] = val;
-                  html += "<input type=text id="+field+" class=input value="+val+" />";
+                  let cla = "input";
+                  if(field == "amount" || field == "minTezExpected"){
+                     cla += " tez";
+                  }
+                  html += "<input type=text id="+field+" class='"+cla+"' value="+val+" />";
+                  if(field == "amount" || field == "minTezExpected"){
+                     html += "<span class=tez_unit>ꜩ</span>";
+                  }
                   break;
                case "counter":
                   html += "<input type=number min=1 id=counter class=input  value="+self.newTransaction[field]+" />";
@@ -2854,12 +2843,10 @@ function Tezos(params) {
 
                }
                html += "</p>";
-               // if(field == "signature")
-               //    html += "<button id=sign>"+taskStrings.sign+"</button>";
             }
             if(ep)
                html += "</div>";
-            html += "<div id=buttons ><button id=simulate>"+taskStrings.simulate+"</button><button id=cancel>"+taskStrings.cancel+"</button></div>";
+            html += "<div id=buttons ><button id=simulate>"+taskStrings.simulate+"</button><button id=cancel class=button-style-2 >"+taskStrings.cancel+"</button></div>";
             content.append(html);
             cont.append(header,content);
             return cont
@@ -2867,6 +2854,11 @@ function Tezos(params) {
       };
 
       function initFormHandlers() {
+         // $(".select-arrow").click(function() {
+         //    let id = $(this).attr("name");
+         //    console.log(id);
+         //    $("#"+id).trigger('chosen:updated');
+         // })
          $("[id^=select_").on("change",function() {
             displayError("");
             $(".form select").removeClass("highlight");
@@ -2914,8 +2906,8 @@ function Tezos(params) {
          $("#simulate").on("click",simulate);
          $("#simulate").css("cursor","pointer");
 
-         $("#cancel").on("click",deleteView());
-         $("#cancel").css("cursor","pointer");
+         $("#cancel, #header .icon").on("click",deleteView());
+         $("#cancel, #header .icon").css("cursor","pointer");
       };
 
       function updateHash(val) {
@@ -3370,11 +3362,12 @@ function Tezos(params) {
       for(let block of self.blocks){
          let date = new Date(block.timestamp);
          let time = date.toLocaleString();
-         html +="<tr class=row_"+row+" ><td colspan=4 class=block_header ><span>Block "+block.id+"</span><span class=timestamp>"+time+"</span></td></tr>";
+         html +="<tr class=row_"+row+" ><td colspan=4 class=block_header ><span>Block "+block.id+"</span> - <span class=timestamp>"+time+"</span></td></tr>";
          row++;
-         for(let transID of block.transactions){
+         for(let iT = 0; iT < block.transactions.length; iT++){
+            let transID = block.transactions[iT];
             let t = self.transactions[transID];
-            html += "<tr class=row_"+row+">";
+            html += "<tr class='row_"+row+" "+((iT > 0) ? "separation_line" : "")+"'>";
             for(let col = 0; col < colKeys.length; col++){
                let key = colKeys[col];
                let entry = getTransactionTableEntry(key,t);
@@ -3418,11 +3411,12 @@ function Tezos(params) {
       if(scroll == undefined)
          return
       let scrollBarWidth = scroll.offsetWidth - scroll.clientWidth;
-      $("#transaction_table_cont_clone").css("width",(transactionTableW - scrollBarWidth)+"px");
+      $("#transaction_table_cont_clone").css("width",(transactionTableW - 15 - scrollBarWidth)+"px");
       // console.log(scrollBarWidth)
    };
 
    function getTransactionTable(id,nbRows,content) {
+      // console.log("getTransactionTable")
       let table = $("<table id="+id+"></table>");
       let colKeys = transactionTableColKeys;
       // console.log(id,nbRows,content)
@@ -3437,6 +3431,7 @@ function Tezos(params) {
             }else if(content){
                // let key = (col == 2) ? "recipient" : colKeys[col];
                entry = getTransactionTableEntry(colKeys[col],content[row - 1]);
+               // console.log(entry)
             }
             line.append($("<"+type+" class='col_"+col+"'>"+entry+"</"+type+">"));
          }
