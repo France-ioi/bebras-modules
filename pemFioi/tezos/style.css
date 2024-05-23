@@ -4,9 +4,15 @@ html {
    --dark-grey: #627083;
    --blue: #0f61ff;
    --light-blue: #e7efff;
+   --grey-blue: #dae2f2;
    --red: #ff3d39;
    --light-red: #ffe7e7;
    --rowH: 35px;
+}
+
+.consigne {
+   background-color: white;
+   color: var(--dark-grey);
 }
 
 #mainPage {
@@ -144,6 +150,7 @@ button {
    border: none;
    height: var(--rowH);
    border-radius: var(--rowH);
+   cursor: pointer;
 }
 .button-style-2 {
    background-color: white;
@@ -167,7 +174,7 @@ button {
 }
 
 #back, #simBack, #subBack {
-   background: var(--grey);
+   background: black;
    opacity: 0.5;
    position: absolute;
    left: 0;
@@ -273,72 +280,83 @@ button {
    margin-top: 10px;
 }
 
+/*** SC ***/
+
 .view#view_contract {
    max-width: 100%;
+   padding: 0;
+   overflow: hidden;
+}
+.view#view_contract #header {
+   margin: 10px;
+   padding-left: 10px;
 }
 .view#view_contract #content {
-   border: solid black 1px;
    display: flex;
-   padding: 0;
-/*   max-height: 100%;*/
+   border-top: 1px solid var(--grey);
 }
 .view#view_contract #content > * {
    padding: 10px;
    overflow: auto;
 }
 .view#view_contract #content1 {
-   background: lightgrey;
    flex-shrink: 1;
+   padding-left: 20px;
 }
 .view#view_contract #content2 {
+   background: var(--light-grey);
    flex-shrink: 2;
 }
 .view#view_contract .storage_line {
-   padding: 0 20px;
-   margin: 5px 0;
+   padding: 5px 0;
+   margin: 0;
    white-space: nowrap;
 }
 .view#view_contract .level_1 {
-   padding: 0 30px;
+   padding: 5px 20px;
 }
 .view#view_contract .level_2 {
-   padding: 0 40px;
+   padding: 5px 40px;
 }
 .view#view_contract h4 {
    margin-top: 0;
-   margin-bottom: 10px;
+}
+.view#view_contract #content2 h4 {
+   padding-left: 10px;
 }
 .view#view_contract .text {
    margin: 0;
-   padding: 5px 10px;
+   padding: 5px 0;
    tab-size: 20px;
 /*   white-space: pre-wrap;*/
    width: fit-content;
 }
 .view#view_contract .text ul {
    margin-top: 5px;
+   padding-left: 20px;
 }
 .view#view_contract .entrypoint,
 .view#view_contract .sc_view {
    font-family: monospace;
+   border-radius: 5px;
+   padding: 10px;
 }
-.view#view_contract .entrypoint:hover {
-   background: lightgreen;
-}
+.view#view_contract .entrypoint:hover,
 .view#view_contract .sc_view:hover {
-   background: lightblue;
+   background: var(--grey-blue);
 }
 
 .view#sc_view {
    min-width: 30%;
    max-width: 100%;
+   padding: 10px;
+   padding-left: 20px;
 }
 #simView #sc_view #header .icon  {
-   display: block;
+   display: flex;
 }
 .view#sc_view .content {
-   padding: 20px;
-   border: solid 1px black;  
+   padding: 10px 0;
 }
 .view hr {
    border-top: 1px solid var(--grey);
@@ -416,7 +434,7 @@ button {
    color: var(--blue);
 }
 .view #buttons {
-   margin-bottom: 10px;
+   margin: 10px 0;
    display: flex;
    flex-direction: row-reverse;
    justify-content: right;
@@ -424,6 +442,10 @@ button {
 }
 .view #buttons button {
    width: 100px;
+}
+#simView #buttons {
+   margin: 0;
+   margin-top: 10px;
 }
 
 .form .highlight,
@@ -441,9 +463,9 @@ button {
    position: absolute;
    top: 0;
    left: 0;
-   border: 1px solid grey;
-   border-radius: 5px;
-   background: lightgrey;
+/*   border: 1px solid var(--grey);*/
+/*   border-radius: 5px;*/
+   background: var(--light-blue);
    display: flex;
    flex-direction: column;
    justify-content: space-around;

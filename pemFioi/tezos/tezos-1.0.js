@@ -225,7 +225,8 @@ class SmartContract {
       view.append(back,acc);
       $("#mainPage").append(view);
 
-      $("#view_contract #content").css("max-height",$("#mainPage").height()+"px");      
+      // $("#view_contract #content").css("max-height",$("#mainPage").height()+"px");      
+      $("#view_contract #content").css("max-height",(displayHelper.taskH - 68)+"px");      
 
       $("#view_contract #header").on("click",deleteView());
       $("#view_contract #header").css("cursor","pointer");
@@ -241,21 +242,20 @@ class SmartContract {
 
       function display(self) {
          let cont = $("<div id=view_contract class=view></div>");
-         let header = $("<div id=header>"+taskStrings.contract+": "+self.alias+"<img src="+self.tezos.crossSrc+" class=icon /></div>");
+         let header = $("<div id=header>"+taskStrings.contract+": "+self.alias+"<div class=icon ><i class='fas fa-times'></i></div></div></div>");
          let content = $("<div id=content></div>");
          let cont1 = $("<div id=content1></div>");
          let cont2 = $("<div id=content2></div>");
 
          let html1 = "";
-         html1 += "<p class=line><span class=label>"+taskStrings.address+":</span> "+addressEllipsis(self.address)+"</p>";
-         html1 += "<p class=line><span class=label>"+taskStrings.balance+":</span> "+self.balance+" tez</p>";
-         html1 += "<p class=line> </p>";
-         html1 += "<h4 class=line>"+taskStrings.storage+":</h4> ";
+         html1 += "<p class=line><span class=label>"+taskStrings.address+"</span> "+addressEllipsis(self.address)+"</p>";
+         html1 += "<p class=line><span class=label>"+taskStrings.balance+"</span> "+self.balance+" tez</p>";
+         html1 += "<h4 class=line>"+taskStrings.storage+"</h4> ";
          for(let key in self.storage){
             let type = self.storage[key].type;
             if(type != "big-map"){
                // html1 += "<p class='storage_line line'><span class=label>"+key+":</span> "+self.storage[key].val+"</p>";
-               html1 += "<p class='storage_line line'>"+getStorageLine(type,key,self.storage[key].val)+"</p>";
+               html1 += "<p class='storage_line line'>"+getStorageLine(type,key,self.storage[key].val,0)+"</p>";
             }else{
                html1 += getBigMapHTML(key,self.storage,0);
             }
@@ -264,7 +264,7 @@ class SmartContract {
          cont1.append(html1);
 
          let html2 = "";
-         html2 += "<h4 class=line >"+taskStrings.entrypoints+":</h4> ";
+         html2 += "<h4 class=line >"+taskStrings.entrypoints+"</h4> ";
          for(let key in self.entrypoints){
             let ep = self.entrypoints[key];
             if(!ep.clickable)
@@ -272,7 +272,7 @@ class SmartContract {
             html2 += "<div class='text entrypoint' id="+key+" >"+ep.text+"</div>";
          }
          if(self.views){
-            html2 += "<h4 class=line >"+taskStrings.views+":</h4> ";
+            html2 += "<h4 class=line >"+taskStrings.views+"</h4> ";
             for(let key in self.views){
                html2 += "<div class='text sc_view' id="+key+" >"+self.views[key].text+"</div>";
             }
@@ -286,7 +286,7 @@ class SmartContract {
 
          function getBigMapHTML(key,parent,level) {
             let obj = parent[key];
-            let html = "<p class='storage_line level_"+level+"'><span class=label>"+key+":</span> </p>";
+            let html = "<p class='storage_line level_"+level+"'><span class=label>"+key+"</span> </p>";
             for(let k in obj) {
                if(k == "type"){
                   continue;
@@ -295,14 +295,14 @@ class SmartContract {
                   html += getBigMapHTML(k,obj,level + 1);
                }else{
                   // html += "<p class='storage_line level_"+(level + 1)+"'><span class=label>"+k+":</span> "+obj[k].val+"</p>";
-                  html += "<p class='storage_line level_"+(level + 1)+"'>"+getStorageLine(obj[k].type,k,obj[k].val)+"</p>";
+                  html += "<p class='storage_line level_"+(level + 1)+"'>"+getStorageLine(obj[k].type,k,obj[k].val,level + 1)+"</p>";
                }
             }
             return html
          }
 
-         function getStorageLine(type,key,val) {
-            // console.log(type,key,val)
+         function getStorageLine(type,key,val,level) {
+            // console.log(type,key,val,level)
             if(val === undefined)
                return ""
             let str = val;
@@ -317,7 +317,7 @@ class SmartContract {
             }else if(type == "tez"){
                str += " tez";
             }
-            return "<span class=label>"+key+":</span> "+str
+            return "<span class=label>"+key+((level == 0) ? "" : ":")+"</span> "+str
          };
       }
 
@@ -334,9 +334,6 @@ class SmartContract {
 
             self.tezos.newTransaction = undefined;
             self.tezos.createNewTransaction(params)();
-            // let fct = self.entrypoints[id].fct;
-
-            // self[fct]();
          }
       };
 
@@ -352,7 +349,7 @@ class SmartContract {
             $("#mainPage").append(view);
 
             let html = "<div id=sc_view class=view>";
-            html += "<div id=header>"+v.header+"<img src="+self.tezos.crossSrc+" class=icon /></div>";
+            html += "<div id=header>"+v.header+"<div class=icon ><i class='fas fa-times'></i></div></div>";
             html += "<div class=content>"+v.text+"</div>";
             html += "</div>";
 
@@ -1489,6 +1486,18 @@ class Auction extends SmartContract {
       }
    }
 
+   applicationCallCustom(dat) {
+      /*** if the application of a transaction implies a custom contract, return the address of the custom contract ***/
+      let id = dat.params.id;
+      if(id == "bid"){
+         let prevBid = this.storage.topBid.val;
+         let prevAdd = this.storage.topBidder.val;
+         if(prevBid < dat.amount && this.tezos.isSmartContractType(prevAdd,"custom"))
+            return prevAdd
+      }
+      return false
+   }
+
    createTransaction(dat) {
       // console.log(dat)
       let id = dat.id;
@@ -1879,6 +1888,7 @@ function Tezos(params) {
    this.copyMode = false;
 
    let nbSmartContracts;
+   let smartContractTypes = [];
    let fields;
    let copied = null;
    timeDependencies = timeDependencies || [];
@@ -2042,7 +2052,11 @@ function Tezos(params) {
                for(let action of scData.init){
                   sc.createTransaction(action);
                }
-            }   
+            } 
+
+            if(!smartContractTypes.includes(type)){
+               smartContractTypes.push(type);
+            }  
          }
       }
 
@@ -2260,7 +2274,7 @@ function Tezos(params) {
          function displayAccount(id) {
             let dat = accounts[id];
             let cont = $("<div id=view_account class=view></div>");
-            let header = $("<div id=header>"+taskStrings.account+": "+dat.alias+"<img src="+self.crossSrc+" class=icon /></div>");
+            let header = $("<div id=header>"+taskStrings.account+": "+dat.alias+"<div class=icon ><i class='fas fa-times'></i></div></div></div>");
             let content = $("<div id=content></div>");
 
             let html = "";
@@ -2378,7 +2392,7 @@ function Tezos(params) {
 
          function displayTransaction() {
             let cont = $("<div id=view_transaction class=view></div>");
-            let header = $("<div id=header>"+headerStr+"<img src="+self.crossSrc+" class=icon /></div>");
+            let header = $("<div id=header>"+headerStr+"<div class=icon ><i class='fas fa-times'></i></div></div></div>");
             let content = $("<div id=content></div>");
 
             let transactionKeys = ["sender","recipient","amount"];
@@ -3253,7 +3267,7 @@ function Tezos(params) {
          let content = $("<div id=content></div>");
          let html = "<p class=field><span class=label>"+taskStrings.nbBlocks+"</span> <input type=number id=nbBlocks class=input value="+nbBlocks+" min=1 /></p>";
          html += "<p class=field><span class=label>"+taskStrings.timeShift+"</span> <span id=timeShift ></span></p>";
-         html += "<div id=buttons ><button id=validate>"+taskStrings.validate+"</button><button id=cancel>"+taskStrings.cancel+"</button></div>";
+         html += "<div id=buttons ><button id=validate>"+taskStrings.validate+"</button><button id=cancel class=button-style-2 >"+taskStrings.cancel+"</button></div>";
          content.append(html);
          cont.append(header,content);
          return cont
@@ -3308,14 +3322,29 @@ function Tezos(params) {
             continue;
          }
          if(t > dep.time){
-            // dep.action();
             let sc_address = dep.sc_address;
             let sc = self.objectsPerAddress[sc_address];
+            if(type.includes("custom")){
+               let add = sc.applicationCallCustom(dep.action)
+               if(add){
+                  let cus = self.objectsPerAddress[add];
+                  
+               }
+            }
             sc.createTransaction(dep.action);
             dep.done = true;
          }
       }
    };
+
+   this.isSmartContractType = function(address,type) {
+      for(let sc of smartContracts){
+         let add = sc.address;
+         if(add == address && sc.type == type)
+            return true
+      }
+      return false
+   }
 
    function updateAccountsTable() {
       let colKeys = ["alias","address", "balance"];
