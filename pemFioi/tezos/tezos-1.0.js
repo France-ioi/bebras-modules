@@ -77,6 +77,11 @@ const taskStrings = {
    customActionForbidden: function(alias) {
       return "Cette action ne peut pas être efectuée par le contrat "+alias
    },
+   customConfimation: function(sen,cus) {
+      return "Une transaction créée par "+sen+" appelle le point d'entrée default() de votre contrat "+cus+"."
+   },
+   accept: "Accepter",
+   refuse: "Refuser",
 
    error: "Error",
    maxAccounts: "Vous ne pouvez pas créer d'autre compte.",
@@ -145,6 +150,7 @@ const taskStrings = {
       let str = (cur == tar) ? "égal" : "inférieur";
       return "Vous n'avez pas fait de gain. Votre solde actuel de "+cur+" tez est "+str+" à votre solde de départ de "+tar+" tez."
    },
+   errorOwner: "Vous n'êtes pas le propriétaire du contrat Auction",
    cantSign: "Vous ne pouvez pas signer cette transaction car le compte émetteur ne vous appartient pas."
 };
 
@@ -232,6 +238,9 @@ class SmartContract {
       $("#view_contract #header").css("cursor","pointer");
 
       for(let key in this.entrypoints){
+         let ep = this.entrypoints[key];
+         if(!ep.clickable)
+            continue;
          $("#view_contract #"+key).on("click",clickEntrypoint(key,this));
          $("#view_contract #"+key).css("cursor","pointer");
       }
@@ -267,9 +276,10 @@ class SmartContract {
          html2 += "<h4 class=line >"+taskStrings.entrypoints+"</h4> ";
          for(let key in self.entrypoints){
             let ep = self.entrypoints[key];
-            if(!ep.clickable)
-               continue;
-            html2 += "<div class='text entrypoint' id="+key+" >"+ep.text+"</div>";
+            let cla = "text entrypoint"
+            if(ep.clickable)
+               cla += " clickable";
+            html2 += "<div class='"+cla+"' id="+key+" >"+ep.text+"</div>";
          }
          if(self.views){
             html2 += "<h4 class=line >"+taskStrings.views+"</h4> ";
@@ -1486,13 +1496,13 @@ class Auction extends SmartContract {
       }
    }
 
-   applicationCallCustom(dat) {
+   applicationCallCustom(tr) {
       /*** if the application of a transaction implies a custom contract, return the address of the custom contract ***/
-      let id = dat.params.id;
+      let id = tr.params.id;
       if(id == "bid"){
          let prevBid = this.storage.topBid.val;
          let prevAdd = this.storage.topBidder.val;
-         if(prevBid < dat.amount && this.tezos.isSmartContractType(prevAdd,"custom"))
+         if(prevBid < tr.amount && this.tezos.isSmartContractType(prevAdd,"custom"))
             return prevAdd
       }
       return false
@@ -1522,7 +1532,7 @@ class Auction extends SmartContract {
       }
       this.tezos.computeGasAndStorage(trans);
       this.tezos.signTransaction(trans,true);
-      this.tezos.createTransaction(trans);
+      return this.tezos.createTransaction(trans);
    }
 
    computeTransactionGas() {
@@ -1623,6 +1633,9 @@ class Auction extends SmartContract {
       }
       else if(id == "bid"){
          let t = this.tezos.getCurrentTime();
+         // let curr = new Date(t);
+         // let dead = new Date(this.storage.deadline.val);
+         // console.log(curr.toLocaleString(),dead.toLocaleString())
          if(t > this.storage.deadline.val){
             return taskStrings.pastDeadlineAuction
          }
@@ -1653,6 +1666,11 @@ class Custom extends SmartContract {
                "<li>manually create subTransactions</li>",
             clickable: true,
             fct: "use" 
+         },
+         "default": {
+            text: "<span class=ep_name>default():</span><ul>"+
+               "<li>called when another contract wants to send money to this contract</li>",
+            clickable: false
          }
       };
               
@@ -1759,6 +1777,38 @@ class Custom extends SmartContract {
       }
       subStr += "</ol>";
       $("#custom_popup #subs").html(subStr);
+   }
+
+   askConfirmation(tr) {
+      let back = $("<div id=custom_popup_back></div>");
+      let popup = $("<div id=custom_popup></div>");
+      let sen = tr.sender;
+      let acc = this.tezos.objectsPerAddress[sen];
+      let msg = taskStrings.customConfimation(acc.alias,this.alias);
+      let html = "<span>"+msg+"</span>";
+      html += "<div class=buttons><button id=custom_accept>"+taskStrings.accept+"</button>";
+      html += "<button id=custom_refuse class=button-style-2>"+taskStrings.refuse+"</button></div>";
+      popup.append(html);
+      $("#mainPage").append(back,popup);
+
+      let self = this;
+      $("#custom_accept").click(acceptTrans);
+      $("#custom_refuse").click(refuseTrans);
+
+      function acceptTrans() {
+         // console.log("acceptTrans")
+         // let sc_address = tr.params.sc_address;
+         // let sc = self.tezos.objectsPerAddress[sc_address];
+         self.tezos.createTransaction(tr,true);
+         $("#custom_popup, #custom_popup_back").remove();
+         self.tezos.resumeCreateNextXBlocks();
+      }
+
+      function refuseTrans() {
+         // console.log("refuseTrans")
+         $("#custom_popup, #custom_popup_back").remove();
+         self.tezos.resumeCreateNextXBlocks();
+      }
    }
 
    applyTransaction(trans) {
@@ -3061,13 +3111,15 @@ function Tezos(params) {
       }
    };
 
-   this.createTransaction = function(trans) {
+   this.createTransaction = function(trans,accepted) {
       let tr = trans || self.newTransaction;
-      let finalCheck = canBeApplied(tr);
-      if(!finalCheck){
-         if(self.newTransaction)
-            self.newTransaction = undefined;
-         return
+      if(!accepted){
+         let conf = requiresConfirmation(tr);
+         if(conf){
+            if(self.newTransaction)
+               self.newTransaction = undefined;
+            return true
+         }
       }
       let id = self.transactions.length; 
       self.transactions[id] = Beav.Object.clone(tr);
@@ -3089,7 +3141,7 @@ function Tezos(params) {
          updateAccountsTable();
       }
       // self.signatureIndex++;
-
+      return false
    };
 
    this.applyTransaction = function(id,tr) {
@@ -3122,35 +3174,20 @@ function Tezos(params) {
       saveAnswer(self);
    };
 
-   function canBeApplied(tr) {
-      // let trans = tr || self.transactions[id];
-      // // console.log(trans)
-      // let sID = trans.sender;
-      // let rID = trans.recipient;
-      // let amo = trans.amount;
-      // let fee = trans.bakerFee;
-      // let gas = trans.gas;
-      // let sto = trans.storage;
-      // let par = trans.params;
-      // let sub = trans.sub; // for custom contract subTransactions
-      // // console.log(self.objectsPerAddress[sID].balance)
-      // self.objectsPerAddress[sID].balance -= (sub) ? amo : (amo + fee + gas*gasCostPerUnit + sto*storageCostPerUnit);
-      // self.objectsPerAddress[rID].balance += amo;
-      // self.objectsPerAddress[sID].balance = roundTezAmount(self.objectsPerAddress[sID].balance);
-      // self.objectsPerAddress[rID].balance = roundTezAmount(self.objectsPerAddress[rID].balance);
-      // // console.log(self.objectsPerAddress[sID].balance)
-      // if(!par.simple){
-      //    // console.log(trans)
-      //    let sc = self.objectsPerAddress[rID];
-      //    sc.applyTransaction(trans);
-      // }
-      // // console.log(self.objectsPerAddress[sID].balance)
-      // if(sub)
-      //    return
-      // self.objectsPerAddress[sID].transactionNum++;
-      // self.bakerBalance += (fee + gas*gasCostPerUnit);
-      // saveAnswer(self);
-      return true
+   function requiresConfirmation(tr) {
+      if(smartContractTypes.includes("custom")){
+         let rec = tr.recipient;
+         let obj = self.objectsPerAddress[rec];
+         if(obj.applicationCallCustom){
+            let add = obj.applicationCallCustom(tr)
+            if(add){
+               let cus = self.objectsPerAddress[add];
+               cus.askConfirmation(tr);
+               return true
+            }
+         }
+      }
+      return false
    };
 
    function createNextBlock() {
@@ -3299,7 +3336,7 @@ function Tezos(params) {
       };
 
       function updateTimeShift() {
-         let t = Date.now() + nbBlocks*delayBetweenBlocks*1000;
+         let t = self.getCurrentTime() + nbBlocks*delayBetweenBlocks*1000;
          let date = new Date(t);
          let str = date.toLocaleString();
          $("#timeShift").text(str);
@@ -3307,15 +3344,52 @@ function Tezos(params) {
 
       function validate() {
          for(let ib = 0; ib < nbBlocks; ib++){
-            createNextBlock();
             self.timeShift += delayBetweenBlocks;
-            checkTimeDependencies();
+            createNextBlock();
+            let pause = self.checkTimeDependencies();
+            if(pause){
+               self.createNextXBlocksPauseData = { remainingBlocks: nbBlocks - ib - 1 };
+               return
+            }
          }
          deleteView()();
       };
    };
 
-   function checkTimeDependencies() {
+   // this.validateCreateNextXBlocks = function(nbBlocks) {
+   //    console.log("validateCreateNextXBlocks",nbBlocks)
+   //    return function() {
+   //       for(let ib = 0; ib < nbBlocks; ib++){
+   //          createNextBlock();
+   //          self.timeShift += delayBetweenBlocks;
+   //          let pause = self.checkTimeDependencies();
+   //          if(pause){
+   //             self.createNextXBlocksPauseData = { remainingBlocks: nbBlocks - ib };
+   //             return
+   //          }
+   //       }
+   //       deleteView()();
+   //    }
+   // };
+
+   this.resumeCreateNextXBlocks = function() {
+      if(!self.createNextXBlocksPauseData)
+         return
+      let rem = self.createNextXBlocksPauseData.remainingBlocks;
+      for(let ib = 0; ib < rem; ib++){
+         self.timeShift += delayBetweenBlocks;
+         createNextBlock();
+         let pause = self.checkTimeDependencies();
+         if(pause){
+            self.createNextXBlocksPauseData = { remainingBlocks: nbBlocks - ib };
+            return
+         }
+      }
+      deleteView()();
+      self.createNextXBlocksPauseData = undefined;
+   };
+
+   this.checkTimeDependencies = function() {
       let t = self.getCurrentTime();
       for(let dep of timeDependencies){
          if(dep.done){
@@ -3324,15 +3398,18 @@ function Tezos(params) {
          if(t > dep.time){
             let sc_address = dep.sc_address;
             let sc = self.objectsPerAddress[sc_address];
-            if(type.includes("custom")){
-               let add = sc.applicationCallCustom(dep.action)
-               if(add){
-                  let cus = self.objectsPerAddress[add];
-                  
-               }
-            }
-            sc.createTransaction(dep.action);
+            // if(smartContractTypes.includes("custom")){
+            //    let add = sc.applicationCallCustom(dep.action)
+            //    if(add){
+            //       let cus = self.objectsPerAddress[add];
+            //       cus.askConfirmation(dep);
+            //       return true
+            //    }
+            // }
             dep.done = true;
+            let conf = sc.createTransaction(dep.action);
+            if(conf)
+               return true
          }
       }
    };

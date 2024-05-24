@@ -143,7 +143,7 @@ html {
    gap: 20px;
 }
 
-button {
+#mainPage button {
    width: 100%;
    background-color: var(--blue);
    color: white;
@@ -152,7 +152,7 @@ button {
    border-radius: var(--rowH);
    cursor: pointer;
 }
-.button-style-2 {
+#mainPage button.button-style-2 {
    background-color: white;
    color: var(--blue);
    border: 1px solid var(--blue);
@@ -173,7 +173,7 @@ button {
    align-items: center;
 }
 
-#back, #simBack, #subBack {
+#back, #simBack, #subBack, #custom_popup_back {
    background: black;
    opacity: 0.5;
    position: absolute;
@@ -341,7 +341,7 @@ button {
    border-radius: 5px;
    padding: 10px;
 }
-.view#view_contract .entrypoint:hover,
+.view#view_contract .entrypoint.clickable:hover,
 .view#view_contract .sc_view:hover {
    background: var(--grey-blue);
 }
@@ -457,6 +457,9 @@ button {
 
 /*** CUSTOM POPUP ***/
 
+#custom_popup_back {
+   z-index: 3;
+}
 #custom_popup {
    padding: 20px;
    width: 100%;
@@ -471,6 +474,7 @@ button {
    justify-content: space-around;
    align-items: center;
    gap: 20px;
+   z-index: 4;
 }
 #custom_popup #custom_mode {
    font-weight: bold;
@@ -493,4 +497,13 @@ button {
 #custom_popup #quit_custom {
 /*   flex-shrink: 0;*/
    min-width: 120px;
+}
+
+#custom_popup .buttons {
+   display: flex;
+   flex-direction: row-reverse;
+   gap: 20px;
+}
+#custom_popup button {
+   min-width: 100px;
 }
