@@ -916,9 +916,13 @@ function Earth3D(params) {
 
 
     function updateRaycaster(mouse_event) {
+        // console.log(mouse_event)
+        // console.log(mouse_event.touches)
+        var clientX = (mouse_event.changedTouches) ? mouse_event.changedTouches[0].clientX : mouse_event.clientX;
+        var clientY = (mouse_event.changedTouches) ? mouse_event.changedTouches[0].clientY : mouse_event.clientY;
         var rect = mouse_event.target.getBoundingClientRect();
-        var x = mouse_event.clientX - rect.left;
-        var y = mouse_event.clientY - rect.top;
+        var x = clientX - rect.left;
+        var y = clientY - rect.top;
         mouse.x = (x / rect.width) * 2 - 1;
         mouse.y = - (y / rect.height) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
@@ -926,6 +930,7 @@ function Earth3D(params) {
 
 
     function mouseToCoodinates(array) {
+        // console.log("mouseToCoodinates",array)
         for(var i=0; i<array.length; i++) {
             if(array[i].object.uuid == elements.earth.uuid) {
                 return {
@@ -967,6 +972,7 @@ function Earth3D(params) {
 
 
     function addMarker(point) {
+        // console.log("addMarker",point)
         var geo = new zen3d.SphereGeometry(0.04, params.tesselation / 5, params.tesselation / 5);
         var marker = {
             point: point,
@@ -991,7 +997,34 @@ function Earth3D(params) {
     function initMouseClickEvent() {
         initRaycaster();
         var moved_after_down = false;
-        canvas.addEventListener('mouseup', function(e) {
+        canvas.addEventListener('mouseup', mouseUp);
+        canvas.addEventListener('mousedown', mouseDown);        
+        canvas.addEventListener('mousemove', mouseMove); 
+        canvas.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            mouseUp(e)
+        });
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            mouseDown(e)
+        });        
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            mouseMove(e)
+        }); 
+
+        function mouseDown(e) {
+            // console.log("mouseDown")
+            moved_after_down = false;
+        };
+
+        function mouseMove(e) {
+            // console.log("mouseMove")
+            moved_after_down = true;
+        }; 
+
+        function mouseUp(e) {
+            // console.log("mouseup")
             if(moved_after_down) {
                 return;
             }
@@ -1009,14 +1042,7 @@ function Earth3D(params) {
             if(point) {
                 addMarker(point);
             }
-            
-        });
-        canvas.addEventListener('mousedown', function(e) {
-            moved_after_down = false;
-        });        
-        canvas.addEventListener('mousemove', function(e) {
-            moved_after_down = true;
-        });                
+        }              
     }
   
 
