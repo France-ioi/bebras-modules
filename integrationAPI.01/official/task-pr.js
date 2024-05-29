@@ -232,7 +232,7 @@ Platform.prototype.askHint = function(platformToken) {};
 Platform.prototype.updateHeight = function(height) { this.updateDisplay({height: height}); }; // Legacy
 Platform.prototype.updateDisplay = function(data) {
    if(data.height) {
-      this.task.iframe.height(parseInt(height)+40);
+      this.task.iframe.height(parseInt(data.height)+40);
    }
 };
 Platform.prototype.log = function(data) {};
