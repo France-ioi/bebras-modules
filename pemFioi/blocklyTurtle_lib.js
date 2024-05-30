@@ -81,6 +81,7 @@ var makeTurtle = function(coords) {
    this.jump = function(x, y) {
 	   this.x = x;
 	   this.y = y;
+      this.placeTurtle();
    }
    this.start_painting = function() {
       this.paint = true;
