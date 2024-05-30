@@ -67,8 +67,8 @@ def \${1:entrypointName}(self):
         name: 'smartpy_test_starter',
         type: 'token',
         caption: '@sp.add_test',
-        snippet: `@sp.add_test(name = "\${1:name of your test}")
-def \${2:test_name}():
+        snippet: `@sp.add_test()
+def \${1:test_name}():
         `,
     }],
 
@@ -76,7 +76,7 @@ def \${2:test_name}():
         name: 'smartpy_scenario_creation',
         type: 'token',
         caption: 'sp.test_scenario',
-        snippet: `\${1:scenario_name} = sp.test_scenario(main)`,
+        snippet: `\${1:scenario_name} = sp.test_scenario("\${2:name of your test}", main)`,
     }],
 
     'smartpy_contract_instantiation': [{
