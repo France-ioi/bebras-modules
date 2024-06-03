@@ -25,7 +25,7 @@ function isCrossDomain() {
       } catch(e){
           res = false;
       }
-      return res;
+      return res && !getUrlParameterByName('xd');
    }
    return isInIframe() && !isSameDomain();
 }
