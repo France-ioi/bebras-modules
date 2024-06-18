@@ -1,3 +1,5 @@
+var _simulation_timeout_manager = {};
+
 function Simulation(id, delayFactory) {
    this.id = id;
    this.stepIndex = 0;
@@ -43,6 +45,8 @@ function Simulation(id, delayFactory) {
    };
 
    this.play = function() {
+      if(!this.canPlay())
+         return
       this.playing = true;
       this.steps[this.stepIndex].setExpedite(this.expediting);
       this.steps[this.stepIndex].execute(delayFactory);
@@ -117,6 +121,9 @@ function SimulationStep() {
 
    this.addEntry = function(entry) {
       this.entries[entry.name] = entry;
+      if(entry.action.useTimeout){
+         _simulation_timeout_manager[entry.name] = {};
+      }
    };
 
    this.addEntries = function(entries) {
@@ -207,7 +214,7 @@ function SimulationStep() {
          var entry = this.entries[name];
          if (entry.runner && entry.runner.executing) {
             entry.runner.stop();
-            //console.log("Simulation: " + name + " stopped");
+            // console.log("Simulation: " + name + " stopped");
          }
       }
       this.stopping = false;
@@ -244,9 +251,12 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
 
    this.executing = false;
 
+   var _sim = _simulation_timeout_manager[that.name];
+
    this.execute = function(expedite){
       this.executing = true;
       var delay = this.delay;
+      // console.log(delay)
       var duration = this.duration;
       if(expedite) {
          delay = 0;
@@ -254,7 +264,7 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
       }
 
       var onDelayEnd = function() {
-         //console.log("Entry: " + that.name + " delay is finished.");
+         // console.log("Entry: " + that.name + " delay is finished.");
          if (!(that.executing)) {
             return;
          }
@@ -271,7 +281,15 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
                onFinish();
             }
             else {
-               //console.log("Entry: registering timeout for " + that.name);
+               // console.log("timeout",that.name)
+               if(_sim.duration){
+                  duration =  _sim.duration;
+               }else{
+                  _sim.duration = duration;
+                  // console.log(duration)
+               }
+               _sim.startTime = Date.now();
+               // console.log("Entry: registering timeout for " + that.name, that.startTime);
                delayFactory.create(_SIMULATION_TIMEOUT_PREFIX + that.name, onFinish, duration);
             }
          }
@@ -296,6 +314,11 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
          that.actingObject.stop();
       }
       that.actingObject = null;
+      if(that.useTimeout){
+         _sim.stopTime = Date.now();
+         _sim.duration = _sim.duration - (_sim.stopTime - _sim.startTime);
+         // console.log("stop",that.name,_sim.duration)
+      }
       that.callback();
    };
 
