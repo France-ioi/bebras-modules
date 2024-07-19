@@ -270,7 +270,6 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
       // console.log(speedFactor)
       this.executing = true;
       var delay = this.delay*speedFactor;
-      // console.log(delay)
       var duration = this.duration*speedFactor;
       if(expedite) {
          delay = 0;
