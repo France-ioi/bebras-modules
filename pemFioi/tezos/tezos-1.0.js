@@ -2401,7 +2401,7 @@ function Tezos(params) {
             if(!params.simple){
                return findEntrypointCallError()
             }
-            
+            console.log(dat.counter,acc.transactionNum)
             if(counterEnabled && dat.counter != acc.transactionNum + 1){
                return taskStrings.wrongCounter(acc.transactionNum)
             } 
@@ -2939,7 +2939,7 @@ function Tezos(params) {
          });
 
          $("#amount, #nbOfTokens, #nbTokensSold, #minTokensExpected, #minTezExpected,"+
-            " #counter, #randomNumber, #idPlayer, #numberValue, #delay").on("keyup",function() {
+            " #counter, #randomNumber, #idPlayer, #numberValue, #delay").on("keyup",changeInput/*function() {
             displayError("");
             if(isNaN(this.value)){
                $(this).addClass("highlight");
@@ -2948,6 +2948,7 @@ function Tezos(params) {
             }
             let id = $(this).attr("id");
             let val = Number(this.value);
+               console.log(val)
             if(id == "amount" || id == "minTezExpected")
                val = roundTezAmount(val);
             if(id == "randomNumber")
@@ -2961,7 +2962,8 @@ function Tezos(params) {
             }
             // self.newTransaction[id] = Number(val);
             // console.log(self.newTransaction)
-         });
+         }*/);
+         $("#counter").change(changeInput);
          
 
          // $("#sign").on("click",signTransaction);
@@ -2972,6 +2974,29 @@ function Tezos(params) {
 
          $("#cancel, #header .icon").on("click",deleteView());
          $("#cancel, #header .icon").css("cursor","pointer");
+
+         function changeInput() {
+            displayError("");
+            if(isNaN(this.value)){
+               $(this).addClass("highlight");
+            }else{
+               $(this).removeClass("highlight");
+            }
+            let id = $(this).attr("id");
+            let val = Number(this.value);
+               // console.log(val)
+            if(id == "amount" || id == "minTezExpected")
+               val = roundTezAmount(val);
+            if(id == "randomNumber")
+               updateHash(val);
+            if(id == "delay")
+               updateDeadline(val);
+            if(self.newTransaction[id] != val){
+               self.newTransaction[id] = val;
+               delete self.newTransaction.signature
+               $("#transaction_form #signature").text(taskStrings.notSigned);
+            }
+         };
       };
 
       function updateHash(val) {
