@@ -65,75 +65,75 @@ const taskStrings = {
    // none: "Aucune",
 
    customMode: function(alias) {
-      return "Créez manuellement les sous-transactions à effectuer par le contrat "+alias 
+      return "Manially create sub-transactions to be performed by contrat " + alias 
    },
    quitCustomMode: "Arrêter",
    availableCredit: function(amo) {
-      return "Crédit disponible : "+amo+" tez"
+      return "Available balance: "+amo+" tez"
    },
    customEntryPointForbidden: function(alias) {
-      return "Cet entrypoint ne peut pas être appelé par le contrat "+alias
+      return "This entrypoint can't be called by contract " + alias
    },
    customActionForbidden: function(alias) {
-      return "Cette action ne peut pas être efectuée par le contrat "+alias
+      return "This action can't be performed by contract " + alias
    },
    customConfimation: function(sen,cus) {
-      return "Une transaction créée par "+sen+" appelle le point d'entrée default() de votre contrat "+cus+"."
+      return "A transaction created by " + sen + " is calling the default() entrypoint of your contract "+cus+"."
    },
-   accept: "Accepter",
-   refuse: "Refuser",
+   accept: "Accept",
+   refuse: "Reject",
 
    error: "Error",
-   maxAccounts: "Vous ne pouvez pas créer d'autre compte.",
-   noAccount: "Vous ne possédez aucun compte.",
-   noSender: "Vous devez spécifier le compte émetteur",
-   noSource: "Vous devez spécifier le compte source",
-   noRecipient: "Vous devez spécifier le compte destinataire",
-   noOperator: "Vous devez spécifier un compte opérateur",
-   recipientIsSender: "Les comptes émetteur et destinataire sont les mêmes",
-   sourceIsDestination: "Les comptes source et destinataire sont les mêmes",
-   operatorIsSender: "Les comptes émetteur et opérateur sont les mêmes",
-   wrongAmount: "Le montant doit être un nombre positif.",
+   maxAccounts: "You can't create another account.",
+   noAccount: "You don't own any account.",
+   noSender: "You must specify the sender account",
+   noSource: "You must specify the source account",
+   noRecipient: "You must specify the destination account",
+   noOperator: "You must specify an operator account",
+   recipientIsSender: "The sender and destination accounts are the same",
+   sourceIsDestination: "The source and destination accounts are the same",
+   operatorIsSender: "The sender and operator accounts are the same",
+   wrongAmount: "The amount must be a positive number.",
    wrongAdditionalFee: "The additional fee must be a positive number",
-   amountWrongFormat: "Le format du montant de tez est incorrect.",
-   amountUnwanted: "Le transfert de tez est rejeté par cet entrypoint.",
-   amountWrongValue: "Le montant doit être égal à la somme de la mise et du dépôt.",
-   wrongNbOfTokens: "Le nombre de jetons doit être un nombre entier positif.",
-   wrongNumber: "Le nombre aléatoire doit être un nombre entier positif.",
-   wrongDelay: "Le délai doit être un nombre entier positif.",
-   wrongIdPlayer: "Le format de l'identifiant est incorrect.",
-   playerUnknown: "Identifiant inconnu.",
-   wrongHash: "Le hash ne correspond pas",
-   alreadyRevealed: "Ce joueur a déjà révélé son nombre aléatoire",
-   winnerNotRevealed: "Le gagnant n'a pas révélé son nombre aléatoire",
-   playerNotRevealed: "Le joueur n'a pas révélé son nombre aléatoire",
-   pastDeadlineCommit: "L'échéance pour miser est dépassée",
-   pastDeadlineReveal: "L'échéance pour révéler son nombre aléatoire est dépassée",
-   pastDeadlineAuction: "L'échéance pour une faire une enchère est dépassée",
-   beforeDeadlineReveal: "L'échéance pour révéler son nombre aléatoire n'est pas encore dépassée",
-   beforeDeadlineAuction: "L'échéance pour faire une enchère n'est pas encore dépassée",
-   senderIsNotOwner: "Vous n'êtes pas le propriétaire de ce contrat.",
-   amountLowerThanTopBid: "Votre enchère doit être supérieure à l'enchère la plus élevée",
+   amountWrongFormat: "The format of the tez amount is invalid.",
+   amountUnwanted: "The transfer of tez is rejected by this entrypoint.",
+   amountWrongValue: "The amount should be equal to the sum of the bid and deposit.",
+   wrongNbOfTokens: "The number of tokens must be a positive integer.",
+   wrongNumber: "The random number must be a positive integer.",
+   wrongDelay: "The delay must be a positive integer.",
+   wrongIdPlayer: "The format os the identifier is invalid.",
+   playerUnknown: "Unkonwn identifier.",
+   wrongHash: "The hash doesn't match the expected value",
+   alreadyRevealed: "This player already revealed their random value",
+   winnerNotRevealed: "The winner didn't reveal their random value",
+   playerNotRevealed: "The player didn't reveal their random value",
+   pastDeadlineCommit: "The deadline to commit has expired",
+   pastDeadlineReveal: "The deadline to reveal the random value has expired",
+   pastDeadlineAuction: "The deadline to bid has expired",
+   beforeDeadlineReveal: "The deadline to reveal the random value has not been reached yet",
+   beforeDeadlineAuction: "The deadline to bid has not been reached yet",
+   senderIsNotOwner: "You are not the owner of this contract.",
+   amountLowerThanTopBid: "Your bid has to be higher than the current top bid",
    amountTooHigh: function(ba) {
-      return "Le solde du compte émetteur est insuffisant. (Solde actuel = "+Number.parseFloat(ba)+" tez)"
+      return "The balance of the sender is insufficient. (Balance = "+Number.parseFloat(ba)+" tez)"
    },
    nbOfTokensTooHigh: function(ba) {
-      return "Le solde du compte source est insuffisant. (Solde actuel = "+Number.parseFloat(ba)+" tokens)"
+      return "The balance of the source account is insufficient. (Balance = "+Number.parseFloat(ba)+" tokens)"
    },
    errorAllowance: function(src,sen,tok) {
-      return sen+" n'a pas l'autorisation de "+src+" de lui prélever "+tok+" tokens"
+      return sen+" is not allowed by "+src+" to withdraw "+tok+" tokens"
    },
    wrongCounter: function(co) {
-      return "La valeur du compteur est invalide. (compteur actuel = "+co+")"
+      return "The value of the counter is incorrect (current counter = "+co+")"
    },
-   minTokensExpectedNaN: "Le format du minimum de tokens achetés est incorrect.",   
-   minTezExpectedNaN: "Le format du montant minimum de tez souhaités est incorrect.",   
-   minTokensExpectedTooHigh: "Le nombre de tokens achetés pour ce montant est inférieur au nombre minimum de tokens souhaité.",   
-   minTezExpectedTooHigh: "Le montant de tez obtenus pour ce nombre de jetons est inférieur au minimum souhaité.",   
-   nbOfTokensBoughtTooHigh: "Le nombre de tokens achetés pour ce montant est supérieur au stock du liquidity pool.",   
-   nbOfTezBoughtTooHigh: "Le montant de tez obtenus pour ce nombre de jetons est supérieur au solde du liquidity pool.",   
-   signatureMissing: "La transaction n'a pas été signée.",
-   mempoolIsEmpty: "Il n'y a aucune transaction dans le mempool.",
+   minTokensExpectedNaN: "The format of the minimum number of bought tokens is invalid.",   
+   minTezExpectedNaN: "The format of the minumum number of tez requested is invalid.",   
+   minTokensExpectedTooHigh: "The number of tokens obtained for this amount of tez is lower than the minimum number of tokens requested.",
+   minTezExpectedTooHigh: "The number of tez obtained for this number of tokens is lower than the minimum amount of tez requested.",   
+   nbOfTokensBoughtTooHigh: "The number of bought tokens is higher than the available tokens in the liquidity pool.",   
+   nbOfTezBoughtTooHigh: "The amount of tez obtained for this number of tokens is greater than the balance of the liquidity pool.",
+   signatureMissing: "The transaction was not signed.",
+   mempoolIsEmpty: "There is no transaction in the mempool.",
    epError: function(alias,ep,values) {
       let str = alias+"."+ep+"(";
       for(let iF = 0; iF < values.length; iF++){
@@ -147,11 +147,11 @@ const taskStrings = {
       return str
    },
    errorBalance: function(cur,tar) {
-      let str = (cur == tar) ? "égal" : "inférieur";
-      return "Vous n'avez pas fait de gain. Votre solde actuel de "+cur+" tez est "+str+" à votre solde de départ de "+tar+" tez."
+      let str = (cur == tar) ? "equal" : "lower than";
+      return "You didn't earn any tez. Your balance of "+cur+" tez is "+str+" your initial balance of "+tar+" tez."
    },
-   errorOwner: "Vous n'êtes pas le propriétaire du contrat Auction",
-   cantSign: "Vous ne pouvez pas signer cette transaction car le compte émetteur ne vous appartient pas."
+   errorOwner: "You are not the owner of the auction contract",
+   cantSign: "You can't sign this transaction, as the sender account doesn't belong to you."
 };
 
 function displayError(msg) {

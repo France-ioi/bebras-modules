@@ -393,7 +393,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
             if(this.subTask) {
                this.subTask.onChange();
             }
-         } else {
+         } else if(event.element != 'category' && event.element != 'selected') {
             Blockly.svgResize(this.workspace);
          }
 
