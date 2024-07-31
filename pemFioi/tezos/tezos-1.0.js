@@ -3017,7 +3017,7 @@ function Tezos(params) {
       }; 
 
       function simulate() {
-         // console.log(copy)
+         // console.log("simulate")
          $("#amount").val(self.newTransaction.amount);
          if(!isTransactionValid())
             return
@@ -3051,23 +3051,34 @@ function Tezos(params) {
                self.newTransaction.signature = ori.signature;
             }
          }
-         // console.log("simulate")
+         // console.log("end simulate")
          // console.log(params)
          self.copyMode = false;
          viewTransaction(null,1)();
       };
       
       function isTransactionValid() {
-         // console.log(fields)
+         // console.log("isTransactionValid",self.copyMode)
+         // if(self.copyMode){
+         let dat = self.newTransaction;
+         let sen = dat.sender;
+         let acc = self.objectsPerAddress[sen];
+         if(acc.owner != 0){
+            displayError(taskStrings.noAccount);
+            $("#select_sender").addClass("highlight");
+            return false
+         }
+         // }
          if(!params.simple){
             return isEntrypointCallValid()
          }
-         let dat = self.newTransaction;
+         // let dat = self.newTransaction;
          if(dat.sender === ""){
             displayError(taskStrings.noSender);
             $("#select_sender").addClass("highlight");
             return false
          }  
+         console.log(dat.sender)
          if(dat.recipient === ""){
             displayError(taskStrings.noRecipient);
             $("#select_recipient").addClass("highlight");
