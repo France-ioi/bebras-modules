@@ -3059,20 +3059,20 @@ function Tezos(params) {
       
       function isTransactionValid() {
          // console.log("isTransactionValid",self.copyMode)
-         // if(self.copyMode){
-         let dat = self.newTransaction;
-         let sen = dat.sender;
-         let acc = self.objectsPerAddress[sen];
-         if(acc.owner != 0){
-            displayError(taskStrings.noAccount);
-            $("#select_sender").addClass("highlight");
-            return false
+         if(self.copyMode){
+            let dat = self.newTransaction;
+            let sen = dat.sender;
+            let acc = self.objectsPerAddress[sen];
+            if(acc.owner != 0){
+               displayError(taskStrings.noAccount);
+               $("#select_sender").addClass("highlight");
+               return false
+            }
          }
-         // }
          if(!params.simple){
             return isEntrypointCallValid()
          }
-         // let dat = self.newTransaction;
+         let dat = self.newTransaction;
          if(dat.sender === ""){
             displayError(taskStrings.noSender);
             $("#select_sender").addClass("highlight");
