@@ -2046,15 +2046,17 @@ function Tezos(params) {
             let entry = "", type = "td";
             let k = colKeys[col];
             if(row == 0){
-               entry = taskStrings[k];
+               // entry = taskStrings[k];
                type = "th";
             }else if(nbCreatedAccounts >= row){
                entry = accounts[row - 1][k];
-               if(k == "address")
+               if(k == "address"){
                   self.objectsPerAddress[entry] = accounts[row - 1];
-                  entry = addressEllipsis(entry);
-               if(k == "balance")
-                  entry += " tez";
+                  // entry = addressEllipsis(entry);
+               }
+               // if(k == "balance")
+                  // entry += " tez";
+               // console.log(entry)
             }
             line.append($("<"+type+" class='col_"+col+"'>"+entry+"</"+type+">"));
          }
@@ -2401,7 +2403,7 @@ function Tezos(params) {
             if(!params.simple){
                return findEntrypointCallError()
             }
-            console.log(dat.counter,acc.transactionNum)
+            // console.log(dat.counter,acc.transactionNum)
             if(counterEnabled && dat.counter != acc.transactionNum + 1){
                return taskStrings.wrongCounter(acc.transactionNum)
             } 
@@ -2611,13 +2613,20 @@ function Tezos(params) {
                   val = roundTezAmount(val);
                   self.additionalFee = val;
                });
-               $("#simView #cancel").on("click",deleteView(type));
+               $("#simView #cancel").on("click",function() {
+                  // console.log("cancel")
+                  self.copyMode = false;
+                  deleteView(type)();
+               });
                $("#simView #cancel").css("cursor","pointer");
                $("#simView #validate").on("click",validateTransaction);
                $("#simView #cancel").css("cursor","pointer");
             }
             if(type == 2){
-               $("#subView, #subBack").on("click",deleteView(2));
+               $("#subView, #subBack").on("click",function() {
+                  self.copyMode = false;
+                  deleteView(2)();
+               });
                $("#subView, #subBack").css("cursor","pointer");
             }
             if(dat.subTransactions){
@@ -2645,6 +2654,7 @@ function Tezos(params) {
                let tr = Beav.Object.clone(self.newTransaction);
                self.customData.subTransactions.push(tr);
                deleteView()();
+               self.copyMode = false;
                self.customData.currentBalance -= tr.amount;
                self.customData.sc.updateCustomModePopup();
                // console.log(self.customData)
@@ -2672,6 +2682,7 @@ function Tezos(params) {
             self.newTransaction.bakerFee += self.additionalFee;
             self.createTransaction();
             deleteView()();
+            self.copyMode = false;
          };
       }
    };
@@ -2735,6 +2746,7 @@ function Tezos(params) {
 
    this.createNewTransaction = function(params) {
       return function() {
+         // console.log("createNewTransaction")
          deleteView()();
          let ownAcc = false;
          for(let iA = 0; iA < self.nbCreatedAccounts; iA++){
@@ -2926,10 +2938,17 @@ function Tezos(params) {
          $("[id^=select_").on("change",function() {
             displayError("");
             $(".form select").removeClass("highlight");
-            // self.newTransaction.sender = this.value;
             let id = $(this).attr("id");
             let field = id.replace("select_","");
             let val = this.value;
+            if(id == "select_sender" && counterEnabled){
+               var acc = self.objectsPerAddress[val];
+               if(acc){
+                  var num = acc.transactionNum;
+                  $("#counter").val(num + 1);
+                  self.newTransaction["counter"] = num + 1;
+               }
+            }
             if(self.newTransaction[field] != val){
                self.newTransaction[field] = val;
                delete self.newTransaction.signature
@@ -2939,35 +2958,8 @@ function Tezos(params) {
          });
 
          $("#amount, #nbOfTokens, #nbTokensSold, #minTokensExpected, #minTezExpected,"+
-            " #counter, #randomNumber, #idPlayer, #numberValue, #delay").on("keyup",changeInput/*function() {
-            displayError("");
-            if(isNaN(this.value)){
-               $(this).addClass("highlight");
-            }else{
-               $(this).removeClass("highlight");
-            }
-            let id = $(this).attr("id");
-            let val = Number(this.value);
-               console.log(val)
-            if(id == "amount" || id == "minTezExpected")
-               val = roundTezAmount(val);
-            if(id == "randomNumber")
-               updateHash(val);
-            if(id == "delay")
-               updateDeadline(val);
-            if(self.newTransaction[id] != val){
-               self.newTransaction[id] = val;
-               delete self.newTransaction.signature
-               $("#transaction_form #signature").text(taskStrings.notSigned);
-            }
-            // self.newTransaction[id] = Number(val);
-            // console.log(self.newTransaction)
-         }*/);
+            " #counter, #randomNumber, #idPlayer, #numberValue, #delay").on("keyup",changeInput);
          $("#counter").change(changeInput);
-         
-
-         // $("#sign").on("click",signTransaction);
-         // $("#sign").css("cursor","pointer");
 
          $("#simulate").on("click",simulate);
          $("#simulate").css("cursor","pointer");
@@ -3017,7 +3009,7 @@ function Tezos(params) {
       }; 
 
       function simulate() {
-         // console.log("simulate")
+         // console.log("simulate",self.newTransaction)
          $("#amount").val(self.newTransaction.amount);
          if(!isTransactionValid())
             return
@@ -3063,11 +3055,18 @@ function Tezos(params) {
             let dat = self.newTransaction;
             let sen = dat.sender;
             let acc = self.objectsPerAddress[sen];
-            if(acc.owner != 0){
-               displayError(taskStrings.noAccount);
-               $("#select_sender").addClass("highlight");
+            // console.log(acc)
+            if(counterEnabled && dat.counter != acc.transactionNum + 1){
+               displayError(taskStrings.wrongCounter(acc.transactionNum));
+               $("#counter").addClass("highlight");
                return false
             }
+            // console.log(acc,dat)
+            // if(acc.owner != 0){
+            //    displayError(taskStrings.noAccount);
+            //    $("#select_sender").addClass("highlight");
+            //    return false
+            // }
          }
          if(!params.simple){
             return isEntrypointCallValid()
@@ -3078,7 +3077,7 @@ function Tezos(params) {
             $("#select_sender").addClass("highlight");
             return false
          }  
-         console.log(dat.sender)
+         // console.log(dat.sender)
          if(dat.recipient === ""){
             displayError(taskStrings.noRecipient);
             $("#select_recipient").addClass("highlight");
@@ -3472,6 +3471,7 @@ function Tezos(params) {
             if(k == "balance")
                entry += " tez";
             $("#accounts_table .row_"+row+" .col_"+col).html(entry);
+            // console.log(entry)
          }
       }
    };
