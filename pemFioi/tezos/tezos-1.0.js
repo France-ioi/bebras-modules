@@ -1,5 +1,5 @@
 const taskStrings = {
-   success: "Bravo, vous avez réussi !",
+   success: "Congratulations, you succeeded!",
    transactions: "Transactions",
    sender: "Sender",
    recipient: "Recipient",
@@ -65,9 +65,9 @@ const taskStrings = {
    // none: "Aucune",
 
    customMode: function(alias) {
-      return "Manially create sub-transactions to be performed by contrat " + alias 
+      return "Manually create sub-transactions to be performed by contrat " + alias 
    },
-   quitCustomMode: "Arrêter",
+   quitCustomMode: "Stop",
    availableCredit: function(amo) {
       return "Available balance: "+amo+" tez"
    },
