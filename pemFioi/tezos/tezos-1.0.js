@@ -1892,7 +1892,7 @@ class Custom extends SmartContract {
 
 function Tezos(params) {
    let { accounts, transactions, mempool, mempoolMode, nbCreatedAccounts, 
-      counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, delayBetweenBlocks,
+      counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, signatureEnabled,delayBetweenBlocks,
       transactionTableLength, smartContracts, pageW, pageH, saveAnswer, timeDependencies } = params;
    let self = this;
 
@@ -2471,7 +2471,8 @@ function Tezos(params) {
                   transactionKeys.push("counter");
                   if(type == 1)
                      transactionKeys.push("additionalFee");
-                  transactionKeys.push("signature");
+                  if(signatureEnabled)
+                     transactionKeys.push("signature");
                }
 
             }else{
@@ -2573,7 +2574,7 @@ function Tezos(params) {
 
             if(type == 1){
                if(!err){
-                  let id = (dat.signature || self.customMode) ? "validate" : "sign";
+                  let id = (dat.signature || self.customMode || !signatureEnabled) ? "validate" : "sign";
                   html += "<div id=buttons ><button id=validate>"+taskStrings[id]+"</button><button id=cancel class=button-style-2 >"+taskStrings.edit+"</button></div>";
                }else{
                   html += "<button id=cancel class=button-style-2 >"+taskStrings.cancel+"</button>";
@@ -2639,7 +2640,7 @@ function Tezos(params) {
          }
 
          function validateTransaction() {
-            if(!self.newTransaction.signature && !self.newTransaction.sub){
+            if(signatureEnabled && !self.newTransaction.signature && !self.newTransaction.sub){
                let err = self.signTransaction();
                if(err){
                   displayError(err);
@@ -2693,7 +2694,7 @@ function Tezos(params) {
       let sen = tr.sender;
       let acc = self.objectsPerAddress[sen];
       // console.log("sign",acc)
-      if(!noOwner && acc.owner != 0){
+      if(signatureEnabled && !noOwner && acc.owner != 0){
          return taskStrings.cantSign
       }
       tr.signature = this.generateSignature(tr);
@@ -2782,7 +2783,7 @@ function Tezos(params) {
             fields.push("epEnd");
          }
          fields.push("counter");
-         if(!self.customMode)
+         if(!self.customMode && signatureEnabled)
             fields.push("signature");
          self.newTransaction.params = Beav.Object.clone(params);
          // console.log(params)
