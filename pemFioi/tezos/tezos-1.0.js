@@ -1067,7 +1067,8 @@ class Raffle extends SmartContract {
          deadline_commit: { type: "timestamp" },
          deadline_reveal: { type: "timestamp" }
       };
-      let now = Date.now();
+      // console.log(params)
+      let now = params.tezos.getCurrentTime();
       let dc = params.delayCommit || 1000;
       let dr = params.delayReveal || 2000;
       params.storage.deadline_commit.val = now + dc*1000;
@@ -1891,7 +1892,7 @@ class Custom extends SmartContract {
 
 
 function Tezos(params) {
-   let { accounts, transactions, mempool, mempoolMode, nbCreatedAccounts, 
+   let { accounts, transactions, blocks, mempool, mempoolMode, nbCreatedAccounts, 
       counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, signatureEnabled,delayBetweenBlocks,
       transactionTableLength, smartContracts, pageW, pageH, saveAnswer, timeDependencies } = params;
    let self = this;
@@ -1917,6 +1918,8 @@ function Tezos(params) {
    const blockSize = 30; // gas unit
    const allowEmptyBlocks = true;
    const transactionTableColKeys = ["sender", "amount","recipient","parameters"];
+   const startDate = params.startDate || Date.now();
+   // console.log(startDate)
 
    this.crossSrc = $("#cross").attr("src");
    
@@ -1951,11 +1954,8 @@ function Tezos(params) {
       initHandlers();
       initTimeDependencies();
 
-      if(transactions.length > 0){
-         for(let tr of transactions){
-            self.createTransaction(tr);
-         }
-      }
+      initBlocks();
+
 
       updateMemPool();
       updateAccountsTable();
@@ -2163,14 +2163,24 @@ function Tezos(params) {
          self.smartContracts.push(raf);
          self.objectsPerAddress[raf.address] = raf;
          for(let iP = 0; iP < rafData.playerNumbers.length; iP++){
+            var trans = transactions;
             let num = rafData.playerNumbers[iP];
             let add = accounts[iP].address;
-            // raf.createBidTransaction(add,num);
-            raf.createTransaction({
-               id: "bid",
-               sender: add,
-               randomNumber: num
-            })
+            let already = false;
+            for(var t of trans){
+               // console.log(t.sender,t.params,add,num)
+               if(t.params.id == "bid" && t.sender == add){
+                  already = true;
+                  break;
+               }
+            }
+            if(!already){
+               raf.createTransaction({
+                  id: "bid",
+                  sender: add,
+                  randomNumber: num
+               })
+            }
             timeDependencies.push({
                time: raf.storage.deadline_commit.val - 2*delayBetweenBlocks*1000,
                // action: raf.createRevealTransaction(add,iP,num),
@@ -2184,6 +2194,7 @@ function Tezos(params) {
                done: false
             });
          }
+         // console.log(timeDependencies)
       };
 
       function initAuction(aucData) {
@@ -2226,9 +2237,32 @@ function Tezos(params) {
    };
 
    function initTimeDependencies() {
+      // var now = Date.now();
+      // var date = new Date(now);
+      // var str = date.toString();
+      // var test = Date.parse("Aug 01 2024 11:40:34");
+      // console.log(now,str,test)
       for(let dep of timeDependencies){
          if(!dep.time && dep.delay){
-            dep.time = Date.now() + dep.delay*1000;
+            dep.time = startDate + dep.delay*1000;
+         }
+      }
+   };
+
+   function initBlocks() {
+      if(blocks.length > 0){
+         for(let iB = 0; iB < blocks.length; iB++){
+            if(iB > 0){
+               self.timeShift += delayBetweenBlocks;
+            }
+            let b = blocks[iB];
+            createNextBlock();
+            let t = b.transactions;
+            for(let tID of t){
+               if(transactions.length > 0 && transactions[tID]){
+                  self.createTransaction(transactions[tID]);
+               }
+            }
          }
       }
    };
@@ -2278,6 +2312,7 @@ function Tezos(params) {
             self.createNewTransaction({simple: true})();
             break;
          case "nextBlock":
+            self.timeShift += delayBetweenBlocks;
             createNextBlock();
             break;
          case "nextXBlocks":
@@ -2909,6 +2944,7 @@ function Tezos(params) {
                   self.newTransaction.delay = del;
                   html += "<input type=text id=delay class=input value="+del+" /></p>";
                   let deadline = Date.now() + del;
+                  // let deadline = start + del;
                   let date = new Date(deadline);
                   str = date.toLocaleString();
                   html += "<p class=field>"+name+"<span id=deadline >"+str+"</span>";
@@ -3175,6 +3211,7 @@ function Tezos(params) {
          block.transactions.push(id);
          updateTransactionTable();
          updateAccountsTable();
+         saveAnswer(self);
       }
       // self.signatureIndex++;
       return false
@@ -3207,6 +3244,7 @@ function Tezos(params) {
          return
       self.objectsPerAddress[sID].transactionNum++;
       self.bakerBalance += (fee + gas*gasCostPerUnit);
+      // console.log("applyTransaction")
       saveAnswer(self);
    };
 
@@ -3290,7 +3328,9 @@ function Tezos(params) {
       self.blocks.push(block);
       updateTransactionTable();
       updateAccountsTable();
-      // console.log(newBlock,self.mempool)
+      // console.log("createNextBlock")
+      // console.log(self.blocks,self.transactions)
+      saveAnswer(self);
 
       function sortFct(i1,i2) {
          let t1 = self.transactions[i1];
@@ -3611,7 +3651,7 @@ function Tezos(params) {
    };
 
    this.getCurrentTime = function() {
-      return Date.now() + this.timeShift*1000
+      return startDate + this.timeShift*1000
    } 
 
    init();
