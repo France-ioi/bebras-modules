@@ -1519,7 +1519,7 @@ class Auction extends SmartContract {
             recipient: this.address,
             amount: dat.amount,
             delay: dat.delay,
-            deadline: Date.now() + dat.delay*1000,
+            deadline: this.tezos.getCurrentTime() + dat.delay*1000,
             params
          };
       }
@@ -1546,7 +1546,7 @@ class Auction extends SmartContract {
       let id = tr.params.id;
       let blob;
       if(id == "openAuction"){
-         let deadline = Date.now() + tr.delay*1000;
+         let deadline = this.tezos.getCurrentTime() + tr.delay*1000;
          let date = new Date(deadline);
          let deadlineStr = date.toLocaleString();
          blob = new Blob([deadlineStr+"0"+tr.sender]);
@@ -1890,7 +1890,6 @@ class Custom extends SmartContract {
    }
 }
 
-
 function Tezos(params) {
    let { accounts, transactions, blocks, mempool, mempoolMode, nbCreatedAccounts, 
       counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, signatureEnabled,delayBetweenBlocks,
@@ -1939,6 +1938,7 @@ function Tezos(params) {
    this.customMode = false;   // custom contract
    this.customData;
    this.copyMode = false;
+   this.replayMode = false;
 
    let nbSmartContracts;
    let smartContractTypes = [];
@@ -2102,6 +2102,16 @@ function Tezos(params) {
                if(!sc.createTransaction)
                   continue
                for(let action of scData.init){
+                  let already = false;
+                  for(var t of transactions){
+                     if(t.sender == action.sender && t.params.id == action.id){
+                        already = true;
+                        break;
+                     }
+                  }
+                  if(already){
+                     continue;
+                  }
                   sc.createTransaction(action);
                }
             } 
@@ -2250,11 +2260,13 @@ function Tezos(params) {
    };
 
    function initBlocks() {
+      self.replayMode = true;
       if(blocks.length > 0){
          for(let iB = 0; iB < blocks.length; iB++){
             if(iB > 0){
                self.timeShift += delayBetweenBlocks;
             }
+            self.checkTimeDependencies();
             let b = blocks[iB];
             createNextBlock();
             let t = b.transactions;
@@ -2265,6 +2277,7 @@ function Tezos(params) {
             }
          }
       }
+      self.replayMode = false;
    };
 
    function initHandlers() {
@@ -3249,7 +3262,7 @@ function Tezos(params) {
    };
 
    function requiresConfirmation(tr) {
-      if(smartContractTypes.includes("custom")){
+      if(smartContractTypes.includes("custom") && !self.replayMode){
          let rec = tr.recipient;
          let obj = self.objectsPerAddress[rec];
          if(obj.applicationCallCustom){
@@ -3483,6 +3496,9 @@ function Tezos(params) {
             //    }
             // }
             dep.done = true;
+            if(self.replayMode){
+               continue;
+            }
             let conf = sc.createTransaction(dep.action);
             if(conf)
                return true
