@@ -68,6 +68,7 @@ const taskStrings = {
       return "Manually create sub-transactions to be performed by contrat " + alias 
    },
    quitCustomMode: "Stop",
+   fail: "Fail",
    availableCredit: function(amo) {
       return "Available balance: "+amo+" tez"
    },
@@ -1719,21 +1720,46 @@ class Custom extends SmartContract {
       this.showCustomModePopup();    
    }
 
-   showCustomModePopup() {
+   showCustomModePopup(tr) {
+      let msg, back, bal;
+      if(tr){
+         back = $("<div id=custom_popup_back></div>");
+         let sen = tr.sender;
+         let acc = this.tezos.objectsPerAddress[sen];
+         msg = taskStrings.customConfimation(acc.alias,this.alias);
+         bal = this.balance;
+      }else{
+         msg = taskStrings.customMode(this.alias);
+         bal = this.tezos.customData.currentBalance;
+      }
       let popup = $("<div id=custom_popup></div>");
-      let html = "<span id=custom_mode >"+taskStrings.customMode(this.alias)+"</span>";
+      let html = "<span id=custom_mode >"+msg+"</span>";
+      
       html += "<div id=cont >";
-      html += "<span id=ava_cred >"+taskStrings.availableCredit(this.tezos.customData.currentBalance)+"</span>";
+      html += "<span id=ava_cred >"+taskStrings.availableCredit(bal)+"</span>";
       html += "<span id=subs >"+taskStrings.subTransactions+ " : -</span>";
       // html += "<table id=subs ><tr><th>"+taskStrings.subTransactions+ "</th></tr><tr><td></td></tr></table>";
       html += "<button id=quit_custom >"+taskStrings.quitCustomMode+"</button>";
+      if(tr){
+         // html += "<div class=buttons><button id=custom_accept>"+taskStrings.accept+"</button>";
+         html += "<button id=custom_refuse class=button-style-2>"+taskStrings.fail+"</button></div>";
+      }
       html += "</div>";
       html += "</div>";
       popup.html(html);
-      $("#mainPage").append(popup);
+      if(tr){
+         $("#mainPage").append(back,popup);
+      }else{
+         $("#mainPage").append(popup);
+      }
 
       let self = this;
-      $("#quit_custom").click(quitCustom);
+      if(tr){
+         $("#quit_custom").click(acceptTrans);
+         $("#custom_refuse").click(refuseTrans);
+      }else{
+         $("#quit_custom").click(quitCustom);
+      }
 
       function quitCustom() {
          // console.log("quitCustom")
@@ -1745,6 +1771,21 @@ class Custom extends SmartContract {
          self.tezos.copyMode = true;
          // console.log(tr)
          self.tezos.createNewTransaction(null)();
+      }
+
+      function acceptTrans() {
+         // console.log("acceptTrans")
+         // let sc_address = tr.params.sc_address;
+         // let sc = self.tezos.objectsPerAddress[sc_address];
+         self.tezos.createTransaction(tr,true);
+         $("#custom_popup, #custom_popup_back").remove();
+         self.tezos.resumeCreateNextXBlocks();
+      }
+
+      function refuseTrans() {
+         // console.log("refuseTrans")
+         $("#custom_popup, #custom_popup_back").remove();
+         self.tezos.resumeCreateNextXBlocks();
       }
    }
 
@@ -1781,35 +1822,36 @@ class Custom extends SmartContract {
    }
 
    askConfirmation(tr) {
-      let back = $("<div id=custom_popup_back></div>");
-      let popup = $("<div id=custom_popup></div>");
-      let sen = tr.sender;
-      let acc = this.tezos.objectsPerAddress[sen];
-      let msg = taskStrings.customConfimation(acc.alias,this.alias);
-      let html = "<span>"+msg+"</span>";
-      html += "<div class=buttons><button id=custom_accept>"+taskStrings.accept+"</button>";
-      html += "<button id=custom_refuse class=button-style-2>"+taskStrings.refuse+"</button></div>";
-      popup.append(html);
-      $("#mainPage").append(back,popup);
+      this.showCustomModePopup(tr)
+      // let back = $("<div id=custom_popup_back></div>");
+      // let popup = $("<div id=custom_popup></div>");
+      // let sen = tr.sender;
+      // let acc = this.tezos.objectsPerAddress[sen];
+      // let msg = taskStrings.customConfimation(acc.alias,this.alias);
+      // let html = "<span>"+msg+"</span>";
+      // html += "<div class=buttons><button id=custom_accept>"+taskStrings.accept+"</button>";
+      // html += "<button id=custom_refuse class=button-style-2>"+taskStrings.refuse+"</button></div>";
+      // popup.append(html);
+      // $("#mainPage").append(back,popup);
 
-      let self = this;
-      $("#custom_accept").click(acceptTrans);
-      $("#custom_refuse").click(refuseTrans);
+      // let self = this;
+      // $("#custom_accept").click(acceptTrans);
+      // $("#custom_refuse").click(refuseTrans);
 
-      function acceptTrans() {
-         // console.log("acceptTrans")
-         // let sc_address = tr.params.sc_address;
-         // let sc = self.tezos.objectsPerAddress[sc_address];
-         self.tezos.createTransaction(tr,true);
-         $("#custom_popup, #custom_popup_back").remove();
-         self.tezos.resumeCreateNextXBlocks();
-      }
+      // function acceptTrans() {
+      //    // console.log("acceptTrans")
+      //    // let sc_address = tr.params.sc_address;
+      //    // let sc = self.tezos.objectsPerAddress[sc_address];
+      //    self.tezos.createTransaction(tr,true);
+      //    $("#custom_popup, #custom_popup_back").remove();
+      //    self.tezos.resumeCreateNextXBlocks();
+      // }
 
-      function refuseTrans() {
-         // console.log("refuseTrans")
-         $("#custom_popup, #custom_popup_back").remove();
-         self.tezos.resumeCreateNextXBlocks();
-      }
+      // function refuseTrans() {
+      //    // console.log("refuseTrans")
+      //    $("#custom_popup, #custom_popup_back").remove();
+      //    self.tezos.resumeCreateNextXBlocks();
+      // }
    }
 
    applyTransaction(trans) {
