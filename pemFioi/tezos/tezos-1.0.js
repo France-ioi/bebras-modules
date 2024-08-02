@@ -1676,7 +1676,7 @@ class Custom extends SmartContract {
       };
               
       params.storage = {
-
+         owner: { val: params.owner, type: "address" },
       };
 
       super(params);
@@ -1886,13 +1886,22 @@ class Custom extends SmartContract {
    }
 
    findTransactionError(trans) {
+      let dat = trans || this.tezos.newTransaction;
+      let id = dat.params.id;
+      if(id == "use"){
+         let sen = dat.sender;
+         // console.log(sen,this.storage.owner.val)
+         if(sen != this.storage.owner.val){
+            return taskStrings.senderIsNotOwner
+         }         
+      }
       return false
    }
 }
 
 function Tezos(params) {
    let { accounts, transactions, blocks, mempool, mempoolMode, nbCreatedAccounts, 
-      counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, signatureEnabled,delayBetweenBlocks,
+      counterEnabled, ledgerEnabled, createAccountEnabled, nextXBlocksEnabled, delayBetweenBlocks,
       transactionTableLength, smartContracts, pageW, pageH, saveAnswer, timeDependencies } = params;
    let self = this;
 
@@ -1918,6 +1927,7 @@ function Tezos(params) {
    const allowEmptyBlocks = true;
    const transactionTableColKeys = ["sender", "amount","recipient","parameters"];
    const startDate = params.startDate || Date.now();
+   const signatureEnabled = (params.signatureEnabled !== undefined) ? params.signatureEnabled : true;
    // console.log(startDate)
 
    this.crossSrc = $("#cross").attr("src");
@@ -2261,7 +2271,7 @@ function Tezos(params) {
 
    function initBlocks() {
       self.replayMode = true;
-      if(blocks.length > 0){
+      if(blocks && blocks.length > 0){
          for(let iB = 0; iB < blocks.length; iB++){
             if(iB > 0){
                self.timeShift += delayBetweenBlocks;
