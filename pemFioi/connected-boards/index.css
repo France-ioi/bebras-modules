@@ -1,0 +1,644 @@
+html {
+  --colors-blue: #4a90e2;
+}
+
+/*** MENU ***/
+#introControls {
+  height: 40px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+#piui {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: white;
+  padding: 5px 10px;
+}
+
+#piui.hide {
+  height: 44px;
+  overflow: hidden;
+}
+
+#piui.show {
+  height: auto;
+  overflow: hidden;
+  border-bottom: solid 5px lightgray;
+}
+
+.btn#pichangehat {
+  background-color: #f5a623;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#pichangehatui {
+  margin: 0;
+}
+
+#dropdown_menu {
+  width: 200px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 10px;
+  cursor: pointer;
+  color: gray;
+}
+
+.menu_line {
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.menu_line .fas {
+  color: #4a90e2;
+}
+
+.menu_line .label {
+  margin-left: 10px;
+}
+
+#dropdown_menu .clickable:hover {
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+/*** CONFIG ***/
+.simple-dialog.config {
+  padding: 0;
+  margin: 0;
+}
+
+.simple-dialog.config #popupMessage {
+  background: none;
+}
+
+.simple-dialog.config #popupMessage .iconTag {
+  margin: 0;
+  margin-right: 20px;
+}
+
+#quickpiViewer {
+  left: 0px;
+  top: 0px;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+#quickpiViewer .content {
+  width: auto;
+  /*    height: 640px;*/
+  height: 80vh;
+  background-color: #fff;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.config #quickpiViewer .panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#quickpiViewer .section-external-exit {
+  display: inline-flex;
+}
+
+#quickpiViewer .exit {
+  cursor: pointer;
+  /*    margin: 0 16px;*/
+  padding: 20px;
+}
+
+#quickpiViewer .exit .icon {
+  font-size: 18px;
+  color: #4a90e2;
+}
+
+.config #quickpiViewer .panel-body {
+  display: flex;
+  justify-content: stretch;
+  height: 100%;
+  min-height: 0;
+  margin-left: 0;
+  transform: translate(0px);
+  position: relative;
+}
+
+/*@media screen and (min-width: 481px){*/
+#quickpiViewer .navigationContent {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/*}*/
+#quickpiViewer .navigation {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+#quickpiViewer #boardlist {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 20px;
+}
+
+@media (max-width: 720px) {
+  #quickpiViewer #piconsel {
+    flex-direction: column;
+    background: transparent;
+    box-shadow: none;
+    gap: 5px;
+    margin-top: 1em;
+  }
+  #quickpiViewer #piconsel button {
+    background-color: #e5e5e5;
+    border-radius: 50px;
+  }
+  #quickpiViewer #piconsel button.active {
+    background-color: var(--colors-blue);
+  }
+  #quickpiViewer .inlineButtons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  #quickpiViewer .inlineButtons button {
+    margin: 0 !important;
+    width: 300px;
+  }
+}
+@media (max-width: 600px) {
+  #quickpiViewer #boardlist {
+    flex-direction: column;
+  }
+}
+@media (max-width: 684px) {
+  #quickpiViewer #pi-displayconf {
+    flex-direction: column;
+    background: transparent;
+    box-shadow: none;
+  }
+  #quickpiViewer #pi-displayconf button {
+    background-color: #e5e5e5;
+    border-radius: 50px;
+  }
+  #quickpiViewer #pi-displayconf button.active {
+    background-color: var(--colors-blue);
+  }
+}
+@media (max-width: 460px) {
+  #quickpiViewer .sectionTitle {
+    font-size: 0.9rem !important;
+    display: flex;
+    align-items: center;
+  }
+  #quickpiViewer #pi-displayconf button,
+  #quickpiViewer #piconsel button {
+    padding: 6px;
+    font-size: 0.6rem !important;
+  }
+  #quickpiViewer .inlineButtons #piconnectok,
+  #quickpiViewer .inlineButtons #pirelease {
+    width: auto;
+    font-size: 0.6rem !important;
+  }
+}
+#quickpiViewer .navigationLanguage {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+#quickpiViewer .navigationLanguage {
+  position: relative;
+}
+
+#quickpiViewer .showNavigationLanguage {
+  display: block;
+  background-color: #4a90e2;
+  color: #fff;
+  line-height: 20px;
+  padding: 5px 20px;
+  border-radius: 50px;
+  position: relative;
+  margin-left: 50px;
+}
+
+#quickpiViewer .showNavigationLanguage::before {
+  content: "\f121";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 20px;
+  margin: 0 15px;
+  color: #4a90e2;
+  position: absolute;
+  left: -55px;
+}
+
+@media screen and (orientation: landscape) and (max-width: 768px) {
+  #quickpiViewer .showNavigationLanguage {
+    margin-left: 0;
+  }
+  #quickpiViewer .showNavigationLanguage::before {
+    content: normal;
+  }
+}
+#quickpiViewer .showNavigationLanguage::after {
+  content: "\f107";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 10px;
+}
+
+#quickpiViewer .navigationLanguage ul {
+  position: absolute;
+  width: calc(100% - 4px);
+  list-style-type: none;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  left: 2px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity linear 150ms 25ms;
+  z-index: 1;
+}
+
+#quickpiViewer #showNavigationLanguage:checked + ul {
+  visibility: visible;
+  opacity: 1;
+}
+
+#quickpiViewer .navigationLanguage ul li {
+  line-height: 2em;
+  padding: 0 20px;
+  display: block;
+  cursor: pointer;
+}
+
+#quickpiViewer .navigationLanguage ul li.selected {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+#quickpiViewer .navigationContent ul {
+  list-style-type: none;
+  margin: 1em 0 0;
+  padding: 0;
+}
+
+#quickpiViewer .navigationContent ul li {
+  line-height: 3em;
+  padding: 0 20px;
+  cursor: pointer;
+}
+
+#quickpiViewer .navigationContent ul li.selected {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+#quickpiViewer #showNavigationLanguage,
+#quickpiViewer .showNavigationContent,
+#quickpiViewer #showNavigationContent {
+  display: none;
+}
+
+/*@media screen and (max-width: 480px) and (orientation: portrait) {
+    #quickpiViewer .panel-body {
+        flex-direction: column;
+    }
+    #quickpiViewer .navigation {
+        border: none;
+    }
+    #quickpiViewer .navigationContent {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+    #quickpiViewer .navigationContent {
+        position: relative;
+    }
+    #quickpiViewer .showNavigationContent {
+        display: block;
+        background-color: #4a90e2;
+        color: #fff;
+        line-height: 20px;
+        padding: 5px 20px;
+        border-radius: 50px;
+        position: relative;
+        margin-left: 50px;
+    }
+    #quickpiViewer .showNavigationContent::before {
+        content: "\f03a";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 20px;
+        margin: 0 15px;
+        color: #4a90e2;
+        position: absolute;
+        left: -55px;
+    }
+    #quickpiViewer .showNavigationContent::after {
+        content: "\f107";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+    }
+    #quickpiViewer .navigationContent ul {
+        position: absolute;
+        width: calc(100% - 4px);
+        list-style-type: none;
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        left: 2px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity linear 150ms 25ms;
+    }
+    #quickpiViewer #showNavigationContent:checked + ul {
+        visibility: visible;
+        opacity: 1;
+    }
+    #quickpiViewer .navigationContent ul li {
+        line-height: 2em;
+    }
+}*/
+#quickpiViewer .viewer {
+  flex-grow: 1;
+  overflow-y: auto;
+  /*    position: relative;*/
+}
+
+#quickpiViewer .viewerContent { /* iframe */
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#quickpiViewer.quickpiViewer-fullscreen .content {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#quickpiViewer.quickpiViewer-fullscreen .section-external-exit {
+  display: none;
+}
+
+#quickpiViewer .viewerInlineContent {
+  /*    margin: 15px;*/
+  padding: 15px;
+}
+
+/*
+.connectPi {
+    width: 80vh;
+    height: 80vh;
+}*/
+#popupMessage .qpi .hiddenContent {
+  display: none !important;
+}
+
+/*** config portsname ***/
+.config #qpi-uiblock-portsnames {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.config #example_sensor {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  color: gray;
+  align-items: center;
+  gap: 20px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/*** config components ***/
+#qpi-uiblock-components {
+  /*    position: relative;*/
+  margin-bottom: 30px;
+}
+
+#qpi-uiblock-components #tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  position: relative;
+}
+
+#qpi-uiblock-components #tabs_back {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-bottom: 2px solid var(--colors-blue);
+}
+
+#qpi-uiblock-components .tab {
+  width: 150px;
+  background-color: lightgray;
+  border-radius: 5px 5px 0 0;
+  border: 1px solid gray;
+  border-bottom: 2px solid var(--colors-blue);
+  color: gray;
+  font-weight: normal;
+  font-size: 16px;
+  padding: 5px 10px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+#qpi-uiblock-components .tab.selected {
+  border: 2px solid var(--colors-blue);
+  border-bottom: 2px solid white;
+  font-weight: bold;
+  color: var(--colors-blue);
+  background-color: white;
+}
+
+#remove_cont, #add_cont {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sensorGrid, #addSensorGrid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /*    justify-content: space-around;*/
+  /*    align-items: center;*/
+}
+
+.sensorElement {
+  text-align: center;
+  /*    display: inline-block;*/
+  width: 150px;
+  height: 150px;
+  position: relative;
+  border: none;
+  /*    display: flex;
+      flex-direction: column;
+      justify-content: space-around;*/
+}
+
+.sensorElement:hover {
+  background-color: lightgray;
+}
+
+#sensorGrid .sensorElement.selected {
+  background-color: #ffd9de;
+  border: 2px solid #bc1f30;
+  color: #bc1f30;
+}
+
+#addSensorGrid .sensorElement.selected {
+  background-color: #a5e6ae;
+  border: 2px solid #1cb52f;
+  color: #1cb52f;
+}
+
+.sensorElement .name {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10%;
+}
+
+.sensorElement .sensor_element_container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.sensorImage {
+  max-width: 90px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-60%, -30%);
+}
+
+.sensorInfo {
+  max-width: 100px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 90%;
+  transform: translate(-50%, -30%);
+}
+
+#qpi-uiblock-components .buttonContainer {
+  position: absolute;
+  padding: 10px;
+  bottom: 0px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#qpi-uiblock-components .buttonContainer button {
+  margin: 0 !important;
+}
+
+.config #buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+/*** add sensor port dialog ***/
+#port_dialog_back {
+  background-color: black;
+  opacity: 30%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 500;
+}
+
+#port_dialog {
+  background-color: white;
+  padding: 20px;
+  color: grey;
+  border-radius: 5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 501;
+}
+
+#port_dialog #port_field {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#port_dialog #port_field select {
+  min-width: 100px;
+}
+
+#port_dialog #buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 20px;
+}
+
+#port_dialog button {
+  background-color: var(--colors-blue);
+  color: white;
+  font-weight: bold;
+  width: 120px;
+  height: 30px;
+  border: none;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#port_dialog button:disabled {
+  opacity: 20%;
+}
