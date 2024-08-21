@@ -17,6 +17,7 @@ var boardProgramming = (function (exports) {
       }
       constructor(){
           this.strings = {};
+          this.defaultSubBoard = 'quickpi';
       }
   }
 
@@ -2797,14 +2798,12 @@ elif program_exists:
           classImplementations: {
               Button: {
                   is_pressed: function(self, callback) {
-                      const buttonName = `btn${self.__variableName.split('_')[1].toLocaleUpperCase()}`;
-                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(buttonName, callback);
+                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(self.__variableName, callback);
                   }
               },
               ButtonTouch: {
                   is_touched: function(self, callback) {
-                      const buttonName = `btn${self.__variableName.split('_')[1].toLocaleUpperCase()}`;
-                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(buttonName, callback);
+                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(self.__variableName, callback);
                   }
               }
           },
@@ -3099,6 +3098,8 @@ elif program_exists:
       };
   }
 
+  var img = "data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3c!-- Generator: Adobe Illustrator 21.1.0%2c SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3e%3csvg version='1.1' id='galaxia' inkscape:version='1.3.2 (091e20e%2c 2023-11-25%2c custom)' sodipodi:docname='galaxia.svg' xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape' xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 162.1 255.3' style='enable-background:new 0 0 162.1 255.3%3b' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:none%3bstroke:%238A8989%3b%7d .st1%7bfill:%23B8E986%3b%7d .st2%7bfill:url(%23SVGID_1_)%3b%7d .st3%7bfill:url(%23Path-10_1_)%3b%7d .st4%7bfill:%232E5E95%3b%7d .st5%7bfill:url(%23rect3_2_)%3b%7d .st6%7bfill:url(%23rect2_1_)%3b%7d .st7%7bfill:url(%23rect2-2_1_)%3b%7d .st8%7bfill:%234A4A4A%3b%7d .st9%7bfill:%23333333%3b%7d .st10%7bfill:%230B356F%3b%7d .st11%7bfill:%23101010%3bstroke:white%3bstroke-width:1.603%3b%7d .st12%7bfill:%23111111%3b%7d .st13%7bfill:url(%23screen-reflect_1_)%3b%7d .st14%7bfill:%23101010%3b%7d .st15%7bfill:url(%23rect1-3-6_2_)%3b%7d .st16%7bfill:%236AA2F0%3b%7d .st17%7bfill:url(%23front_1_)%3b%7d .st18%7bfill:url(%23button-sys-top_1_)%3b%7d .st19%7bfill:url(%23rect1-3-6-8_2_)%3b%7d .st20%7bfill:%230B356F%3bfill-opacity:0%3bstroke:white%3bstroke-width:0.5%3bstroke-linejoin:round%3b%7d .st21%7bfill:url(%23path11_1_)%3b%7d .st22%7bfill:url(%23path11-9_1_)%3b%7d .st23%7bfill:url(%23path11-7_1_)%3b%7d .st24%7bfill:url(%23path11-5_1_)%3b%7d .st25%7bfill:url(%23path11-78_1_)%3b%7d .st26%7bfill:url(%23rect12_1_)%3b%7d .st27%7bfill:url(%23rect12-9_1_)%3b%7d .st28%7bfill:url(%23rect12-0_1_)%3b%7d .st29%7bfill:url(%23rect12-5_1_)%3b%7d .st30%7bfill:url(%23rect12-91_1_)%3b%7d .st31%7bfill:url(%23rect12-2_1_)%3b%7d .st32%7bfill:url(%23rect12-00_1_)%3b%7d .st33%7bfill:url(%23rect12-59_1_)%3b%7d .st34%7bfill:url(%23rect12-50_1_)%3b%7d .st35%7bfill:url(%23rect12-8_1_)%3b%7d .st36%7bfill:url(%23rect12-01_1_)%3b%7d .st37%7bfill:url(%23rect12-502_1_)%3b%7d .st38%7bfill:url(%23rect12-57_1_)%3b%7d .st39%7bfill:url(%23rect12-3_1_)%3b%7d .st40%7bfill:url(%23rect12-4_1_)%3b%7d .st41%7bfill:url(%23rect12-31_1_)%3b%7d .st42%7bfill:url(%23rect12-5023_1_)%3b%7d .st43%7bfill:url(%23rect12-010_1_)%3b%7d .st44%7bfill:url(%23rect12-82_1_)%3b%7d .st45%7bfill:url(%23rect12-915_1_)%3b%7d .st46%7bfill:white%3b%7d .st47%7bfont-family:'Arial'%3b%7d .st48%7bfont-size:15.8224px%3b%7d .st49%7bfont-size:5.356px%3b%7d .st50%7bfill:none%3bstroke:white%3bstroke-width:0.5%3bstroke-miterlimit:10%3b%7d .st51%7bfill:none%3bstroke:white%3bstroke-width:0.2%3bstroke-miterlimit:10%3b%7d%3c/style%3e%3cg id='led-component'%3e %3cpath id='led-wire-4' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8' class='st0' d=' M85%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-3' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-2' class='st0' d=' M92%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-2' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-5' class='st0' d=' M88.5%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-1' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-1' class='st0' d=' M95.4%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led' inkscape:label='led' sodipodi:nodetypes='cccccc' class='st1' d='M90%2c0c-3.8%2c0.1-6.7%2c3.4-6.7%2c7.2 c0%2c4.1-0.1%2c8.7-0.1%2c13c0%2c0.9%2c0.8%2c1.7%2c1.7%2c1.7h10.7c0.9%2c0%2c1.7-0.8%2c1.7-1.7L97.1%2c6.9C97.1%2c3%2c93.9-0.1%2c90%2c0z'/%3e %3cg id='led-reflect'%3e %3clinearGradient id='SVGID_1_' gradientUnits='userSpaceOnUse' x1='90.3304' y1='2.7957' x2='95.3505' y2='7.6366'%3e %3cstop offset='0' style='stop-color:white'/%3e %3cstop offset='0.9991' style='stop-color:white%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath class='st2' d='M94.4%2c8.5c-0.6%2c0-1-0.4-1-1c0-1.6-1.3-2.9-2.9-2.9c-0.6%2c0-1-0.4-1-1s0.4-1%2c1-1c2.7%2c0%2c4.9%2c2.2%2c4.9%2c4.9 C95.4%2c8.1%2c94.9%2c8.5%2c94.4%2c8.5z'/%3e %3c/g%3e %3cg id='led-filament'%3e %3cg id='E.03.f---Concours---QuickPI-_x28_connection-error_x29_' transform='translate(-315%2c -448)'%3e %3cg id='Group-11' transform='translate(302%2c 419)'%3e %3clinearGradient id='Path-10_1_' gradientUnits='userSpaceOnUse' x1='-569.5046' y1='659.9916' x2='-569.5046' y2='659.3275' gradientTransform='matrix(17 0 0 -11.6073 9784.9883 7700.646)'%3e %3cstop offset='0' style='stop-color:%232E5E95%3bstop-opacity:0.4'/%3e %3cstop offset='1' style='stop-color:%232E5E95%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath id='Path-10' class='st3' d='M97.8%2c46.7v-1.2c0-0.5%2c0.2-0.9%2c0.5-1.2c0.3-0.3%2c0.5-0.8%2c0.5-1.2v-2.5c0-0.4%2c0.3-0.7%2c0.7-0.7 h0.2c0.2%2c0%2c0.4%2c0.2%2c0.4%2c0.4c0%2c0.2%2c0.2%2c0.4%2c0.4%2c0.4h5.5c0.2%2c0%2c0.4-0.2%2c0.4-0.4c0-0.2%2c0.2-0.4%2c0.4-0.4h0.4c0.5%2c0%2c0.8%2c0.4%2c0.8%2c0.8 v2.3c0%2c0.5%2c0.2%2c0.9%2c0.5%2c1.2s0.5%2c0.8%2c0.5%2c1.2v1.2c0%2c0.5-0.4%2c0.9-0.9%2c0.9h0c-0.5%2c0-0.9-0.4-0.9-0.9c0-0.6-0.2-1.1-0.6-1.5 l-0.3-0.3c-0.6-0.6-0.7-1.4-0.4-2.1l0.3-0.7c0.1-0.2%2c0-0.4-0.2-0.4c0%2c0-0.1%2c0-0.1%2c0c-0.3%2c0-0.6%2c0.1-0.9%2c0.2l-2.6%2c1.5 c-0.7%2c0.4-1.4%2c0.9-1.9%2c1.5l-0.3%2c0.3c-0.4%2c0.4-0.6%2c0.9-0.6%2c1.5c0%2c0.5-0.4%2c0.9-0.9%2c0.9h0C98.2%2c47.6%2c97.8%2c47.2%2c97.8%2c46.7z'/%3e %3c/g%3e %3c/g%3e %3c/g%3e%3c/g%3e%3cg id='board'%3e %3cpath id='rect3_1_' class='st4' d='M24.5%2c20.8c-2.9%2c0-5.3%2c2.3-5.3%2c5.2v224c0%2c2.9%2c2.3%2c5.2%2c5.3%2c5.2h132.4c2.9%2c0%2c5.2-2.3%2c5.2-5.2v-224 c0-2.9-2.3-5.2-5.2-5.2h-55.6c-0.7%2c4.2-1.5%2c8.4-2.2%2c12.6H81.3L80%2c20.8H24.5z'/%3e %3clinearGradient id='rect3_2_' gradientUnits='userSpaceOnUse' x1='25.97' y1='17.2623' x2='154.47' y2='240.2623'%3e %3cstop offset='0' style='stop-color:%236BAAF4'/%3e %3cstop offset='1' style='stop-color:%234A90E2'/%3e %3c/linearGradient%3e %3cpath id='rect3' class='st5' d='M24.5%2c12.4c-2.9%2c0-5.3%2c2.4-5.3%2c5.3v224c0%2c2.9%2c2.4%2c5.2%2c5.2%2c5.2h132.4c2.9%2c0%2c5.2-2.4%2c5.2-5.2v-224 c0-2.9-2.3-5.2-5.2-5.2h-52.1c-2%2c0-3.7%2c1.4-4.1%2c3.4c-0.4%2c2.1-0.7%2c4.2-1.1%2c6.3c-0.3%2c1.6-1.7%2c2.9-3.4%2c2.9H84.4 c-1.8%2c0-3.2-1.3-3.4-3.1l-0.6-5.8c-0.2-2.1-2-3.7-4.1-3.7H24.5z'/%3e%3c/g%3e%3cg id='cable'%3e %3clinearGradient id='rect2_1_' gradientUnits='userSpaceOnUse' x1='-297.9723' y1='421.476' x2='-294.3843' y2='421.476' gradientTransform='matrix(2.8346 0 0 -2.8346 844.646 1236.2024)'%3e %3cstop offset='0' style='stop-color:black%3bstop-opacity:0'/%3e %3cstop offset='0.5' style='stop-color:black'/%3e %3cstop offset='1' style='stop-color:black'/%3e %3c/linearGradient%3e %3crect id='rect2' y='39.1' class='st6' width='10.2' height='4.7'/%3e %3clinearGradient id='rect2-2_1_' gradientUnits='userSpaceOnUse' x1='17.6471' y1='44.5313' x2='17.6471' y2='37.7196'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect2-2' x='16' y='37.2' class='st7' width='3.2' height='8.5'/%3e %3crect id='rect2-2_2_' x='16' y='44.7' class='st8' width='3.2' height='1'/%3e %3cpath id='rect2-2-4' sodipodi:nodetypes='sccsssss' d='M12.3%2c36.2l5.8%2c0c0%2c2.7%2c0%2c10.5%2c0%2c10.5h-5.8c-1.4%2c0-2.5-1.1-2.5-2.4v-5.8 C9.8%2c37.3%2c10.9%2c36.3%2c12.3%2c36.2L12.3%2c36.2z'/%3e %3cpath id='rect2-2-4_1_' sodipodi:nodetypes='sccsssss' class='st9' d='M12.3%2c36.2l5.8%2c0c0%2c2.2%2c0%2c8.7%2c0%2c8.7h-5.8 c-1.4%2c0-2.5-0.9-2.5-2v-4.8C9.8%2c37.1%2c10.9%2c36.2%2c12.3%2c36.2L12.3%2c36.2z'/%3e%3c/g%3e%3cg id='Screen'%3e %3cpath id='rect1_1_' class='st10' d='M36.3%2c43.4h109.5c3.4%2c0%2c6.2%2c2.8%2c6.2%2c6.2v78c0%2c3.4-2.8%2c6.2-6.2%2c6.2H36.3c-3.4%2c0-6.2-2.8-6.2-6.2 v-78C30.1%2c46.2%2c32.9%2c43.4%2c36.3%2c43.4z'/%3e %3cpath id='rect1' class='st11' d='M36.3%2c40.4h109.5c3.4%2c0%2c6.2%2c2.8%2c6.2%2c6.2v78c0%2c3.4-2.8%2c6.2-6.2%2c6.2H36.3c-3.4%2c0-6.2-2.8-6.2-6.2 v-78C30.1%2c43.2%2c32.9%2c40.4%2c36.3%2c40.4z'/%3e %3cpath id='screen-inner' class='st12' d='M142.1%2c124.3H40.9c-1.6%2c0-2.9-1.3-2.9-2.9V49.7c0-1.6%2c1.3-2.9%2c2.9-2.9h101.2 c1.6%2c0%2c2.9%2c1.3%2c2.9%2c2.9v71.6C145%2c123%2c143.7%2c124.3%2c142.1%2c124.3z'/%3e %3clinearGradient id='screen-reflect_1_' gradientUnits='userSpaceOnUse' x1='134.4387' y1='126.9072' x2='40.0091' y2='36.3318'%3e %3cstop offset='0' style='stop-color:%2367696B'/%3e %3cstop offset='0.9997' style='stop-color:%23B1B3B4%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath id='screen-reflect' inkscape:label='screen-inner' class='st13' d='M40.8%2c46.8h101.1c1.7%2c0%2c3.2%2c1.4%2c3.2%2c3.2L40.8%2c124.3 c-1.7%2c0-3.2-1.4-3.2-3.2V50C37.6%2c48.3%2c39%2c46.8%2c40.8%2c46.8z'/%3e %3crect id='rect5' x='26.6' y='46.8' class='st14' width='7.8' height='76.3'/%3e %3crect id='rect5-8' x='24' y='60.4' class='st8' width='10.8' height='52.3'/%3e %3crect id='rect5-8_1_' x='31.7' y='60.4' class='st9' width='3.1' height='52.3'/%3e%3c/g%3e%3cg id='button-a'%3e %3cpath id='rect1-3-6_1_' class='st8' d='M121.7%2c142.2h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9V171c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c143.1%2c120.7%2c142.2%2c121.7%2c142.2z'/%3e %3clinearGradient id='rect1-3-6_2_' gradientUnits='userSpaceOnUse' x1='135.6954' y1='141.1228' x2='135.6954' y2='171.3371'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='rect1-3-6' class='st15' d='M121.7%2c140.5h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c141.3%2c120.7%2c140.5%2c121.7%2c140.5z'/%3e %3cellipse id='path2' class='st8' cx='123.8' cy='144.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3' class='st8' cx='147.5' cy='144.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1' class='st8' cx='147.5' cy='167.6' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-2' class='st8' cx='123.8' cy='167.6' rx='2.1' ry='2'/%3e %3ccircle id='button-a-bot' inkscape:label='button-a-bot' class='st10' cx='135.7' cy='155.8' r='10.9'%3e %3c/circle%3e %3ccircle id='button-a-top' inkscape:label='button-a-top' class='st16' cx='135.7' cy='153.2' r='10.9'%3e %3c/circle%3e%3c/g%3e%3cg id='button-sys'%3e %3cpath id='shadow' class='st8' d='M137.5%2c17.8h16.3c0.6%2c0%2c1.1%2c0.5%2c1.1%2c1.1v15.7c0%2c0.6-0.5%2c1.1-1.1%2c1.1h-16.3c-0.6%2c0-1.1-0.5-1.1-1.1 V18.9C136.4%2c18.3%2c136.9%2c17.8%2c137.5%2c17.8z'/%3e %3clinearGradient id='front_1_' gradientUnits='userSpaceOnUse' x1='145.6426' y1='16.181' x2='145.6426' y2='33.4903'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='front' class='st17' d='M137.5%2c16.4h16.3c0.6%2c0%2c1.1%2c0.5%2c1.1%2c1.1v15.7c0%2c0.6-0.5%2c1.1-1.1%2c1.1h-16.3c-0.6%2c0-1.1-0.5-1.1-1.1 V17.5C136.4%2c16.9%2c136.9%2c16.4%2c137.5%2c16.4z'/%3e %3cellipse id='path2-5' class='st8' cx='138.7' cy='18.4' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-9' class='st8' cx='152.6' cy='18.4' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-1-6' class='st8' cx='152.6' cy='32.2' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-1-2-6' class='st8' cx='138.7' cy='32.2' rx='1.2' ry='1.2'/%3e %3ccircle id='button-sys-bot' inkscape:label='button-sys-bot' class='st10' cx='145.6' cy='25.3' r='6.4'%3e %3c/circle%3e %3clinearGradient id='button-sys-top_1_' gradientUnits='userSpaceOnUse' x1='140.2529' y1='23.3427' x2='151.8014' y2='23.3427'%3e %3cstop offset='0' style='stop-color:%236BAAF4'/%3e %3cstop offset='1' style='stop-color:%234A90E2'/%3e %3c/linearGradient%3e %3ccircle id='button-sys-top' inkscape:label='button-sys-top' class='st18' cx='145.6' cy='23.3' r='6.4'%3e %3c/circle%3e%3c/g%3e%3cg id='button-b'%3e %3cpath id='rect1-3-6-8_1_' class='st8' d='M121.7%2c185.3h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c186.1%2c120.7%2c185.3%2c121.7%2c185.3z'/%3e %3clinearGradient id='rect1-3-6-8_2_' gradientUnits='userSpaceOnUse' x1='135.6954' y1='184.2388' x2='135.6954' y2='214.7807'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='rect1-3-6-8' class='st19' d='M121.7%2c183.6h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c184.4%2c120.7%2c183.6%2c121.7%2c183.6z'/%3e %3cellipse id='path2-8' class='st8' cx='123.8' cy='187.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-12' class='st8' cx='147.5' cy='187.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-1' class='st8' cx='147.5' cy='210.7' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-2-4' class='st8' cx='123.8' cy='210.7' rx='2.1' ry='2'/%3e %3ccircle id='button-b-bot' inkscape:label='button-b-bot' class='st10' cx='135.7' cy='198.9' r='10.9'%3e %3c/circle%3e %3ccircle id='button-b-top' inkscape:label='button-b-top' class='st16' cx='135.7' cy='196.2' r='10.9'%3e %3c/circle%3e%3c/g%3e%3cpath id='pad-left' inkscape:label='pad-left' class='st20' d='M36.5%2c149.8c-6.9%2c7.1-10.8%2c16.6-10.8%2c26.5c0%2c9.8%2c3.8%2c19.2%2c10.6%2c26.3 l17.3-17.3c-2.2-2.5-3.4-5.7-3.4-9c0-3.4%2c1.3-6.7%2c3.6-9.2L36.5%2c149.8z'/%3e%3cpath id='pad-up' inkscape:label='pad-up' class='st20' d='M90.9%2c148.2c-7.1-6.9-16.6-10.8-26.5-10.8c-9.8%2c0-19.2%2c3.8-26.3%2c10.6 l17.3%2c17.3c2.5-2.2%2c5.7-3.4%2c9-3.4c3.4%2c0%2c6.7%2c1.3%2c9.2%2c3.6L90.9%2c148.2z'/%3e%3cpath id='pad-right' inkscape:label='pad-right' class='st20' d='M92.1%2c203c6.9-7.1%2c10.8-16.6%2c10.8-26.5c0-9.8-3.8-19.2-10.6-26.3 L75%2c167.4c2.2%2c2.5%2c3.4%2c5.7%2c3.4%2c9c0%2c3.4-1.3%2c6.7-3.6%2c9.2L92.1%2c203z'/%3e%3cpath id='pad-down' inkscape:label='pad-down' class='st20' d='M37.5%2c204.2c7.1%2c6.9%2c16.6%2c10.8%2c26.5%2c10.8c9.8%2c0%2c19.2-3.8%2c26.3-10.6 l-17.3-17.3c-2.5%2c2.2-5.7%2c3.4-9%2c3.4c-3.4%2c0-6.7-1.3-9.2-3.6L37.5%2c204.2z'/%3e%3cg id='connection'%3e %3crect id='rect14' x='20.3' y='245.3' class='st16' width='5.1' height='5.5'/%3e %3crect id='rect14-5' x='156.3' y='245.3' class='st16' width='5.1' height='5.5'/%3e %3crect id='rect14-0-7' x='66.6' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-3' x='36.7' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-6' x='98.2' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-5' x='128.2' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3clinearGradient id='path11_1_' gradientUnits='userSpaceOnUse' x1='30.939' y1='250.2664' x2='30.939' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11' class='st21' d='M30.9%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3H39l0-18.9 C39%2c227.5%2c35.4%2c223.9%2c30.9%2c223.9L30.9%2c223.9z'/%3e %3clinearGradient id='path11-9_1_' gradientUnits='userSpaceOnUse' x1='59.3629' y1='250.2664' x2='59.3629' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-9' class='st22' d='M59.4%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C67.4%2c227.5%2c63.8%2c223.9%2c59.4%2c223.9L59.4%2c223.9z'/%3e %3clinearGradient id='path11-7_1_' gradientUnits='userSpaceOnUse' x1='90.7304' y1='250.2664' x2='90.7304' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-7' class='st23' d='M90.7%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C98.8%2c227.5%2c95.2%2c223.9%2c90.7%2c223.9L90.7%2c223.9z'/%3e %3clinearGradient id='path11-5_1_' gradientUnits='userSpaceOnUse' x1='122.0979' y1='250.2664' x2='122.0979' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-5' class='st24' d='M122.1%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C130.2%2c227.5%2c126.6%2c223.9%2c122.1%2c223.9L122.1%2c223.9z'/%3e %3clinearGradient id='path11-78_1_' gradientUnits='userSpaceOnUse' x1='150.5217' y1='250.2664' x2='150.5217' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-78' class='st25' d='M150.5%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C158.6%2c227.5%2c155%2c223.9%2c150.5%2c223.9L150.5%2c223.9z'/%3e %3clinearGradient id='rect12_1_' gradientUnits='userSpaceOnUse' x1='160.6279' y1='250.2664' x2='160.6279' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12' x='159.1' y='234.4' class='st26' width='3' height='16.5'/%3e %3clinearGradient id='rect12-9_1_' gradientUnits='userSpaceOnUse' x1='137.7817' y1='250.2664' x2='137.7817' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-9' x='136.6' y='234.4' class='st27' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-0_1_' gradientUnits='userSpaceOnUse' x1='134.838' y1='250.2664' x2='134.838' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-0' x='133.6' y='234.4' class='st28' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-5_1_' gradientUnits='userSpaceOnUse' x1='131.8944' y1='250.2664' x2='131.8944' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-5' x='130.7' y='234.4' class='st29' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-91_1_' gradientUnits='userSpaceOnUse' x1='140.7253' y1='250.2664' x2='140.7253' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-91' x='139.5' y='234.4' class='st30' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-2_1_' gradientUnits='userSpaceOnUse' x1='112.3015' y1='250.2664' x2='112.3015' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-2' x='111.1' y='234.4' class='st31' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-00_1_' gradientUnits='userSpaceOnUse' x1='109.3578' y1='250.2664' x2='109.3578' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-00' x='108.1' y='234.4' class='st32' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-59_1_' gradientUnits='userSpaceOnUse' x1='106.4142' y1='250.2664' x2='106.4142' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-59' x='105.2' y='234.4' class='st33' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-50_1_' gradientUnits='userSpaceOnUse' x1='103.4706' y1='250.2664' x2='103.4706' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-50' x='102.2' y='234.4' class='st34' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-8_1_' gradientUnits='userSpaceOnUse' x1='100.5269' y1='250.2664' x2='100.5269' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-8' x='99.3' y='234.4' class='st35' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-01_1_' gradientUnits='userSpaceOnUse' x1='80.9339' y1='250.2664' x2='80.9339' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-01' x='79.7' y='234.4' class='st36' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-502_1_' gradientUnits='userSpaceOnUse' x1='77.9903' y1='250.2664' x2='77.9903' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-502' x='76.8' y='234.4' class='st37' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-57_1_' gradientUnits='userSpaceOnUse' x1='75.0467' y1='250.2664' x2='75.0467' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-57' x='73.8' y='234.4' class='st38' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-3_1_' gradientUnits='userSpaceOnUse' x1='72.103' y1='250.2664' x2='72.103' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-3' x='70.9' y='234.4' class='st39' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-4_1_' gradientUnits='userSpaceOnUse' x1='69.1594' y1='250.2664' x2='69.1594' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-4' x='67.9' y='234.4' class='st40' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-31_1_' gradientUnits='userSpaceOnUse' x1='49.5665' y1='250.2664' x2='49.5665' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-31' x='48.3' y='234.4' class='st41' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-5023_1_' gradientUnits='userSpaceOnUse' x1='46.6229' y1='250.2664' x2='46.6229' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-5023' x='45.4' y='234.4' class='st42' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-010_1_' gradientUnits='userSpaceOnUse' x1='43.6792' y1='250.2664' x2='43.6792' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-010' x='42.4' y='234.4' class='st43' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-82_1_' gradientUnits='userSpaceOnUse' x1='40.7355' y1='250.2664' x2='40.7355' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-82' x='39.5' y='234.4' class='st44' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-915_1_' gradientUnits='userSpaceOnUse' x1='20.8083' y1='250.2664' x2='20.8083' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-915' x='19.3' y='234.4' class='st45' width='3.1' height='16.5'/%3e %3ccircle id='path12' class='st8' cx='30.9' cy='232.3' r='6.6'/%3e %3ccircle id='path12-2' class='st8' cx='59.4' cy='232.3' r='6.6'/%3e %3ccircle id='path12-7' class='st8' cx='90.7' cy='232.3' r='6.6'/%3e %3ccircle id='path12-4' class='st8' cx='122.1' cy='232.3' r='6.6'/%3e %3ccircle id='path12-23' class='st8' cx='150.5' cy='232.3' r='6.6'/%3e %3cpath class='st14' d='M37.6%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1s-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7S37.6%2c228.6%2c37.6%2c232.3z'/%3e %3cpath class='st14' d='M66%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C63%2c225.6%2c66%2c228.6%2c66%2c232.3z'/%3e %3cpath class='st14' d='M97.4%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C94.4%2c225.6%2c97.4%2c228.6%2c97.4%2c232.3z'/%3e %3cpath class='st14' d='M128.7%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C125.8%2c225.6%2c128.7%2c228.6%2c128.7%2c232.3z'/%3e %3cpath class='st14' d='M157.2%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C154.2%2c225.6%2c157.2%2c228.6%2c157.2%2c232.3z'/%3e%3c/g%3e%3ctext transform='matrix(1 0 0 1 104.5744 148.2085)' class='st46 st47 st48'%3eA%3c/text%3e%3ctext transform='matrix(1 0 0 1 108.1418 28.5307)' class='st46 st47 st49'%3eSYST%c3%88ME%3c/text%3e%3ctext transform='matrix(1 0 0 1 104.3547 219.7241)' class='st46 st47 st48'%3eB%3c/text%3e%3cg id='Arrow-A'%3e %3cpath id='path135' class='st46' d='M115.4%2c157.9l-1.5%2c0.9V157L115.4%2c157.9z'/%3e %3cpath class='st50' d='M113.9%2c157.9c-2.8%2c0-5.1-2.2-5.1-5'/%3e%3c/g%3e%3cg id='Arrow-B'%3e %3cpath id='path135-3' class='st46' d='M115.4%2c196.8l-1.5%2c0.9v-1.8L115.4%2c196.8z'/%3e %3cpath class='st50' d='M108.9%2c201.9c0-2.8%2c2.2-5.1%2c5-5.1'/%3e%3c/g%3e%3cg id='Arrow-Sys'%3e %3cpath class='st51' d='M126.8%2c22.7c0.7-2.7%2c3.4-4.4%2c6.1-3.7'/%3e %3cg%3e %3cpolygon class='st46' points='132.4%2c19.4 134.6%2c19.4 132.7%2c18.3 '/%3e %3c/g%3e%3c/g%3e%3c/svg%3e";
+
   let galaxiaSvgInline = null;
   class GalaxiaBoard extends AbstractBoard {
       init(selector, onUserEvent) {
@@ -3108,14 +3109,10 @@ elif program_exists:
       }
       async fetchGalaxiaCard() {
           // Cache results
-          if (galaxiaSvgInline) {
-              return Promise.resolve(galaxiaSvgInline);
+          if (!galaxiaSvgInline) {
+              galaxiaSvgInline = decodeURIComponent(img.substring(img.indexOf(',') + 1));
           }
-          const svgPath = (window.modulesPath || '') + 'img/quickpi/galaxia.svg';
-          return fetch(svgPath).then((response)=>response.text()).then((svgData)=>{
-              galaxiaSvgInline = svgData;
-              return svgData;
-          });
+          return galaxiaSvgInline;
       }
       async importGalaxia(selector) {
           const svgData = await this.fetchGalaxiaCard();
@@ -3129,18 +3126,18 @@ elif program_exists:
           this.galaxiaSvg.attr('width', "100%");
           this.galaxiaSvg.attr('height', "100%");
           let buttonIds = {
-              a: 'btnA',
-              b: 'btnB',
-              sys: 'btnSys'
+              a: 'button_a',
+              b: 'button_b',
+              sys: 'button_sys'
           };
           for (let [buttonId, buttonName] of Object.entries(buttonIds)){
               this.bindPushButton(buttonId, buttonName);
           }
           let padIds = {
-              up: 'btnN',
-              down: 'btnS',
-              left: 'btnW',
-              right: 'btnE'
+              up: 'button_n',
+              down: 'button_s',
+              left: 'button_w',
+              right: 'button_e'
           };
           for (let [padId, padName] of Object.entries(padIds)){
               this.bindPadButton(padId, padName);
@@ -3249,48 +3246,71 @@ elif program_exists:
           this.setLed(this.innerState.led || 'transparent');
           this.setConnected(this.innerState.connected);
       }
-      // TODO: make something corresponding more to the Galaxia
       getBoardDefinitions() {
           return [
               {
-                  name: "quickpi",
-                  friendlyName: this.strings.messages.quickpihat,
+                  name: "galaxia",
                   image: "quickpihat.png",
-                  adc: "ads1015",
                   portTypes: {
                       "D": [
-                          5,
+                          0,
+                          1,
+                          2,
+                          6,
+                          7,
+                          8,
+                          12,
+                          13,
+                          14,
+                          15,
                           16,
-                          24
+                          19,
+                          20
                       ],
                       "A": [
-                          0
+                          0,
+                          1,
+                          2,
+                          6,
+                          7,
+                          8,
+                          12,
+                          13,
+                          14,
+                          15,
+                          16,
+                          19,
+                          20
                       ]
                   },
                   builtinSensors: [
                       {
-                          type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "A"
+                          type: "ledrgb",
+                          suggestedName: 'led'
                       },
                       {
                           type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "B"
+                          suggestedName: 'button_a'
                       },
                       {
                           type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "N"
+                          suggestedName: 'button_b'
                       },
                       {
                           type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "S"
+                          suggestedName: 'button_n'
                       },
                       {
                           type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "W"
+                          suggestedName: 'button_s'
                       },
                       {
                           type: "button",
-                          suggestedName: this.strings.messages.sensorNameButton + "E"
+                          suggestedName: 'button_e'
+                      },
+                      {
+                          type: "button",
+                          suggestedName: 'button_w'
                       }
                   ]
               }
@@ -3337,6 +3357,7 @@ elif program_exists:
       constructor(...args){
           super(...args);
           this.buttonStatesUpdators = {};
+          this.defaultSubBoard = 'galaxia';
           this.galaxiaSvg = null;
           this.initialized = false;
           this.innerState = {};
@@ -8145,7 +8166,6 @@ def detectBoard():
           return [
               {
                   name: "grovepi",
-                  friendlyName: this.strings.messages.grovehat,
                   image: "grovepihat.png",
                   adc: "grovepi",
                   portTypes: {
@@ -8227,7 +8247,6 @@ def detectBoard():
               },
               {
                   name: "quickpi",
-                  friendlyName: this.strings.messages.quickpihat,
                   image: "quickpihat.png",
                   adc: "ads1015",
                   portTypes: {
@@ -8336,7 +8355,6 @@ def detectBoard():
               {
                   name: "pinohat",
                   image: "pinohat.png",
-                  friendlyName: this.strings.messages.pinohat,
                   adc: [
                       "ads1015",
                       "none"
@@ -8603,6 +8621,7 @@ def detectBoard():
       const sensorHandler = context.sensorHandler;
       const sensorDefinitions = sensorHandler.getSensorDefinitions();
       const connectionDialogHTML = getConnectionDialogHTML(availableConnectionMethods, strings, boardDefinitions, sensorDefinitions);
+      const customSensors = context.infos.customSensors;
       window.displayHelper.showPopupDialog(connectionDialogHTML, function() {
           $(".simple-dialog").addClass("config");
           $('#popupMessage .navigationContent ul li').removeClass('selected');
@@ -8688,7 +8707,15 @@ def detectBoard():
           function addGridElement(gridID, add, idName, name, img, port) {
               // console.log(add,idName,name,img)
               var idType = add ? "add" : "remove";
-              $('#' + gridID).append("<span class=\"sensorElement\" id=\"qpi-" + idType + "-sensor-parent-" + idName + "\">" + "<div class='name'>" + name + "</div>" + getSensorImg(img) + "<div class=\"sensorInfo\">" + "<span class='port'>" + port + "</span>" + "<input type=\"checkbox\" id=\"qpi-" + idType + "-sensor-" + idName + "\"></input>" + "</div>" + "</span>");
+              $('#' + gridID).append(`
+        <span class="sensorElement ${!customSensors ? 'read-only' : ''}" id="qpi-${idType}-sensor-parent-${idName}">
+          <div class='name'>${name}</div>
+          ${getSensorImg(img)}
+          <div class="sensorInfo">
+            <span class='port'>${port}</span>
+            ${customSensors ? `<input type="checkbox" id="qpi-${idType}-sensor-${idName}"/>` : ''}
+          </div>
+        </span>`);
           }
           function getSensorImg(img) {
               var html = "";
@@ -8738,6 +8765,9 @@ def detectBoard():
               }
           }
           $("#sensorGrid .sensorElement").click(function() {
+              if (!customSensors) {
+                  return;
+              }
               var id = $(this).attr('id');
               changeSelect(id);
           });
@@ -8777,12 +8807,19 @@ def detectBoard():
                       changePort(elID, false);
                   }
               }
+              if ('add' === type) {
+                  toAdd = [];
+              } else {
+                  toRemove = [];
+              }
           }
-          if (context.infos.customSensors) {
+          if (customSensors) {
               // $('#piaddsensor').click(clickAdder);
               $('#piaddsensor').click(addSensors);
           } else {
               $('#piaddsensor').hide();
+              $('#piremovesensor').hide();
+              $('#qpi-uiblock-components #tabs').hide();
           }
           $('#piremovesensor').click(function() {
               //$('#popupMessage').hide();
@@ -8803,6 +8840,7 @@ def detectBoard():
                   // console.log(sensorName);
                   }
               });
+              unselectSensors("remove");
               if (removed) {
                   context.recreateDisplay = true;
                   context.resetDisplay();
@@ -12762,6 +12800,7 @@ def detectBoard():
       if (!mainBoard) {
           throw `This main board doesn't exist: "${context.infos.quickPiBoard}"`;
       }
+      context.board = mainBoard.defaultSubBoard;
       mainBoard.setStrings(strings);
       context.mainBoard = mainBoard;
       const sensorHandler = new SensorHandler(context, strings);
@@ -13551,7 +13590,6 @@ def detectBoard():
           context.resetSensorTable();
           context.reset();
       };
-      context.board = "quickpi";
       if (getSessionStorage('board')) context.changeBoard(getSessionStorage('board'));
       /**
        * This method allow us to save the sensors inside of the variable additional.

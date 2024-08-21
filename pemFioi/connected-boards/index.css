@@ -519,7 +519,7 @@ html {
       justify-content: space-around;*/
 }
 
-.sensorElement:hover {
+.sensorElement:not(.read-only):hover {
   background-color: lightgray;
 }
 
