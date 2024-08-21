@@ -161,11 +161,25 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
 
    task.load = function(views, callback) {
       hasJustLoaded = true;
+      var urlOptions = {};
+      try {
+         var strOptions = getUrlParameter("options");
+         if (strOptions && strOptions.trim()) {
+            urlOptions = JSON.parse(strOptions);
+         }
+      } catch (exception) {
+         console.error("Error when parsing options URL parameter.");
+      }
+
       platform.getTaskParams(null, null, function(taskParams) {
-         if(taskParams.options && taskParams.options.level) {
+         if (!taskParams.options) {
+            taskParams.options = {};
+         }
+         taskParams.options = Object.assign({}, urlOptions, taskParams.options);
+         if (taskParams.options.level) {
             window.forcedLevel = taskParams.options.level;
          }
-         if(taskParams.options && taskParams.options.initialLevel) {
+         if (taskParams.options.initialLevel) {
             window.initialLevel = taskParams.options.initialLevel;
          }
          if(window.forcedLevel) {
