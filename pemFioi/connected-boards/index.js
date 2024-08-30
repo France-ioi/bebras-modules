@@ -14387,12 +14387,16 @@ def detectBoard():
               "galaxia",
               "microbit"
           ].includes(context.infos.quickPiBoard)) {
-              $('#grid').css('display', 'flex');
-              if (context.infos.quickPiBoard == "microbit") {
-                  $('#grid').css('flex-direction', 'column');
-                  $('#virtualBoard').css('flex', '0 0 200px').css('height', '200px');
+              if (context.autoGrading) {
+                  $('#virtualBoard').hide();
               } else {
-                  $('#virtualBoard').css('flex', '1 0 40%').css('margin-right', '20px');
+                  $('#grid').css('display', 'flex');
+                  if (context.infos.quickPiBoard == "microbit") {
+                      $('#grid').css('flex-direction', 'column');
+                      $('#virtualBoard').css('flex', '0 0 200px').css('height', '200px');
+                  } else {
+                      $('#virtualBoard').css('flex', '1 0 40%').css('margin-right', '20px');
+                  }
               }
               function onUserEvent(sensorName, state) {
                   let sensor = sensorHandler.findSensorByName(sensorName);
