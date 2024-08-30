@@ -9783,7 +9783,11 @@ def detectBoard():
               isSensor: false,
               portType: "D",
               getInitialState: function(sensor) {
-                  return null;
+                  return [
+                      0,
+                      0,
+                      0
+                  ];
               },
               selectorImages: [
                   "ledon-red.png"
@@ -9797,7 +9801,7 @@ def detectBoard():
                   else return 0;
               },
               getStateFromPercentage: function(percentage) {
-                  if (percentage) return percentage * 255;
+                  if (percentage) return Math.round(percentage * 255);
                   else return 0;
               },
               setLiveState: function(sensor, state, callback) {
@@ -11111,6 +11115,14 @@ def detectBoard():
               sensor.stateText = this.context.paper.text(state1x, state1y, `${sensor.state ? sensor.state.join(',') : ''}`);
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
                   this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
+              }
+              if (!this.context.autoGrading && this.context.offLineMode) {
+                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 255);
+              } else {
+                  sensor.focusrect.click(()=>{
+                      this.sensorInConnectedModeError();
+                  });
+                  this.removeSlider(sensor);
               }
           } else if (sensor.type == "leddim") {
               if (sensor.stateText) sensor.stateText.remove();
