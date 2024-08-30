@@ -3017,9 +3017,14 @@ elif program_exists:
                       if (!sensor) {
                           throw `There is no sensor connected to the digital port D${self.pin.pinNumber}`;
                       }
+                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+                      if (!sensorDef.getStateFromPwm) {
+                          throw "This sensor may not be controlled by a PWM";
+                      }
+                      const newState = sensorDef.getStateFromPwm(duty);
                       let command = "pwmDuty(\"" + sensor.name + "\", " + duty + ")";
                       self.currentDuty = duty;
-                      context.registerQuickPiEvent(sensor.name, true);
+                      context.registerQuickPiEvent(sensor.name, newState);
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           context.waitDelay(callback);
                       } else {
@@ -3976,6 +3981,7 @@ elif program_exists:
           pinohat: "Raspberry Pi without hat",
           led: "LED",
           ledrgb: "LED RGB",
+          leddim: "LED variable",
           blueled: "LED bleue",
           greenled: "LED verte",
           orangeled: "LED orange",
@@ -4051,6 +4057,7 @@ elif program_exists:
           sensorNameBuzzer: "buzz",
           sensorNameLed: "led",
           sensorNameLedRgb: "ledRgb",
+          sensorNameLedDim: "ledDim",
           // sensorNameRedLed: "redled",
           sensorNameRedLed: "Rled",
           // sensorNameGreenLed: "greenled",
@@ -4382,6 +4389,7 @@ elif program_exists:
           pinohat: "Raspberry Pi sin sombrero",
           led: "LED",
           ledrgb: "LED RGB",
+          leddim: "LED regulable",
           blueled: "LED azul",
           greenled: "LED verde",
           orangeled: "LED naranja",
@@ -4449,6 +4457,7 @@ elif program_exists:
           sensorNameBuzzer: "tim",
           sensorNameLed: "led",
           sensorNameLedRgb: "ledRgb",
+          sensorNameLedDim: "ledDim",
           sensorNameRedLed: "ledrojo",
           sensorNameGreenLed: "ledverde",
           sensorNameBlueLed: "ledazul",
@@ -4768,6 +4777,7 @@ elif program_exists:
           pinohat: "Raspberry Pi without hat",
           led: "LED",
           ledrgb: "LED RGB",
+          leddim: "LED dimmerabile",
           blueled: "LED blu",
           greenled: "LED verde",
           orangeled: "LED arancione",
@@ -4834,6 +4844,7 @@ elif program_exists:
           sensorNameBuzzer: "buzzer",
           sensorNameLed: "led",
           sensorNameLedRgb: "ledRgb",
+          sensorNameLedDim: "ledDim",
           sensorNameRedLed: "redled",
           sensorNameGreenLed: "greenled",
           sensorNameBlueLed: "blueled",
@@ -9796,6 +9807,39 @@ def detectBoard():
               }
           },
           {
+              name: "leddim",
+              suggestedName: strings.messages.sensorNameLedDim,
+              description: strings.messages.ledDim,
+              isAnalog: false,
+              isSensor: false,
+              portType: "D",
+              getInitialState: function(sensor) {
+                  return 0;
+              },
+              selectorImages: [
+                  "ledon-red.png"
+              ],
+              valueType: "number",
+              pluggable: true,
+              getPercentageFromState: function(state) {
+                  return state;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return percentage;
+              },
+              getStateFromPwm: function(duty) {
+                  return duty / 1023;
+              },
+              setLiveState: function(sensor, state, callback) {
+                  var ledstate = state ? 1 : 0;
+                  var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
+                  context.quickPiConnection.sendCommand(command, callback);
+              },
+              getStateString: function(state) {
+                  return state;
+              }
+          },
+          {
               name: "ledmatrix",
               suggestedName: strings.messages.sensorNameLedMatrix,
               description: strings.messages.ledmatrix,
@@ -10024,6 +10068,9 @@ def detectBoard():
               },
               getStateString: function(state) {
                   return "" + state + "°";
+              },
+              getStateFromPwm: function(pwmDuty) {
+                  return 180 * (pwmDuty - 0.025 * 1023) / (0.1 * 1023);
               }
           },
           {
@@ -11033,7 +11080,7 @@ def detectBoard():
                   });
               }
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
+                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
               }
           } else if (sensor.type == "ledrgb") {
               if (sensor.stateText) sensor.stateText.remove();
@@ -11059,7 +11106,57 @@ def detectBoard():
               });
               sensor.stateText = this.context.paper.text(state1x, state1y, `${sensor.state ? sensor.state.join(',') : ''}`);
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
+                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
+              }
+          } else if (sensor.type == "leddim") {
+              if (sensor.stateText) sensor.stateText.remove();
+              if (sensor.state == null) sensor.state = 0;
+              if (!sensor.ledoff || this.sensorHandler.isElementRemoved(sensor.ledoff)) {
+                  sensor.ledoff = this.context.paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
+              }
+              if (!sensor.ledon || this.sensorHandler.isElementRemoved(sensor.ledon)) {
+                  let imagename = "ledon-";
+                  if (sensor.subType) imagename += sensor.subType;
+                  else imagename += "red";
+                  imagename += ".png";
+                  sensor.ledon = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+              }
+              sensor.ledon.attr(sensorAttr);
+              sensor.ledoff.attr(sensorAttr);
+              sensor.stateText = this.context.paper.text(state1x, state1y, Math.round(100 * sensor.state) + '%');
+              if (sensor.state) {
+                  sensor.ledon.attr({
+                      "opacity": fadeopacity
+                  });
+                  sensor.ledoff.attr({
+                      "opacity": 0
+                  });
+              } else {
+                  sensor.ledon.attr({
+                      "opacity": 0
+                  });
+                  sensor.ledoff.attr({
+                      "opacity": fadeopacity
+                  });
+              }
+              if (typeof sensor.state == 'number') {
+                  sensor.ledon.attr({
+                      "opacity": sensor.state * fadeopacity
+                  });
+                  sensor.ledoff.attr({
+                      "opacity": fadeopacity
+                  });
+              }
+              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
+              }
+              if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 1);
+              } else {
+                  sensor.focusrect.click(()=>{
+                      this.sensorInConnectedModeError();
+                  });
+                  this.removeSlider(sensor);
               }
           } else if (sensor.type == "ledmatrix") {
               if (sensor.stateText) sensor.stateText.remove();
@@ -11231,7 +11328,7 @@ def detectBoard():
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
                   let setLiveState = this.sensorHandler.findSensorDefinition(sensor).setLiveState;
                   if (setLiveState) {
-                      setLiveState(sensor, sensor.state, function(x) {});
+                      setLiveState(sensor, sensor.state, function() {});
                   }
               }
           } else if (sensor.type == "button") {
@@ -11450,7 +11547,7 @@ def detectBoard():
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
                   if (!sensor.updatetimeout) {
                       sensor.updatetimeout = setTimeout(()=>{
-                          this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
+                          this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
                           sensor.updatetimeout = null;
                       }, 100);
                   }
@@ -11911,7 +12008,7 @@ def detectBoard():
                   sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
               }
               if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
+                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
               }
           } else if (sensor.type == "irrecv") {
               if (sensor.stateText) sensor.stateText.remove();
@@ -12333,7 +12430,18 @@ def detectBoard():
               return;
           } else if (sensor.type == "wifi") {
               if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('wifi.png'), imgx, imgy, imgw, imgh);
+              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) {
+                  sensor.img = this.context.paper.image(getImg('wifi.png'), imgx, imgy, imgw, imgh);
+                  sensor.focusrect.click(()=>{
+                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                          sensor.state.connected = !sensor.state.connected;
+                          this.sensorHandler.warnClientSensorStateChanged(sensor);
+                          this.drawSensor(sensor);
+                      } else {
+                          this.actuatorsInRunningModeError();
+                      }
+                  });
+              }
               if (!sensor.active || this.sensorHandler.isElementRemoved(sensor.active)) sensor.active = this.context.paper.circle();
               const ssid = sensor.state?.ssid;
               sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state?.scanning ? '...' : ssid ? textEllipsis(ssid, 6) : '');
