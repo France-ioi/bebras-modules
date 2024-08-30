@@ -9779,7 +9779,7 @@ def detectBoard():
               name: "ledrgb",
               suggestedName: strings.messages.sensorNameLedRgb,
               description: strings.messages.ledrgb,
-              isAnalog: false,
+              isAnalog: true,
               isSensor: false,
               portType: "D",
               getInitialState: function(sensor) {
@@ -9789,13 +9789,15 @@ def detectBoard():
                   "ledon-red.png"
               ],
               valueType: "object",
+              valueMin: 0,
+              valueMax: 255,
               pluggable: true,
               getPercentageFromState: function(state) {
-                  if (state) return 1;
+                  if (state) return state / 255;
                   else return 0;
               },
               getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
+                  if (percentage) return percentage * 255;
                   else return 0;
               },
               setLiveState: function(sensor, state, callback) {
@@ -9810,7 +9812,7 @@ def detectBoard():
               name: "leddim",
               suggestedName: strings.messages.sensorNameLedDim,
               description: strings.messages.ledDim,
-              isAnalog: false,
+              isAnalog: true,
               isSensor: false,
               portType: "D",
               getInitialState: function(sensor) {
@@ -9821,6 +9823,8 @@ def detectBoard():
               ],
               valueType: "number",
               pluggable: true,
+              valueMin: 0,
+              valueMax: 1,
               getPercentageFromState: function(state) {
                   return state;
               },
@@ -9836,7 +9840,7 @@ def detectBoard():
                   context.quickPiConnection.sendCommand(command, callback);
               },
               getStateString: function(state) {
-                  return state;
+                  return Math.round(state * 100) + "%";
               }
           },
           {
@@ -13171,6 +13175,9 @@ def detectBoard():
           }
           if (sensorDef && !sensorDef.compareState) {
               sensorDef.compareState = function(state1, state2) {
+                  if (Array.isArray(state1) && Array.isArray(state2)) {
+                      return JSON.stringify(state1) === JSON.stringify(state2);
+                  }
                   return state1 == state2;
               };
           }
@@ -15148,7 +15155,7 @@ def detectBoard():
           var percentage = +state;
           var drawnElements = [];
           var deleteLastDrawnElements = true;
-          if (sensor.type == "accelerometer" || sensor.type == "gyroscope" || sensor.type == "magnetometer") {
+          if (sensor.type == "accelerometer" || sensor.type == "gyroscope" || sensor.type == "magnetometer" || sensor.type == "ledrgb") {
               if (state != null) {
                   for(var i = 0; i < 3; i++){
                       var startx = context.timelineStartx + startTime * context.pixelsPerTime;
@@ -15893,11 +15900,63 @@ def detectBoard():
       ]);
   }
 
+  function OutputGenerator() {
+      this.events = [];
+      this.time = 0;
+      this.start = function() {
+          this.events = [];
+          this.time = 0;
+      };
+      this.sleep = function(time) {
+          this.time += time;
+      };
+      this.setElementState = function(type, name, state, input) {
+          // Note : input means the grading will not check whether the program
+          // actually read the sensor
+          var event = {
+              time: this.time,
+              type: type,
+              name: name,
+              state: state,
+              input: !!input
+          };
+          this.events.push(event);
+      };
+      this.setElementStateAfter = function(type, name, state, input, time) {
+          // Note : input means the grading will not check whether the program
+          // actually read the sensor
+          var event = {
+              time: this.time + time,
+              type: type,
+              name: name,
+              state: state,
+              input: !!input
+          };
+          this.events.push(event);
+      };
+      this.setBuzzerNote = function(name, frequency) {
+          this.setElementState("buzzer", name, frequency);
+      };
+      this.setElementProperty = function(type, name, property, value) {
+          var event = {
+              time: this.time,
+              type: type,
+              name: name
+          };
+          event[property] = value;
+          this.events.push(event);
+      };
+      this.getEvents = function() {
+          return this.events;
+      };
+  }
+
   const exportToWindow = {
       quickPiLocalLanguageStrings,
       QuickStore,
       getContext,
-      quickPiStore: LocalQuickStore
+      quickPiStore: LocalQuickStore,
+      OutputGenerator
   };
   for (let [name, object] of Object.entries(exportToWindow)){
       window[name] = object;
