@@ -1231,6 +1231,8 @@ window.displayHelper = {
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
          $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
+         $('#zone_12').css("overflow-x", "");
+         $('#zone_12').css("overflow-y", "");
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }
