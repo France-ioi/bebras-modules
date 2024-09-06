@@ -9300,7 +9300,6 @@ def detectBoard():
               this[key] = value;
           }
       }
-      drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {}
   }
 
   class SensorLed extends AbstractSensor {
