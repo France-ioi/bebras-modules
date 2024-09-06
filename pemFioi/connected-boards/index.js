@@ -574,6 +574,18 @@ elif program_exists:
       }
       return true;
   }
+  function deepSubsetEqual(obj1, obj2) {
+      if (obj1 === obj2) return true;
+      // if one is primitive and not the other, then we can return false. If both are primitive, then the up
+      // comparison can return true
+      if (isPrimitive(obj1) || isPrimitive(obj2)) return false;
+      // compare objects with same number of keys
+      for(let key in obj2){
+          if (!(key in obj1)) return false; //other object doesn't have this prop
+          if (!deepSubsetEqual(obj1[key], obj2[key])) return false;
+      }
+      return true;
+  }
   function getImg(filename) {
       // Get the path to an image stored in bebras-modules
       return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
@@ -687,6 +699,241 @@ elif program_exists:
               dataType: 'json',
               success: callback
           });
+      }
+  }
+
+  if (!window.OffscreenCanvas) {
+      window.OffscreenCanvas = class OffscreenCanvas1 {
+          constructor(width, height){
+              this.canvas = document.createElement("canvas");
+              this.canvas.width = width;
+              this.canvas.height = height;
+              this.canvas.convertToBlob = ()=>{
+                  return new Promise((resolve)=>{
+                      this.canvas.toBlob(resolve);
+                  });
+              };
+              return this.canvas;
+          }
+      };
+  }
+  class screenImageData {
+      constructor(){
+          this.isDrawingData = true;
+          this.imagedata = [];
+      }
+      addData(scale, data) {
+          this.imagedata.push({
+              scale: scale,
+              data: data
+          });
+      }
+      getData(scale) {
+          for(var i = 0; i < this.imagedata.length; i++){
+              if (this.imagedata[i].scale == scale) return this.imagedata[i].data;
+          }
+          return null;
+      }
+  }
+  class screenDrawing {
+      constructor(onScreenCanvas){
+          this.width = 128;
+          this.height = 32;
+          this.scales = [
+              0.5,
+              1,
+              2
+          ];
+          this.canvas = [
+              null,
+              null,
+              null
+          ];
+          this.resetCanvas();
+          this.noFillStatus = false;
+          this.noStrokeStatus = false;
+      }
+      resetCanvas() {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this.canvas[i] = new OffscreenCanvas(this.width * scale, this.height * scale);
+              var ctx = this.canvas[i].getContext('2d');
+              ctx.imageSmoothingEnabled = false;
+              ctx.fillStyle = "white";
+              ctx.fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);
+              ctx.fillStyle = "black";
+              ctx.strokeStyle = "black";
+              ctx.lineWidth = scale;
+          }
+      }
+      getStateData() {
+          var imageData = new screenImageData();
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              var ctx = this.canvas[i].getContext('2d');
+              var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
+              imageData.addData(scale, imagedata);
+          }
+          return imageData;
+      }
+      fill(color) {
+          this.noFillStatus = false;
+          for(var i = 0; i < this.scales.length; i++){
+              var canvas = this.canvas[i];
+              var ctx = canvas.getContext('2d');
+              if (color) ctx.fillStyle = "black";
+              else ctx.fillStyle = "white";
+          }
+      }
+      noFill(color) {
+          this.noFillStatus = true;
+      }
+      stroke(color) {
+          this.noStrokeStatus = false;
+          for(var i = 0; i < this.scales.length; i++){
+              var canvas = this.canvas[i];
+              var ctx = canvas.getContext('2d');
+              if (color) ctx.strokeStyle = "black";
+              else ctx.strokeStyle = "white";
+          }
+      }
+      noStroke(color) {
+          this.noStrokeStatus = true;
+      }
+      _drawPoint(canvas, scale, x, y) {
+          var ctx = canvas.getContext('2d');
+          ctx.fillRect(scale * x, scale * y, scale * 1, scale * 1);
+      }
+      drawPoint(x, y) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawPoint(this.canvas[i], scale, x, y);
+          }
+      }
+      isPointSet(x, y) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              if (scale == 1) {
+                  var ctx = this.canvas[i].getContext('2d');
+                  var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
+                  var basepos = (x + y * this.canvas[i].width) * 4;
+                  var r = imagedata.data[basepos];
+                  var g = imagedata.data[basepos + 1];
+                  var b = imagedata.data[basepos + 2];
+                  imagedata.data[basepos + 3];
+                  if (r != 255 && g != 255 && b != 255) return true;
+                  break;
+              }
+          }
+          return false;
+      }
+      _drawLine(canvas, scale, x0, y0, x1, y1) {
+          var ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.moveTo(scale * x0, scale * y0);
+          ctx.lineTo(scale * x1, scale * y1);
+          ctx.closePath();
+          ctx.stroke();
+      }
+      drawLine(x0, y0, x1, y1) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawLine(this.canvas[i], scale, x0, y0, x1, y1);
+          }
+      }
+      _drawRectangle(canvas, scale, x0, y0, width, height) {
+          var ctx = canvas.getContext('2d');
+          if (!this.noFillStatus) {
+              ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
+          }
+          if (!this.noStrokeStatus) {
+              ctx.strokeRect(scale * x0, scale * y0, scale * width, scale * height);
+          }
+      }
+      drawRectangle(x0, y0, width, height) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawRectangle(this.canvas[i], scale, x0, y0, width, height);
+          }
+      }
+      _drawCircle(canvas, scale, x0, y0, diameter) {
+          var ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.arc(scale * x0, scale * y0, scale * diameter / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          if (!this.noFillStatus) {
+              ctx.fill();
+          }
+          if (!this.noStrokeStatus) {
+              ctx.stroke();
+          }
+      }
+      drawCircle(x0, y0, diameter) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawCircle(this.canvas[i], scale, x0, y0, diameter);
+          }
+      }
+      _clearScreen(canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "black";
+          ctx.strokeStyle = "black";
+      }
+      clearScreen() {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._clearScreen(this.canvas[i], scale);
+          }
+      }
+      copyToCanvas(canvas, scale) {
+          for(var i = 0; i < this.scales.length; i++){
+              var currentScale = this.scales[i];
+              if (currentScale == scale) {
+                  var ctx = canvas.getContext('2d');
+                  ctx.drawImage(this.canvas[i], 0, 0, this.canvas[i].width, this.canvas[i].height, 0, 0, canvas.width, canvas.height);
+              }
+          }
+      }
+      static renderToCanvas(state, canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          ctx.putImageData(state.getData(scale), 0, 0);
+      }
+      static renderDifferences(dataExpected, dataWrong, canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          var expectedData = dataExpected.getData(scale);
+          var actualData = dataWrong.getData(scale);
+          var newData = ctx.createImageData(canvas.width, canvas.height);
+          for(var i = 0; i < newData.data.length; i += 4){
+              var actualSet = false;
+              var expectedSet = false;
+              if (expectedData.data[i + 0] != 255 && expectedData.data[i + 1] != 255 && expectedData.data[i + 2] != 255) {
+                  expectedSet = true;
+              }
+              if (actualData.data[i + 0] != 255 && actualData.data[i + 1] != 255 && actualData.data[i + 2] != 255) {
+                  actualSet = true;
+              }
+              if (expectedSet && actualSet) {
+                  newData.data[i + 0] = 0;
+                  newData.data[i + 1] = 0;
+                  newData.data[i + 2] = 0;
+              } else if (expectedSet) {
+                  newData.data[i + 0] = 100;
+                  newData.data[i + 1] = 100;
+                  newData.data[i + 2] = 100;
+              } else if (actualSet) {
+                  newData.data[i + 0] = 255;
+                  newData.data[i + 1] = 0;
+                  newData.data[i + 2] = 0;
+              } else {
+                  newData.data[i + 0] = 255;
+                  newData.data[i + 1] = 255;
+                  newData.data[i + 2] = 255;
+              }
+              newData.data[i + 3] = 255;
+          }
+          ctx.putImageData(newData, 0, 0);
       }
   }
 
@@ -1875,12 +2122,18 @@ elif program_exists:
               }
           },
           isButtonPressed: function(arg1, arg2) {
-              let callback = arg2;
-              let sensor = sensorHandler.findSensorByName(arg1, true);
-              let name = arg1;
+              let callback;
+              let sensor;
+              let name;
               if (typeof arg2 == "undefined") {
-                  let sensor = sensorHandler.findSensorByType("button");
-                  sensor.name;
+                  // no arguments
+                  callback = arg1;
+                  sensor = sensorHandler.findSensorByType("button");
+                  name = sensor.name;
+              } else {
+                  callback = arg2;
+                  sensor = sensorHandler.findSensorByName(arg1, true);
+                  name = arg1;
               }
               if (!context.display || context.autoGrading || context.offLineMode) {
                   if (sensor.type == "stick") {
@@ -1896,14 +2149,14 @@ elif program_exists:
                   let cb = context.runner.waitCallback(callback);
                   if (sensor.type == "stick") {
                       let stickDefinition = sensorHandler.findSensorDefinition(sensor);
-                      stickDefinition.getLiveState(sensor, function(returnVal) {
+                      sensor.getLiveState(function(returnVal) {
                           sensor.state = returnVal;
                           sensorHandler.drawSensor(sensor);
                           let buttonstate = stickDefinition.getButtonState(name, sensor.state);
                           cb(buttonstate);
                       });
                   } else {
-                      sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                      sensor.getLiveState(function(returnVal) {
                           sensor.state = returnVal != "0";
                           sensorHandler.drawSensor(sensor);
                           cb(returnVal != "0");
@@ -1954,7 +2207,9 @@ elif program_exists:
               let callback = arg2;
               let sensor = sensorHandler.findSensorByName(arg1, true);
               if (typeof arg2 == "undefined") {
-                  sensorHandler.findSensorByType("buzzer");
+                  // no arguments
+                  callback = arg1;
+                  sensor = sensorHandler.findSensorByType("buzzer");
               }
               let command = "isBuzzerOn(\"" + sensor.name + "\")";
               if (!context.display || context.autoGrading || context.offLineMode) {
@@ -2029,7 +2284,9 @@ elif program_exists:
               let callback = arg2;
               let sensor = sensorHandler.findSensorByName(arg1, true);
               if (typeof arg2 == "undefined") {
-                  sensorHandler.findSensorByType("led");
+                  // no arguments
+                  callback = arg1;
+                  sensor = sensorHandler.findSensorByType("led");
               }
               let command = "getLedState(\"" + sensor.name + "\")";
               if (!context.display || context.autoGrading || context.offLineMode) {
@@ -2059,6 +2316,11 @@ elif program_exists:
           displayText: function(line1, arg2, arg3) {
               let line2 = arg2;
               let callback = arg3;
+              if (typeof arg3 == "undefined") {
+                  // Only one argument
+                  line2 = null;
+                  callback = arg2;
+              }
               let sensor = sensorHandler.findSensorByType("screen");
               let command = "displayText(\"" + line1 + "\", \"\")";
               context.registerQuickPiEvent(sensor.name, {
@@ -2081,7 +2343,7 @@ elif program_exists:
                   context.runner.waitDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2146,7 +2408,7 @@ elif program_exists:
                   context.waitDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2160,7 +2422,7 @@ elif program_exists:
                   context.waitDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2174,7 +2436,7 @@ elif program_exists:
                   context.waitDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2188,7 +2450,7 @@ elif program_exists:
                   context.waitDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2446,7 +2708,7 @@ elif program_exists:
                   context.runner.noDelay(callback, state);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2464,7 +2726,7 @@ elif program_exists:
               } else {
                   let cb = context.runner.waitCallback(callback);
                   let sensor = context.findSensor("magnetometer", "i2c");
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(axis, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       if (axis == "x") returnVal = returnVal[0];
@@ -2499,7 +2761,7 @@ elif program_exists:
                   context.runner.noDelay(callback, state ? true : false);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       cb(returnVal);
@@ -2535,7 +2797,7 @@ elif program_exists:
               } else {
                   let cb = context.runner.waitCallback(callback);
                   let sensor = context.findSensor("gyroscope", "i2c");
-                  sensorHandler.findSensorDefinition(sensor).getLiveState(axis, function(returnVal) {
+                  sensor.getLiveState(function(returnVal) {
                       sensor.state = returnVal;
                       sensorHandler.drawSensor(sensor);
                       if (axis == "x") returnVal = returnVal[0];
@@ -3166,12 +3428,15 @@ elif program_exists:
                   active: function(self, active, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
                       let command = "wifiSetActive(\"" + sensor.name + "\", " + active + ")";
-                      context.registerQuickPiEvent(sensor.name, {
-                          ...sensor.state,
-                          active: !!active
-                      });
                       if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
+                          let cb = context.runner.waitCallback(callback);
+                          setTimeout(()=>{
+                              context.registerQuickPiEvent(sensor.name, {
+                                  ...sensor.state,
+                                  active: !!active
+                              });
+                              cb();
+                          }, 500);
                       } else {
                           let cb = context.runner.waitCallback(callback);
                           context.quickPiConnection.sendCommand(command, cb);
@@ -3206,13 +3471,17 @@ elif program_exists:
                       if (!sensor.state?.active) {
                           throw strings.messages.wifiNotActive;
                       }
-                      context.registerQuickPiEvent(sensor.name, {
-                          ...sensor.state,
-                          connected: true,
-                          ssid
-                      });
                       if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
+                          let cb = context.runner.waitCallback(callback);
+                          setTimeout(()=>{
+                              context.registerQuickPiEvent(sensor.name, {
+                                  ...sensor.state,
+                                  connected: true,
+                                  ssid,
+                                  password
+                              });
+                              cb();
+                          }, 500);
                       } else {
                           let cb = context.runner.waitCallback(callback);
                           let command = "wifiConnect(\"" + sensor.name + "\", \"" + ssid + "\", \"" + password + "\")";
@@ -3262,14 +3531,33 @@ elif program_exists:
       };
   }
 
+  function getRealValue(object) {
+      if (!object) {
+          return object;
+      }
+      if (object.toJSON) {
+          return object.toJSON();
+      }
+      return object;
+  }
   function urequestsModuleDefinition(context, strings) {
-      async function makeRequest(fetchParameters, callback) {
+      async function makeRequest(sensor, fetchParameters, callback) {
           const proxyUrl = fetchParameters.url;
-          const { url, ...withoutUrlParameters } = fetchParameters;
+          context.registerQuickPiEvent(sensor.name, {
+              ...sensor.state,
+              lastRequest: {
+                  ...fetchParameters
+              }
+          });
+          const fetchArguments = {
+              method: fetchParameters.method,
+              headers: getRealValue(fetchParameters.headers),
+              body: getRealValue(fetchParameters.body)
+          };
           let result = null;
           try {
               // @ts-ignore
-              result = await fetch(proxyUrl, withoutUrlParameters);
+              result = await fetch(proxyUrl, fetchArguments);
           } catch (e) {
               console.error(e);
               throw strings.messages.networkRequestFailed.format(fetchParameters.url);
@@ -3357,8 +3645,12 @@ elif program_exists:
                   ];
                   const callback = args.pop();
                   const [url, headers] = args;
+                  const sensor = context.sensorHandler.findSensorByType('wifi');
+                  if (!sensor.state?.active) {
+                      throw strings.messages.wifiNotActive;
+                  }
                   const cb = context.runner.waitCallback(callback);
-                  return makeRequest({
+                  return makeRequest(sensor, {
                       method: 'GET',
                       url,
                       headers
@@ -3370,8 +3662,12 @@ elif program_exists:
                   ];
                   const callback = args.pop();
                   const [url, data, headers] = args;
+                  const sensor = context.sensorHandler.findSensorByType('wifi');
+                  if (!sensor.state?.active) {
+                      throw strings.messages.wifiNotActive;
+                  }
                   const cb = context.runner.waitCallback(callback);
-                  return makeRequest({
+                  return makeRequest(sensor, {
                       method: 'POST',
                       url,
                       headers,
@@ -3397,10 +3693,6 @@ elif program_exists:
           },
           blockImplementations: {
               dumps: function(params, callback) {
-                  console.log('param', {
-                      params,
-                      callback
-                  });
                   const serialized = JSON.stringify(params);
                   context.waitDelay(callback, serialized);
               }
@@ -4042,6 +4334,27 @@ elif program_exists:
           hello: "Bonjour",
           getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} n'est pas une ville supportée par getTemperatureFromCloud",
           wifiNotActive: "Le Wi-Fi n'est pas activé. Activez le Wi-Fi pour faire cette opération.",
+          wifiSsid: "SSID :",
+          wifiPassword: "Mot de passe :",
+          wifiEnable: "Activer",
+          wifiDisable: "Désactiver",
+          wifiConnect: "Connecter",
+          wifiDisconnect: "Déconnecter",
+          wifiStatusDisabled: "Désactivé",
+          wifiStatusDisconnected: "Déconnecté",
+          wifiStatusConnected: "Connecté",
+          wifiStatus: "Statut :",
+          wifiHeaders: "En-têtes :",
+          wifiBody: "Contenu :",
+          wifiWrongCredentials: "Test échoué : <code>{0}</code> a essayé de se connecter avec les identifiants \"{1}\" au lieu de \"{2}\" à t={3}ms.",
+          wifiNoRequest: "Test échoué : <code>{0}</code> n'a pas effectué de requête à t={1}ms.",
+          wifiWrongMethod: "Test échoué : <code>{0}</code> a effectué une requête avec la méthode \"{1}\" à t={3}ms, la méthode attendue était \"{2}\".",
+          wifiWrongUrl: "Test échoué : <code>{0}</code> a effectué une requête à l'URL \"{1}\" à t={3}ms, l'URL attendue était \"{2}\".",
+          wifiWrongHeader: "Test échoué : <code>{0}</code> a effectué une requête avec le header \"{1}\" valant \"{2}\" à t={4}ms, la valeur attendue était \"{3}\".",
+          wifiWrongBody: "Test échoué : <code>{0}</code> a effectué une requête avec le paramètre \"{1}\" valant \"{2}\" à t={4}ms, la valeur attendue était \"{3}\".",
+          wifiUnknownError: "Test échoué : <code>{0}</code> a été dans un état incorrect à t={1}ms.",
+          insteadOf: "au lieu de",
+          wifiNoRequestShort: "pas de requête",
           networkRequestFailed: "La requête à la page {0} a échoué.",
           networkResponseInvalidJson: "Cette réponse n'est pas au format JSON.",
           experiment: "Expérimenter",
@@ -4375,6 +4688,16 @@ elif program_exists:
           irDisableContinous: "Desactivar la emisión IR continua",
           getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud",
           wifiNotActive: "El wifi no está activado. Active Wi-Fi para hacer esto.",
+          wifiSsid: "SSID:",
+          wifiPassword: "Contraseña:",
+          wifiEnable: "Activar",
+          wifiDisable: "Desactivar",
+          wifiConnect: "Conectar",
+          wifiDisconnect: "Desconectar",
+          wifiStatusDisabled: "Desactivado",
+          wifiStatusDisconnected: "Desconectado",
+          wifiStatusConnected: "Conectado",
+          wifiStatus: "Estado:",
           networkRequestFailed: "Error en la solicitud a la página {0}.",
           networkResponseInvalidJson: "Esta respuesta no está en formato JSON.",
           up: "arriba",
@@ -4770,6 +5093,16 @@ elif program_exists:
           off: "Off",
           getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud",
           wifiNotActive: "Il Wi-Fi non è attivato. Attiva il Wi-Fi per farlo.",
+          wifiSsid: "SSID:",
+          wifiPassword: "Password:",
+          wifiEnable: "Activare",
+          wifiDisable: "Disabilitare",
+          wifiConnect: "Connetti",
+          wifiDisconnect: "Disconnetti",
+          wifiStatusDisabled: "Disabilitato",
+          wifiStatusDisconnected: "Disconnesso",
+          wifiStatusConnected: "Connesso",
+          wifiStatus: "Stato:",
           networkRequestFailed: "La richiesta alla pagina {0} non è riuscita.",
           networkResponseInvalidJson: "Questa risposta non è in formato JSON.",
           grovehat: "Grove Base Hat for Raspberry Pi",
@@ -4996,7 +5329,7 @@ elif program_exists:
       this.seq = 0;
       this.wrongVersion = false;
       this.onDistributedEvent = null;
-      this.connect = function(url1) {
+      this.connect = function(url) {
           if (this.wsSession != null) {
               return;
           }
@@ -5006,77 +5339,77 @@ elif program_exists:
           this.resultsCallbackArray = [];
           this.wrongVersion = false;
           this.seq = Math.floor(Math.random() * 65536);
-          this.wsSession = new WebSocket(url1);
-          this.wsSession.onopen = function() {
+          this.wsSession = new WebSocket(url);
+          this.wsSession.onopen = ()=>{
               var command = {
                   "command": "grabLock",
                   "username": userName,
                   "detectionLib": pythonLibDetection
               };
-              wsSession.send(JSON.stringify(command));
+              this.wsSession.send(JSON.stringify(command));
           };
-          this.wsSession.onmessage = function(evt) {
+          this.wsSession.onmessage = (evt)=>{
               var message = JSON.parse(evt.data);
               if (message.command == "hello") {
                   var version = 0;
                   if (message.version) version = message.version;
                   if (version < NEED_VERSION) {
-                      wrongVersion = true;
-                      wsSession.close();
-                      onclose();
+                      this.wrongVersion = true;
+                      this.wsSession.close();
+                      this.onclose();
                   } else {
                       var replaceLib = pythonLibHash != message.libraryHash;
-                      if (replaceLib) transferPythonLib();
+                      if (replaceLib) this.transferPythonLib();
                       else {
                           var command = {
                               "command": "pythonLib",
                               "replaceLib": false
                           };
-                          wsSession.send(JSON.stringify(command));
+                          this.wsSession.send(JSON.stringify(command));
                       }
-                      connected = true;
-                      onConnect();
-                      pingInterval = setInterval(function() {
+                      this.connected = true;
+                      this.onConnect();
+                      this.pingInterval = setInterval(()=>{
                           var command = {
                               "command": "ping"
                           };
-                          if (pingsWithoutPong > 8) {
-                              wsSession.close();
-                              onclose();
+                          if (this.pingsWithoutPong > 8) {
+                              this.wsSession.close();
+                              this.onclose();
                           } else {
-                              pingsWithoutPong++;
-                              wsSession.send(JSON.stringify(command));
-                              lastPingSend = +new Date();
+                              this.pingsWithoutPong++;
+                              this.wsSession.send(JSON.stringify(command));
+                              this.lastPingSend = +new Date();
                           }
                       }, 4000);
-                      if (onChangeBoard && message.board) {
-                          onChangeBoard(message.board);
+                      if (this.onChangeBoard && message.board) {
+                          this.onChangeBoard(message.board);
                       }
                   }
               }
               if (message.command == "locked") {
-                  locked = message.lockedby;
+                  this.locked = message.lockedby;
               } else if (message.command == "pong") {
-                  pingsWithoutPong = 0;
+                  this.pingsWithoutPong = 0;
               } else if (message.command == "installed") {
-                  if (oninstalled != null) oninstalled();
+                  if (this.oninstalled != null) this.oninstalled();
               } else if (message.command == "startCommandMode") {
-                  if (commandQueue.length > 0) {
-                      var command = commandQueue.shift();
-                      resultsCallbackArray = [];
-                      sendCommand(command.command, command.callback);
+                  if (this.commandQueue.length > 0) {
+                      let command = this.commandQueue.shift();
+                      this.resultsCallbackArray = [];
+                      this.sendCommand(command.command, command.callback);
                   }
               } else if (message.command == "execLineresult") {
-                  if (commandMode) {
+                  if (this.commandMode) {
                       //console.log("Result seq: " + message.seq);
-                      if (resultsCallbackArray && resultsCallbackArray.length > 0) {
+                      if (this.resultsCallbackArray && this.resultsCallbackArray.length > 0) {
                           //console.log("resultsCallbackArray has elements")
-                          if (message.seq >= resultsCallbackArray[0].seq) {
+                          if (message.seq >= this.resultsCallbackArray[0].seq) {
                               //console.log("we under the seq");
                               var callbackelement = null;
                               var found = false;
-                              while(resultsCallbackArray.length > 0){
-                                  callbackelement = resultsCallbackArray.shift();
+                              while(this.resultsCallbackArray.length > 0){
+                                  callbackelement = this.resultsCallbackArray.shift();
                                   if (callbackelement.seq == message.seq) {
                                       //console.log("we found it " + callbackelement.command, message.seq );
                                       found = true;
@@ -5088,28 +5421,28 @@ elif program_exists:
                               }
                           }
                       }
-                      if (commandQueue.length > 0 && !transaction) {
-                          var command = commandQueue.shift();
-                          sendCommand(command.command, command.callback);
+                      if (this.commandQueue.length > 0 && !this.transaction) {
+                          let command = this.commandQueue.shift();
+                          this.sendCommand(command.command, command.callback);
                       }
                   }
               } else if (message.command == "closed") {
-                  if (wsSession) {
-                      wsSession.close();
+                  if (this.wsSession) {
+                      this.wsSession.close();
                   }
               } else if (message.command == "distributedEvent") {
-                  if (onDistributedEvent) onDistributedEvent(message.event);
+                  if (this.onDistributedEvent) this.onDistributedEvent(message.event);
               }
           };
-          this.wsSession.onclose = function(event) {
-              if (wsSession != null) {
-                  clearInterval(pingInterval);
-                  pingInterval = null;
-                  wsSession = null;
-                  commandMode = false;
-                  sessionTainted = false;
-                  connected = false;
-                  onDisconnect(connected, wrongVersion);
+          this.wsSession.onclose = (event)=>{
+              if (this.wsSession != null) {
+                  clearInterval(this.pingInterval);
+                  this.pingInterval = null;
+                  this.wsSession = null;
+                  this.commandMode = false;
+                  this.sessionTainted = false;
+                  this.connected = false;
+                  this.onDisconnect(this.connected, this.wrongVersion);
               }
           };
       };
@@ -5124,13 +5457,13 @@ elif program_exists:
                   "library": chunk,
                   "last": numChunks - 1 == i
               };
-              wsSession.send(JSON.stringify(command));
+              this.wsSession.send(JSON.stringify(command));
           }
       };
       this.isAvailable = function(ipaddress, callback) {
-          url = "ws://" + ipaddress + ":5000/api/v1/commands";
+          this.url = "ws://" + ipaddress + ":5000/api/v1/commands";
           try {
-              var websocket = new WebSocket(url);
+              var websocket = new WebSocket(this.url);
               websocket.onopen = function() {
                   websocket.onclose = null;
                   websocket.close();
@@ -5144,13 +5477,13 @@ elif program_exists:
           }
       };
       this.onclose = function() {
-          clearInterval(pingInterval);
-          pingInterval = null;
-          wsSession = null;
-          commandMode = false;
-          sessionTainted = false;
-          connected = false;
-          onDisconnect(connected, wrongVersion);
+          clearInterval(this.pingInterval);
+          this.pingInterval = null;
+          this.wsSession = null;
+          this.commandMode = false;
+          this.sessionTainted = false;
+          this.connected = false;
+          this.onDisconnect(this.connected, this.wrongVersion);
       };
       this.wasLocked = function() {
           if (this.locked) return true;
@@ -5228,19 +5561,19 @@ elif program_exists:
           this.transaction = true;
       };
       this.endTransaction = function() {
-          messages = [];
+          const messages = [];
           this.resultsCallbackArray = [];
           for(var i = 0; i < this.commandQueue.length; i++){
               this.seq++;
               messages.push({
                   "command": "execLine",
                   "line": this.commandQueue[i].command,
-                  "seq": seq,
+                  "seq": this.seq,
                   "long": this.commandQueue[i].long ? true : false
               });
               //console.log("trans seq: " + seq);
               this.resultsCallbackArray.push({
-                  "seq": seq,
+                  "seq": this.seq,
                   "callback": this.commandQueue[i].callback,
                   "command": this.commandQueue[i].command
               });
@@ -5270,13 +5603,13 @@ elif program_exists:
                       var commandobj = {
                           "command": "execLine",
                           "line": command,
-                          "seq": seq,
+                          "seq": this.seq,
                           "long": long ? true : false
                       };
                       //console.log("send command ", command, seq);
                       //console.log("Sending seq: " + seq);
                       this.resultsCallbackArray.push({
-                          "seq": seq,
+                          "seq": this.seq,
                           "callback": callback,
                           "command": command
                       });
@@ -8425,7 +8758,6 @@ def detectBoard():
       return cmn(c ^ (b | ~d), a, b, x, s, t);
   }
   function md51(s) {
-      txt = '';
       var n = s.length, state = [
           1732584193,
           -271733879,
@@ -8792,8 +9124,8 @@ def detectBoard():
           <div class="panel-heading">
              <h2 class="sectionTitle">
                 <span class="iconTag">
-                <i class="icon fas fa-list-ul">
-                </i>
+                  <i class="icon fas fa-list-ul">
+                  </i>
                 </span>
                 ${strings.messages.raspiConfig}       
              </h2>
@@ -8959,6 +9291,3363 @@ def detectBoard():
     `;
   }
 
+  class AbstractSensor {
+      constructor(sensorData, context, strings){
+          this.context = context;
+          this.strings = strings;
+          for (let [key, value] of Object.entries(sensorData)){
+              this[key] = value;
+          }
+      }
+      drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {}
+  }
+
+  class SensorLed extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "led",
+              suggestedName: strings.messages.sensorNameLed,
+              description: strings.messages.led,
+              isAnalog: false,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "ledon-red.png"
+              ],
+              valueType: "boolean",
+              pluggable: true,
+              getPercentageFromState: function(state) {
+                  if (state) return 1;
+                  else return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return 1;
+                  else return 0;
+              },
+              getStateString: function(state) {
+                  return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
+              },
+              subTypes: [
+                  {
+                      subType: "blue",
+                      description: strings.messages.blueled,
+                      selectorImages: [
+                          "ledon-blue.png"
+                      ],
+                      suggestedName: strings.messages.sensorNameBlueLed
+                  },
+                  {
+                      subType: "green",
+                      description: strings.messages.greenled,
+                      selectorImages: [
+                          "ledon-green.png"
+                      ],
+                      suggestedName: strings.messages.sensorNameGreenLed
+                  },
+                  {
+                      subType: "orange",
+                      description: strings.messages.orangeled,
+                      selectorImages: [
+                          "ledon-orange.png"
+                      ],
+                      suggestedName: strings.messages.sensorNameOrangeLed
+                  },
+                  {
+                      subType: "red",
+                      description: strings.messages.redled,
+                      selectorImages: [
+                          "ledon-red.png"
+                      ],
+                      suggestedName: strings.messages.sensorNameRedLed
+                  }
+              ]
+          };
+      }
+      setLiveState(state, callback) {
+          var ledstate = state ? 1 : 0;
+          var command = "setLedState(\"" + this.name + "\"," + ledstate + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      getInitialState() {
+          return false;
+      }
+      draw(sensorHandler, { fadeopacity, sensorAttr, imgx, imgy, imgw, imgh, state1x, state1y }) {
+          if (this.stateText) this.stateText.remove();
+          if (this.state == null) this.state = 0;
+          if (!this.ledoff || sensorHandler.isElementRemoved(this.ledoff)) {
+              this.ledoff = this.context.paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
+              this.focusrect.click(()=>{
+                  if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                      this.state = !this.state;
+                      sensorHandler.warnClientSensorStateChanged(this);
+                      sensorHandler.drawSensor(this);
+                  } else {
+                      sensorHandler.actuatorsInRunningModeError();
+                  }
+              });
+          }
+          if (!this.ledon || sensorHandler.isElementRemoved(this.ledon)) {
+              let imagename = "ledon-";
+              if (this.subType) imagename += this.subType;
+              else imagename += "red";
+              imagename += ".png";
+              this.ledon = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+          }
+          this.ledon.attr(sensorAttr);
+          this.ledoff.attr(sensorAttr);
+          if (this.showAsAnalog) {
+              this.stateText = this.context.paper.text(state1x, state1y, this.state);
+          } else {
+              if (this.state) {
+                  this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
+              } else {
+                  this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
+              }
+          }
+          if (this.state) {
+              this.ledon.attr({
+                  "opacity": fadeopacity
+              });
+              this.ledoff.attr({
+                  "opacity": 0
+              });
+          } else {
+              this.ledon.attr({
+                  "opacity": 0
+              });
+              this.ledoff.attr({
+                  "opacity": fadeopacity
+              });
+          }
+          // let x = typeof sensor.state;
+          if (typeof this.state == 'number') {
+              this.ledon.attr({
+                  "opacity": this.state * fadeopacity
+              });
+              this.ledoff.attr({
+                  "opacity": fadeopacity
+              });
+          }
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              this.setLiveState(this.state, function() {});
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'led';
+      }
+  }
+
+  class SensorLedRgb extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "ledrgb",
+              suggestedName: strings.messages.sensorNameLedRgb,
+              description: strings.messages.ledrgb,
+              isAnalog: true,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "ledon-red.png"
+              ],
+              valueType: "object",
+              valueMin: 0,
+              valueMax: 255,
+              pluggable: true,
+              getPercentageFromState: function(state) {
+                  if (state) return state / 255;
+                  else return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return Math.round(percentage * 255);
+                  else return 0;
+              },
+              getStateString: function(state) {
+                  return `[${state.join(', ')}]`;
+              }
+          };
+      }
+      setLiveState(state, callback) {
+          var command = `setLedRgbState("${this.name}", [0, 0, 0])`;
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      getInitialState() {
+          return [
+              0,
+              0,
+              0
+          ];
+      }
+      draw(sensorHandler, { sensorAttr, imgx, imgy, imgw, imgh, state1x, state1y, juststate }) {
+          if (this.stateText) this.stateText.remove();
+          if (this.state == null) this.state = 0;
+          if (!this.ledimage || sensorHandler.isElementRemoved(this.ledimage)) {
+              let imagename = "ledoff.png";
+              this.ledimage = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+          }
+          if (!this.ledcolor || sensorHandler.isElementRemoved(this.ledcolor)) {
+              this.ledcolor = this.context.paper.circle();
+          }
+          this.ledimage.attr(sensorAttr);
+          this.ledcolor.attr(sensorAttr);
+          this.ledcolor.attr({});
+          this.ledcolor.attr({
+              "cx": imgx + imgw / 2,
+              "cy": imgy + imgh * 0.3,
+              "r": imgh * 0.15,
+              fill: this.state ? `rgb(${this.state.join(',')})` : 'none',
+              stroke: 'none',
+              opacity: 0.5
+          });
+          this.stateText = this.context.paper.text(state1x, state1y, `${this.state ? this.state.join(',') : ''}`);
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              this.setLiveState(this.state, function() {});
+          }
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 255);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'ledrgb';
+      }
+  }
+
+  class SensorLedDim extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "leddim",
+              suggestedName: strings.messages.sensorNameLedDim,
+              description: strings.messages.ledDim,
+              isAnalog: true,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "ledon-red.png"
+              ],
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 1,
+              getPercentageFromState: function(state) {
+                  return state;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return percentage;
+              },
+              getStateFromPwm: function(duty) {
+                  return duty / 1023;
+              },
+              getStateString: function(state) {
+                  return Math.round(state * 100) + "%";
+              }
+          };
+      }
+      setLiveState(state, callback) {
+          var ledstate = state ? 1 : 0;
+          var command = "setLedState(\"" + this.name + "\"," + ledstate + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      getInitialState() {
+          return 0;
+      }
+      draw(sensorHandler, { fadeopacity, sensorAttr, imgx, imgy, imgw, imgh, state1x, state1y, juststate }) {
+          if (this.stateText) this.stateText.remove();
+          if (this.state == null) this.state = 0;
+          if (!this.ledoff || sensorHandler.isElementRemoved(this.ledoff)) {
+              this.ledoff = this.context.paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
+          }
+          if (!this.ledon || sensorHandler.isElementRemoved(this.ledon)) {
+              let imagename = "ledon-";
+              if (this.subType) imagename += this.subType;
+              else imagename += "red";
+              imagename += ".png";
+              this.ledon = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+          }
+          this.ledon.attr(sensorAttr);
+          this.ledoff.attr(sensorAttr);
+          this.stateText = this.context.paper.text(state1x, state1y, Math.round(100 * this.state) + '%');
+          if (this.state) {
+              this.ledon.attr({
+                  "opacity": fadeopacity
+              });
+              this.ledoff.attr({
+                  "opacity": 0
+              });
+          } else {
+              this.ledon.attr({
+                  "opacity": 0
+              });
+              this.ledoff.attr({
+                  "opacity": fadeopacity
+              });
+          }
+          if (typeof this.state == 'number') {
+              this.ledon.attr({
+                  "opacity": this.state * fadeopacity
+              });
+              this.ledoff.attr({
+                  "opacity": fadeopacity
+              });
+          }
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              this.setLiveState(this.state, function() {});
+          }
+          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 1);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'leddim';
+      }
+  }
+
+  class SensorLedMatrix extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "ledmatrix",
+              suggestedName: strings.messages.sensorNameLedMatrix,
+              description: strings.messages.ledmatrix,
+              isAnalog: false,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "ledon-red.png"
+              ],
+              valueType: "boolean",
+              pluggable: true,
+              getPercentageFromState: function(state) {
+                  if (state) {
+                      var total = 0;
+                      state.forEach(function(substate) {
+                          substate.forEach(function(v) {
+                              total += v;
+                          });
+                      });
+                      return total / 25;
+                  }
+                  return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage > 0) {
+                      return [
+                          [
+                              1,
+                              1,
+                              1,
+                              1,
+                              1
+                          ],
+                          [
+                              1,
+                              1,
+                              1,
+                              1,
+                              1
+                          ],
+                          [
+                              1,
+                              1,
+                              1,
+                              1,
+                              1
+                          ],
+                          [
+                              1,
+                              1,
+                              1,
+                              1,
+                              1
+                          ],
+                          [
+                              1,
+                              1,
+                              1,
+                              1,
+                              1
+                          ]
+                      ];
+                  }
+                  return [
+                      [
+                          0,
+                          0,
+                          0,
+                          0,
+                          0
+                      ],
+                      [
+                          0,
+                          0,
+                          0,
+                          0,
+                          0
+                      ],
+                      [
+                          0,
+                          0,
+                          0,
+                          0,
+                          0
+                      ],
+                      [
+                          0,
+                          0,
+                          0,
+                          0,
+                          0
+                      ],
+                      [
+                          0,
+                          0,
+                          0,
+                          0,
+                          0
+                      ]
+                  ];
+              },
+              getStateString: function(state) {
+                  return '';
+              }
+          };
+      }
+      setLiveState(state, callback) {
+          var command = "setLedMatrixState(\"" + this.name + "\"," + JSON.stringify(state) + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      getInitialState() {
+          return [
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ]
+          ];
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.state || !this.state.length) this.state = [
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ],
+              [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+              ]
+          ];
+          let ledmatrixOnAttr = {
+              "fill": "red",
+              "stroke": "darkgray"
+          };
+          let ledmatrixOffAttr = {
+              "fill": "lightgray",
+              "stroke": "darkgray"
+          };
+          if (!this.ledmatrix || sensorHandler.isElementRemoved(this.ledmatrix[0][0])) {
+              this.ledmatrix = [];
+              for(let i = 0; i < 5; i++){
+                  this.ledmatrix[i] = [];
+                  for(let j = 0; j < 5; j++){
+                      this.ledmatrix[i][j] = this.context.paper.rect(imgx + imgw / 5 * i, imgy + imgh / 5 * j, imgw / 5, imgh / 5);
+                      this.ledmatrix[i][j].attr(ledmatrixOffAttr);
+                  }
+              }
+          }
+          for(let i = 0; i < 5; i++){
+              for(let j = 0; j < 5; j++){
+                  if (this.state[i][j]) {
+                      this.ledmatrix[i][j].attr(ledmatrixOnAttr);
+                  } else {
+                      this.ledmatrix[i][j].attr(ledmatrixOffAttr);
+                  }
+              }
+          }
+          const ledMatrixListener = (imgx, imgy, imgw, imgh, sensor)=>{
+              return (e)=>{
+                  let i = Math.floor((e.offsetX - imgx) / (imgw / 5));
+                  let j = Math.floor((e.offsetY - imgy) / (imgh / 5));
+                  sensor.state[i][j] = !sensor.state[i][j] ? 1 : 0;
+                  sensor.setLiveState(sensor.state, ()=>{});
+                  sensorHandler.getSensorDrawer().drawSensor(sensor);
+              };
+          };
+          this.focusrect.unclick();
+          this.focusrect.click(ledMatrixListener(imgx, imgy, imgw, imgh, this));
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'ledmatrix';
+      }
+  }
+
+  class SensorButton extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "button",
+              suggestedName: strings.messages.sensorNameButton,
+              description: strings.messages.button,
+              isAnalog: false,
+              isSensor: true,
+              portType: "D",
+              valueType: "boolean",
+              pluggable: true,
+              selectorImages: [
+                  "buttonoff.png"
+              ],
+              getPercentageFromState: function(state) {
+                  if (state) return 1;
+                  else return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return 1;
+                  else return 0;
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("isButtonPressed(\"" + this.name + "\")", function(retVal) {
+              var intVal = parseInt(retVal, 10);
+              callback(intVal != 0);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.buttonon || sensorHandler.isElementRemoved(this.buttonon)) this.buttonon = this.context.paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
+          if (!this.buttonoff || sensorHandler.isElementRemoved(this.buttonoff)) this.buttonoff = this.context.paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
+          if (this.state == null) this.state = false;
+          this.buttonon.attr(sensorAttr);
+          this.buttonoff.attr(sensorAttr);
+          if (this.state) {
+              this.buttonon.attr({
+                  "opacity": fadeopacity
+              });
+              this.buttonoff.attr({
+                  "opacity": 0
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
+          } else {
+              this.buttonon.attr({
+                  "opacity": 0
+              });
+              this.buttonoff.attr({
+                  "opacity": fadeopacity
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
+          }
+          if (!this.context.autoGrading && !this.buttonon.node.onmousedown) {
+              this.focusrect.node.onmousedown = ()=>{
+                  if (this.context.offLineMode) {
+                      this.state = true;
+                      sensorHandler.warnClientSensorStateChanged(this);
+                      sensorHandler.getSensorDrawer().drawSensor(this);
+                  } else sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              };
+              this.focusrect.node.onmouseup = ()=>{
+                  if (this.context.offLineMode) {
+                      this.state = false;
+                      this.wasPressed = true;
+                      sensorHandler.warnClientSensorStateChanged(this);
+                      sensorHandler.getSensorDrawer().drawSensor(this);
+                      if (this.onPressed) this.onPressed();
+                  } else sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              };
+              this.focusrect.node.ontouchstart = this.focusrect.node.onmousedown;
+              this.focusrect.node.ontouchend = this.focusrect.node.onmouseup;
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'button';
+      }
+  }
+
+  class SensorBuzzer extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "buzzer",
+              suggestedName: strings.messages.sensorNameBuzzer,
+              description: strings.messages.buzzer,
+              isAnalog: false,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "buzzer-ringing.png"
+              ],
+              valueType: "boolean",
+              getPercentageFromState: function(state, sensor) {
+                  if (sensor.showAsAnalog) {
+                      return (state - sensor.minAnalog) / (sensor.maxAnalog - sensor.minAnalog);
+                  } else {
+                      if (state) return 1;
+                      else return 0;
+                  }
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return 1;
+                  else return 0;
+              },
+              getStateString: function(state) {
+                  if (typeof state == 'number' && state != 1 && state != 0) {
+                      return state.toString() + "Hz";
+                  }
+                  return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
+              },
+              subTypes: [
+                  {
+                      subType: "active",
+                      description: strings.messages.grovebuzzer,
+                      pluggable: true
+                  },
+                  {
+                      subType: "passive",
+                      description: strings.messages.quickpibuzzer
+                  }
+              ]
+          };
+      }
+      getInitialState() {
+          return false;
+      }
+      setLiveState(state, callback) {
+          var ledstate = state ? 1 : 0;
+          var command = "setBuzzerState(\"" + this.name + "\"," + ledstate + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (typeof this.state == 'number' && this.state != 0 && this.state != 1) {
+              buzzerSound.start(this.name, this.state);
+          } else if (this.state) {
+              buzzerSound.start(this.name);
+          } else {
+              buzzerSound.stop(this.name);
+          }
+          if (!juststate) {
+              if (this.muteBtn) {
+                  this.muteBtn.remove();
+              }
+              // let muteBtnSize = w * 0.15;
+              let muteBtnSize = imgw * 0.3;
+              this.muteBtn = this.context.paper.text(imgx + imgw * 0.8, imgy + imgh * 0.8, buzzerSound.isMuted(this.name) ? "\uf6a9" : "\uf028");
+              this.muteBtn.node.style.fontWeight = "bold";
+              this.muteBtn.node.style.cursor = "default";
+              this.muteBtn.node.style.MozUserSelect = "none";
+              this.muteBtn.node.style.WebkitUserSelect = "none";
+              this.muteBtn.attr({
+                  "font-size": muteBtnSize + "px",
+                  fill: buzzerSound.isMuted(this.name) ? "lightgray" : "#468DDF",
+                  "font-family": '"Font Awesome 5 Free"',
+                  'text-anchor': 'start',
+                  "cursor": "pointer"
+              });
+              this.muteBtn.getBBox();
+              this.muteBtn.click(()=>{
+                  if (buzzerSound.isMuted(this.name)) {
+                      buzzerSound.unmute(this.name);
+                  } else {
+                      buzzerSound.mute(this.name);
+                  }
+                  sensorHandler.getSensorDrawer().drawSensor(this);
+              });
+              this.muteBtn.toFront();
+          }
+          if (!this.buzzeron || sensorHandler.isElementRemoved(this.buzzeron)) this.buzzeron = this.context.paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
+          if (!this.buzzeroff || sensorHandler.isElementRemoved(this.buzzeroff)) {
+              this.buzzeroff = this.context.paper.image(getImg('buzzer.png'), imgx, imgy, imgw, imgh);
+              this.focusrect.click(()=>{
+                  if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                      this.state = !this.state;
+                      sensorHandler.warnClientSensorStateChanged(this);
+                      sensorHandler.getSensorDrawer().drawSensor(this);
+                  } else {
+                      sensorHandler.actuatorsInRunningModeError();
+                  }
+              });
+          }
+          if (this.state) {
+              if (!this.buzzerInterval) {
+                  this.buzzerInterval = setInterval(()=>{
+                      if (!this.removed) {
+                          this.ringingState = !this.ringingState;
+                          sensorHandler.getSensorDrawer().drawSensor(this, true, true);
+                      } else {
+                          clearInterval(this.buzzerInterval);
+                      }
+                  }, 100);
+              }
+          } else {
+              if (this.buzzerInterval) {
+                  clearInterval(this.buzzerInterval);
+                  this.buzzerInterval = null;
+                  this.ringingState = null;
+              }
+          }
+          this.buzzeron.attr(sensorAttr);
+          this.buzzeroff.attr(sensorAttr);
+          let drawState = this.state;
+          if (this.ringingState != null) drawState = this.ringingState;
+          if (drawState) {
+              this.buzzeron.attr({
+                  "opacity": fadeopacity
+              });
+              this.buzzeroff.attr({
+                  "opacity": 0
+              });
+          } else {
+              this.buzzeron.attr({
+                  "opacity": 0
+              });
+              this.buzzeroff.attr({
+                  "opacity": fadeopacity
+              });
+          }
+          if (this.stateText) this.stateText.remove();
+          let stateText = sensorHandler.findSensorDefinition(this).getStateString(this.state);
+          this.stateText = this.context.paper.text(state1x, state1y, stateText);
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              this.setLiveState(this.state, function() {});
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'buzzer';
+      }
+  }
+
+  function generateIrRemoteDialog(strings) {
+      return "<div class=\"content qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + strings.messages.irRemoteControl + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div id=\"sensorPicker\" class=\"panel-body\">" + "       <div id=\"piremotemessage\" >" + "       </div>" + "       <div id=\"piremotecontent\" >" + "       </div>" + "   </div>" + "   <div class=\"singleButton\">" + "       <button id=\"picancel2\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.closeDialog + "</button>" + "   </div>" + "</div>";
+  }
+  class SensorIrTrans extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "irtrans",
+              suggestedName: strings.messages.sensorNameIrTrans,
+              description: strings.messages.irtrans,
+              isAnalog: false,
+              isSensor: true,
+              portType: "D",
+              valueType: "number",
+              valueMin: 0,
+              valueMax: 60,
+              selectorImages: [
+                  "irtranson.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 60;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 60);
+              }
+          };
+      }
+      setLiveState(state, callback) {
+          var ledstate = state ? 1 : 0;
+          var command = "setInfraredState(\"" + this.name + "\"," + ledstate + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.ledon || sensorHandler.isElementRemoved(this.ledon)) {
+              this.ledon = this.context.paper.image(getImg("irtranson.png"), imgx, imgy, imgw, imgh);
+          }
+          const irRemoteDialog = generateIrRemoteDialog(this.strings);
+          if (!this.ledoff || sensorHandler.isElementRemoved(this.ledoff)) {
+              this.ledoff = this.context.paper.image(getImg('irtransoff.png'), imgx, imgy, imgw, imgh);
+              this.focusrect.click(()=>{
+                  if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+                      //sensor.state = !sensor.state;
+                      //this.drawSensor(sensor);
+                      window.displayHelper.showPopupDialog(irRemoteDialog, ()=>{
+                          $('#picancel').click(()=>{
+                              $('#popupMessage').hide();
+                              window.displayHelper.popupMessageShown = false;
+                          });
+                          $('#picancel2').click(()=>{
+                              $('#popupMessage').hide();
+                              window.displayHelper.popupMessageShown = false;
+                          });
+                          let addedSomeButtons = false;
+                          let remotecontent = document.getElementById('piremotecontent');
+                          let parentdiv = document.createElement("DIV");
+                          parentdiv.className = "form-group";
+                          remotecontent.appendChild(parentdiv);
+                          let count = 0;
+                          for(let code in this.context.remoteIRcodes){
+                              addedSomeButtons = true;
+                              this.context.remoteIRcodes[code];
+                              let btn = document.createElement("BUTTON");
+                              let t = document.createTextNode(code);
+                              btn.className = "btn";
+                              btn.appendChild(t);
+                              parentdiv.appendChild(btn);
+                              let capturedcode = code;
+                              let captureddata = this.context.remoteIRcodes[code];
+                              btn.onclick = ()=>{
+                                  $('#popupMessage').hide();
+                                  window.displayHelper.popupMessageShown = false;
+                                  //if (sensor.waitingForIrMessage)
+                                  //sensor.waitingForIrMessage(capturedcode);
+                                  this.context.quickPiConnection.sendCommand("presetIRMessage(\"" + capturedcode + "\", '" + captureddata + "')", function(returnVal) {});
+                                  this.context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + capturedcode + "\")", function(returnVal) {});
+                              };
+                              count += 1;
+                              if (count == 4) {
+                                  count = 0;
+                                  parentdiv = document.createElement("DIV");
+                                  parentdiv.className = "form-group";
+                                  remotecontent.appendChild(parentdiv);
+                              }
+                          }
+                          if (!addedSomeButtons) {
+                              $('#piremotemessage').text(this.strings.messages.noIrPresets);
+                          }
+                          let btn = document.createElement("BUTTON");
+                          let t = document.createTextNode(this.strings.messages.irEnableContinous);
+                          if (this.state) {
+                              t = document.createTextNode(this.strings.messages.irDisableContinous);
+                          }
+                          btn.className = "btn";
+                          btn.appendChild(t);
+                          parentdiv.appendChild(btn);
+                          btn.onclick = ()=>{
+                              $('#popupMessage').hide();
+                              window.displayHelper.popupMessageShown = false;
+                              this.state = !this.state;
+                              sensorHandler.warnClientSensorStateChanged(this);
+                              sensorHandler.getSensorDrawer().drawSensor(this);
+                          };
+                      });
+                  } else {
+                      sensorHandler.actuatorsInRunningModeError();
+                  }
+              });
+          }
+          this.ledon.attr(sensorAttr);
+          this.ledoff.attr(sensorAttr);
+          if (this.state) {
+              this.ledon.attr({
+                  "opacity": fadeopacity
+              });
+              this.ledoff.attr({
+                  "opacity": 0
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
+          } else {
+              this.ledon.attr({
+                  "opacity": 0
+              });
+              this.ledoff.attr({
+                  "opacity": fadeopacity
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
+          }
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              this.setLiveState(this.state, function() {});
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'irtrans';
+      }
+  }
+
+  class SensorScreen extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "screen",
+              suggestedName: strings.messages.sensorNameScreen,
+              description: strings.messages.screen,
+              isAnalog: false,
+              isSensor: false,
+              cellsAmount: function(paper) {
+                  // console.log(paper.width)
+                  if (context.board == 'grovepi') {
+                      return 2;
+                  }
+                  if (paper.width < 250) {
+                      return 4;
+                  } else if (paper.width < 350) {
+                      return 3;
+                  }
+                  if (context.compactLayout) return 3;
+                  else return 2;
+              },
+              portType: "i2c",
+              valueType: "object",
+              selectorImages: [
+                  "screen.png"
+              ],
+              compareState: function(state1, state2) {
+                  // Both are null are equal
+                  if (state1 == null && state2 == null) return true;
+                  // If only one is null they are different
+                  if (state1 == null && state2 || state1 && state2 == null) return false;
+                  if (state1.isDrawingData != state2.isDrawingData) return false;
+                  if (state1 && state1.isDrawingData) {
+                      // They are ImageData objects
+                      // The image data is RGBA so there are 4 bits per pixel
+                      var data1 = state1.getData(1).data;
+                      var data2 = state2.getData(1).data;
+                      for(var i = 0; i < data1.length; i += 4){
+                          if (data1[i] != data2[i] || data1[i + 1] != data2[i + 1] || data1[i + 2] != data2[i + 2] || data1[i + 3] != data2[i + 3]) return false;
+                      }
+                      return true;
+                  } else {
+                      // Otherwise compare the strings
+                      return state1.line1 == state2.line1 && (state1.line2 == state2.line2 || !state1.line2 && !state2.line2);
+                  }
+              },
+              getStateString: function(state) {
+                  if (!state) {
+                      return '""';
+                  }
+                  if (state.isDrawingData) return strings.messages.drawing;
+                  else return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
+              },
+              getWrongStateString: function(failInfo) {
+                  if (!failInfo.expected || !failInfo.expected.isDrawingData || !failInfo.actual || !failInfo.actual.isDrawingData) {
+                      return null; // Use default message
+                  }
+                  var data1 = failInfo.expected.getData(1).data;
+                  var data2 = failInfo.actual.getData(1).data;
+                  var nbDiff = 0;
+                  for(var i = 0; i < data1.length; i += 4){
+                      if (data1[i] != data2[i]) {
+                          nbDiff += 1;
+                      }
+                  }
+                  return strings.messages.wrongStateDrawing.format(failInfo.name, nbDiff, failInfo.time);
+              },
+              subTypes: [
+                  {
+                      subType: "16x2lcd",
+                      description: strings.messages.grove16x2lcd,
+                      pluggable: true
+                  },
+                  {
+                      subType: "oled128x32",
+                      description: strings.messages.oled128x32
+                  }
+              ]
+          };
+      }
+      getInitialState() {
+          if (this.isDrawingScreen) return null;
+          else return {
+              line1: "",
+              line2: ""
+          };
+      }
+      setLiveState(state, callback) {
+          var line2 = state.line2;
+          if (!line2) line2 = "";
+          var command = "displayText(\"" + this.name + "\"," + state.line1 + "\", \"" + line2 + "\")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      draw(sensorHandler, drawParameters) {
+          if (this.stateText) {
+              this.stateText.remove();
+              this.stateText = null;
+          }
+          let borderSize = 5;
+          let screenScale = 1.5;
+          if (drawParameters.w < 300) {
+              screenScale = 1;
+          }
+          if (drawParameters.w < 150) {
+              screenScale = 0.5;
+          }
+          // console.log(screenScale,w,h)
+          let screenScalerSize = {
+              width: 128 * screenScale,
+              height: 32 * screenScale
+          };
+          borderSize = borderSize * screenScale;
+          drawParameters.imgw = screenScalerSize.width + borderSize * 2;
+          drawParameters.imgh = screenScalerSize.height + borderSize * 2;
+          drawParameters.imgx = drawParameters.x - drawParameters.imgw / 2 + drawParameters.w / 2;
+          drawParameters.imgy = drawParameters.y + (drawParameters.h - drawParameters.imgh) / 2 + drawParameters.h * 0.05;
+          drawParameters.portx = drawParameters.imgx + drawParameters.imgw + borderSize;
+          drawParameters.porty = drawParameters.imgy + drawParameters.imgh / 3;
+          drawParameters.statesize = drawParameters.imgh / 3.5;
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) {
+              this.img = this.context.paper.image(getImg('screen.png'), drawParameters.imgx, drawParameters.imgy, drawParameters.imgw, drawParameters.imgh);
+          }
+          this.img.attr({
+              "x": drawParameters.imgx,
+              "y": drawParameters.imgy,
+              "width": drawParameters.imgw,
+              "height": drawParameters.imgh,
+              "opacity": drawParameters.fadeopacity
+          });
+          if (this.state) {
+              if (this.state.isDrawingData) {
+                  if (!this.screenrect || sensorHandler.isElementRemoved(this.screenrect) || !this.canvasNode) {
+                      this.screenrect = this.context.paper.rect(drawParameters.imgx, drawParameters.imgy, screenScalerSize.width, screenScalerSize.height);
+                      this.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                      this.canvasNode.setAttribute("x", drawParameters.imgx + borderSize); //Set rect data
+                      this.canvasNode.setAttribute("y", drawParameters.imgy + borderSize); //Set rect data
+                      this.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                      this.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
+                      this.context.paper.canvas.appendChild(this.canvasNode);
+                      this.canvas = document.createElement("canvas");
+                      this.canvas.id = "screencanvas";
+                      this.canvas.width = screenScalerSize.width;
+                      this.canvas.height = screenScalerSize.height;
+                      this.canvasNode.appendChild(this.canvas);
+                  }
+                  $(this.canvas).css({
+                      opacity: drawParameters.fadeopacity
+                  });
+                  this.canvasNode.setAttribute("x", drawParameters.imgx + borderSize); //Set rect data
+                  this.canvasNode.setAttribute("y", drawParameters.imgy + borderSize); //Set rect data
+                  this.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                  this.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
+                  this.screenrect.attr({
+                      "x": drawParameters.imgx + borderSize,
+                      "y": drawParameters.imgy + borderSize,
+                      "width": 128,
+                      "height": 32
+                  });
+                  this.screenrect.attr({
+                      "opacity": 0
+                  });
+                  this.context.quickpi.initScreenDrawing(this);
+                  //sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
+                  screenDrawing.renderToCanvas(this.state, this.canvas, screenScale);
+              } else {
+                  let statex = drawParameters.imgx + drawParameters.imgw * .05;
+                  let statey = drawParameters.imgy + drawParameters.imgh * .2;
+                  if (this.state.line1.length > 16) this.state.line1 = this.state.line1.substring(0, 16);
+                  if (this.state.line2 && this.state.line2.length > 16) this.state.line2 = this.state.line2.substring(0, 16);
+                  if (this.canvasNode) {
+                      $(this.canvasNode).remove();
+                      this.canvasNode = null;
+                  }
+                  this.stateText = this.context.paper.text(statex, statey, this.state.line1 + "\n" + (this.state.line2 ? this.state.line2 : ""));
+                  drawParameters.stateanchor = "start";
+                  this.stateText.attr("");
+              }
+          }
+      }
+      drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
+          const { startx, ypositionmiddle, color, strokewidth, ypositiontop } = drawParameters;
+          var sensorDef = sensorHandler.findSensorDefinition(this);
+          if (type != "actual" || !this.lastScreenState || !sensorDef.compareState(this.lastScreenState, state)) {
+              this.lastScreenState = state;
+              let stateBubble;
+              if (state.isDrawingData) {
+                  stateBubble = this.context.paper.text(startx, ypositiontop + 10, '\uf303');
+                  stateBubble.attr({
+                      "font": "Font Awesome 5 Free",
+                      "stroke": color,
+                      "fill": color,
+                      "font-size": 4 * 2 + "px"
+                  });
+                  stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                  stateBubble.node.style.fontWeight = "bold";
+                  $(stateBubble.node).css("z-index", "1");
+                  const showPopup = (event)=>{
+                      if (!this.showingTooltip) {
+                          $("body").append('<div id="screentooltip"></div>');
+                          $('#screentooltip').css("position", "absolute");
+                          $('#screentooltip').css("border", "1px solid gray");
+                          $('#screentooltip').css("background-color", "#efefef");
+                          $('#screentooltip').css("padding", "3px");
+                          $('#screentooltip').css("z-index", "1000");
+                          $('#screentooltip').css("width", "262px");
+                          $('#screentooltip').css("height", "70px");
+                          $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
+                          var canvas = document.createElement("canvas");
+                          canvas.id = "tooltipcanvas";
+                          canvas.width = 128 * 2;
+                          canvas.height = 32 * 2;
+                          $('#screentooltip').append(canvas);
+                          $(canvas).css("position", "absolute");
+                          $(canvas).css("z-index", "1500");
+                          $(canvas).css("left", 3).css("top", 3);
+                          if (expectedState && type == "wrong") {
+                              screenDrawing.renderDifferences(expectedState, state, canvas, 2);
+                          } else {
+                              screenDrawing.renderToCanvas(state, canvas, 2);
+                          }
+                          this.showingTooltip = true;
+                      }
+                  };
+                  $(stateBubble.node).mouseenter(showPopup);
+                  $(stateBubble.node).click(showPopup);
+                  $(stateBubble.node).mouseleave((event)=>{
+                      this.showingTooltip = false;
+                      $('#screentooltip').remove();
+                  });
+              } else {
+                  stateBubble = this.context.paper.text(startx, ypositionmiddle + 10, '\uf27a');
+                  stateBubble.attr({
+                      "font": "Font Awesome 5 Free",
+                      "stroke": color,
+                      "fill": color,
+                      "font-size": strokewidth * 2 + "px"
+                  });
+                  stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                  stateBubble.node.style.fontWeight = "bold";
+                  const showPopup = ()=>{
+                      if (!this.tooltip) {
+                          this.tooltipText = this.context.paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + (state.line2 ? state.line2 : ""));
+                          var textDimensions = this.tooltipText.getBBox();
+                          this.tooltip = this.context.paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
+                          this.tooltip.attr({
+                              "stroke": "black",
+                              "stroke-width": 2,
+                              "fill": "white"
+                          });
+                          this.tooltipText.toFront();
+                      }
+                  };
+                  stateBubble.click(showPopup);
+                  stateBubble.hover(showPopup, ()=>{
+                      if (this.tooltip) {
+                          this.tooltip.remove();
+                          this.tooltip = null;
+                      }
+                      if (this.tooltipText) {
+                          this.tooltipText.remove();
+                          this.tooltipText = null;
+                      }
+                  });
+              }
+              drawParameters.drawnElements.push(stateBubble);
+              this.context.sensorStates.push(stateBubble);
+          } else {
+              drawParameters.deleteLastDrawnElements = false;
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.showingTooltip = false;
+          this.type = 'screen';
+      }
+  }
+
+  class SensorServo extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "servo",
+              suggestedName: strings.messages.sensorNameServo,
+              description: strings.messages.servo,
+              isAnalog: true,
+              isSensor: false,
+              portType: "D",
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 180,
+              selectorImages: [
+                  "servo.png",
+                  "servo-pale.png",
+                  "servo-center.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 180;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 180);
+              },
+              getStateString: function(state) {
+                  return "" + state + "°";
+              },
+              getStateFromPwm: function(pwmDuty) {
+                  return 180 * (pwmDuty - 0.025 * 1023) / (0.1 * 1023);
+              }
+          };
+      }
+      getInitialState() {
+          return 0;
+      }
+      setLiveState(state, callback) {
+          var command = "setServoAngle(\"" + this.name + "\"," + state + ")";
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('servo.png'), imgx, imgy, imgw, imgh);
+          if (!this.pale || sensorHandler.isElementRemoved(this.pale)) this.pale = this.context.paper.image(getImg('servo-pale.png'), imgx, imgy, imgw, imgh);
+          if (!this.center || sensorHandler.isElementRemoved(this.center)) this.center = this.context.paper.image(getImg('servo-center.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.pale.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "transform": "",
+              "opacity": fadeopacity
+          });
+          this.center.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.pale.rotate(this.state);
+          if (this.state == null) this.state = 0;
+          this.state = Math.round(this.state);
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + "°");
+          if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
+              if (!this.updatetimeout) {
+                  this.updatetimeout = setTimeout(()=>{
+                      this.setLiveState(this.state, function() {});
+                      this.updatetimeout = null;
+                  }, 100);
+              }
+          }
+          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 180);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'servo';
+      }
+  }
+
+  const gpios = [
+      10,
+      9,
+      11,
+      8,
+      7
+  ];
+  class SensorStick extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "stick",
+              suggestedName: strings.messages.sensorNameStick,
+              description: strings.messages.fivewaybutton,
+              isAnalog: false,
+              isSensor: true,
+              portType: "D",
+              valueType: "boolean",
+              selectorImages: [
+                  "stick.png"
+              ],
+              gpiosNames: [
+                  "up",
+                  "down",
+                  "left",
+                  "right",
+                  "center"
+              ],
+              gpios,
+              getPercentageFromState: function(state) {
+                  if (state) return 1;
+                  else return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return 1;
+                  else return 0;
+              },
+              compareState: function(state1, state2) {
+                  if (state1 == null && state2 == null) return true;
+                  return state1[0] == state2[0] && state1[1] == state2[1] && state1[2] == state2[2] && state1[3] == state2[3] && state1[4] == state2[4];
+              },
+              getButtonState: function(buttonname, state) {
+                  if (state) {
+                      var buttonparts = buttonname.split(".");
+                      var actualbuttonmame = buttonname;
+                      if (buttonparts.length == 2) {
+                          actualbuttonmame = buttonparts[1];
+                      }
+                      var index = this.gpiosNames.indexOf(actualbuttonmame);
+                      if (index >= 0) {
+                          return state[index];
+                      }
+                  }
+                  return false;
+              },
+              cellsAmount: function(paper) {
+                  return 2;
+              }
+          };
+      }
+      getLiveState(callback) {
+          "readStick(" + gpios.join() + ")";
+          this.context.quickPiConnection.sendCommand("readStick(" + gpios.join() + ")", function(retVal) {
+              let array = JSON.parse(retVal);
+              callback(array);
+          });
+      }
+      draw(sensorHandler, drawParameters) {
+          const { imgx, imgy, imgw, imgh, fadeopacity, state1x, state1y } = drawParameters;
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('stick.png'), imgx, imgy, imgw, imgh);
+          if (!this.imgup || sensorHandler.isElementRemoved(this.imgup)) this.imgup = this.context.paper.image(getImg('stickup.png'), imgx, imgy, imgw, imgh);
+          if (!this.imgdown || sensorHandler.isElementRemoved(this.imgdown)) this.imgdown = this.context.paper.image(getImg('stickdown.png'), imgx, imgy, imgw, imgh);
+          if (!this.imgleft || sensorHandler.isElementRemoved(this.imgleft)) this.imgleft = this.context.paper.image(getImg('stickleft.png'), imgx, imgy, imgw, imgh);
+          if (!this.imgright || sensorHandler.isElementRemoved(this.imgright)) this.imgright = this.context.paper.image(getImg('stickright.png'), imgx, imgy, imgw, imgh);
+          if (!this.imgcenter || sensorHandler.isElementRemoved(this.imgcenter)) this.imgcenter = this.context.paper.image(getImg('stickcenter.png'), imgx, imgy, imgw, imgh);
+          let a = {
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": 0
+          };
+          this.img.attr(a).attr("opacity", fadeopacity);
+          this.imgup.attr(a);
+          this.imgdown.attr(a);
+          this.imgleft.attr(a);
+          this.imgright.attr(a);
+          this.imgcenter.attr(a);
+          if (this.stateText) this.stateText.remove();
+          if (!this.state) this.state = [
+              false,
+              false,
+              false,
+              false,
+              false
+          ];
+          // let stateString = "\n";
+          let stateString = "";
+          let click = false;
+          if (this.state[0]) {
+              stateString += this.strings.messages.up.toUpperCase() + "\n";
+              this.imgup.attr({
+                  "opacity": 1
+              });
+              click = true;
+          }
+          if (this.state[1]) {
+              stateString += this.strings.messages.down.toUpperCase() + "\n";
+              this.imgdown.attr({
+                  "opacity": 1
+              });
+              click = true;
+          }
+          if (this.state[2]) {
+              stateString += this.strings.messages.left.toUpperCase() + "\n";
+              this.imgleft.attr({
+                  "opacity": 1
+              });
+              click = true;
+          }
+          if (this.state[3]) {
+              stateString += this.strings.messages.right.toUpperCase() + "\n";
+              this.imgright.attr({
+                  "opacity": 1
+              });
+              click = true;
+          }
+          if (this.state[4]) {
+              stateString += this.strings.messages.center.toUpperCase() + "\n";
+              this.imgcenter.attr({
+                  "opacity": 1
+              });
+              click = true;
+          }
+          if (!click) {
+              stateString += "...";
+          }
+          this.stateText = this.context.paper.text(state1x, state1y, stateString);
+          if (this.portText) this.portText.remove();
+          drawParameters.drawPortText = false;
+          if (this.portText) this.portText.remove();
+          if (!this.context.autoGrading) {
+              let gpios = sensorHandler.findSensorDefinition(this).gpios;
+              let min = 255;
+              let max = 0;
+              for(let i = 0; i < gpios.length; i++){
+                  if (gpios[i] > max) max = gpios[i];
+                  if (gpios[i] < min) min = gpios[i];
+              }
+              $('#stickupstate').text(this.state[0] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
+              $('#stickdownstate').text(this.state[1] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
+              $('#stickleftstate').text(this.state[2] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
+              $('#stickrightstate').text(this.state[3] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
+              $('#stickcenterstate').text(this.state[4] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
+          /*
+                        sensor.portText = this.context.paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
+                        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
+                        sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+                        let b = sensor.portText._getBBox();
+                        sensor.portText.translate(0, b.height / 2);
+
+                        let stickPortsDialog = `
+                        <div class="content qpi">
+                        <div class="panel-heading">
+                            <h2 class="sectionTitle">
+                                <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                                Noms et ports de la manette
+                            </h2>
+                            <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                        </div>
+                        <div id="sensorPicker" class="panel-body">
+                            <label></label>
+                            <div class="flex-container">
+                            <table style="display:table-header-group;">
+                            <tr>
+                            <th>Name</th>
+                            <th>Port</th>
+                            <th>State</th>
+                            <th>Direction</th>
+                            </tr>
+                            <tr>
+                            <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
+                            </tr>
+                            <tr>
+                            <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
+                            </tr>
+                            <tr>
+                            <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
+                            </tr>
+                            <tr>
+                            <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
+                            </tr>
+                            <tr>
+                            <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
+                            </tr>
+                            </table>
+                            </div>
+                        </div>
+                        <div class="singleButton">
+                            <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
+                        </div>
+                    </div>
+                        `;
+
+                        sensor.portText.click(() => {
+                            window.displayHelper.showPopupDialog(stickPortsDialog);
+
+                            $('#picancel').click(() => {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+                            });
+
+                            $('#picancel2').click(() => {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+                            });
+
+                            $('#stickupname').text(sensor.name + ".up");
+                            $('#stickdownname').text(sensor.name + ".down");
+                            $('#stickleftname').text(sensor.name + ".left");
+                            $('#stickrightname').text(sensor.name + ".right");
+                            $('#stickcentername').text(sensor.name + ".center");
+
+                            $('#stickupport').text("D" + gpios[0]);
+                            $('#stickdownport').text("D" + gpios[1]);
+                            $('#stickleftport').text("D" + gpios[2]);
+                            $('#stickrightport').text("D" + gpios[3]);
+                            $('#stickcenterport').text("D" + gpios[4]);
+
+                            $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
+                            $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
+                            $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
+                            $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
+                            $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+
+                        });
+                        */ }
+          function poinInRect(rect, x, y) {
+              if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) return true;
+              return false;
+          }
+          function moveRect(rect, x, y) {
+              rect.left += x;
+              rect.right += x;
+              rect.top += y;
+              rect.bottom += y;
+          }
+          this.focusrect.node.onmousedown = (evt)=>{
+              if (!this.context.offLineMode) {
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+                  return;
+              }
+              let e = evt.target;
+              let dim = e.getBoundingClientRect();
+              let rectsize = dim.width * .30;
+              let rect = {
+                  left: dim.left,
+                  right: dim.left + rectsize,
+                  top: dim.top,
+                  bottom: dim.top + rectsize
+              };
+              // Up left
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[0] = true;
+                  this.state[2] = true;
+              }
+              // Up
+              moveRect(rect, rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[0] = true;
+              }
+              // Up right
+              moveRect(rect, rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[0] = true;
+                  this.state[3] = true;
+              }
+              // Right
+              moveRect(rect, 0, rectsize);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[3] = true;
+              }
+              // Center
+              moveRect(rect, -rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[4] = true;
+              }
+              // Left
+              moveRect(rect, -rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[2] = true;
+              }
+              // Down left
+              moveRect(rect, 0, rectsize);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[1] = true;
+                  this.state[2] = true;
+              }
+              // Down
+              moveRect(rect, rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[1] = true;
+              }
+              // Down right
+              moveRect(rect, rectsize, 0);
+              if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                  this.state[1] = true;
+                  this.state[3] = true;
+              }
+              sensorHandler.warnClientSensorStateChanged(this);
+              sensorHandler.getSensorDrawer().drawSensor(this);
+          };
+          this.focusrect.node.onmouseup = (evt)=>{
+              if (!this.context.offLineMode) {
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+                  return;
+              }
+              this.state = [
+                  false,
+                  false,
+                  false,
+                  false,
+                  false
+              ];
+              sensorHandler.warnClientSensorStateChanged(this);
+              sensorHandler.getSensorDrawer().drawSensor(this);
+          };
+          this.focusrect.node.ontouchstart = this.focusrect.node.onmousedown;
+          this.focusrect.node.ontouchend = this.focusrect.node.onmouseup;
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'stick';
+      }
+  }
+
+  class SensorAccelerometer extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "accelerometer",
+              suggestedName: strings.messages.sensorNameAccelerometer,
+              description: strings.messages.accelerometerbmi160,
+              isAnalog: true,
+              isSensor: true,
+              portType: "i2c",
+              valueType: "object",
+              valueMin: 0,
+              valueMax: 100,
+              step: 0.1,
+              selectorImages: [
+                  "accel.png"
+              ],
+              getStateString: function(state) {
+                  if (state == null) return "0m/s²";
+                  if (Array.isArray(state)) {
+                      return "X: " + state[0] + "m/s² Y: " + state[1] + "m/s² Z: " + state[2] + "m/s²";
+                  } else {
+                      return state.toString() + "m/s²";
+                  }
+              },
+              getPercentageFromState: function(state) {
+                  var perc = (state + 78.48) / 156.96;
+                  // console.log(state,perc)
+                  return perc;
+              },
+              getStateFromPercentage: function(percentage) {
+                  var value = percentage * 156.96 - 78.48;
+                  var state = parseFloat(value.toFixed(1));
+                  // console.log(state)
+                  return state;
+              },
+              cellsAmount: function(paper) {
+                  return 2;
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
+              var array = JSON.parse(val);
+              callback(array);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1y, cx }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('accel.png'), imgx, imgy, imgw, imgh);
+          // this.context.paper.rect(x,y,w,h)
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          if (this.stateText) this.stateText.remove();
+          if (!this.state) {
+              this.state = [
+                  0,
+                  0,
+                  1
+              ];
+          }
+          if (this.state) {
+              try {
+                  let str = "X: " + this.state[0] + " m/s²\nY: " + this.state[1] + " m/s²\nZ: " + this.state[2] + " m/s²";
+                  this.stateText = this.context.paper.text(cx, state1y, str);
+              } catch (e) {
+              }
+          // let bbox = sensor.stateText.getBBox();
+          // sensor.stateText.attr("y",cy - bbox.height/2);
+          }
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, -8 * 9.81, 8 * 9.81);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'accelerometer';
+      }
+  }
+
+  class SensorClock extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "clock",
+              description: strings.messages.cloudstore,
+              isAnalog: false,
+              isSensor: false,
+              portType: "none",
+              valueType: "object",
+              selectorImages: [
+                  "clock.png"
+              ]
+          };
+      }
+      draw(sensorHandler, drawParameters) {
+          const { imgx, imgy, imgw, imgh, state1x, state1y } = drawParameters;
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('clock.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh
+          });
+          this.stateText = this.context.paper.text(state1x, state1y, this.context.currentTime.toString() + "ms");
+          drawParameters.drawPortText = false;
+          drawParameters.drawName = false;
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'clock';
+      }
+  }
+
+  class SensorCloudStore extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "cloudstore",
+              suggestedName: strings.messages.sensorNameCloudStore,
+              description: strings.messages.cloudstore,
+              isAnalog: false,
+              isSensor: false,
+              // portType: "none",
+              portType: "D",
+              valueType: "object",
+              selectorImages: [
+                  "cloudstore.png"
+              ],
+              /*getInitialState: function(sensor) {
+            return {};
+        },*/ getWrongStateString: function(failInfo) {
+                  /**
+           * Call this function when more.length > less.length. It will find the key that is missing inside of the
+           * less array
+           * @param more The bigger array, containing one or more key more than less
+           * @param less Less, the smaller array, he has a key or more missing
+           */ function getMissingKey(more, less) {
+                      for(var i = 0; i < more.length; i++){
+                          var found = false;
+                          for(var j = 0; j < less.length; j++){
+                              if (more[i] === less[j]) {
+                                  found = true;
+                                  break;
+                              }
+                          }
+                          if (!found) return more[i];
+                      }
+                      // should never happen because length are different.
+                      return null;
+                  }
+                  // the type of a value in comparison.
+                  var valueType = {
+                      // Primitive type are strings and integers
+                      PRIMITIVE: "primitive",
+                      ARRAY: "array",
+                      DICTIONARY: "dictionary",
+                      // if two values are of wrong type then this is returned
+                      WRONG_TYPE: "wrong_type"
+                  };
+                  /**
+           * This method allow us to compare two keys of the cloud and their values
+           * @param actual The actual key that we have
+           * @param expected The expected key that we have
+           * @return An object containing the type of the return and the key that differ
+           */ function compareKeys(actual, expected) {
+                      function compareArrays(arr1, arr2) {
+                          if (arr1.length != arr2.length) return false;
+                          for(var i = 0; i < arr1.length; i++){
+                              for(var j = 0; j < arr2.length; j++){
+                                  if (arr1[i] !== arr2[i]) return false;
+                              }
+                          }
+                          return true;
+                      }
+                      var actualKeys = Object.keys(actual);
+                      for(var i = 0; i < actualKeys.length; i++){
+                          var actualVal = actual[actualKeys[i]];
+                          // they both have the same keys so we can do that.
+                          var expectedVal = expected[actualKeys[i]];
+                          if (isPrimitive(expectedVal)) {
+                              // if string with int for example
+                              if (typeof expectedVal !== typeof actualVal) {
+                                  return {
+                                      type: valueType.WRONG_TYPE,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                              if (expectedVal !== actualVal) {
+                                  return {
+                                      type: valueType.PRIMITIVE,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                          } else if (Array.isArray(expectedVal)) {
+                              if (!Array.isArray(actualVal)) {
+                                  return {
+                                      type: valueType.WRONG_TYPE,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                              if (!compareArrays(expectedVal, actualVal)) {
+                                  return {
+                                      type: valueType.ARRAY,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                          // if we are in a dictionary
+                          // method from: https://stackoverflow.com/questions/38304401/javascript-check-if-dictionary
+                          } else if (expectedVal.constructor == Object) {
+                              if (actualVal.constructor != Object) {
+                                  return {
+                                      type: valueType.WRONG_TYPE,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                              if (!deepEqual(expectedVal, actualVal)) {
+                                  return {
+                                      type: valueType.DICTIONARY,
+                                      key: actualKeys[i]
+                                  };
+                              }
+                          }
+                      }
+                  }
+                  if (!failInfo.expected && !failInfo.actual) return null;
+                  var expected = failInfo.expected;
+                  var actual = failInfo.actual;
+                  var expectedKeys = Object.keys(expected);
+                  var actualKeys = Object.keys(actual);
+                  if (expectedKeys.length != actualKeys.length) {
+                      if (expectedKeys.length > actualKeys.length) {
+                          var missingKey = getMissingKey(expectedKeys, actualKeys);
+                          return strings.messages.cloudMissingKey.format(missingKey);
+                      } else {
+                          var additionalKey = getMissingKey(actualKeys, expectedKeys);
+                          return strings.messages.cloudMoreKey.format(additionalKey);
+                      }
+                  }
+                  // This will return a key that is missing inside of expectedKeys if there is one, otherwise it will return null.
+                  var unexpectedKey = getMissingKey(actualKeys, expectedKeys);
+                  if (unexpectedKey) {
+                      return strings.messages.cloudUnexpectedKeyCorrection.format(unexpectedKey);
+                  }
+                  var keyCompare = compareKeys(actual, expected);
+                  switch(keyCompare.type){
+                      case valueType.PRIMITIVE:
+                          return strings.messages.cloudPrimitiveWrongKey.format(keyCompare.key, expected[keyCompare.key], actual[keyCompare.key]);
+                      case valueType.WRONG_TYPE:
+                          var typeActual = typeof actual[keyCompare.key];
+                          var typeExpected = typeof expected[keyCompare.key];
+                          // we need to check if it is an array or a dictionary
+                          if (typeActual == "object") {
+                              if (Array.isArray(actual[keyCompare.key])) typeActual = "array";
+                          }
+                          if (typeExpected == "object") {
+                              if (Array.isArray(expected[keyCompare.key])) typeExpected = "array";
+                          }
+                          var typeActualTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeActual];
+                          var typeExpectedTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeExpected];
+                          return strings.messages.cloudWrongType.format(typeActualTranslate, keyCompare.key, typeExpectedTranslate);
+                      case valueType.ARRAY:
+                          return strings.messages.cloudArrayWrongKey.format(keyCompare.key);
+                      case valueType.DICTIONARY:
+                          return strings.messages.cloudDictionaryWrongKey.format(keyCompare.key);
+                  }
+              },
+              compareState: function(state1, state2) {
+                  return LocalQuickStore.compareState(state1, state2);
+              }
+          };
+      }
+      draw(sensorHandler, drawParameters) {
+          const { imgx, imgy, imgw, imgh, scrolloffset } = drawParameters;
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('cloudstore.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh * 0.8,
+              "opacity": scrolloffset ? 0.3 : 1
+          });
+          drawParameters.drawPortText = false;
+      // drawName = false;
+      }
+      drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
+          const { startx, ypositionmiddle, color } = drawParameters;
+          const sensorDef = sensorHandler.findSensorDefinition(this);
+          if (type != "actual" || !this.lastScreenState || !sensorDef.compareState(this.lastScreenState, state)) {
+              this.lastScreenState = state;
+              var stateBubble = this.context.paper.text(startx, ypositionmiddle + 10, '\uf044');
+              stateBubble.attr({
+                  "font": "Font Awesome 5 Free",
+                  "stroke": color,
+                  "fill": color,
+                  "font-size": 4 * 2 + "px"
+              });
+              stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+              stateBubble.node.style.fontWeight = "bold";
+              const showPopup = (event)=>{
+                  if (!this.showingTooltip) {
+                      $("body").append('<div id="screentooltip"></div>');
+                      $('#screentooltip').css("position", "absolute");
+                      $('#screentooltip').css("border", "1px solid gray");
+                      $('#screentooltip').css("background-color", "#efefef");
+                      $('#screentooltip').css("padding", "3px");
+                      $('#screentooltip').css("z-index", "1000");
+                      /*
+            $('#screentooltip').css("width", "262px");
+            $('#screentooltip').css("height", "70px");*/ $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
+                      if (expectedState && type == "wrong") {
+                          var div = LocalQuickStore.renderDifferences(expectedState, state);
+                          $('#screentooltip').append(div);
+                      } else {
+                          for(var property in state){
+                              var div = document.createElement("div");
+                              $(div).text(property + " = " + state[property]);
+                              $('#screentooltip').append(div);
+                          }
+                      }
+                      this.showingTooltip = true;
+                  }
+              };
+              $(stateBubble.node).mouseenter(showPopup);
+              $(stateBubble.node).click(showPopup);
+              $(stateBubble.node).mouseleave((event)=>{
+                  this.showingTooltip = false;
+                  $('#screentooltip').remove();
+              });
+              drawParameters.drawnElements.push(stateBubble);
+              this.context.sensorStates.push(stateBubble);
+          } else {
+              drawParameters.deleteLastDrawnElements = false;
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'cloudstore';
+      }
+  }
+
+  const gyroscope3D = function() {
+      let instance;
+      function createInstance(width, height) {
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          // debug code start
+          /*
+      canvas.style.zIndex = 99999;
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      document.body.appendChild(canvas);
+      */ // debug code end
+          try {
+              var renderer = new window.zen3d.Renderer(canvas, {
+                  antialias: true,
+                  alpha: true
+              });
+          } catch (e) {
+              return false;
+          }
+          renderer.glCore.state.colorBuffer.setClear(0, 0, 0, 0);
+          var scene = new window.zen3d.Scene();
+          var lambert = new window.zen3d.LambertMaterial();
+          lambert.diffuse.setHex(0x468DDF);
+          var cube_geometry = new window.zen3d.CubeGeometry(10, 2, 10);
+          var cube = new window.zen3d.Mesh(cube_geometry, lambert);
+          cube.position.x = 0;
+          cube.position.y = 0;
+          cube.position.z = 0;
+          scene.add(cube);
+          var ambientLight = new window.zen3d.AmbientLight(0xffffff, 2);
+          scene.add(ambientLight);
+          var pointLight = new window.zen3d.PointLight(0xffffff, 1, 100);
+          pointLight.position.set(-20, 40, 10);
+          scene.add(pointLight);
+          var camera = new window.zen3d.Camera();
+          camera.position.set(0, 13, 13);
+          camera.lookAt(new window.zen3d.Vector3(0, 0, 0), new window.zen3d.Vector3(0, 1, 0));
+          camera.setPerspective(45 / 180 * Math.PI, width / height, 1, 1000);
+          scene.add(camera);
+          return {
+              resize: function(width, height) {
+                  camera.setPerspective(45 / 180 * Math.PI, width / height, 1, 1000);
+              },
+              render: function(ax, ay, az) {
+                  cube.euler.x = Math.PI * ax / 360;
+                  cube.euler.y = Math.PI * ay / 360;
+                  cube.euler.z = Math.PI * az / 360;
+                  renderer.render(scene, camera);
+                  return canvas;
+              }
+          };
+      }
+      return {
+          getInstance: function(width, height) {
+              if (!instance) {
+                  instance = createInstance(width, height);
+              } else {
+                  instance.resize(width, height);
+              }
+              return instance;
+          }
+      };
+  }();
+
+  class SensorGyroscope extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "gyroscope",
+              suggestedName: strings.messages.sensorNameGyroscope,
+              description: strings.messages.gyrobmi160,
+              isAnalog: true,
+              isSensor: true,
+              portType: "i2c",
+              valueType: "object",
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "gyro.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return (state + 125) / 250;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 250) - 125;
+              },
+              cellsAmount: function(paper) {
+                  return 2;
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readGyroBMI160()", (val)=>{
+              let array = JSON.parse(val);
+              array[0] = Math.round(array[0]);
+              array[1] = Math.round(array[1]);
+              array[2] = Math.round(array[2]);
+              callback(array);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, cx, state1y, sensorAttr }) {
+          if (!this.state) {
+              this.state = [
+                  0,
+                  0,
+                  0
+              ];
+          }
+          if (this.stateText) {
+              this.stateText.remove();
+          }
+          let str = "X: " + this.state[0] + "°/s\nY: " + this.state[1] + "°/s\nZ: " + this.state[2] + "°/s";
+          this.stateText = this.context.paper.text(cx, state1y, str);
+          if (!this.previousState) this.previousState = [
+              0,
+              0,
+              0
+          ];
+          if (this.rotationAngles != undefined) {
+              // update the rotation angle
+              for(let i = 0; i < 3; i++)this.rotationAngles[i] += this.previousState[i] * ((+new Date() - +this.lastSpeedChange) / 1000);
+              this.lastSpeedChange = new Date();
+          }
+          this.previousState = this.state;
+          let img3d = null;
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              img3d = gyroscope3D.getInstance(imgw, imgh);
+          }
+          if (img3d) {
+              if (!this.screenrect || sensorHandler.isElementRemoved(this.screenrect)) {
+                  this.screenrect = this.context.paper.rect(imgx, imgy, imgw, imgh);
+                  this.screenrect.attr({
+                      "opacity": 0
+                  });
+                  this.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                  this.canvasNode.setAttribute("x", imgx);
+                  this.canvasNode.setAttribute("y", imgy);
+                  this.canvasNode.setAttribute("width", imgw);
+                  this.canvasNode.setAttribute("height", imgh);
+                  this.context.paper.canvas.appendChild(this.canvasNode);
+                  this.canvas = document.createElement("canvas");
+                  this.canvas.width = imgw;
+                  this.canvas.height = imgh;
+                  this.canvasNode.appendChild(this.canvas);
+              }
+              let sensorCtx = this.canvas.getContext('2d');
+              sensorCtx.clearRect(0, 0, imgw, imgh);
+              sensorCtx.drawImage(img3d.render(this.state[0], this.state[2], this.state[1]), 0, 0);
+              if (!juststate) {
+                  this.focusrect.drag((dx, dy, x, y, event)=>{
+                      this.state[0] = Math.max(-125, Math.min(125, this.old_state[0] + dy));
+                      this.state[1] = Math.max(-125, Math.min(125, this.old_state[1] - dx));
+                      sensorHandler.warnClientSensorStateChanged(this);
+                      sensorHandler.getSensorDrawer().drawSensor(this, true);
+                  }, ()=>{
+                      this.old_state = this.state.slice();
+                  });
+              }
+          } else {
+              if (!this.img || sensorHandler.isElementRemoved(this.img)) {
+                  this.img = this.context.paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
+              }
+              this.img.attr({
+                  "x": imgx,
+                  "y": imgy,
+                  "width": imgw,
+                  "height": imgh,
+                  "opacity": fadeopacity
+              });
+              if (!this.context.autoGrading && this.context.offLineMode) {
+                  sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, -125, 125);
+              } else {
+                  this.focusrect.click(()=>{
+                      sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+                  });
+                  sensorHandler.getSensorDrawer().removeSlider(this);
+              }
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'gyroscope';
+      }
+  }
+
+  class SensorHumidity extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "humidity",
+              suggestedName: strings.messages.sensorNameHumidity,
+              description: strings.messages.humiditysensor,
+              isAnalog: true,
+              isSensor: true,
+              portType: "D",
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "humidity.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 100;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 100);
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readHumidity(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('humidity.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          if (this.state == null) this.state = 0;
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + "%");
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 100);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'humidity';
+      }
+  }
+
+  class SensorIrRecv extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "irrecv",
+              suggestedName: strings.messages.sensorNameIrRecv,
+              description: strings.messages.irreceiver,
+              isAnalog: false,
+              isSensor: true,
+              portType: "D",
+              valueType: "number",
+              valueMin: 0,
+              valueMax: 60,
+              selectorImages: [
+                  "irrecvon.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 60;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 60);
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("isButtonPressed(\"" + this.name + "\")", function(retVal) {
+              var intVal = parseInt(retVal, 10);
+              callback(intVal == 0);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.buttonon || sensorHandler.isElementRemoved(this.buttonon)) this.buttonon = this.context.paper.image(getImg('irrecvon.png'), imgx, imgy, imgw, imgh);
+          if (!this.buttonoff || sensorHandler.isElementRemoved(this.buttonoff)) this.buttonoff = this.context.paper.image(getImg('irrecvoff.png'), imgx, imgy, imgw, imgh);
+          this.buttonon.attr(sensorAttr);
+          this.buttonoff.attr(sensorAttr);
+          if (this.state) {
+              this.buttonon.attr({
+                  "opacity": fadeopacity
+              });
+              this.buttonoff.attr({
+                  "opacity": 0
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
+          } else {
+              this.buttonon.attr({
+                  "opacity": 0
+              });
+              this.buttonoff.attr({
+                  "opacity": fadeopacity
+              });
+              this.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
+          }
+          const irRemoteDialog = generateIrRemoteDialog(this.strings);
+          this.focusrect.click(()=>{
+              if (this.context.offLineMode) {
+                  window.displayHelper.showPopupDialog(irRemoteDialog, ()=>{
+                      $('#picancel').click(()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                      });
+                      $('#picancel2').click(()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                      });
+                      let addedSomeButtons = false;
+                      let remotecontent = document.getElementById('piremotecontent');
+                      let parentdiv = document.createElement("DIV");
+                      parentdiv.className = "form-group";
+                      remotecontent.appendChild(parentdiv);
+                      let count = 0;
+                      for(let code in this.context.remoteIRcodes){
+                          addedSomeButtons = true;
+                          this.context.remoteIRcodes[code];
+                          let btn = document.createElement("BUTTON");
+                          let t = document.createTextNode(code);
+                          btn.className = "btn";
+                          btn.appendChild(t);
+                          parentdiv.appendChild(btn);
+                          let capturedcode = code;
+                          btn.onclick = ()=>{
+                              $('#popupMessage').hide();
+                              window.displayHelper.popupMessageShown = false;
+                              if (this.waitingForIrMessage) this.waitingForIrMessage(capturedcode);
+                          };
+                          count += 1;
+                          if (count == 4) {
+                              count = 0;
+                              parentdiv = document.createElement("DIV");
+                              parentdiv.className = "form-group";
+                              remotecontent.appendChild(parentdiv);
+                          }
+                      }
+                      if (!addedSomeButtons) {
+                          $('#piremotemessage').text(this.strings.messages.noIrPresets);
+                      }
+                      let btn = document.createElement("BUTTON");
+                      let t = document.createTextNode(this.strings.messages.irEnableContinous);
+                      if (this.state) {
+                          t = document.createTextNode(this.strings.messages.irDisableContinous);
+                      }
+                      btn.className = "btn";
+                      btn.appendChild(t);
+                      parentdiv.appendChild(btn);
+                      btn.onclick = ()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                          this.state = !this.state;
+                          sensorHandler.warnClientSensorStateChanged(this);
+                          sensorHandler.getSensorDrawer().drawSensor(this);
+                      };
+                  });
+              } else {
+                  //this.sensorInConnectedModeError();
+                  this.context.stopLiveUpdate = true;
+                  let irLearnDialog = "<div class=\"content qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + this.strings.messages.irReceiverTitle + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div id=\"sensorPicker\" class=\"panel-body\">" + "       <div class=\"form-group\">" + "           <p>" + this.strings.messages.directIrControl + "</p>" + "       </div>" + "       <div class=\"form-group\">" + "           <p id=piircode></p>" + "       </div>" + "   </div>" + "   <div class=\"singleButton\">" + "       <button id=\"piirlearn\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + this.strings.messages.getIrCode + "</button>" + "       <button id=\"picancel2\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + this.strings.messages.closeDialog + "</button>" + "   </div>" + "</div>";
+                  window.displayHelper.showPopupDialog(irLearnDialog, ()=>{
+                      $('#picancel').click(()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                          this.context.stopLiveUpdate = false;
+                      });
+                      $('#picancel2').click(()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                          this.context.stopLiveUpdate = false;
+                      });
+                      $('#piirlearn').click(()=>{
+                          $('#piirlearn').attr('disabled', 'disabled');
+                          $("#piircode").text("");
+                          this.context.quickPiConnection.sendCommand("readIRMessageCode(\"irrec1\", 10000)", function(retval) {
+                              $('#piirlearn').attr('disabled', null);
+                              $("#piircode").text(retval);
+                          });
+                      });
+                  });
+              }
+          });
+      /*
+      if (!this.context.autoGrading && !sensor.buttonon.node.onmousedown) {
+          sensor.focusrect.node.onmousedown = () => {
+              if (this.context.offLineMode) {
+                  sensor.state = true;
+                  this.drawSensor(sensor);
+              } else
+                  this.sensorInConnectedModeError();
+          };
+
+
+          sensor.focusrect.node.onmouseup = () => {
+              if (this.context.offLineMode) {
+                  sensor.state = false;
+                  this.drawSensor(sensor);
+
+                  if (sensor.onPressed)
+                      sensor.onPressed();
+              } else
+                  this.sensorInConnectedModeError();
+          }
+
+          sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
+          sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
+      }*/ }
+      constructor(...args){
+          super(...args);
+          this.type = 'irrecv';
+      }
+  }
+
+  class SensorLight extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "light",
+              suggestedName: strings.messages.sensorNameLight,
+              description: strings.messages.lightsensor,
+              isAnalog: true,
+              isSensor: true,
+              portType: "A",
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "light.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 100;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 100);
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readLightIntensity(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('light.png'), imgx, imgy, imgw, imgh);
+          if (!this.moon || sensorHandler.isElementRemoved(this.moon)) this.moon = this.context.paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+          if (!this.sun || sensorHandler.isElementRemoved(this.sun)) this.sun = this.context.paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          if (this.state == null) this.state = 0;
+          if (this.state > 50) {
+              let opacity = (this.state - 50) * 0.02;
+              this.sun.attr({
+                  "x": imgx,
+                  "y": imgy,
+                  "width": imgw,
+                  "height": imgh,
+                  "opacity": opacity * .80 * fadeopacity
+              });
+              this.moon.attr({
+                  "opacity": 0
+              });
+          } else {
+              let opacity = (50 - this.state) * 0.02;
+              this.moon.attr({
+                  "x": imgx,
+                  "y": imgy,
+                  "width": imgw,
+                  "height": imgh,
+                  "opacity": opacity * .80 * fadeopacity
+              });
+              this.sun.attr({
+                  "opacity": 0
+              });
+          }
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + "%");
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 100);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'light';
+      }
+  }
+
+  class SensorMagnetometer extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "magnetometer",
+              suggestedName: strings.messages.sensorNameMagnetometer,
+              description: strings.messages.maglsm303c,
+              isAnalog: true,
+              isSensor: true,
+              portType: "i2c",
+              valueType: "object",
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "mag.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return (state + 1600) / 3200;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 3200) - 1600;
+              },
+              cellsAmount: function(paper) {
+                  return 2;
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readMagnetometerLSM303C(False)", (val)=>{
+              var array = JSON.parse(val);
+              array[0] = Math.round(array[0]);
+              array[1] = Math.round(array[1]);
+              array[2] = Math.round(array[2]);
+              callback(array);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, cx, state1y }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('mag.png'), imgx, imgy, imgw, imgh);
+          if (!this.needle || sensorHandler.isElementRemoved(this.needle)) this.needle = this.context.paper.image(getImg('mag-needle.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.needle.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "transform": "",
+              "opacity": fadeopacity
+          });
+          if (!this.state) {
+              this.state = [
+                  0,
+                  0,
+                  0
+              ];
+          }
+          if (this.state) {
+              let heading = Math.atan2(this.state[0], this.state[1]) * (180 / Math.PI) + 180;
+              this.needle.rotate(heading);
+          }
+          if (this.stateText) this.stateText.remove();
+          if (this.state) {
+              let str = "X: " + this.state[0] + " μT\nY: " + this.state[1] + " μT\nZ: " + this.state[2] + " μT";
+              this.stateText = this.context.paper.text(cx, state1y, str);
+          }
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, -1600, 1600);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'magnetometer';
+      }
+  }
+
+  class SensorPotentiometer extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "potentiometer",
+              suggestedName: strings.messages.sensorNamePotentiometer,
+              description: strings.messages.potentiometer,
+              isAnalog: true,
+              isSensor: true,
+              portType: "A",
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "potentiometer.png",
+                  "potentiometer-pale.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 100;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 100);
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readRotaryAngle(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('potentiometer.png'), imgx, imgy, imgw, imgh);
+          if (!this.pale || sensorHandler.isElementRemoved(this.pale)) this.pale = this.context.paper.image(getImg('potentiometer-pale.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.pale.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "transform": "",
+              "opacity": fadeopacity
+          });
+          if (this.state == null) this.state = 0;
+          this.pale.rotate(this.state * 3.6);
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + "%");
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 100);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'potentiometer';
+      }
+  }
+
+  class SensorRange extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "range",
+              suggestedName: strings.messages.sensorNameDistance,
+              description: strings.messages.distancesensor,
+              isAnalog: true,
+              isSensor: true,
+              portType: "D",
+              valueType: "number",
+              valueMin: 0,
+              valueMax: 5000,
+              selectorImages: [
+                  "range.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 500;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 500);
+              },
+              subTypes: [
+                  {
+                      subType: "vl53l0x",
+                      description: strings.messages.timeofflightranger,
+                      portType: "i2c"
+                  },
+                  {
+                      subType: "ultrasonic",
+                      description: strings.messages.ultrasonicranger,
+                      portType: "D",
+                      pluggable: true
+                  }
+              ]
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readDistance(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('range.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy - imgh * 0.1,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          if (this.state == null) this.state = 500;
+          if (this.rangedistance) this.rangedistance.remove();
+          if (this.rangedistancestart) this.rangedistancestart.remove();
+          if (this.rangedistanceend) this.rangedistanceend.remove();
+          let rangew;
+          if (this.state < 30) {
+              rangew = imgw * this.state / 100;
+          } else {
+              let firstpart = imgw * 30 / 100;
+              let remaining = imgw - firstpart;
+              rangew = firstpart + remaining * this.state * 0.0015;
+          }
+          let cx = imgx + imgw / 2;
+          let cy = imgy + imgh * 0.85;
+          let x1 = cx - rangew / 2;
+          let x2 = cx + rangew / 2;
+          let markh = 12;
+          let y1 = cy - markh / 2;
+          let y2 = cy + markh / 2;
+          this.rangedistance = this.context.paper.path([
+              "M",
+              x1,
+              cy,
+              "H",
+              x2
+          ]);
+          this.rangedistancestart = this.context.paper.path([
+              "M",
+              x1,
+              y1,
+              "V",
+              y2
+          ]);
+          this.rangedistanceend = this.context.paper.path([
+              "M",
+              x2,
+              y1,
+              "V",
+              y2
+          ]);
+          this.rangedistance.attr({
+              "stroke-width": 4,
+              "stroke": "#468DDF",
+              "stroke-linecapstring": "round"
+          });
+          this.rangedistancestart.attr({
+              "stroke-width": 4,
+              "stroke": "#468DDF",
+              "stroke-linecapstring": "round"
+          });
+          this.rangedistanceend.attr({
+              "stroke-width": 4,
+              "stroke": "#468DDF",
+              "stroke-linecapstring": "round"
+          });
+          if (this.state >= 10) this.state = Math.round(this.state);
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + " cm");
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 500);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'range';
+      }
+  }
+
+  class SensorSound extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "sound",
+              suggestedName: strings.messages.sensorNameMicrophone,
+              description: strings.messages.soundsensor,
+              isAnalog: true,
+              isSensor: true,
+              portType: "A",
+              valueType: "number",
+              pluggable: true,
+              valueMin: 0,
+              valueMax: 100,
+              selectorImages: [
+                  "sound.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 100;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 100);
+              }
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readSoundLevel(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (this.state == null) this.state = 25; // FIXME
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('sound.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          // if we just do sensor.state, if it is equal to 0 then the state is not displayed
+          if (this.state != null) {
+              this.stateText = this.context.paper.text(state1x, state1y, this.state + " dB");
+          }
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 60);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'sound';
+      }
+  }
+
+  class SensorTemperature extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "temperature",
+              suggestedName: strings.messages.sensorNameTemperature,
+              description: strings.messages.tempsensor,
+              isAnalog: true,
+              isSensor: true,
+              portType: "A",
+              valueType: "number",
+              valueMin: 0,
+              valueMax: 60,
+              selectorImages: [
+                  "temperature-hot.png",
+                  "temperature-overlay.png"
+              ],
+              getPercentageFromState: function(state) {
+                  return state / 60;
+              },
+              getStateFromPercentage: function(percentage) {
+                  return Math.round(percentage * 60);
+              },
+              subTypes: [
+                  {
+                      subType: "groveanalog",
+                      description: strings.messages.groveanalogtempsensor,
+                      portType: "A",
+                      pluggable: true
+                  },
+                  {
+                      subType: "BMI160",
+                      description: strings.messages.quickpigyrotempsensor,
+                      portType: "i2c"
+                  },
+                  {
+                      subType: "DHT11",
+                      description: strings.messages.dht11tempsensor,
+                      portType: "D",
+                      pluggable: true
+                  }
+              ]
+          };
+      }
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand("readTemperature(\"" + this.name + "\")", function(val) {
+              val = Math.round(val);
+              callback(val);
+          });
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
+          if (this.stateText) this.stateText.remove();
+          if (this.state == null) this.state = 25; // FIXME
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
+          if (!this.img2 || sensorHandler.isElementRemoved(this.img2)) this.img2 = this.context.paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
+          if (!this.img3 || sensorHandler.isElementRemoved(this.img3)) this.img3 = this.context.paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.img2.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          this.img3.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          let scale = imgh / 60;
+          let cliph = scale * this.state;
+          this.img2.attr({
+              "clip-rect": imgx + "," + (imgy + imgh - cliph) + "," + imgw + "," + cliph
+          });
+          this.stateText = this.context.paper.text(state1x, state1y, this.state + " °C");
+          if (!this.context.autoGrading && this.context.offLineMode) {
+              sensorHandler.getSensorDrawer().setSlider(this, juststate, imgx, imgy, imgw, imgh, 0, 60);
+          } else {
+              this.focusrect.click(()=>{
+                  sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+              });
+              sensorHandler.getSensorDrawer().removeSlider(this);
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.type = 'temperature';
+      }
+  }
+
+  class SensorWifi extends AbstractSensor {
+      static getDefinition(context, strings) {
+          return {
+              name: "wifi",
+              suggestedName: strings.messages.sensorNameWifi,
+              description: strings.messages.wifi,
+              isAnalog: false,
+              isSensor: false,
+              portType: "D",
+              selectorImages: [
+                  "wifi.png"
+              ],
+              valueType: "object",
+              valueMin: 0,
+              valueMax: 100,
+              pluggable: true,
+              getPercentageFromState: function(state) {
+                  if (state.active) {
+                      if (state.connected) {
+                          return 1;
+                      }
+                      return 0.5;
+                  }
+                  return 0;
+              },
+              getStateFromPercentage: function(percentage) {
+                  if (percentage) return 1;
+                  else return 0;
+              },
+              getStateString: function(state) {
+                  if (state.connected) {
+                      return strings.messages.wifiStatusConnected;
+                  }
+                  if (state.active) {
+                      return strings.messages.wifiStatusDisconnected;
+                  }
+                  return strings.messages.wifiStatusDisabled;
+              },
+              compareState: function(state1, state2) {
+                  if (state1 === null && state2 === null) {
+                      return true;
+                  }
+                  if (null !== state1 && null === state2 || null !== state2 && null === state1) {
+                      return false;
+                  }
+                  return deepSubsetEqual(state1, state2);
+              },
+              getWrongStateString: function(failInfo) {
+                  const { actual, expected, name, time } = failInfo;
+                  const expectedStatus = this.getStateString(expected);
+                  const actualStatus = this.getStateString(actual);
+                  if (undefined !== expected.active && actual.active !== expected.active || undefined !== expected.connected && actual.connected !== expected.connected) {
+                      return strings.messages.wrongState.format(name, actualStatus, expectedStatus, time);
+                  }
+                  if (undefined !== expected.ssid && actual.ssid !== expected.ssid || undefined !== expected.password && actual.password !== expected.password) {
+                      return strings.messages.wifiWrongCredentials.format(name, actual.ssid + ' / ' + actual.password, expected.ssid + ' / ' + expected.password, time);
+                  }
+                  if (undefined !== expected.lastRequest) {
+                      if (!actual.lastRequest) {
+                          return strings.messages.wifiNoRequest.format(name, time);
+                      }
+                      if (undefined !== expected.lastRequest.method && expected.lastRequest.method !== actual.lastRequest.method) {
+                          return strings.messages.wifiWrongMethod.format(name, actual.lastRequest.method, expected.lastRequest.method, time);
+                      }
+                      if (undefined !== expected.lastRequest.url && expected.lastRequest.url !== actual.lastRequest.url) {
+                          return strings.messages.wifiWrongUrl.format(name, actual.lastRequest.url, expected.lastRequest.url, time);
+                      }
+                      if (undefined !== expected.lastRequest.headers) {
+                          for(let field in expected.lastRequest.headers){
+                              if (expected.lastRequest.headers[field] !== actual.lastRequest.headers?.[field]) {
+                                  return strings.messages.wifiWrongHeader.format(name, field, actual.lastRequest.headers?.[field] ?? '', expected.lastRequest.headers[field], time);
+                              }
+                          }
+                      }
+                      if (undefined !== expected.lastRequest.body) {
+                          for(let field in expected.lastRequest.body){
+                              if (expected.lastRequest.body[field] !== actual.lastRequest.body?.[field]) {
+                                  return strings.messages.wifiWrongBody.format(name, field, actual.lastRequest.body?.[field] ?? '', expected.lastRequest.body[field], time);
+                              }
+                          }
+                      }
+                  }
+                  return strings.messages.wifiUnknownError.format(name, time);
+              }
+          };
+      }
+      getInitialState() {
+          return {
+              active: false,
+              connected: false,
+              ssid: '',
+              password: ''
+          };
+      }
+      setLiveState(state, callback) {
+          var command = `setWifiState("${this.name}", [0, 0, 0])`;
+          this.context.quickPiConnection.sendCommand(command, callback);
+      }
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, fadeopacity, state1x, state1y }) {
+          if (this.stateText) this.stateText.remove();
+          if (!this.img || sensorHandler.isElementRemoved(this.img)) {
+              this.img = this.context.paper.image(getImg('wifi.png'), imgx, imgy, imgw, imgh);
+              this.focusrect.click(()=>{
+                  const state = this.state;
+                  let wifiDialog = `
+        <div class="content qpi" id="wifi_dialog">
+          <div class="panel-heading" id="bim">
+            <h2 class="sectionTitle">
+              <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+              ${this.strings.messages.wifi}
+            </h2>
+            <div class="exit" id="picancel">
+              <i class="icon fas fa-times"></i>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="wifi-actuator">
+              <div class="form-group">
+                 <label id="ssidlabel">${this.strings.messages.wifiSsid}</label>
+                 <div class="input-group">
+                    <div class="input-group-prepend">
+                       Aa
+                    </div>
+                    <input type="text" id="wifi_ssid" class="form-control">
+                 </div>
+              </div>
+               <div class="form-group">
+                 <label id="passwordlabel">${this.strings.messages.wifiPassword}</label>
+                 <div class="input-group">
+                    <div class="input-group-prepend">
+                       Aa
+                    </div>
+                    <input type="text" id="wifi_password" class="form-control">
+                 </div>
+              </div>
+               <div class="wifi-button-group">
+                  <button id="wifi_disable" class="btn">
+                    <i id="piconnectwifiicon" class="fa fa-power-off icon"></i>
+                    ${this.strings.messages.wifiDisable}
+                  </button>
+                  <button id="wifi_enable" class="btn">
+                    <i id="wifi_activating" class="fas fa-spinner fa-spin icon"> </i>
+                    <i id="wifi_enable_icon" class="fa fa-signal icon"></i>
+                    ${this.strings.messages.wifiEnable}
+                  </button>
+                  <button id="wifi_connect" class="btn">
+                    <i id="wifi_connecting" class="fas fa-spinner fa-spin icon"> </i>
+                    <i id="wifi_connect_icon" class="fa fa-wifi icon"></i>
+                    ${this.strings.messages.wifiConnect}
+                  </button>
+                   <button id="wifi_disconnect" class="btn">
+                    <i id="wifi_disable_icon" class="fa fa-wifi icon"></i>
+                    ${this.strings.messages.wifiDisconnect}
+                  </button>
+               </div>
+            </div>    
+            <div class="wifi-sensor">
+             <div class="form-group">
+                 <label id="pilistlabel">${this.strings.messages.wifiStatus}</label>
+                 <div class="input-group">
+                    <select id="wifi_status" class="custom-select">
+                      <option value="disabled">${this.strings.messages.wifiStatusDisabled}</option>
+                      <option value="disconnected">${this.strings.messages.wifiStatusDisconnected}</option>
+                      <option value="connected">${this.strings.messages.wifiStatusConnected}</option>
+                    </select>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+                  const redrawModalState = ()=>{
+                      $('#wifi_ssid').val(state.ssid);
+                      $('#wifi_password').val(state.password);
+                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                          $('#wifi_ssid').prop('disabled', false);
+                          $('#wifi_password').prop('disabled', false);
+                      } else {
+                          $('#wifi_ssid').prop('disabled', true);
+                          $('#wifi_password').prop('disabled', true);
+                      }
+                      if (state.active) {
+                          if (state.connected) {
+                              $('#wifi_enable').hide();
+                              $('#wifi_disable').show();
+                              $('#wifi_connect').hide();
+                              $('#wifi_disconnect').show();
+                          } else {
+                              $('#wifi_enable').hide();
+                              $('#wifi_disable').show();
+                              $('#wifi_connect').show();
+                              $('#wifi_disconnect').hide();
+                          }
+                      } else {
+                          $('#wifi_enable').show();
+                          $('#wifi_disable').hide();
+                          $('#wifi_connect').hide();
+                          $('#wifi_disconnect').hide();
+                      }
+                      if (state.activating) {
+                          $('#wifi_activating').show();
+                          $('#wifi_enable_icon').hide();
+                      } else {
+                          $('#wifi_activating').hide();
+                          $('#wifi_enable_icon').show();
+                      }
+                      if (state.connecting) {
+                          $('#wifi_connecting').show();
+                          $('#wifi_connect_icon').hide();
+                      } else {
+                          $('#wifi_connecting').hide();
+                          $('#wifi_connect_icon').show();
+                      }
+                      const realStatus = !state.active ? 'disabled' : state.connected ? 'connected' : 'disconnected';
+                      $('#wifi_status').val(realStatus);
+                  };
+                  window.displayHelper.showPopupDialog(wifiDialog, ()=>{
+                      redrawModalState();
+                      $('#picancel').click(()=>{
+                          $('#popupMessage').hide();
+                          window.displayHelper.popupMessageShown = false;
+                      });
+                      $('#wifi_enable').click(()=>{
+                          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                              this.state.activating = true;
+                              redrawModalState();
+                              setTimeout(()=>{
+                                  this.state.activating = false;
+                                  this.state.active = true;
+                                  sensorHandler.warnClientSensorStateChanged(this);
+                                  sensorHandler.getSensorDrawer().drawSensor(this);
+                                  redrawModalState();
+                              }, 500);
+                          } else {
+                              sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
+                          }
+                      });
+                      $('#wifi_disable').click(()=>{
+                          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                              this.state.active = false;
+                              this.state.connected = false;
+                              sensorHandler.warnClientSensorStateChanged(this);
+                              sensorHandler.getSensorDrawer().drawSensor(this);
+                              redrawModalState();
+                          } else {
+                              sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
+                          }
+                      });
+                      $('#wifi_connect').click(()=>{
+                          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                              this.state.connecting = true;
+                              redrawModalState();
+                              setTimeout(()=>{
+                                  this.state.connecting = false;
+                                  this.state.connected = true;
+                                  sensorHandler.warnClientSensorStateChanged(this);
+                                  sensorHandler.getSensorDrawer().drawSensor(this);
+                                  redrawModalState();
+                              }, 500);
+                          } else {
+                              sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
+                          }
+                      });
+                      $('#wifi_disconnect').click(()=>{
+                          if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                              this.state.connected = false;
+                              sensorHandler.warnClientSensorStateChanged(this);
+                              sensorHandler.getSensorDrawer().drawSensor(this);
+                              redrawModalState();
+                          } else {
+                              sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
+                          }
+                      });
+                      $('#wifi_ssid').on('change', ()=>{
+                          this.state.ssid = $('#wifi_ssid').val();
+                          sensorHandler.warnClientSensorStateChanged(this);
+                          sensorHandler.getSensorDrawer().drawSensor(this);
+                      });
+                      $('#wifi_password').on('change', ()=>{
+                          this.state.password = $('#wifi_password').val();
+                          sensorHandler.warnClientSensorStateChanged(this);
+                          sensorHandler.getSensorDrawer().drawSensor(this);
+                      });
+                      $('#wifi_status').on('change', ()=>{
+                          const newStatus = $('#wifi_status').val();
+                          if (!this.context.autoGrading && this.context.offLineMode) {
+                              if ('disabled' === newStatus) {
+                                  this.state.active = false;
+                                  this.state.connected = false;
+                              } else if ('disconnected' === newStatus) {
+                                  this.state.active = true;
+                                  this.state.connected = false;
+                              } else if ('connected' === newStatus) {
+                                  this.state.active = true;
+                                  this.state.connected = true;
+                              }
+                              sensorHandler.warnClientSensorStateChanged(this);
+                              sensorHandler.getSensorDrawer().drawSensor(this);
+                              redrawModalState();
+                          } else {
+                              sensorHandler.getSensorDrawer().sensorInConnectedModeError();
+                          }
+                      });
+                  });
+              });
+          }
+          if (!this.active || sensorHandler.isElementRemoved(this.active)) this.active = this.context.paper.circle();
+          const ssid = this.state?.ssid;
+          this.stateText = this.context.paper.text(state1x, state1y, this.state?.scanning ? '...' : ssid && this.state?.connected ? textEllipsis(ssid, 6) : '');
+          this.img.attr({
+              "x": imgx,
+              "y": imgy,
+              "width": imgw,
+              "height": imgh,
+              "opacity": fadeopacity
+          });
+          let color = 'grey';
+          if (this.state?.connected) {
+              color = 'green';
+          } else if (this.state?.active) {
+              color = 'red';
+          }
+          this.active.attr({
+              "cx": imgx + imgw * 0.15,
+              "cy": imgy + imgh * 0.1,
+              "r": imgh * 0.15,
+              fill: `${color}`,
+              stroke: 'none',
+              opacity: 1
+          });
+      }
+      drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
+          const { startx, ypositionmiddle, color, strokewidth } = drawParameters;
+          const sensorDef = sensorHandler.findSensorDefinition(this);
+          if (type != "actual" || !this.lastWifiState || !sensorDef.compareState(this.lastWifiState, state)) {
+              this.lastWifiState = state;
+              let stateBubble = this.context.paper.text(startx, ypositionmiddle + 10, '\uf27a');
+              stateBubble.attr({
+                  "font": "Font Awesome 5 Free",
+                  "stroke": color,
+                  "fill": color,
+                  "font-size": strokewidth * 2 + "px"
+              });
+              stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+              stateBubble.node.style.fontWeight = "bold";
+              const showPopup = (event)=>{
+                  if (!this.showingTooltip) {
+                      let textToDisplay = [];
+                      const renderNewLine = (title, value, expectedValue)=>{
+                          if (null !== expectedValue && undefined !== expectedValue && value !== expectedValue) {
+                              textToDisplay.push(`${title ? `${title} "${value}"` : value} (${this.strings.messages.insteadOf} "${expectedValue}")`);
+                          } else {
+                              textToDisplay.push(`${title ? `${title} "${value}"` : value}`);
+                          }
+                      };
+                      let expectedStatus = expectedState ? sensorDef.getStateString(expectedState) : null;
+                      let currentStatus = sensorDef.getStateString(state);
+                      let displayFieldsFrom = 'wrong' === type && expectedState ? expectedState : state;
+                      if ('connected' in displayFieldsFrom || 'active' in displayFieldsFrom) {
+                          renderNewLine(this.strings.messages.wifiStatus, currentStatus, expectedStatus);
+                      }
+                      if (displayFieldsFrom.ssid) {
+                          renderNewLine(this.strings.messages.wifiSsid, state.ssid, expectedState?.ssid);
+                      }
+                      if (displayFieldsFrom.password) {
+                          renderNewLine(this.strings.messages.wifiPassword, state.password, expectedState?.password);
+                      }
+                      if (displayFieldsFrom.lastRequest) {
+                          renderNewLine(null, state?.lastRequest ? `${state.lastRequest.method} ${state.lastRequest.url}` : this.strings.messages.wifiNoRequestShort, expectedState?.lastRequest ? `${expectedState?.lastRequest?.method} ${expectedState?.lastRequest?.url}` : null);
+                          if (state?.lastRequest && displayFieldsFrom.lastRequest.headers) {
+                              renderNewLine(this.strings.messages.wifiHeaders, `${serializeFields(state.lastRequest.headers) ?? ''}`, expectedState?.lastRequest?.headers ? `${serializeFields(expectedState?.lastRequest?.headers)}` : null);
+                          }
+                          if (state?.lastRequest && displayFieldsFrom.lastRequest.body) {
+                              renderNewLine(this.strings.messages.wifiBody, `${serializeFields(state.lastRequest.body) ?? ''}`, expectedState?.lastRequest?.body ? `${serializeFields(expectedState?.lastRequest?.body ?? {})}` : null);
+                          }
+                      }
+                      const div = document.createElement("div");
+                      $(div).html(textToDisplay.join('<br/>'));
+                      displayTooltip(event, div);
+                      this.showingTooltip = true;
+                  }
+              };
+              $(stateBubble.node).mouseenter(showPopup);
+              $(stateBubble.node).click(showPopup);
+              $(stateBubble.node).mouseleave((event)=>{
+                  this.showingTooltip = false;
+                  $('#screentooltip').remove();
+              });
+              drawParameters.drawnElements.push(stateBubble);
+              this.context.sensorStates.push(stateBubble);
+          } else {
+              drawParameters.deleteLastDrawnElements = false;
+          }
+      }
+      constructor(...args){
+          super(...args);
+          this.showingTooltip = false;
+          this.type = 'wifi';
+      }
+  }
+  function serializeFields(fields) {
+      if (!fields || 0 === Object.keys(fields).length) {
+          return null;
+      }
+      return Object.entries(fields).map(([key, value])=>`${key} = ${value}`).join(', ');
+  }
+  function displayTooltip(event, mainDiv) {
+      $("body").append('<div id="screentooltip"></div>');
+      $('#screentooltip').css("position", "absolute").css("border", "1px solid gray").css("background-color", "#efefef").css("padding", "3px").css("z-index", "1000").css("left", event.clientX + 2).css("top", event.clientY + 2).append(mainDiv);
+  }
+
+  const sensorsList = {
+      accelerometer: SensorAccelerometer,
+      button: SensorButton,
+      buzzer: SensorBuzzer,
+      clock: SensorClock,
+      cloudstore: SensorCloudStore,
+      gyroscope: SensorGyroscope,
+      humidity: SensorHumidity,
+      irrecv: SensorIrRecv,
+      irtrans: SensorIrTrans,
+      led: SensorLed,
+      leddim: SensorLedDim,
+      ledmatrix: SensorLedMatrix,
+      ledrgb: SensorLedRgb,
+      light: SensorLight,
+      magnetometer: SensorMagnetometer,
+      potentiometer: SensorPotentiometer,
+      range: SensorRange,
+      screen: SensorScreen,
+      servo: SensorServo,
+      sound: SensorSound,
+      stick: SensorStick,
+      temperature: SensorTemperature,
+      wifi: SensorWifi
+  };
+  function createSensor(sensor, context, strings) {
+      if (sensor.type in sensorsList) {
+          return new sensorsList[sensor.type](sensor, context, strings);
+      }
+      return {
+          ...sensor
+      };
+  }
+
   function showConfig({ context, strings, mainBoard }) {
       const availableConnectionMethods = mainBoard.getAvailableConnectionMethods();
       if (!(context.localhostAvailable || context.windowLocationAvailable) && -1 !== availableConnectionMethods.indexOf(ConnectionMethod.Local)) {
@@ -8988,10 +12677,8 @@ def detectBoard():
                   context.changeBoard(board.name);
               };
           }
-          for(let i = 0; i < context.infos.quickPiSensors.length; i++){
-              let sensor = context.infos.quickPiSensors[i];
+          for (let sensor of context.sensorsList.all()){
               let sensorDefinition = sensorHandler.findSensorDefinition(sensor);
-              if (sensor.type == "adder") continue;
               addGridElement("sensorGrid", 0, sensor.name, sensor.name, sensorDefinition.selectorImages[0], sensor.port);
           }
           updateAddGrid();
@@ -9161,7 +12848,6 @@ def detectBoard():
               }
           }
           if (customSensors) {
-              // $('#piaddsensor').click(clickAdder);
               $('#piaddsensor').click(addSensors);
           } else {
               $('#piaddsensor').hide();
@@ -9177,10 +12863,10 @@ def detectBoard():
                       var sensorName = $(this).attr('id').replace("qpi-remove-sensor-", "");
                       var sensor = sensorHandler.findSensorByName(sensorName);
                       $("#qpi-remove-sensor-parent-" + sensorName).remove();
-                      for(var i = 0; i < context.infos.quickPiSensors.length; i++){
-                          if (context.infos.quickPiSensors[i] === sensor) {
+                      for (let otherSensor of context.sensorsList.all()){
+                          if (otherSensor === sensor) {
                               sensor.removed = true;
-                              context.infos.quickPiSensors.splice(i, 1);
+                              context.sensorsList.all().splice(i, 1);
                           }
                       }
                       removed = true;
@@ -9210,12 +12896,13 @@ def detectBoard():
                       var sensorDefinition = sensorHandler.findSensorDefinition(dummysensor);
                       var port = $("#qpi-add-sensor-parent-" + sensorID + " .port").text();
                       var name = sensorHandler.getNewSensorSuggestedName(sensorDefinition.suggestedName);
-                      context.infos.quickPiSensors.push({
+                      const newSensor = createSensor({
                           type: sensorDefinition.name,
                           subType: sensorDefinition.subType,
                           port: port,
                           name: name
-                      });
+                      }, context, strings);
+                      context.sensorsList.add(newSensor);
                       added = true;
                   }
               });
@@ -9707,1185 +13394,6 @@ def detectBoard():
       });
   }
 
-  const getSensorDefinitions = function(context, strings) {
-      return [
-          /******************************** */ /*             Actuators          */ /**********************************/ {
-              name: "led",
-              suggestedName: strings.messages.sensorNameLed,
-              description: strings.messages.led,
-              isAnalog: false,
-              isSensor: false,
-              portType: "D",
-              getInitialState: function(sensor) {
-                  return false;
-              },
-              selectorImages: [
-                  "ledon-red.png"
-              ],
-              valueType: "boolean",
-              pluggable: true,
-              getPercentageFromState: function(state) {
-                  if (state) return 1;
-                  else return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
-                  else return 0;
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var ledstate = state ? 1 : 0;
-                  var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
-              },
-              subTypes: [
-                  {
-                      subType: "blue",
-                      description: strings.messages.blueled,
-                      selectorImages: [
-                          "ledon-blue.png"
-                      ],
-                      suggestedName: strings.messages.sensorNameBlueLed
-                  },
-                  {
-                      subType: "green",
-                      description: strings.messages.greenled,
-                      selectorImages: [
-                          "ledon-green.png"
-                      ],
-                      suggestedName: strings.messages.sensorNameGreenLed
-                  },
-                  {
-                      subType: "orange",
-                      description: strings.messages.orangeled,
-                      selectorImages: [
-                          "ledon-orange.png"
-                      ],
-                      suggestedName: strings.messages.sensorNameOrangeLed
-                  },
-                  {
-                      subType: "red",
-                      description: strings.messages.redled,
-                      selectorImages: [
-                          "ledon-red.png"
-                      ],
-                      suggestedName: strings.messages.sensorNameRedLed
-                  }
-              ]
-          },
-          {
-              name: "ledrgb",
-              suggestedName: strings.messages.sensorNameLedRgb,
-              description: strings.messages.ledrgb,
-              isAnalog: true,
-              isSensor: false,
-              portType: "D",
-              getInitialState: function(sensor) {
-                  return [
-                      0,
-                      0,
-                      0
-                  ];
-              },
-              selectorImages: [
-                  "ledon-red.png"
-              ],
-              valueType: "object",
-              valueMin: 0,
-              valueMax: 255,
-              pluggable: true,
-              getPercentageFromState: function(state) {
-                  if (state) return state / 255;
-                  else return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return Math.round(percentage * 255);
-                  else return 0;
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var command = `setLedRgbState("${sensor.name}", [0, 0, 0])`;
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return `[${state.join(', ')}]`;
-              }
-          },
-          {
-              name: "leddim",
-              suggestedName: strings.messages.sensorNameLedDim,
-              description: strings.messages.ledDim,
-              isAnalog: true,
-              isSensor: false,
-              portType: "D",
-              getInitialState: function(sensor) {
-                  return 0;
-              },
-              selectorImages: [
-                  "ledon-red.png"
-              ],
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 1,
-              getPercentageFromState: function(state) {
-                  return state;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return percentage;
-              },
-              getStateFromPwm: function(duty) {
-                  return duty / 1023;
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var ledstate = state ? 1 : 0;
-                  var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return Math.round(state * 100) + "%";
-              }
-          },
-          {
-              name: "ledmatrix",
-              suggestedName: strings.messages.sensorNameLedMatrix,
-              description: strings.messages.ledmatrix,
-              isAnalog: false,
-              isSensor: false,
-              portType: "D",
-              getInitialState: function(sensor) {
-                  return [
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ]
-                  ];
-              },
-              selectorImages: [
-                  "ledon-red.png"
-              ],
-              valueType: "boolean",
-              pluggable: true,
-              getPercentageFromState: function(state) {
-                  if (state) {
-                      var total = 0;
-                      state.forEach(function(substate) {
-                          substate.forEach(function(v) {
-                              total += v;
-                          });
-                      });
-                      return total / 25;
-                  }
-                  return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage > 0) {
-                      return [
-                          [
-                              1,
-                              1,
-                              1,
-                              1,
-                              1
-                          ],
-                          [
-                              1,
-                              1,
-                              1,
-                              1,
-                              1
-                          ],
-                          [
-                              1,
-                              1,
-                              1,
-                              1,
-                              1
-                          ],
-                          [
-                              1,
-                              1,
-                              1,
-                              1,
-                              1
-                          ],
-                          [
-                              1,
-                              1,
-                              1,
-                              1,
-                              1
-                          ]
-                      ];
-                  }
-                  return [
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ],
-                      [
-                          0,
-                          0,
-                          0,
-                          0,
-                          0
-                      ]
-                  ];
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var command = "setLedMatrixState(\"" + sensor.name + "\"," + JSON.stringify(state) + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return '';
-              }
-          },
-          {
-              name: "buzzer",
-              suggestedName: strings.messages.sensorNameBuzzer,
-              description: strings.messages.buzzer,
-              isAnalog: false,
-              isSensor: false,
-              getInitialState: function(sensor) {
-                  return false;
-              },
-              portType: "D",
-              selectorImages: [
-                  "buzzer-ringing.png"
-              ],
-              valueType: "boolean",
-              getPercentageFromState: function(state, sensor) {
-                  if (sensor.showAsAnalog) {
-                      return (state - sensor.minAnalog) / (sensor.maxAnalog - sensor.minAnalog);
-                  } else {
-                      if (state) return 1;
-                      else return 0;
-                  }
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
-                  else return 0;
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var ledstate = state ? 1 : 0;
-                  var command = "setBuzzerState(\"" + sensor.name + "\"," + ledstate + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  if (typeof state == 'number' && state != 1 && state != 0) {
-                      return state.toString() + "Hz";
-                  }
-                  return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
-              },
-              subTypes: [
-                  {
-                      subType: "active",
-                      description: strings.messages.grovebuzzer,
-                      pluggable: true
-                  },
-                  {
-                      subType: "passive",
-                      description: strings.messages.quickpibuzzer
-                  }
-              ]
-          },
-          {
-              name: "servo",
-              suggestedName: strings.messages.sensorNameServo,
-              description: strings.messages.servo,
-              isAnalog: true,
-              isSensor: false,
-              getInitialState: function(sensor) {
-                  return 0;
-              },
-              portType: "D",
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 180,
-              selectorImages: [
-                  "servo.png",
-                  "servo-pale.png",
-                  "servo-center.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 180;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 180);
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var command = "setServoAngle(\"" + sensor.name + "\"," + state + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return "" + state + "°";
-              },
-              getStateFromPwm: function(pwmDuty) {
-                  return 180 * (pwmDuty - 0.025 * 1023) / (0.1 * 1023);
-              }
-          },
-          {
-              name: "screen",
-              suggestedName: strings.messages.sensorNameScreen,
-              description: strings.messages.screen,
-              isAnalog: false,
-              isSensor: false,
-              getInitialState: function(sensor) {
-                  if (sensor.isDrawingScreen) return null;
-                  else return {
-                      line1: "",
-                      line2: ""
-                  };
-              },
-              cellsAmount: function(paper) {
-                  // console.log(paper.width)
-                  if (context.board == 'grovepi') {
-                      return 2;
-                  }
-                  if (paper.width < 250) {
-                      return 4;
-                  } else if (paper.width < 350) {
-                      return 3;
-                  }
-                  if (context.compactLayout) return 3;
-                  else return 2;
-              },
-              portType: "i2c",
-              valueType: "object",
-              selectorImages: [
-                  "screen.png"
-              ],
-              compareState: function(state1, state2) {
-                  // Both are null are equal
-                  if (state1 == null && state2 == null) return true;
-                  // If only one is null they are different
-                  if (state1 == null && state2 || state1 && state2 == null) return false;
-                  if (state1.isDrawingData != state2.isDrawingData) return false;
-                  if (state1 && state1.isDrawingData) {
-                      // They are ImageData objects
-                      // The image data is RGBA so there are 4 bits per pixel
-                      var data1 = state1.getData(1).data;
-                      var data2 = state2.getData(1).data;
-                      for(var i = 0; i < data1.length; i += 4){
-                          if (data1[i] != data2[i] || data1[i + 1] != data2[i + 1] || data1[i + 2] != data2[i + 2] || data1[i + 3] != data2[i + 3]) return false;
-                      }
-                      return true;
-                  } else {
-                      // Otherwise compare the strings
-                      return state1.line1 == state2.line1 && (state1.line2 == state2.line2 || !state1.line2 && !state2.line2);
-                  }
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var line2 = state.line2;
-                  if (!line2) line2 = "";
-                  var command = "displayText(\"" + sensor.name + "\"," + state.line1 + "\", \"" + line2 + "\")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  if (!state) {
-                      return '""';
-                  }
-                  if (state.isDrawingData) return strings.messages.drawing;
-                  else return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
-              },
-              getWrongStateString: function(failInfo) {
-                  if (!failInfo.expected || !failInfo.expected.isDrawingData || !failInfo.actual || !failInfo.actual.isDrawingData) {
-                      return null; // Use default message
-                  }
-                  var data1 = failInfo.expected.getData(1).data;
-                  var data2 = failInfo.actual.getData(1).data;
-                  var nbDiff = 0;
-                  for(var i = 0; i < data1.length; i += 4){
-                      if (data1[i] != data2[i]) {
-                          nbDiff += 1;
-                      }
-                  }
-                  return strings.messages.wrongStateDrawing.format(failInfo.name, nbDiff, failInfo.time);
-              },
-              subTypes: [
-                  {
-                      subType: "16x2lcd",
-                      description: strings.messages.grove16x2lcd,
-                      pluggable: true
-                  },
-                  {
-                      subType: "oled128x32",
-                      description: strings.messages.oled128x32
-                  }
-              ]
-          },
-          {
-              name: "irtrans",
-              suggestedName: strings.messages.sensorNameIrTrans,
-              description: strings.messages.irtrans,
-              isAnalog: false,
-              isSensor: true,
-              portType: "D",
-              valueType: "number",
-              valueMin: 0,
-              valueMax: 60,
-              selectorImages: [
-                  "irtranson.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 60;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 60);
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var ledstate = state ? 1 : 0;
-                  var command = "setInfraredState(\"" + sensor.name + "\"," + ledstate + ")";
-                  context.quickPiConnection.sendCommand(command, callback);
-              }
-          },
-          /******************************** */ /*             sensors            */ /**********************************/ {
-              name: "button",
-              suggestedName: strings.messages.sensorNameButton,
-              description: strings.messages.button,
-              isAnalog: false,
-              isSensor: true,
-              portType: "D",
-              valueType: "boolean",
-              pluggable: true,
-              selectorImages: [
-                  "buttonoff.png"
-              ],
-              getPercentageFromState: function(state) {
-                  if (state) return 1;
-                  else return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
-                  else return 0;
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("isButtonPressed(\"" + sensor.name + "\")", function(retVal) {
-                      var intVal = parseInt(retVal, 10);
-                      callback(intVal != 0);
-                  });
-              }
-          },
-          {
-              name: "stick",
-              suggestedName: strings.messages.sensorNameStick,
-              description: strings.messages.fivewaybutton,
-              isAnalog: false,
-              isSensor: true,
-              portType: "D",
-              valueType: "boolean",
-              selectorImages: [
-                  "stick.png"
-              ],
-              gpiosNames: [
-                  "up",
-                  "down",
-                  "left",
-                  "right",
-                  "center"
-              ],
-              gpios: [
-                  10,
-                  9,
-                  11,
-                  8,
-                  7
-              ],
-              getPercentageFromState: function(state) {
-                  if (state) return 1;
-                  else return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
-                  else return 0;
-              },
-              compareState: function(state1, state2) {
-                  if (state1 == null && state2 == null) return true;
-                  return state1[0] == state2[0] && state1[1] == state2[1] && state1[2] == state2[2] && state1[3] == state2[3] && state1[4] == state2[4];
-              },
-              getLiveState: function(sensor, callback) {
-                  "readStick(" + this.gpios.join() + ")";
-                  context.quickPiConnection.sendCommand("readStick(" + this.gpios.join() + ")", function(retVal) {
-                      var array = JSON.parse(retVal);
-                      callback(array);
-                  });
-              },
-              getButtonState: function(buttonname, state) {
-                  if (state) {
-                      var buttonparts = buttonname.split(".");
-                      var actualbuttonmame = buttonname;
-                      if (buttonparts.length == 2) {
-                          actualbuttonmame = buttonparts[1];
-                      }
-                      var index = this.gpiosNames.indexOf(actualbuttonmame);
-                      if (index >= 0) {
-                          return state[index];
-                      }
-                  }
-                  return false;
-              },
-              cellsAmount: function(paper) {
-                  return 2;
-              }
-          },
-          {
-              name: "temperature",
-              suggestedName: strings.messages.sensorNameTemperature,
-              description: strings.messages.tempsensor,
-              isAnalog: true,
-              isSensor: true,
-              portType: "A",
-              valueType: "number",
-              valueMin: 0,
-              valueMax: 60,
-              selectorImages: [
-                  "temperature-hot.png",
-                  "temperature-overlay.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 60;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 60);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readTemperature(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              },
-              subTypes: [
-                  {
-                      subType: "groveanalog",
-                      description: strings.messages.groveanalogtempsensor,
-                      portType: "A",
-                      pluggable: true
-                  },
-                  {
-                      subType: "BMI160",
-                      description: strings.messages.quickpigyrotempsensor,
-                      portType: "i2c"
-                  },
-                  {
-                      subType: "DHT11",
-                      description: strings.messages.dht11tempsensor,
-                      portType: "D",
-                      pluggable: true
-                  }
-              ]
-          },
-          {
-              name: "potentiometer",
-              suggestedName: strings.messages.sensorNamePotentiometer,
-              description: strings.messages.potentiometer,
-              isAnalog: true,
-              isSensor: true,
-              portType: "A",
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "potentiometer.png",
-                  "potentiometer-pale.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 100;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 100);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readRotaryAngle(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              }
-          },
-          {
-              name: "light",
-              suggestedName: strings.messages.sensorNameLight,
-              description: strings.messages.lightsensor,
-              isAnalog: true,
-              isSensor: true,
-              portType: "A",
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "light.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 100;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 100);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readLightIntensity(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              }
-          },
-          {
-              name: "range",
-              suggestedName: strings.messages.sensorNameDistance,
-              description: strings.messages.distancesensor,
-              isAnalog: true,
-              isSensor: true,
-              portType: "D",
-              valueType: "number",
-              valueMin: 0,
-              valueMax: 5000,
-              selectorImages: [
-                  "range.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 500;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 500);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readDistance(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              },
-              subTypes: [
-                  {
-                      subType: "vl53l0x",
-                      description: strings.messages.timeofflightranger,
-                      portType: "i2c"
-                  },
-                  {
-                      subType: "ultrasonic",
-                      description: strings.messages.ultrasonicranger,
-                      portType: "D",
-                      pluggable: true
-                  }
-              ]
-          },
-          {
-              name: "humidity",
-              suggestedName: strings.messages.sensorNameHumidity,
-              description: strings.messages.humiditysensor,
-              isAnalog: true,
-              isSensor: true,
-              portType: "D",
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "humidity.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 100;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 100);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readHumidity(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              }
-          },
-          {
-              name: "sound",
-              suggestedName: strings.messages.sensorNameMicrophone,
-              description: strings.messages.soundsensor,
-              isAnalog: true,
-              isSensor: true,
-              portType: "A",
-              valueType: "number",
-              pluggable: true,
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "sound.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 100;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 100);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readSoundLevel(\"" + sensor.name + "\")", function(val) {
-                      val = Math.round(val);
-                      callback(val);
-                  });
-              }
-          },
-          {
-              name: "accelerometer",
-              suggestedName: strings.messages.sensorNameAccelerometer,
-              description: strings.messages.accelerometerbmi160,
-              isAnalog: true,
-              isSensor: true,
-              portType: "i2c",
-              valueType: "object",
-              valueMin: 0,
-              valueMax: 100,
-              step: 0.1,
-              selectorImages: [
-                  "accel.png"
-              ],
-              getStateString: function(state) {
-                  if (state == null) return "0m/s²";
-                  if (Array.isArray(state)) {
-                      return "X: " + state[0] + "m/s² Y: " + state[1] + "m/s² Z: " + state[2] + "m/s²";
-                  } else {
-                      return state.toString() + "m/s²";
-                  }
-              },
-              getPercentageFromState: function(state) {
-                  var perc = (state + 78.48) / 156.96;
-                  // console.log(state,perc)
-                  return perc;
-              },
-              getStateFromPercentage: function(percentage) {
-                  var value = percentage * 156.96 - 78.48;
-                  var state = parseFloat(value.toFixed(1));
-                  // console.log(state)
-                  return state;
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
-                      var array = JSON.parse(val);
-                      callback(array);
-                  });
-              },
-              cellsAmount: function(paper) {
-                  return 2;
-              }
-          },
-          {
-              name: "gyroscope",
-              suggestedName: strings.messages.sensorNameGyroscope,
-              description: strings.messages.gyrobmi160,
-              isAnalog: true,
-              isSensor: true,
-              portType: "i2c",
-              valueType: "object",
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "gyro.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return (state + 125) / 250;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 250) - 125;
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readGyroBMI160()", function(val) {
-                      var array = JSON.parse(val);
-                      array[0] = Math.round(array[0]);
-                      array[1] = Math.round(array[1]);
-                      array[2] = Math.round(array[2]);
-                      callback(array);
-                  });
-              },
-              cellsAmount: function(paper) {
-                  return 2;
-              }
-          },
-          {
-              name: "magnetometer",
-              suggestedName: strings.messages.sensorNameMagnetometer,
-              description: strings.messages.maglsm303c,
-              isAnalog: true,
-              isSensor: true,
-              portType: "i2c",
-              valueType: "object",
-              valueMin: 0,
-              valueMax: 100,
-              selectorImages: [
-                  "mag.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return (state + 1600) / 3200;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 3200) - 1600;
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("readMagnetometerLSM303C(False)", function(val) {
-                      var array = JSON.parse(val);
-                      array[0] = Math.round(array[0]);
-                      array[1] = Math.round(array[1]);
-                      array[2] = Math.round(array[2]);
-                      callback(array);
-                  });
-              },
-              cellsAmount: function(paper) {
-                  return 2;
-              }
-          },
-          {
-              name: "irrecv",
-              suggestedName: strings.messages.sensorNameIrRecv,
-              description: strings.messages.irreceiver,
-              isAnalog: false,
-              isSensor: true,
-              portType: "D",
-              valueType: "number",
-              valueMin: 0,
-              valueMax: 60,
-              selectorImages: [
-                  "irrecvon.png"
-              ],
-              getPercentageFromState: function(state) {
-                  return state / 60;
-              },
-              getStateFromPercentage: function(percentage) {
-                  return Math.round(percentage * 60);
-              },
-              getLiveState: function(sensor, callback) {
-                  context.quickPiConnection.sendCommand("isButtonPressed(\"" + sensor.name + "\")", function(retVal) {
-                      var intVal = parseInt(retVal, 10);
-                      callback(intVal == 0);
-                  });
-              }
-          },
-          {
-              name: "wifi",
-              suggestedName: strings.messages.sensorNameWifi,
-              description: strings.messages.wifi,
-              isAnalog: false,
-              isSensor: false,
-              portType: "D",
-              getInitialState: function(sensor) {
-                  return null;
-              },
-              selectorImages: [
-                  "wifi.png"
-              ],
-              valueType: "object",
-              pluggable: true,
-              getPercentageFromState: function(state) {
-                  if (state) return 1;
-                  else return 0;
-              },
-              getStateFromPercentage: function(percentage) {
-                  if (percentage) return 1;
-                  else return 0;
-              },
-              setLiveState: function(sensor, state, callback) {
-                  var command = `setWifiState("${sensor.name}", [0, 0, 0])`;
-                  context.quickPiConnection.sendCommand(command, callback);
-              },
-              getStateString: function(state) {
-                  return `[${state.join(', ')}]`;
-              }
-          },
-          /******************************** */ /*             dummy sensors      */ /**********************************/ {
-              name: "cloudstore",
-              suggestedName: strings.messages.sensorNameCloudStore,
-              description: strings.messages.cloudstore,
-              isAnalog: false,
-              isSensor: false,
-              // portType: "none",
-              portType: "D",
-              valueType: "object",
-              selectorImages: [
-                  "cloudstore.png"
-              ],
-              /*getInitialState: function(sensor) {
-            return {};
-        },*/ getWrongStateString: function(failInfo) {
-                  /**
-           * Call this function when more.length > less.length. It will find the key that is missing inside of the
-           * less array
-           * @param more The bigger array, containing one or more key more than less
-           * @param less Less, the smaller array, he has a key or more missing
-           */ function getMissingKey(more, less) {
-                      for(var i = 0; i < more.length; i++){
-                          var found = false;
-                          for(var j = 0; j < less.length; j++){
-                              if (more[i] === less[j]) {
-                                  found = true;
-                                  break;
-                              }
-                          }
-                          if (!found) return more[i];
-                      }
-                      // should never happen because length are different.
-                      return null;
-                  }
-                  // the type of a value in comparison.
-                  var valueType = {
-                      // Primitive type are strings and integers
-                      PRIMITIVE: "primitive",
-                      ARRAY: "array",
-                      DICTIONARY: "dictionary",
-                      // if two values are of wrong type then this is returned
-                      WRONG_TYPE: "wrong_type"
-                  };
-                  /**
-           * This method allow us to compare two keys of the cloud and their values
-           * @param actual The actual key that we have
-           * @param expected The expected key that we have
-           * @return An object containing the type of the return and the key that differ
-           */ function compareKeys(actual, expected) {
-                      function compareArrays(arr1, arr2) {
-                          if (arr1.length != arr2.length) return false;
-                          for(var i = 0; i < arr1.length; i++){
-                              for(var j = 0; j < arr2.length; j++){
-                                  if (arr1[i] !== arr2[i]) return false;
-                              }
-                          }
-                          return true;
-                      }
-                      var actualKeys = Object.keys(actual);
-                      for(var i = 0; i < actualKeys.length; i++){
-                          var actualVal = actual[actualKeys[i]];
-                          // they both have the same keys so we can do that.
-                          var expectedVal = expected[actualKeys[i]];
-                          if (isPrimitive(expectedVal)) {
-                              // if string with int for example
-                              if (typeof expectedVal !== typeof actualVal) {
-                                  return {
-                                      type: valueType.WRONG_TYPE,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                              if (expectedVal !== actualVal) {
-                                  return {
-                                      type: valueType.PRIMITIVE,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                          } else if (Array.isArray(expectedVal)) {
-                              if (!Array.isArray(actualVal)) {
-                                  return {
-                                      type: valueType.WRONG_TYPE,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                              if (!compareArrays(expectedVal, actualVal)) {
-                                  return {
-                                      type: valueType.ARRAY,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                          // if we are in a dictionary
-                          // method from: https://stackoverflow.com/questions/38304401/javascript-check-if-dictionary
-                          } else if (expectedVal.constructor == Object) {
-                              if (actualVal.constructor != Object) {
-                                  return {
-                                      type: valueType.WRONG_TYPE,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                              if (!deepEqual(expectedVal, actualVal)) {
-                                  return {
-                                      type: valueType.DICTIONARY,
-                                      key: actualKeys[i]
-                                  };
-                              }
-                          }
-                      }
-                  }
-                  if (!failInfo.expected && !failInfo.actual) return null;
-                  var expected = failInfo.expected;
-                  var actual = failInfo.actual;
-                  var expectedKeys = Object.keys(expected);
-                  var actualKeys = Object.keys(actual);
-                  if (expectedKeys.length != actualKeys.length) {
-                      if (expectedKeys.length > actualKeys.length) {
-                          var missingKey = getMissingKey(expectedKeys, actualKeys);
-                          return strings.messages.cloudMissingKey.format(missingKey);
-                      } else {
-                          var additionalKey = getMissingKey(actualKeys, expectedKeys);
-                          return strings.messages.cloudMoreKey.format(additionalKey);
-                      }
-                  }
-                  // This will return a key that is missing inside of expectedKeys if there is one, otherwise it will return null.
-                  var unexpectedKey = getMissingKey(actualKeys, expectedKeys);
-                  if (unexpectedKey) {
-                      return strings.messages.cloudUnexpectedKeyCorrection.format(unexpectedKey);
-                  }
-                  var keyCompare = compareKeys(actual, expected);
-                  switch(keyCompare.type){
-                      case valueType.PRIMITIVE:
-                          return strings.messages.cloudPrimitiveWrongKey.format(keyCompare.key, expected[keyCompare.key], actual[keyCompare.key]);
-                      case valueType.WRONG_TYPE:
-                          var typeActual = typeof actual[keyCompare.key];
-                          var typeExpected = typeof expected[keyCompare.key];
-                          // we need to check if it is an array or a dictionary
-                          if (typeActual == "object") {
-                              if (Array.isArray(actual[keyCompare.key])) typeActual = "array";
-                          }
-                          if (typeExpected == "object") {
-                              if (Array.isArray(expected[keyCompare.key])) typeExpected = "array";
-                          }
-                          var typeActualTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeActual];
-                          var typeExpectedTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeExpected];
-                          return strings.messages.cloudWrongType.format(typeActualTranslate, keyCompare.key, typeExpectedTranslate);
-                      case valueType.ARRAY:
-                          return strings.messages.cloudArrayWrongKey.format(keyCompare.key);
-                      case valueType.DICTIONARY:
-                          return strings.messages.cloudDictionaryWrongKey.format(keyCompare.key);
-                  }
-              },
-              compareState: function(state1, state2) {
-                  return LocalQuickStore.compareState(state1, state2);
-              }
-          },
-          {
-              name: "clock",
-              description: strings.messages.cloudstore,
-              isAnalog: false,
-              isSensor: false,
-              portType: "none",
-              valueType: "object",
-              selectorImages: [
-                  "clock.png"
-              ]
-          },
-          {
-              name: "adder",
-              portType: "none"
-          }
-      ];
-  };
-
-  const gyroscope3D = function() {
-      let instance;
-      function createInstance(width, height) {
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          // debug code start
-          /*
-      canvas.style.zIndex = 99999;
-      canvas.style.position = 'fixed';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
-      document.body.appendChild(canvas);
-      */ // debug code end
-          try {
-              var renderer = new window.zen3d.Renderer(canvas, {
-                  antialias: true,
-                  alpha: true
-              });
-          } catch (e) {
-              return false;
-          }
-          renderer.glCore.state.colorBuffer.setClear(0, 0, 0, 0);
-          var scene = new window.zen3d.Scene();
-          var lambert = new window.zen3d.LambertMaterial();
-          lambert.diffuse.setHex(0x468DDF);
-          var cube_geometry = new window.zen3d.CubeGeometry(10, 2, 10);
-          var cube = new window.zen3d.Mesh(cube_geometry, lambert);
-          cube.position.x = 0;
-          cube.position.y = 0;
-          cube.position.z = 0;
-          scene.add(cube);
-          var ambientLight = new window.zen3d.AmbientLight(0xffffff, 2);
-          scene.add(ambientLight);
-          var pointLight = new window.zen3d.PointLight(0xffffff, 1, 100);
-          pointLight.position.set(-20, 40, 10);
-          scene.add(pointLight);
-          var camera = new window.zen3d.Camera();
-          camera.position.set(0, 13, 13);
-          camera.lookAt(new window.zen3d.Vector3(0, 0, 0), new window.zen3d.Vector3(0, 1, 0));
-          camera.setPerspective(45 / 180 * Math.PI, width / height, 1, 1000);
-          scene.add(camera);
-          return {
-              resize: function(width, height) {
-                  camera.setPerspective(45 / 180 * Math.PI, width / height, 1, 1000);
-              },
-              render: function(ax, ay, az) {
-                  cube.euler.x = Math.PI * ax / 360;
-                  cube.euler.y = Math.PI * ay / 360;
-                  cube.euler.z = Math.PI * az / 360;
-                  renderer.render(scene, camera);
-                  return canvas;
-              }
-          };
-      }
-      return {
-          getInstance: function(width, height) {
-              if (!instance) {
-                  instance = createInstance(width, height);
-              } else {
-                  instance.resize(width, height);
-              }
-              return instance;
-          }
-      };
-  }();
-
-  const colors = {
-      blue: "#4a90e2",
-      orange: "#f5a623"
-  };
   class SensorDrawer {
       constructor(context, strings, sensorDefinitions, sensorHandler){
           this.context = context;
@@ -10933,7 +13441,6 @@ def detectBoard():
           }
           let fontWeight = "normal";
           if (this.context.paper == undefined || !this.context.display || !sensor.drawInfo) return;
-          const irRemoteDialog = "<div class=\"content qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + this.strings.messages.irRemoteControl + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div id=\"sensorPicker\" class=\"panel-body\">" + "       <div id=\"piremotemessage\" >" + "       </div>" + "       <div id=\"piremotecontent\" >" + "       </div>" + "   </div>" + "   <div class=\"singleButton\">" + "       <button id=\"picancel2\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + this.strings.messages.closeDialog + "</button>" + "   </div>" + "</div>";
           let scrolloffset = 0;
           let fadeopacity = 1;
           let w = sensor.drawInfo.width;
@@ -10941,6 +13448,7 @@ def detectBoard():
           let x = sensor.drawInfo.x;
           let y = sensor.drawInfo.y;
           let cx = x + w / 2;
+          let cy = y + h / 2;
           let imgh = h / 2;
           let imgw = imgh;
           let imgx = x - imgw / 2 + w / 2;
@@ -10985,9 +13493,8 @@ def detectBoard():
           let maxNameSize = 25;
           let maxStateSize = 20;
           // console.log(this.context.compactLayout,statesize)
-          let drawPortText = true;
+          let drawPortText = false;
           let drawName = true;
-          drawPortText = false;
           if (!sensor.focusrect || this.sensorHandler.isElementRemoved(sensor.focusrect)) {
               sensor.focusrect = this.context.paper.rect(imgx, imgy, imgw, imgh);
           }
@@ -11030,1460 +13537,38 @@ def detectBoard():
               "width": imgw,
               "height": imgh
           };
-          if (sensor.type == "led") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state == null) sensor.state = 0;
-              if (!sensor.ledoff || this.sensorHandler.isElementRemoved(sensor.ledoff)) {
-                  sensor.ledoff = this.context.paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
-                  sensor.focusrect.click(()=>{
-                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                          sensor.state = !sensor.state;
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor);
-                      } else {
-                          this.actuatorsInRunningModeError();
-                      }
-                  });
-              }
-              if (!sensor.ledon || this.sensorHandler.isElementRemoved(sensor.ledon)) {
-                  let imagename = "ledon-";
-                  if (sensor.subType) imagename += sensor.subType;
-                  else imagename += "red";
-                  imagename += ".png";
-                  sensor.ledon = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
-              }
-              sensor.ledon.attr(sensorAttr);
-              sensor.ledoff.attr(sensorAttr);
-              if (sensor.showAsAnalog) {
-                  sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state);
-              } else {
-                  if (sensor.state) {
-                      sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
-                  } else {
-                      sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
-                  }
-              }
-              if (sensor.state) {
-                  sensor.ledon.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": 0
-                  });
-              } else {
-                  sensor.ledon.attr({
-                      "opacity": 0
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": fadeopacity
-                  });
-              }
-              // let x = typeof sensor.state;
-              if (typeof sensor.state == 'number') {
-                  sensor.ledon.attr({
-                      "opacity": sensor.state * fadeopacity
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": fadeopacity
-                  });
-              }
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
-              }
-          } else if (sensor.type == "ledrgb") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state == null) sensor.state = 0;
-              if (!sensor.ledimage || this.sensorHandler.isElementRemoved(sensor.ledimage)) {
-                  let imagename = "ledoff.png";
-                  sensor.ledimage = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
-              }
-              if (!sensor.ledcolor || this.sensorHandler.isElementRemoved(sensor.ledcolor)) {
-                  console.log('new ledcolor');
-                  sensor.ledcolor = this.context.paper.circle();
-              }
-              sensor.ledimage.attr(sensorAttr);
-              sensor.ledcolor.attr(sensorAttr);
-              sensor.ledcolor.attr({});
-              sensor.ledcolor.attr({
-                  "cx": imgx + imgw / 2,
-                  "cy": imgy + imgh * 0.3,
-                  "r": imgh * 0.15,
-                  fill: sensor.state ? `rgb(${sensor.state.join(',')})` : 'none',
-                  stroke: 'none',
-                  opacity: 0.5
-              });
-              sensor.stateText = this.context.paper.text(state1x, state1y, `${sensor.state ? sensor.state.join(',') : ''}`);
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
-              }
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 255);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "leddim") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state == null) sensor.state = 0;
-              if (!sensor.ledoff || this.sensorHandler.isElementRemoved(sensor.ledoff)) {
-                  sensor.ledoff = this.context.paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
-              }
-              if (!sensor.ledon || this.sensorHandler.isElementRemoved(sensor.ledon)) {
-                  let imagename = "ledon-";
-                  if (sensor.subType) imagename += sensor.subType;
-                  else imagename += "red";
-                  imagename += ".png";
-                  sensor.ledon = this.context.paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
-              }
-              sensor.ledon.attr(sensorAttr);
-              sensor.ledoff.attr(sensorAttr);
-              sensor.stateText = this.context.paper.text(state1x, state1y, Math.round(100 * sensor.state) + '%');
-              if (sensor.state) {
-                  sensor.ledon.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": 0
-                  });
-              } else {
-                  sensor.ledon.attr({
-                      "opacity": 0
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": fadeopacity
-                  });
-              }
-              if (typeof sensor.state == 'number') {
-                  sensor.ledon.attr({
-                      "opacity": sensor.state * fadeopacity
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": fadeopacity
-                  });
-              }
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
-              }
-              if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 1);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "ledmatrix") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.state || !sensor.state.length) sensor.state = [
-                  [
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                  ],
-                  [
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                  ],
-                  [
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                  ],
-                  [
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                  ],
-                  [
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                  ]
-              ];
-              let ledmatrixOnAttr = {
-                  "fill": "red",
-                  "stroke": "darkgray"
-              };
-              let ledmatrixOffAttr = {
-                  "fill": "lightgray",
-                  "stroke": "darkgray"
-              };
-              if (!sensor.ledmatrix || this.sensorHandler.isElementRemoved(sensor.ledmatrix[0][0])) {
-                  sensor.ledmatrix = [];
-                  for(let i = 0; i < 5; i++){
-                      sensor.ledmatrix[i] = [];
-                      for(let j = 0; j < 5; j++){
-                          sensor.ledmatrix[i][j] = this.context.paper.rect(imgx + imgw / 5 * i, imgy + imgh / 5 * j, imgw / 5, imgh / 5);
-                          sensor.ledmatrix[i][j].attr(ledmatrixOffAttr);
-                      }
-                  }
-              }
-              for(let i = 0; i < 5; i++){
-                  for(let j = 0; j < 5; j++){
-                      if (sensor.state[i][j]) {
-                          sensor.ledmatrix[i][j].attr(ledmatrixOnAttr);
-                      } else {
-                          sensor.ledmatrix[i][j].attr(ledmatrixOffAttr);
-                      }
-                  }
-              }
-              const ledMatrixListener = (imgx, imgy, imgw, imgh, sensor)=>{
-                  return (e)=>{
-                      let i = Math.floor((e.offsetX - imgx) / (imgw / 5));
-                      let j = Math.floor((e.offsetY - imgy) / (imgh / 5));
-                      sensor.state[i][j] = !sensor.state[i][j] ? 1 : 0;
-                      this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, ()=>{});
-                      this.drawSensor(sensor);
-                  };
-              };
-              sensor.focusrect.unclick();
-              sensor.focusrect.click(ledMatrixListener(imgx, imgy, imgw, imgh, sensor));
-          } else if (sensor.type == "buzzer") {
-              if (typeof sensor.state == 'number' && sensor.state != 0 && sensor.state != 1) {
-                  buzzerSound.start(sensor.name, sensor.state);
-              } else if (sensor.state) {
-                  buzzerSound.start(sensor.name);
-              } else {
-                  buzzerSound.stop(sensor.name);
-              }
-              if (!juststate) {
-                  if (sensor.muteBtn) {
-                      sensor.muteBtn.remove();
-                  }
-                  // let muteBtnSize = w * 0.15;
-                  let muteBtnSize = imgw * 0.3;
-                  sensor.muteBtn = this.context.paper.text(imgx + imgw * 0.8, imgy + imgh * 0.8, buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028");
-                  sensor.muteBtn.node.style.fontWeight = "bold";
-                  sensor.muteBtn.node.style.cursor = "default";
-                  sensor.muteBtn.node.style.MozUserSelect = "none";
-                  sensor.muteBtn.node.style.WebkitUserSelect = "none";
-                  sensor.muteBtn.attr({
-                      "font-size": muteBtnSize + "px",
-                      fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
-                      "font-family": '"Font Awesome 5 Free"',
-                      'text-anchor': 'start',
-                      "cursor": "pointer"
-                  });
-                  sensor.muteBtn.getBBox();
-                  sensor.muteBtn.click(()=>{
-                      if (buzzerSound.isMuted(sensor.name)) {
-                          buzzerSound.unmute(sensor.name);
-                      } else {
-                          buzzerSound.mute(sensor.name);
-                      }
-                      this.drawSensor(sensor);
-                  });
-                  sensor.muteBtn.toFront();
-              }
-              if (!sensor.buzzeron || this.sensorHandler.isElementRemoved(sensor.buzzeron)) sensor.buzzeron = this.context.paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.buzzeroff || this.sensorHandler.isElementRemoved(sensor.buzzeroff)) {
-                  sensor.buzzeroff = this.context.paper.image(getImg('buzzer.png'), imgx, imgy, imgw, imgh);
-                  sensor.focusrect.click(()=>{
-                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                          sensor.state = !sensor.state;
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor);
-                      } else {
-                          this.actuatorsInRunningModeError();
-                      }
-                  });
-              }
-              if (sensor.state) {
-                  if (!sensor.buzzerInterval) {
-                      sensor.buzzerInterval = setInterval(()=>{
-                          if (!sensor.removed) {
-                              sensor.ringingState = !sensor.ringingState;
-                              this.drawSensor(sensor, true, true);
-                          } else {
-                              clearInterval(sensor.buzzerInterval);
-                          }
-                      }, 100);
-                  }
-              } else {
-                  if (sensor.buzzerInterval) {
-                      clearInterval(sensor.buzzerInterval);
-                      sensor.buzzerInterval = null;
-                      sensor.ringingState = null;
-                  }
-              }
-              sensor.buzzeron.attr(sensorAttr);
-              sensor.buzzeroff.attr(sensorAttr);
-              let drawState = sensor.state;
-              if (sensor.ringingState != null) drawState = sensor.ringingState;
-              if (drawState) {
-                  sensor.buzzeron.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.buzzeroff.attr({
-                      "opacity": 0
-                  });
-              } else {
-                  sensor.buzzeron.attr({
-                      "opacity": 0
-                  });
-                  sensor.buzzeroff.attr({
-                      "opacity": fadeopacity
-                  });
-              }
-              if (sensor.stateText) sensor.stateText.remove();
-              let stateText = this.sensorHandler.findSensorDefinition(sensor).getStateString(sensor.state);
-              sensor.stateText = this.context.paper.text(state1x, state1y, stateText);
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  let setLiveState = this.sensorHandler.findSensorDefinition(sensor).setLiveState;
-                  if (setLiveState) {
-                      setLiveState(sensor, sensor.state, function() {});
-                  }
-              }
-          } else if (sensor.type == "button") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.buttonon || this.sensorHandler.isElementRemoved(sensor.buttonon)) sensor.buttonon = this.context.paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.buttonoff || this.sensorHandler.isElementRemoved(sensor.buttonoff)) sensor.buttonoff = this.context.paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
-              if (sensor.state == null) sensor.state = false;
-              sensor.buttonon.attr(sensorAttr);
-              sensor.buttonoff.attr(sensorAttr);
-              if (sensor.state) {
-                  sensor.buttonon.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.buttonoff.attr({
-                      "opacity": 0
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
-              } else {
-                  sensor.buttonon.attr({
-                      "opacity": 0
-                  });
-                  sensor.buttonoff.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
-              }
-              if (!this.context.autoGrading && !sensor.buttonon.node.onmousedown) {
-                  sensor.focusrect.node.onmousedown = ()=>{
-                      if (this.context.offLineMode) {
-                          sensor.state = true;
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor);
-                      } else this.sensorInConnectedModeError();
-                  };
-                  sensor.focusrect.node.onmouseup = ()=>{
-                      if (this.context.offLineMode) {
-                          sensor.state = false;
-                          sensor.wasPressed = true;
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor);
-                          if (sensor.onPressed) sensor.onPressed();
-                      } else this.sensorInConnectedModeError();
-                  };
-                  sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
-                  sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
-              }
-          } else if (sensor.type == "galaxia") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.galaxia || this.sensorHandler.isElementRemoved(sensor.galaxia)) sensor.galaxia = this.context.paper.image(getImg('galaxia.svg'), imgx, imgy, imgw, imgh);
-              if (sensor.state == null) sensor.state = false;
-              sensor.galaxia.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh
-              });
-              if (sensor.state) ;
-              if (!this.context.autoGrading) ;
-          } else if (sensor.type == "screen") {
-              if (sensor.stateText) {
-                  sensor.stateText.remove();
-                  sensor.stateText = null;
-              }
-              let borderSize = 5;
-              let screenScale = 1.5;
-              if (w < 300) {
-                  screenScale = 1;
-              }
-              if (w < 150) {
-                  screenScale = 0.5;
-              }
-              // console.log(screenScale,w,h)
-              let screenScalerSize = {
-                  width: 128 * screenScale,
-                  height: 32 * screenScale
-              };
-              borderSize = borderSize * screenScale;
-              imgw = screenScalerSize.width + borderSize * 2;
-              imgh = screenScalerSize.height + borderSize * 2;
-              imgx = x - imgw / 2 + w / 2;
-              imgy = y + (h - imgh) / 2 + h * 0.05;
-              portx = imgx + imgw + borderSize;
-              porty = imgy + imgh / 3;
-              statesize = imgh / 3.5;
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) {
-                  sensor.img = this.context.paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
-              }
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              if (sensor.state) {
-                  if (sensor.state.isDrawingData) {
-                      if (!sensor.screenrect || this.sensorHandler.isElementRemoved(sensor.screenrect) || !sensor.canvasNode) {
-                          sensor.screenrect = this.context.paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
-                          sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                          sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
-                          sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
-                          sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
-                          sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
-                          this.context.paper.canvas.appendChild(sensor.canvasNode);
-                          sensor.canvas = document.createElement("canvas");
-                          sensor.canvas.id = "screencanvas";
-                          sensor.canvas.width = screenScalerSize.width;
-                          sensor.canvas.height = screenScalerSize.height;
-                          sensor.canvasNode.appendChild(sensor.canvas);
-                      }
-                      $(sensor.canvas).css({
-                          opacity: fadeopacity
-                      });
-                      sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
-                      sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
-                      sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
-                      sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
-                      sensor.screenrect.attr({
-                          "x": imgx + borderSize,
-                          "y": imgy + borderSize,
-                          "width": 128,
-                          "height": 32
-                      });
-                      sensor.screenrect.attr({
-                          "opacity": 0
-                      });
-                      this.context.quickpi.initScreenDrawing(sensor);
-                      //sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
-                      screenDrawing.renderToCanvas(sensor.state, sensor.canvas, screenScale);
-                  } else {
-                      let statex = imgx + imgw * .05;
-                      let statey = imgy + imgh * .2;
-                      if (sensor.state.line1.length > 16) sensor.state.line1 = sensor.state.line1.substring(0, 16);
-                      if (sensor.state.line2 && sensor.state.line2.length > 16) sensor.state.line2 = sensor.state.line2.substring(0, 16);
-                      if (sensor.canvasNode) {
-                          $(sensor.canvasNode).remove();
-                          sensor.canvasNode = null;
-                      }
-                      sensor.stateText = this.context.paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
-                      stateanchor = "start";
-                      sensor.stateText.attr("");
-                  }
-              }
-          } else if (sensor.type == "temperature") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state == null) sensor.state = 25; // FIXME
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.img2 || this.sensorHandler.isElementRemoved(sensor.img2)) sensor.img2 = this.context.paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.img3 || this.sensorHandler.isElementRemoved(sensor.img3)) sensor.img3 = this.context.paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.img2.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.img3.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              let scale = imgh / 60;
-              let cliph = scale * sensor.state;
-              sensor.img2.attr({
-                  "clip-rect": imgx + "," + (imgy + imgh - cliph) + "," + imgw + "," + cliph
-              });
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + " °C");
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "servo") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('servo.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.pale || this.sensorHandler.isElementRemoved(sensor.pale)) sensor.pale = this.context.paper.image(getImg('servo-pale.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.center || this.sensorHandler.isElementRemoved(sensor.center)) sensor.center = this.context.paper.image(getImg('servo-center.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.pale.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "transform": "",
-                  "opacity": fadeopacity
-              });
-              sensor.center.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.pale.rotate(sensor.state);
-              if (sensor.state == null) sensor.state = 0;
-              sensor.state = Math.round(sensor.state);
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + "°");
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  if (!sensor.updatetimeout) {
-                      sensor.updatetimeout = setTimeout(()=>{
-                          this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
-                          sensor.updatetimeout = null;
-                      }, 100);
-                  }
-              }
-              if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "potentiometer") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('potentiometer.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.pale || this.sensorHandler.isElementRemoved(sensor.pale)) sensor.pale = this.context.paper.image(getImg('potentiometer-pale.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.pale.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "transform": "",
-                  "opacity": fadeopacity
-              });
-              if (sensor.state == null) sensor.state = 0;
-              sensor.pale.rotate(sensor.state * 3.6);
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + "%");
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "range") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('range.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy - imgh * 0.1,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              if (sensor.state == null) sensor.state = 500;
-              if (sensor.rangedistance) sensor.rangedistance.remove();
-              if (sensor.rangedistancestart) sensor.rangedistancestart.remove();
-              if (sensor.rangedistanceend) sensor.rangedistanceend.remove();
-              let rangew;
-              if (sensor.state < 30) {
-                  rangew = imgw * sensor.state / 100;
-              } else {
-                  let firstpart = imgw * 30 / 100;
-                  let remaining = imgw - firstpart;
-                  rangew = firstpart + remaining * sensor.state * 0.0015;
-              }
-              let cx = imgx + imgw / 2;
-              let cy = imgy + imgh * 0.85;
-              let x1 = cx - rangew / 2;
-              let x2 = cx + rangew / 2;
-              let markh = 12;
-              let y1 = cy - markh / 2;
-              let y2 = cy + markh / 2;
-              sensor.rangedistance = this.context.paper.path([
-                  "M",
-                  x1,
-                  cy,
-                  "H",
-                  x2
-              ]);
-              sensor.rangedistancestart = this.context.paper.path([
-                  "M",
-                  x1,
-                  y1,
-                  "V",
-                  y2
-              ]);
-              sensor.rangedistanceend = this.context.paper.path([
-                  "M",
-                  x2,
-                  y1,
-                  "V",
-                  y2
-              ]);
-              sensor.rangedistance.attr({
-                  "stroke-width": 4,
-                  "stroke": "#468DDF",
-                  "stroke-linecapstring": "round"
-              });
-              sensor.rangedistancestart.attr({
-                  "stroke-width": 4,
-                  "stroke": "#468DDF",
-                  "stroke-linecapstring": "round"
-              });
-              sensor.rangedistanceend.attr({
-                  "stroke-width": 4,
-                  "stroke": "#468DDF",
-                  "stroke-linecapstring": "round"
-              });
-              if (sensor.state >= 10) sensor.state = Math.round(sensor.state);
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + " cm");
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "light") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('light.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.moon || this.sensorHandler.isElementRemoved(sensor.moon)) sensor.moon = this.context.paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.sun || this.sensorHandler.isElementRemoved(sensor.sun)) sensor.sun = this.context.paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              if (sensor.state == null) sensor.state = 0;
-              if (sensor.state > 50) {
-                  let opacity = (sensor.state - 50) * 0.02;
-                  sensor.sun.attr({
-                      "x": imgx,
-                      "y": imgy,
-                      "width": imgw,
-                      "height": imgh,
-                      "opacity": opacity * .80 * fadeopacity
-                  });
-                  sensor.moon.attr({
-                      "opacity": 0
-                  });
-              } else {
-                  let opacity = (50 - sensor.state) * 0.02;
-                  sensor.moon.attr({
-                      "x": imgx,
-                      "y": imgy,
-                      "width": imgw,
-                      "height": imgh,
-                      "opacity": opacity * .80 * fadeopacity
-                  });
-                  sensor.sun.attr({
-                      "opacity": 0
-                  });
-              }
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + "%");
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "humidity") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('humidity.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              if (sensor.state == null) sensor.state = 0;
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + "%");
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "accelerometer") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('accel.png'), imgx, imgy, imgw, imgh);
-              // this.context.paper.rect(x,y,w,h)
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.state) {
-                  sensor.state = [
-                      0,
-                      0,
-                      1
-                  ];
-              }
-              if (sensor.state) {
-                  try {
-                      let str = "X: " + sensor.state[0] + " m/s²\nY: " + sensor.state[1] + " m/s²\nZ: " + sensor.state[2] + " m/s²";
-                      sensor.stateText = this.context.paper.text(cx, state1y, str);
-                  } catch (Err) {
-                  }
-              // let bbox = sensor.stateText.getBBox();
-              // sensor.stateText.attr("y",cy - bbox.height/2);
-              }
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -8 * 9.81, 8 * 9.81);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "gyroscope") {
-              if (!sensor.state) {
-                  sensor.state = [
-                      0,
-                      0,
-                      0
-                  ];
-              }
-              if (sensor.stateText) {
-                  sensor.stateText.remove();
-              }
-              let str = "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s";
-              sensor.stateText = this.context.paper.text(cx, state1y, str);
-              if (!sensor.previousState) sensor.previousState = [
-                  0,
-                  0,
-                  0
-              ];
-              if (sensor.rotationAngles != undefined) {
-                  // update the rotation angle
-                  for(let i = 0; i < 3; i++)sensor.rotationAngles[i] += sensor.previousState[i] * ((+new Date() - sensor.lastSpeedChange) / 1000);
-                  sensor.lastSpeedChange = new Date();
-              }
-              sensor.previousState = sensor.state;
-              let img3d = null;
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  img3d = gyroscope3D.getInstance(imgw, imgh);
-              }
-              if (img3d) {
-                  if (!sensor.screenrect || this.sensorHandler.isElementRemoved(sensor.screenrect)) {
-                      sensor.screenrect = this.context.paper.rect(imgx, imgy, imgw, imgh);
-                      sensor.screenrect.attr({
-                          "opacity": 0
-                      });
-                      sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                      sensor.canvasNode.setAttribute("x", imgx);
-                      sensor.canvasNode.setAttribute("y", imgy);
-                      sensor.canvasNode.setAttribute("width", imgw);
-                      sensor.canvasNode.setAttribute("height", imgh);
-                      this.context.paper.canvas.appendChild(sensor.canvasNode);
-                      sensor.canvas = document.createElement("canvas");
-                      sensor.canvas.width = imgw;
-                      sensor.canvas.height = imgh;
-                      sensor.canvasNode.appendChild(sensor.canvas);
-                  }
-                  let sensorCtx = sensor.canvas.getContext('2d');
-                  sensorCtx.clearRect(0, 0, imgw, imgh);
-                  sensorCtx.drawImage(img3d.render(sensor.state[0], sensor.state[2], sensor.state[1]), 0, 0);
-                  if (!juststate) {
-                      sensor.focusrect.drag((dx, dy, x, y, event)=>{
-                          sensor.state[0] = Math.max(-125, Math.min(125, sensor.old_state[0] + dy));
-                          sensor.state[1] = Math.max(-125, Math.min(125, sensor.old_state[1] - dx));
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor, true);
-                      }, ()=>{
-                          sensor.old_state = sensor.state.slice();
-                      });
-                  }
-              } else {
-                  if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) {
-                      sensor.img = this.context.paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
-                  }
-                  sensor.img.attr({
-                      "x": imgx,
-                      "y": imgy,
-                      "width": imgw,
-                      "height": imgh,
-                      "opacity": fadeopacity
-                  });
-                  if (!this.context.autoGrading && this.context.offLineMode) {
-                      this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
-                  } else {
-                      sensor.focusrect.click(()=>{
-                          this.sensorInConnectedModeError();
-                      });
-                      this.removeSlider(sensor);
-                  }
-              }
-          } else if (sensor.type == "magnetometer") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('mag.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.needle || this.sensorHandler.isElementRemoved(sensor.needle)) sensor.needle = this.context.paper.image(getImg('mag-needle.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              sensor.needle.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "transform": "",
-                  "opacity": fadeopacity
-              });
-              if (!sensor.state) {
-                  sensor.state = [
-                      0,
-                      0,
-                      0
-                  ];
-              }
-              if (sensor.state) {
-                  let heading = Math.atan2(sensor.state[0], sensor.state[1]) * (180 / Math.PI) + 180;
-                  sensor.needle.rotate(heading);
-              }
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state) {
-                  let str = "X: " + sensor.state[0] + " μT\nY: " + sensor.state[1] + " μT\nZ: " + sensor.state[2] + " μT";
-                  sensor.stateText = this.context.paper.text(cx, state1y, str);
-              }
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -1600, 1600);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "sound") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (sensor.state == null) sensor.state = 25; // FIXME
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('sound.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              // if we just do sensor.state, if it is equal to 0 then the state is not displayed
-              if (sensor.state != null) {
-                  sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state + " dB");
-              }
-              if (!this.context.autoGrading && this.context.offLineMode) {
-                  this.setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
-              } else {
-                  sensor.focusrect.click(()=>{
-                      this.sensorInConnectedModeError();
-                  });
-                  this.removeSlider(sensor);
-              }
-          } else if (sensor.type == "irtrans") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.ledon || this.sensorHandler.isElementRemoved(sensor.ledon)) {
-                  sensor.ledon = this.context.paper.image(getImg("irtranson.png"), imgx, imgy, imgw, imgh);
-              }
-              if (!sensor.ledoff || this.sensorHandler.isElementRemoved(sensor.ledoff)) {
-                  sensor.ledoff = this.context.paper.image(getImg('irtransoff.png'), imgx, imgy, imgw, imgh);
-                  sensor.focusrect.click(()=>{
-                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                          //sensor.state = !sensor.state;
-                          //this.drawSensor(sensor);
-                          window.displayHelper.showPopupDialog(irRemoteDialog, ()=>{
-                              $('#picancel').click(()=>{
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                              });
-                              $('#picancel2').click(()=>{
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                              });
-                              let addedSomeButtons = false;
-                              let remotecontent = document.getElementById('piremotecontent');
-                              let parentdiv = document.createElement("DIV");
-                              parentdiv.className = "form-group";
-                              remotecontent.appendChild(parentdiv);
-                              let count = 0;
-                              for(let code in this.context.remoteIRcodes){
-                                  addedSomeButtons = true;
-                                  this.context.remoteIRcodes[code];
-                                  let btn = document.createElement("BUTTON");
-                                  let t = document.createTextNode(code);
-                                  btn.className = "btn";
-                                  btn.appendChild(t);
-                                  parentdiv.appendChild(btn);
-                                  let capturedcode = code;
-                                  let captureddata = this.context.remoteIRcodes[code];
-                                  btn.onclick = ()=>{
-                                      $('#popupMessage').hide();
-                                      window.displayHelper.popupMessageShown = false;
-                                      //if (sensor.waitingForIrMessage)
-                                      //sensor.waitingForIrMessage(capturedcode);
-                                      this.context.quickPiConnection.sendCommand("presetIRMessage(\"" + capturedcode + "\", '" + captureddata + "')", function(returnVal) {});
-                                      this.context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + capturedcode + "\")", function(returnVal) {});
-                                  };
-                                  count += 1;
-                                  if (count == 4) {
-                                      count = 0;
-                                      parentdiv = document.createElement("DIV");
-                                      parentdiv.className = "form-group";
-                                      remotecontent.appendChild(parentdiv);
-                                  }
-                              }
-                              if (!addedSomeButtons) {
-                                  $('#piremotemessage').text(this.strings.messages.noIrPresets);
-                              }
-                              let btn = document.createElement("BUTTON");
-                              let t = document.createTextNode(this.strings.messages.irEnableContinous);
-                              if (sensor.state) {
-                                  t = document.createTextNode(this.strings.messages.irDisableContinous);
-                              }
-                              btn.className = "btn";
-                              btn.appendChild(t);
-                              parentdiv.appendChild(btn);
-                              btn.onclick = ()=>{
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                                  sensor.state = !sensor.state;
-                                  this.sensorHandler.warnClientSensorStateChanged(sensor);
-                                  this.drawSensor(sensor);
-                              };
-                          });
-                      } else {
-                          this.actuatorsInRunningModeError();
-                      }
-                  });
-              }
-              sensor.ledon.attr(sensorAttr);
-              sensor.ledoff.attr(sensorAttr);
-              if (sensor.state) {
-                  sensor.ledon.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": 0
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
-              } else {
-                  sensor.ledon.attr({
-                      "opacity": 0
-                  });
-                  sensor.ledoff.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
-              }
-              if ((!this.context.runner || !this.context.runner.isRunning()) && !this.context.offLineMode) {
-                  this.sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function() {});
-              }
-          } else if (sensor.type == "irrecv") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.buttonon || this.sensorHandler.isElementRemoved(sensor.buttonon)) sensor.buttonon = this.context.paper.image(getImg('irrecvon.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.buttonoff || this.sensorHandler.isElementRemoved(sensor.buttonoff)) sensor.buttonoff = this.context.paper.image(getImg('irrecvoff.png'), imgx, imgy, imgw, imgh);
-              sensor.buttonon.attr(sensorAttr);
-              sensor.buttonoff.attr(sensorAttr);
-              if (sensor.state) {
-                  sensor.buttonon.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.buttonoff.attr({
-                      "opacity": 0
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.on.toUpperCase());
-              } else {
-                  sensor.buttonon.attr({
-                      "opacity": 0
-                  });
-                  sensor.buttonoff.attr({
-                      "opacity": fadeopacity
-                  });
-                  sensor.stateText = this.context.paper.text(state1x, state1y, this.strings.messages.off.toUpperCase());
-              }
-              sensor.focusrect.click(()=>{
-                  if (this.context.offLineMode) {
-                      window.displayHelper.showPopupDialog(irRemoteDialog, ()=>{
-                          $('#picancel').click(()=>{
-                              $('#popupMessage').hide();
-                              window.displayHelper.popupMessageShown = false;
-                          });
-                          $('#picancel2').click(()=>{
-                              $('#popupMessage').hide();
-                              window.displayHelper.popupMessageShown = false;
-                          });
-                          let addedSomeButtons = false;
-                          let remotecontent = document.getElementById('piremotecontent');
-                          let parentdiv = document.createElement("DIV");
-                          parentdiv.className = "form-group";
-                          remotecontent.appendChild(parentdiv);
-                          let count = 0;
-                          for(let code in this.context.remoteIRcodes){
-                              addedSomeButtons = true;
-                              this.context.remoteIRcodes[code];
-                              let btn = document.createElement("BUTTON");
-                              let t = document.createTextNode(code);
-                              btn.className = "btn";
-                              btn.appendChild(t);
-                              parentdiv.appendChild(btn);
-                              let capturedcode = code;
-                              btn.onclick = ()=>{
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                                  if (sensor.waitingForIrMessage) sensor.waitingForIrMessage(capturedcode);
-                              };
-                              count += 1;
-                              if (count == 4) {
-                                  count = 0;
-                                  parentdiv = document.createElement("DIV");
-                                  parentdiv.className = "form-group";
-                                  remotecontent.appendChild(parentdiv);
-                              }
-                          }
-                          if (!addedSomeButtons) {
-                              $('#piremotemessage').text(this.strings.messages.noIrPresets);
-                          }
-                          let btn = document.createElement("BUTTON");
-                          let t = document.createTextNode(this.strings.messages.irEnableContinous);
-                          if (sensor.state) {
-                              t = document.createTextNode(this.strings.messages.irDisableContinous);
-                          }
-                          btn.className = "btn";
-                          btn.appendChild(t);
-                          parentdiv.appendChild(btn);
-                          btn.onclick = ()=>{
-                              $('#popupMessage').hide();
-                              window.displayHelper.popupMessageShown = false;
-                              sensor.state = !sensor.state;
-                              this.sensorHandler.warnClientSensorStateChanged(sensor);
-                              this.drawSensor(sensor);
-                          };
-                      });
-                  } else {
-                      //this.sensorInConnectedModeError();
-                      this.context.stopLiveUpdate = true;
-                      let irLearnDialog = "<div class=\"content qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + this.strings.messages.irReceiverTitle + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div id=\"sensorPicker\" class=\"panel-body\">" + "       <div class=\"form-group\">" + "           <p>" + this.strings.messages.directIrControl + "</p>" + "       </div>" + "       <div class=\"form-group\">" + "           <p id=piircode></p>" + "       </div>" + "   </div>" + "   <div class=\"singleButton\">" + "       <button id=\"piirlearn\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + this.strings.messages.getIrCode + "</button>" + "       <button id=\"picancel2\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + this.strings.messages.closeDialog + "</button>" + "   </div>" + "</div>";
-                      window.displayHelper.showPopupDialog(irLearnDialog, ()=>{
-                          $('#picancel').click(()=>{
-                              $('#popupMessage').hide();
-                              window.displayHelper.popupMessageShown = false;
-                              this.context.stopLiveUpdate = false;
-                          });
-                          $('#picancel2').click(()=>{
-                              $('#popupMessage').hide();
-                              window.displayHelper.popupMessageShown = false;
-                              this.context.stopLiveUpdate = false;
-                          });
-                          $('#piirlearn').click(()=>{
-                              $('#piirlearn').attr('disabled', 'disabled');
-                              $("#piircode").text("");
-                              this.context.quickPiConnection.sendCommand("readIRMessageCode(\"irrec1\", 10000)", function(retval) {
-                                  $('#piirlearn').attr('disabled', null);
-                                  $("#piircode").text(retval);
-                              });
-                          });
-                      });
-                  }
-              });
-          /*
-                    if (!this.context.autoGrading && !sensor.buttonon.node.onmousedown) {
-                        sensor.focusrect.node.onmousedown = () => {
-                            if (this.context.offLineMode) {
-                                sensor.state = true;
-                                this.drawSensor(sensor);
-                            } else
-                                this.sensorInConnectedModeError();
-                        };
-
-
-                        sensor.focusrect.node.onmouseup = () => {
-                            if (this.context.offLineMode) {
-                                sensor.state = false;
-                                this.drawSensor(sensor);
-
-                                if (sensor.onPressed)
-                                    sensor.onPressed();
-                            } else
-                                this.sensorInConnectedModeError();
-                        }
-
-                        sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
-                        sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
-                    }*/ } else if (sensor.type == "stick") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('stick.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.imgup || this.sensorHandler.isElementRemoved(sensor.imgup)) sensor.imgup = this.context.paper.image(getImg('stickup.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.imgdown || this.sensorHandler.isElementRemoved(sensor.imgdown)) sensor.imgdown = this.context.paper.image(getImg('stickdown.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.imgleft || this.sensorHandler.isElementRemoved(sensor.imgleft)) sensor.imgleft = this.context.paper.image(getImg('stickleft.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.imgright || this.sensorHandler.isElementRemoved(sensor.imgright)) sensor.imgright = this.context.paper.image(getImg('stickright.png'), imgx, imgy, imgw, imgh);
-              if (!sensor.imgcenter || this.sensorHandler.isElementRemoved(sensor.imgcenter)) sensor.imgcenter = this.context.paper.image(getImg('stickcenter.png'), imgx, imgy, imgw, imgh);
-              let a = {
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": 0
-              };
-              sensor.img.attr(a).attr("opacity", fadeopacity);
-              sensor.imgup.attr(a);
-              sensor.imgdown.attr(a);
-              sensor.imgleft.attr(a);
-              sensor.imgright.attr(a);
-              sensor.imgcenter.attr(a);
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.state) sensor.state = [
-                  false,
-                  false,
-                  false,
-                  false,
-                  false
-              ];
-              // let stateString = "\n";
-              let stateString = "";
-              let click = false;
-              if (sensor.state[0]) {
-                  stateString += this.strings.messages.up.toUpperCase() + "\n";
-                  sensor.imgup.attr({
-                      "opacity": 1
-                  });
-                  click = true;
-              }
-              if (sensor.state[1]) {
-                  stateString += this.strings.messages.down.toUpperCase() + "\n";
-                  sensor.imgdown.attr({
-                      "opacity": 1
-                  });
-                  click = true;
-              }
-              if (sensor.state[2]) {
-                  stateString += this.strings.messages.left.toUpperCase() + "\n";
-                  sensor.imgleft.attr({
-                      "opacity": 1
-                  });
-                  click = true;
-              }
-              if (sensor.state[3]) {
-                  stateString += this.strings.messages.right.toUpperCase() + "\n";
-                  sensor.imgright.attr({
-                      "opacity": 1
-                  });
-                  click = true;
-              }
-              if (sensor.state[4]) {
-                  stateString += this.strings.messages.center.toUpperCase() + "\n";
-                  sensor.imgcenter.attr({
-                      "opacity": 1
-                  });
-                  click = true;
-              }
-              if (!click) {
-                  stateString += "...";
-              }
-              sensor.stateText = this.context.paper.text(state1x, state1y, stateString);
-              if (sensor.portText) sensor.portText.remove();
-              drawPortText = false;
-              if (sensor.portText) sensor.portText.remove();
-              if (!this.context.autoGrading) {
-                  let gpios = this.sensorHandler.findSensorDefinition(sensor).gpios;
-                  let min = 255;
-                  let max = 0;
-                  for(let i = 0; i < gpios.length; i++){
-                      if (gpios[i] > max) max = gpios[i];
-                      if (gpios[i] < min) min = gpios[i];
-                  }
-                  $('#stickupstate').text(sensor.state[0] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
-                  $('#stickdownstate').text(sensor.state[1] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
-                  $('#stickleftstate').text(sensor.state[2] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
-                  $('#stickrightstate').text(sensor.state[3] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
-                  $('#stickcenterstate').text(sensor.state[4] ? this.strings.messages.on.toUpperCase() : this.strings.messages.off.toUpperCase());
-              /*
-                          sensor.portText = this.context.paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
-                          sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
-                          sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-                          let b = sensor.portText._getBBox();
-                          sensor.portText.translate(0, b.height / 2);
-
-                          let stickPortsDialog = `
-                          <div class="content qpi">
-                          <div class="panel-heading">
-                              <h2 class="sectionTitle">
-                                  <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                                  Noms et ports de la manette
-                              </h2>
-                              <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                          </div>
-                          <div id="sensorPicker" class="panel-body">
-                              <label></label>
-                              <div class="flex-container">
-                              <table style="display:table-header-group;">
-                              <tr>
-                              <th>Name</th>
-                              <th>Port</th>
-                              <th>State</th>
-                              <th>Direction</th>
-                              </tr>
-                              <tr>
-                              <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
-                              </tr>
-                              <tr>
-                              <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
-                              </tr>
-                              <tr>
-                              <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
-                              </tr>
-                              <tr>
-                              <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
-                              </tr>
-                              <tr>
-                              <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
-                              </tr>
-                              </table>
-                              </div>
-                          </div>
-                          <div class="singleButton">
-                              <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
-                          </div>
-                      </div>
-                          `;
-
-                          sensor.portText.click(() => {
-                              window.displayHelper.showPopupDialog(stickPortsDialog);
-
-                              $('#picancel').click(() => {
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                              });
-
-                              $('#picancel2').click(() => {
-                                  $('#popupMessage').hide();
-                                  window.displayHelper.popupMessageShown = false;
-                              });
-
-                              $('#stickupname').text(sensor.name + ".up");
-                              $('#stickdownname').text(sensor.name + ".down");
-                              $('#stickleftname').text(sensor.name + ".left");
-                              $('#stickrightname').text(sensor.name + ".right");
-                              $('#stickcentername').text(sensor.name + ".center");
-
-                              $('#stickupport').text("D" + gpios[0]);
-                              $('#stickdownport').text("D" + gpios[1]);
-                              $('#stickleftport').text("D" + gpios[2]);
-                              $('#stickrightport').text("D" + gpios[3]);
-                              $('#stickcenterport').text("D" + gpios[4]);
-
-                              $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
-                              $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
-                              $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
-                              $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
-                              $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
-
-                          });
-                          */ }
-              function poinInRect(rect, x, y) {
-                  if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) return true;
-                  return false;
-              }
-              function moveRect(rect, x, y) {
-                  rect.left += x;
-                  rect.right += x;
-                  rect.top += y;
-                  rect.bottom += y;
-              }
-              sensor.focusrect.node.onmousedown = (evt)=>{
-                  if (!this.context.offLineMode) {
-                      this.sensorInConnectedModeError();
-                      return;
-                  }
-                  let e = evt.target;
-                  let dim = e.getBoundingClientRect();
-                  let rectsize = dim.width * .30;
-                  let rect = {
-                      left: dim.left,
-                      right: dim.left + rectsize,
-                      top: dim.top,
-                      bottom: dim.top + rectsize
-                  };
-                  // Up left
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[0] = true;
-                      sensor.state[2] = true;
-                  }
-                  // Up
-                  moveRect(rect, rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[0] = true;
-                  }
-                  // Up right
-                  moveRect(rect, rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[0] = true;
-                      sensor.state[3] = true;
-                  }
-                  // Right
-                  moveRect(rect, 0, rectsize);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[3] = true;
-                  }
-                  // Center
-                  moveRect(rect, -rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[4] = true;
-                  }
-                  // Left
-                  moveRect(rect, -rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[2] = true;
-                  }
-                  // Down left
-                  moveRect(rect, 0, rectsize);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[1] = true;
-                      sensor.state[2] = true;
-                  }
-                  // Down
-                  moveRect(rect, rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[1] = true;
-                  }
-                  // Down right
-                  moveRect(rect, rectsize, 0);
-                  if (poinInRect(rect, evt.clientX, evt.clientY)) {
-                      sensor.state[1] = true;
-                      sensor.state[3] = true;
-                  }
-                  this.sensorHandler.warnClientSensorStateChanged(sensor);
-                  this.drawSensor(sensor);
-              };
-              sensor.focusrect.node.onmouseup = (evt)=>{
-                  if (!this.context.offLineMode) {
-                      this.sensorInConnectedModeError();
-                      return;
-                  }
-                  sensor.state = [
-                      false,
-                      false,
-                      false,
-                      false,
-                      false
-                  ];
-                  this.sensorHandler.warnClientSensorStateChanged(sensor);
-                  this.drawSensor(sensor);
-              };
-              sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
-              sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
-          } else if (sensor.type == "cloudstore") {
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('cloudstore.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh * 0.8,
-                  "opacity": scrolloffset ? 0.3 : 1
-              });
-              drawPortText = false;
-          // drawName = false;
-          } else if (sensor.type == "clock") {
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) sensor.img = this.context.paper.image(getImg('clock.png'), imgx, imgy, imgw, imgh);
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh
-              });
-              sensor.stateText = this.context.paper.text(state1x, state1y, this.context.currentTime.toString() + "ms");
-              drawPortText = false;
-              drawName = false;
-          } else if (sensor.type == "adder") {
-              this.drawCustomSensorAdder(x, y, w, h, namesize);
-              return;
-          } else if (sensor.type == "wifi") {
-              if (sensor.stateText) sensor.stateText.remove();
-              if (!sensor.img || this.sensorHandler.isElementRemoved(sensor.img)) {
-                  sensor.img = this.context.paper.image(getImg('wifi.png'), imgx, imgy, imgw, imgh);
-                  sensor.focusrect.click(()=>{
-                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                          sensor.state.connected = !sensor.state.connected;
-                          this.sensorHandler.warnClientSensorStateChanged(sensor);
-                          this.drawSensor(sensor);
-                      } else {
-                          this.actuatorsInRunningModeError();
-                      }
-                  });
-              }
-              if (!sensor.active || this.sensorHandler.isElementRemoved(sensor.active)) sensor.active = this.context.paper.circle();
-              const ssid = sensor.state?.ssid;
-              sensor.stateText = this.context.paper.text(state1x, state1y, sensor.state?.scanning ? '...' : ssid ? textEllipsis(ssid, 6) : '');
-              sensor.img.attr({
-                  "x": imgx,
-                  "y": imgy,
-                  "width": imgw,
-                  "height": imgh,
-                  "opacity": fadeopacity
-              });
-              let color = 'grey';
-              if (sensor.state?.active) {
-                  if (sensor.state.connected) {
-                      color = 'green';
-                  } else {
-                      color = 'red';
-                  }
-              }
-              sensor.active.attr({
-                  "cx": imgx + imgw * 0.15,
-                  "cy": imgy + imgh * 0.1,
-                  "r": imgh * 0.15,
-                  fill: `${color}`,
-                  stroke: 'none',
-                  opacity: 1
-              });
+          const drawParameters = {
+              fadeopacity,
+              sensorAttr,
+              imgx,
+              imgy,
+              imgw,
+              imgh,
+              state1x,
+              state1y,
+              juststate,
+              x,
+              y,
+              w,
+              h,
+              cx,
+              cy,
+              portx,
+              porty,
+              portsize,
+              stateanchor,
+              statesize,
+              drawName,
+              drawPortText,
+              fontWeight,
+              namex,
+              namey,
+              namesize,
+              nameanchor,
+              scrolloffset
+          };
+          if (sensor.draw) {
+              sensor.draw(this.sensorHandler, drawParameters);
           }
           if (sensor.stateText) {
               try {
@@ -12492,9 +13577,9 @@ def detectBoard():
                   //     statecolor = "black";
                   // console.log(statesize)
                   sensor.stateText.attr({
-                      "font-size": statesize,
-                      'text-anchor': stateanchor,
-                      'font-weight': fontWeight,
+                      "font-size": drawParameters.statesize,
+                      'text-anchor': drawParameters.stateanchor,
+                      'font-weight': drawParameters.fontWeight,
                       fill: statecolor
                   });
                   // let b = sensor.stateText._getBBox();
@@ -12502,41 +13587,29 @@ def detectBoard():
                   sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
               } catch (err) {}
           }
-          if (drawPortText) {
-              if (sensor.portText) sensor.portText.remove();
-              sensor.portText = this.context.paper.text(portx, porty, sensor.port);
-              sensor.portText.attr({
-                  "font-size": portsize + "px",
-                  'text-anchor': 'start',
-                  fill: "gray"
-              });
-              sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-              let b = sensor.portText._getBBox();
-              sensor.portText.translate(0, b.height / 2);
-          }
           if (sensor.nameText) {
               sensor.nameText.remove();
           }
-          if (drawName) {
+          if (drawParameters.drawName) {
               if (sensor.name) {
                   let sensorId = sensor.name;
                   if (this.context.useportforname) sensorId = sensor.port;
-                  sensor.nameText = this.context.paper.text(namex, namey, sensorId);
+                  sensor.nameText = this.context.paper.text(drawParameters.namex, drawParameters.namey, sensorId);
                   // sensor.nameText = this.context.paper.text(namex, namey, sensor.name );
                   sensor.nameText.attr({
-                      "font-size": namesize,
-                      "font-weight": fontWeight,
-                      'text-anchor': nameanchor,
+                      "font-size": drawParameters.namesize,
+                      "font-weight": drawParameters.fontWeight,
+                      'text-anchor': drawParameters.nameanchor,
                       fill: "#7B7B7B"
                   });
                   sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
                   let bbox = sensor.nameText.getBBox();
                   if (bbox.width > w - 20) {
-                      namesize = namesize * (w - 20) / bbox.width;
-                      namey += namesize * (1 - (w - 20) / bbox.width);
+                      drawParameters.namesize = drawParameters.namesize * (w - 20) / bbox.width;
+                      drawParameters.namey += drawParameters.namesize * (1 - (w - 20) / bbox.width);
                       sensor.nameText.attr({
-                          "font-size": namesize,
-                          y: namey
+                          "font-size": drawParameters.namesize,
+                          y: drawParameters.namey
                       });
                   }
               }
@@ -12547,374 +13620,6 @@ def detectBoard():
               if (sensor.muteBtn) sensor.muteBtn.toFront();
           }
           this.saveSensorStateIfNotRunning(sensor);
-      }
-      drawCustomSensorAdder(x, y, w, h, fontsize) {
-          if (this.context.sensorAdder) {
-              this.context.sensorAdder.remove();
-          }
-          // paper.rect(x,y,size,size)
-          let r = Math.min(w, h) * 0.2;
-          let cx = x + w / 2;
-          let cy = y + h * 0.4;
-          let plusSize = r * 0.8;
-          let x1 = cx - plusSize / 2;
-          let x2 = cx + plusSize / 2;
-          let y1 = cy - plusSize / 2;
-          let y2 = cy + plusSize / 2;
-          let yText = y + h - (h / 2 - r) / 2;
-          // let fontsize = h * .15;
-          let sSize1 = 2 * h / 100;
-          let sSize2 = 3 * h / 100;
-          // console.log(h)
-          let circ = this.context.paper.circle(cx, cy, r).attr({
-              stroke: colors.blue,
-              "stroke-width": sSize1,
-              fill: "white"
-          });
-          let plus = this.context.paper.path([
-              "M",
-              cx,
-              y1,
-              "V",
-              y2,
-              "M",
-              x1,
-              cy,
-              "H",
-              x2
-          ]).attr({
-              stroke: colors.blue,
-              "stroke-width": sSize2,
-              "stroke-linecap": "round"
-          });
-          let text = this.context.paper.text(cx, yText, this.strings.messages.add).attr({
-              "font-size": fontsize,
-              "font-weight": "bold",
-              fill: colors.blue
-          });
-          let rect = this.context.paper.rect(x, y, w, h).attr({
-              stroke: "none",
-              fill: "red",
-              opacity: 0
-          });
-          // context.sensorAdder = paper.text(cx, cy, "+");
-          this.context.sensorAdder = this.context.paper.set(circ, plus, text, rect);
-          // context.sensorAdder.attr({
-          //     "font-size": fontsize + "px",
-          //     fill: "lightgray"
-          // });
-          // context.sensorAdder.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-          this.context.sensorAdder.click(this.clickAdder);
-      //     window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
-      //         "   <div class=\"panel-heading\">" +
-      //         "       <h2 class=\"sectionTitle\">" +
-      //         "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
-      //                     strings.messages.addcomponent +
-      //         "       </h2>" +
-      //         "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
-      //         "   </div>" +
-      //         "   <div id=\"sensorPicker\" class=\"panel-body\">" +
-      //         "       <label>" + strings.messages.selectcomponent + "</label>" +
-      //         "       <div class=\"flex-container\">" +
-      //         "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
-      //         "               <img id=\"selector-sensor-image\">" +
-      //         "           </div>" +
-      //         "           <div class=\"flex-col half\">" +
-      //         "               <div class=\"form-group\">" +
-      //         "                   <div class=\"input-group\">" +
-      //         "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
-      //         "                   </div>" +
-      //         "              </div>" +
-      //         "              <div class=\"form-group\">" +
-      //         "                   <div class=\"input-group\">" +
-      //         "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
-      //         "                   </div>" +
-      //         "                   <label id=\"selector-label\"></label>" +
-      //         "               </div>" +
-      //         "           </div>" +
-      //         "       </div>" +
-      //         "   </div>" +
-      //         "   <div class=\"singleButton\">" +
-      //         "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
-      //         "   </div>" +
-      //         "</div>");
-      //     let select = document.getElementById("selector-sensor-list");
-      //     for (let iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
-      //         let sensorDefinition = sensorDefinitions[iSensorDef];
-      //         if (sensorDefinition.subTypes) {
-      //             for (let iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++) {
-      //                 if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
-      //                     continue;
-      //                 let el = document.createElement("option");
-      //                 el.textContent = sensorDefinition.description;
-      //                 if (sensorDefinition.subTypes[iSubType].description)
-      //                     el.textContent = sensorDefinition.subTypes[iSubType].description;
-      //                 el.value = sensorDefinition.name;
-      //                 el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
-      //                 select.appendChild(el);
-      //             }
-      //         } else {
-      //             if (!sensorDefinition.pluggable)
-      //                 continue;
-      //             let el = document.createElement("option");
-      //             el.textContent = sensorDefinition.description;
-      //             el.value = sensorDefinition.name;
-      //             select.appendChild(el);
-      //         }
-      //     }
-      //     let board = mainBoard.getCurrentBoard(context.board);
-      //     if (board.builtinSensors) {
-      //         for (let i = 0; i < board.builtinSensors.length; i++) {
-      //             let sensor = board.builtinSensors[i];
-      //             let sensorDefinition = sensorHandler.findSensorDefinition(sensor);
-      //             if (context.findSensor(sensor.type, sensor.port, false))
-      //                 continue;
-      //             let el = document.createElement("option");
-      //             el.textContent = sensorDefinition.description + strings.messages.builtin;
-      //             el.value = sensorDefinition.name + "-";
-      //             if (sensor.subType)
-      //                 el.value += sensor.subType;
-      //             el.value += "-" + sensor.port;
-      //             select.appendChild(el);
-      //         }
-      //     }
-      //     $('#selector-sensor-list').on('change', function () {
-      //         let values = this.value.split("-");
-      //         let builtinport = false;
-      //         let dummysensor = { type: values[0] };
-      //         if (values.length >= 2)
-      //             if (values[1])
-      //                 dummysensor.subType = values[1];
-      //         if (values.length >= 3)
-      //             builtinport = values[2];
-      //         let sensorDefinition = sensorHandler.findSensorDefinition(dummysensor);
-      //         let imageContainer = document.getElementById("selector-image-container");
-      //         while (imageContainer.firstChild) {
-      //             imageContainer.removeChild(imageContainer.firstChild);
-      //         }
-      //         for (let i = 0; i < sensorDefinition.selectorImages.length; i++) {
-      //             let image = document.createElement('img');
-      //             image.src = getImg(sensorDefinition.selectorImages[i]);
-      //             imageContainer.appendChild(image);
-      //             //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
-      //         }
-      //         let portSelect = document.getElementById("selector-sensor-port");
-      //         $('#selector-sensor-port').empty();
-      //         let hasPorts = false;
-      //         if (builtinport) {
-      //             let option = document.createElement('option');
-      //             option.innerText = builtinport;
-      //             option.value = builtinport;
-      //             portSelect.appendChild(option);
-      //             hasPorts = true;
-      //         } else {
-      //             let ports = mainBoard.getCurrentBoard(context.board).portTypes[sensorDefinition.portType];
-      //             if (sensorDefinition.portType == "i2c")
-      //             {
-      //                 ports = ["i2c"];
-      //             }
-      //             for (let iPort = 0; iPort < ports.length; iPort++) {
-      //                 let port = sensorDefinition.portType + ports[iPort];
-      //                 if (sensorDefinition.portType == "i2c")
-      //                     port = "i2c";
-      //                 if (!isPortUsed(sensorDefinition.name, port)) {
-      //                     let option = document.createElement('option');
-      //                     option.innerText = port;
-      //                     option.value = port;
-      //                     portSelect.appendChild(option);
-      //                     hasPorts = true;
-      //                 }
-      //             }
-      //         }
-      //         if (!hasPorts) {
-      //             $('#selector-add-button').attr('disabled', 'disabled');
-      //             let object_function = strings.messages.actuator;
-      //             if (sensorDefinition.isSensor)
-      //                 object_function = strings.messages.sensor;
-      //             $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
-      //             $('#selector-label').show();
-      //         }
-      //         else {
-      //             $('#selector-add-button').attr('disabled', null);
-      //             $('#selector-label').hide();
-      //         }
-      //     });
-      //     $('#selector-add-button').click(function () {
-      //         let sensorType = $("#selector-sensor-list option:selected").val();
-      //         let values = sensorType.split("-");
-      //         let dummysensor = { type: values[0] };
-      //         if (values.length == 2)
-      //             dummysensor.subType = values[1];
-      //         let sensorDefinition = sensorHandler.findSensorDefinition(dummysensor);
-      //         let port = $("#selector-sensor-port option:selected").text();
-      //         let name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
-      //         // if(name == 'screen1') {
-      //             // prepend screen because squareSize func can't handle cells wrap
-      //             infos.quickPiSensors.unshift({
-      //                 type: sensorDefinition.name,
-      //                 subType: sensorDefinition.subType,
-      //                 port: port,
-      //                 name: name
-      //             });
-      //         // } else {
-      //         //     infos.quickPiSensors.push({
-      //         //         type: sensorDefinition.name,
-      //         //         subType: sensorDefinition.subType,
-      //         //         port: port,
-      //         //         name: name
-      //         //     });
-      //         // }
-      //         $('#popupMessage').hide();
-      //         window.displayHelper.popupMessageShown = false;
-      //         context.resetSensorTable();
-      //         context.resetDisplay();
-      //     });
-      //     $("#selector-sensor-list").trigger("change");
-      //     $('#picancel').click(function () {
-      //         $('#popupMessage').hide();
-      //         window.displayHelper.popupMessageShown = false;
-      //     });
-      // });
-      }
-      clickAdder() {
-          window.displayHelper.showPopupDialog("<div class=\"content qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + this.strings.messages.addcomponent + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div id=\"sensorPicker\" class=\"panel-body\">" + "       <label>" + this.strings.messages.selectcomponent + "</label>" + "       <div class=\"flex-container\">" + "           <div id=\"selector-image-container\" class=\"flex-col half\">" + "               <img id=\"selector-sensor-image\">" + "           </div>" + "           <div class=\"flex-col half\">" + "               <div class=\"form-group\">" + "                   <div class=\"input-group\">" + "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" + "                   </div>" + "              </div>" + "              <div class=\"form-group\">" + "                   <div class=\"input-group\">" + "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" + "                   </div>" + "                   <label id=\"selector-label\"></label>" + "               </div>" + "           </div>" + "       </div>" + "   </div>" + "   <div class=\"singleButton\">" + "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + this.strings.messages.add + "</button>" + "   </div>" + "</div>", ()=>{
-              let select = document.getElementById("selector-sensor-list");
-              for(let iSensorDef = 0; iSensorDef < this.sensorDefinitions.length; iSensorDef++){
-                  let sensorDefinition = this.sensorDefinitions[iSensorDef];
-                  // console.log("adder",sensorDefinition.name)
-                  if (sensorDefinition.subTypes) {
-                      for(let iSubType = 0; iSubType < sensorDefinition.subTypes.length; iSubType++){
-                          if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable) continue;
-                          let el = document.createElement("option");
-                          el.textContent = sensorDefinition.description;
-                          if (sensorDefinition.subTypes[iSubType].description) el.textContent = sensorDefinition.subTypes[iSubType].description;
-                          el.value = sensorDefinition.name;
-                          el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
-                          select.appendChild(el);
-                      // console.log("+",el.value)
-                      }
-                  } else {
-                      if (!sensorDefinition.pluggable) continue;
-                      let el = document.createElement("option");
-                      el.textContent = sensorDefinition.description;
-                      el.value = sensorDefinition.name;
-                      // console.log("+",el.value)
-                      select.appendChild(el);
-                  }
-              }
-              let board = this.context.mainBoard.getCurrentBoard(this.context.board);
-              if (board.builtinSensors) {
-                  for(let i = 0; i < board.builtinSensors.length; i++){
-                      let sensor = board.builtinSensors[i];
-                      let sensorDefinition = this.sensorHandler.findSensorDefinition(sensor);
-                      if (this.context.findSensor(sensor.type, sensor.port, false)) continue;
-                      let el = document.createElement("option");
-                      el.textContent = sensorDefinition.description + this.strings.messages.builtin;
-                      el.value = sensorDefinition.name + "-";
-                      if (sensor.subType) el.value += sensor.subType;
-                      el.value += "-" + sensor.port;
-                      select.appendChild(el);
-                  }
-              }
-              $('#selector-sensor-list').on('change', ()=>{
-                  let values = $('#selector-sensor-list').val().split("-");
-                  // console.log(values)
-                  let builtinport = false;
-                  let dummysensor = {
-                      type: values[0]
-                  };
-                  if (values.length >= 2) {
-                      if (values[1]) dummysensor.subType = values[1];
-                  }
-                  if (values.length >= 3) builtinport = values[2];
-                  let sensorDefinition = this.sensorHandler.findSensorDefinition(dummysensor);
-                  let imageContainer = document.getElementById("selector-image-container");
-                  while(imageContainer.firstChild){
-                      imageContainer.removeChild(imageContainer.firstChild);
-                  }
-                  for(let i = 0; i < sensorDefinition.selectorImages.length; i++){
-                      let image = document.createElement('img');
-                      image.src = getImg(sensorDefinition.selectorImages[i]);
-                      imageContainer.appendChild(image);
-                  //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
-                  }
-                  let portSelect = document.getElementById("selector-sensor-port");
-                  $('#selector-sensor-port').empty();
-                  let hasPorts = false;
-                  if (builtinport) {
-                      let option = document.createElement('option');
-                      option.innerText = builtinport;
-                      option.value = builtinport;
-                      portSelect.appendChild(option);
-                      hasPorts = true;
-                  } else {
-                      let ports = this.context.mainBoard.getCurrentBoard(this.context.board).portTypes[sensorDefinition.portType];
-                      // console.log(ports)
-                      if (sensorDefinition.portType == "i2c") {
-                          ports = [
-                              "i2c"
-                          ];
-                      }
-                      for(let iPort = 0; iPort < ports.length; iPort++){
-                          let port = sensorDefinition.portType + ports[iPort];
-                          if (sensorDefinition.portType == "i2c") port = "i2c";
-                          if (!this.sensorHandler.isPortUsed(sensorDefinition.name, port)) {
-                              let option = document.createElement('option');
-                              option.innerText = port;
-                              option.value = port;
-                              portSelect.appendChild(option);
-                              hasPorts = true;
-                          }
-                      }
-                  }
-                  if (!hasPorts) {
-                      $('#selector-add-button').attr('disabled', 'disabled');
-                      let object_function = this.strings.messages.actuator;
-                      if (sensorDefinition.isSensor) object_function = this.strings.messages.sensor;
-                      $('#selector-label').text(this.strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
-                      $('#selector-label').show();
-                  } else {
-                      $('#selector-add-button').attr('disabled', null);
-                      $('#selector-label').hide();
-                  }
-              });
-              $('#selector-add-button').click(()=>{
-                  let sensorType = $("#selector-sensor-list option:selected").val();
-                  let values = sensorType.split("-");
-                  let dummysensor = {
-                      type: values[0]
-                  };
-                  if (values.length == 2) dummysensor.subType = values[1];
-                  let sensorDefinition = this.sensorHandler.findSensorDefinition(dummysensor);
-                  let port = $("#selector-sensor-port option:selected").text();
-                  let name = this.sensorHandler.getNewSensorSuggestedName(sensorDefinition.suggestedName);
-                  // if(name == 'screen1') {
-                  // prepend screen because squareSize func can't handle cells wrap
-                  this.context.infos.quickPiSensors.unshift({
-                      type: sensorDefinition.name,
-                      subType: sensorDefinition.subType,
-                      port: port,
-                      name: name
-                  });
-                  // } else {
-                  //     infos.quickPiSensors.push({
-                  //         type: sensorDefinition.name,
-                  //         subType: sensorDefinition.subType,
-                  //         port: port,
-                  //         name: name
-                  //     });
-                  // }
-                  $('#popupMessage').hide();
-                  window.displayHelper.popupMessageShown = false;
-                  this.context.resetSensorTable();
-                  this.context.resetDisplay();
-              });
-              $("#selector-sensor-list").trigger("change");
-              $('#picancel').click(function() {
-                  $('#popupMessage').hide();
-                  window.displayHelper.popupMessageShown = false;
-              });
-          });
       }
       setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max) {
           // console.log("setSlider",juststate)
@@ -13146,16 +13851,18 @@ def detectBoard():
       constructor(context, strings){
           this.context = context;
           this.strings = strings;
-          this.sensorDefinitions = getSensorDefinitions(context, strings);
+          this.sensorDefinitions = Object.values(sensorsList).map((a)=>a.getDefinition(this.context, this.strings));
           this.sensorDrawer = new SensorDrawer(context, strings, this.sensorDefinitions, this);
       }
       getSensorDefinitions() {
           return this.sensorDefinitions;
       }
+      getSensorDrawer() {
+          return this.sensorDrawer;
+      }
       getNewSensorSuggestedName(name) {
           let maxvalue = 0;
-          for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-              let sensor = this.context.infos.quickPiSensors[i];
+          for (let sensor of this.context.sensorsList.all()){
               let firstdigit = sensor.name.search(/\d/);
               if (firstdigit > 0) {
                   let namepart = sensor.name.substring(0, firstdigit);
@@ -13168,7 +13875,6 @@ def detectBoard():
           return name + (maxvalue + 1);
       }
       findSensorDefinition(sensor) {
-          // console.log(sensor)
           let sensorDef = null;
           for(let iType = 0; iType < this.sensorDefinitions.length; iType++){
               let type = this.sensorDefinitions[iType];
@@ -13196,8 +13902,7 @@ def detectBoard():
           return sensorDef;
       }
       isPortUsed(type, port) {
-          for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-              let sensor = this.context.infos.quickPiSensors[i];
+          for (let sensor of this.context.sensorsList.all()){
               if (port == "i2c") {
                   if (sensor.type == type) return true;
               } else {
@@ -13208,16 +13913,14 @@ def detectBoard():
       }
       findSensorByName(name, error = false) {
           if (isNaN(name.substring(0, 1)) && !isNaN(name.substring(1))) {
-              for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-                  let sensor = this.context.infos.quickPiSensors[i];
+              for (let sensor of this.context.sensorsList.all()){
                   if (sensor.port.toUpperCase() == name.toUpperCase()) {
                       return sensor;
                   }
               }
           } else {
               let firstname = name.split(".")[0];
-              for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-                  let sensor = this.context.infos.quickPiSensors[i];
+              for (let sensor of this.context.sensorsList.all()){
                   if (sensor.name.toUpperCase() == firstname.toUpperCase()) {
                       return sensor;
                   }
@@ -13230,8 +13933,7 @@ def detectBoard():
           return null;
       }
       findSensorByType(type) {
-          for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-              let sensor = this.context.infos.quickPiSensors[i];
+          for (let sensor of this.context.sensorsList.all()){
               if (sensor.type == type) {
                   return sensor;
               }
@@ -13239,8 +13941,7 @@ def detectBoard():
           return null;
       }
       findSensorByPort(port) {
-          for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-              let sensor = this.context.infos.quickPiSensors[i];
+          for (let sensor of this.context.sensorsList.all()){
               if (sensor.port == port) {
                   return sensor;
               }
@@ -13250,8 +13951,7 @@ def detectBoard():
       getSensorNames(sensorType) {
           return ()=>{
               let ports = [];
-              for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-                  let sensor = this.context.infos.quickPiSensors[i];
+              for (let sensor of this.context.sensorsList.all()){
                   if (sensor.type == sensorType) {
                       ports.push([
                           sensor.name,
@@ -13260,8 +13960,7 @@ def detectBoard():
                   }
               }
               if (sensorType == "button") {
-                  for(let i = 0; i < this.context.infos.quickPiSensors.length; i++){
-                      let sensor = this.context.infos.quickPiSensors[i];
+                  for (let sensor of this.context.sensorsList.all()){
                       if (sensor.type == "stick") {
                           let stickDefinition = this.findSensorDefinition(sensor);
                           for(let iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++){
@@ -13301,6 +14000,27 @@ def detectBoard():
                   onlyLog: true
               });
           }
+      }
+      actuatorsInRunningModeError() {
+          window.displayHelper.showPopupMessage(this.strings.messages.actuatorsWhenRunning, 'blanket');
+      }
+  }
+
+  class SensorCollection {
+      add(sensor) {
+          this.entries.push(sensor);
+      }
+      unshift(sensor) {
+          this.entries.unshift(sensor);
+      }
+      all() {
+          return this.entries;
+      }
+      size() {
+          return this.entries.length;
+      }
+      constructor(){
+          this.entries = [];
       }
   }
 
@@ -13533,11 +14253,16 @@ def detectBoard():
           }
           return conceptList;
       };
+      context.sensorsList = new SensorCollection();
+      for (let sensor of infos.quickPiSensors){
+          const realSensor = createSensor(sensor, context, strings);
+          context.sensorsList.add(realSensor);
+      }
       const boardDefinitions = mainBoard.getBoardDefinitions();
       if (window.quickAlgoInterface) {
           window.quickAlgoInterface.stepDelayMin = 1;
       }
-      var defaultQuickPiOptions = {
+      let defaultQuickPiOptions = {
           disableConnection: false,
           increaseTimeAfterCalls: 5
       };
@@ -13615,10 +14340,8 @@ def detectBoard():
       };
       context.getInnerState = function() {
           var savedSensors = {};
-          for(var i = 0; i < infos.quickPiSensors.length; i++){
-              var sensor = infos.quickPiSensors[i];
-              var savedSensor = getSensorFullState(sensor);
-              savedSensors[sensor.name] = savedSensor;
+          for (let sensor of context.sensorsList.all()){
+              savedSensors[sensor.name] = getSensorFullState(sensor);
           }
           innerState.sensors = savedSensors;
           innerState.timeLineStates = context.timeLineStates.map(function(timeLineState) {
@@ -13774,8 +14497,7 @@ def detectBoard():
       context.generatePythonSensorTable = function() {
           var pythonSensorTable = "sensorTable = [";
           var first = true;
-          for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-              var sensor = infos.quickPiSensors[iSensor];
+          for (let sensor of context.sensorsList.all()){
               if (first) {
                   first = false;
               } else {
@@ -13813,8 +14535,7 @@ def detectBoard():
           context.quickPiConnection.sendCommand(pythonSensorTable, function(x) {});
       };
       context.findSensor = function findSensor(type, port, error = true) {
-          for(var i = 0; i < infos.quickPiSensors.length; i++){
-              var sensor = infos.quickPiSensors[i];
+          for (let sensor of context.sensorsList.all()){
               if (sensor.type == type && sensor.port == port) return sensor;
           }
           if (error) {
@@ -13893,8 +14614,7 @@ def detectBoard():
           }
       }
       context.resetSensors = function() {
-          for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-              var sensor = infos.quickPiSensors[iSensor];
+          for (let sensor of context.sensorsList.all()){
               if (context.sensorsSaved[sensor.name] && !context.autoGrading) {
                   var save = context.sensorsSaved[sensor.name];
                   reloadSensorFullState(sensor, save);
@@ -13953,8 +14673,7 @@ def detectBoard():
                       //                    state.badonce = false;
                       if (state.time > context.maxTime) context.maxTime = state.time;
                   }
-                  for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                      var sensor = infos.quickPiSensors[iSensor];
+                  for (let sensor of context.sensorsList.all()){
                       if (sensor.type == "buzzer") {
                           var states = context.gradingStatesBySensor[sensor.name];
                           if (states) {
@@ -13992,7 +14711,7 @@ def detectBoard():
                   }
               }
               if (infos.quickPiSensors == "default") {
-                  infos.quickPiSensors = [];
+                  context.sensorsList = new SensorCollection();
                   addDefaultBoardSensors();
               }
           }
@@ -14004,8 +14723,7 @@ def detectBoard():
               context.sensorStates = context.paper.set();
           }
           context.resetSensors();
-          for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-              var sensor = infos.quickPiSensors[iSensor];
+          for (let sensor of context.sensorsList.all()){
               // If the sensor has no port assign one
               if (!sensor.port) {
                   sensorAssignPort(sensor);
@@ -14020,12 +14738,11 @@ def detectBoard():
               context.success = false;
           }
           // Needs display to be reset before calling registerQuickPiEvent
-          for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-              var sensor = infos.quickPiSensors[iSensor];
+          for (let sensor of context.sensorsList.all()){
               // Set initial state
               var sensorDef = sensorHandler.findSensorDefinition(sensor);
-              if (sensorDef && !sensorDef.isSensor && sensorDef.getInitialState) {
-                  var initialState = sensorDef.getInitialState(sensor);
+              if (sensorDef && !sensorDef.isSensor && sensor.getInitialState) {
+                  var initialState = sensor.getInitialState();
                   if (initialState != null) context.registerQuickPiEvent(sensor.name, initialState, true, true);
               }
           }
@@ -14049,18 +14766,17 @@ def detectBoard():
                   return;
               }
               context.quickPiConnection.startTransaction();
-              for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                  var sensor = infos.quickPiSensors[iSensor];
+              for (let sensor of context.sensorsList.all()){
                   updateLiveSensor(sensor);
               }
               context.quickPiConnection.endTransaction();
           }, 200);
       }
       function updateLiveSensor(sensor) {
-          if (sensorHandler.findSensorDefinition(sensor).isSensor && sensorHandler.findSensorDefinition(sensor).getLiveState) {
+          if (sensorHandler.findSensorDefinition(sensor).isSensor && sensor.getLiveState) {
               context.liveUpdateCount++;
               //console.log("updateLiveSensor " + sensor.name, context.liveUpdateCount);
-              sensorHandler.findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
+              sensor.getLiveState(function(returnVal) {
                   context.liveUpdateCount--;
                   //console.log("updateLiveSensor callback" + sensor.name, context.liveUpdateCount);
                   if (!sensor.removed) {
@@ -14081,32 +14797,30 @@ def detectBoard():
           context.board = newboardname;
           setSessionStorage('board', newboardname);
           if (infos.customSensors) {
-              for(var i = 0; i < infos.quickPiSensors.length; i++){
-                  var sensor = infos.quickPiSensors[i];
+              for (let sensor of context.sensorsList.all()){
                   sensor.removed = true;
               }
-              infos.quickPiSensors = [];
+              context.sensorsList = new SensorCollection();
               if (board.builtinSensors) {
                   for(var i = 0; i < board.builtinSensors.length; i++){
-                      var sensor = board.builtinSensors[i];
-                      var newSensor = {
+                      let sensor = board.builtinSensors[i];
+                      let newSensor = createSensor({
                           "type": sensor.type,
                           "port": sensor.port,
                           "builtin": true
-                      };
+                      }, context, strings);
                       if (sensor.subType) {
                           newSensor.subType = sensor.subType;
                       }
                       newSensor.name = getSensorSuggestedName(sensor.type, sensor.suggestedName);
-                      sensor.state = null;
-                      sensor.callsInTimeSlot = 0;
-                      sensor.lastTimeIncrease = 0;
-                      infos.quickPiSensors.push(newSensor);
+                      newSensor.state = null;
+                      newSensor.callsInTimeSlot = 0;
+                      newSensor.lastTimeIncrease = 0;
+                      context.sensorsList.add(newSensor);
                   }
               }
           } else {
-              for(var i = 0; i < infos.quickPiSensors.length; i++){
-                  var sensor = infos.quickPiSensors[i];
+              for (let sensor of context.sensorsList.all()){
                   sensorAssignPort(sensor);
               }
           }
@@ -14122,8 +14836,7 @@ def detectBoard():
           // we don't need to save sensors if user can't modify them
           if (!infos.customSensors) return;
           additional.quickpiSensors = [];
-          for(var i = 0; i < infos.quickPiSensors.length; i++){
-              var currentSensor = infos.quickPiSensors[i];
+          for (let currentSensor of context.sensorsList.all()){
               var savedSensor = {
                   type: currentSensor.type,
                   port: currentSensor.port,
@@ -14144,24 +14857,22 @@ def detectBoard():
           // we don't verify if sensors are empty or not, because if they are it is maybe meant this
           // way by the user
           if (!newSensors) return;
-          for(let i = 0; i < infos.quickPiSensors.length; i++){
-              var sensor = infos.quickPiSensors[i];
+          for (let sensor of context.sensorsList.all()){
               sensor.removed = true;
           }
-          infos.quickPiSensors = [];
+          context.sensorsList = new SensorCollection();
           for(var i = 0; i < newSensors.length; i++){
-              let sensor = {
+              let sensor = createSensor({
                   type: newSensors[i].type,
                   port: newSensors[i].port,
                   name: newSensors[i].name
-              };
+              }, context, strings);
               if (newSensors[i].subType) sensor.subType = newSensors[i].subType;
               sensor.state = null;
               sensor.callsInTimeSlot = 0;
               sensor.lastTimeIncrease = 0;
-              infos.quickPiSensors.push(sensor);
+              context.sensorsList.add(sensor);
           }
-          // console.log(infos.quickPiSensors)
           context.recreateDisplay = true;
           this.resetDisplay();
       };
@@ -14203,7 +14914,7 @@ def detectBoard():
               if (context.sensorStates) context.sensorStates.remove();
               context.sensorStates = context.paper.set();
               //context.paper.clear(); // Do this for now.
-              var numSensors = infos.quickPiSensors.length;
+              var numSensors = context.sensorsList.size();
               var sensorSize = Math.min(context.paper.height / numSensors * 0.80, $('#virtualSensors').width() / 10);
               //var sensorSize = Math.min(context.paper.height / (numSensors + 1));
               context.timeLineSlotHeight = Math.min(context.paper.height / (numSensors + 1));
@@ -14213,10 +14924,9 @@ def detectBoard():
               if (maxTime == 0) maxTime = 1000;
               if (!context.loopsForever) maxTime = Math.floor(maxTime * 1.05);
               context.pixelsPerTime = (context.paper.width - context.timelineStartx - 30) / maxTime;
-              context.timeLineY = 25 + context.timeLineSlotHeight * infos.quickPiSensors.length;
+              context.timeLineY = 25 + context.timeLineSlotHeight * context.sensorsList.size();
               var color = true;
-              for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                  var sensor = infos.quickPiSensors[iSensor];
+              for (let [iSensor, sensor] of context.sensorsList.all().entries()){
                   sensor.drawInfo = {
                       x: 0,
                       y: 10 + context.timeLineSlotHeight * iSensor,
@@ -14233,8 +14943,7 @@ def detectBoard():
                   color = !color;
               }
               drawTimeLine();
-              for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                  var sensor = infos.quickPiSensors[iSensor];
+              for (let sensor of context.sensorsList.all()){
                   sensorHandler.drawSensor(sensor);
                   sensor.timelinelastxlabel = 0;
                   if (context.gradingStatesBySensor.hasOwnProperty(sensor.name)) {
@@ -14242,8 +14951,9 @@ def detectBoard():
                       var startTime = 0;
                       var lastState = null;
                       sensor.lastAnalogState = null;
-                      for(var iState = 0; iState < states.length; iState++){
-                          var state = states[iState];
+                      let state;
+                      for(let iState = 0; iState < states.length; iState++){
+                          state = states[iState];
                           drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected", true);
                           startTime = state.time;
                           lastState = state.state;
@@ -14258,13 +14968,13 @@ def detectBoard():
                   drawSensorTimeLineState(timelinestate.sensor, timelinestate.state, timelinestate.startTime, timelinestate.endTime, timelinestate.type, true);
               }
           } else {
-              var nSensors = infos.quickPiSensors.length;
-              infos.quickPiSensors.forEach(function(sensor) {
-                  var cellsAmount = sensorHandler.findSensorDefinition(sensor).cellsAmount;
+              var nSensors = context.sensorsList.size();
+              for (let sensor of context.sensorsList.all()){
+                  let cellsAmount = sensorHandler.findSensorDefinition(sensor).cellsAmount;
                   if (cellsAmount) {
                       nSensors += cellsAmount(context.paper) - 1;
                   }
-              });
+              }
               if (nSensors < 4) nSensors = 4;
               var geometry = null;
               if (context.compactLayout) // geometry = squareSize(context.paper.width, context.paper.height, nSensors, 2);
@@ -14303,7 +15013,7 @@ def detectBoard():
                       // var y2 = y + geometry.size * 3 / 4;
                       var y2 = y + geometry.size;
                       var cells = 1;
-                      var sensor = infos.quickPiSensors[iSensor];
+                      var sensor = context.sensorsList.all()[iSensor];
                       var cellsAmount = null;
                       if (sensor) cellsAmount = sensorHandler.findSensorDefinition(sensor).cellsAmount;
                       if (cellsAmount) cells = cellsAmount(context.paper);
@@ -14327,16 +15037,14 @@ def detectBoard():
                       while(!foundcols && !bump){
                           var colsleft = nbCol - col;
                           if (cells > colsleft) {
-                              for(var iNewSensor = iSensor + 1; iNewSensor < infos.quickPiSensors.length; iNewSensor++){
-                                  var newSensor = infos.quickPiSensors[iNewSensor];
-                                  // if(newSensor.type == "adder")
-                                  // continue
+                              for(var iNewSensor = iSensor + 1; iNewSensor < context.sensorsList.size(); iNewSensor++){
+                                  var newSensor = context.sensorsList.all()[iNewSensor];
                                   cells = 1;
                                   cellsAmount = sensorHandler.findSensorDefinition(newSensor).cellsAmount;
                                   if (cellsAmount) cells = cellsAmount(context.paper);
                                   if (cells == 1) {
-                                      infos.quickPiSensors[iNewSensor] = sensor;
-                                      infos.quickPiSensors[iSensor] = newSensor;
+                                      context.sensorsList.all()[iNewSensor] = sensor;
+                                      context.sensorsList.all()[iSensor] = newSensor;
                                       sensor = newSensor;
                                       foundcols = true;
                                       break;
@@ -14348,7 +15056,7 @@ def detectBoard():
                           }
                       }
                       if (bump) continue;
-                      if (iSensor == infos.quickPiSensors.length && infos.customSensors) ; else if (infos.quickPiSensors[iSensor]) {
+                      if (iSensor == context.sensorsList.size() && infos.customSensors) ; else if (context.sensorsList.all()[iSensor]) {
                           col += cells - 1;
                           sensor.drawInfo = {
                               x: x,
@@ -14433,9 +15141,8 @@ def detectBoard():
                   if (context.quickPiZoom < 1) context.quickPiZoom = 1;
                   if (originalzoom != context.quickPiZoom) context.resetDisplay();
               };
-              $('#virtualSensors').scroll(function(event) {
-                  for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                      var sensor = infos.quickPiSensors[iSensor];
+              $('#virtualSensors').scroll(function() {
+                  for (let sensor of context.sensorsList.all()){
                       sensorHandler.drawSensor(sensor);
                   }
               });
@@ -14444,7 +15151,7 @@ def detectBoard():
               $('#virtualSensors').css("overflow", "hidden");
           }
           if (infos.quickPiSensors == "default") {
-              infos.quickPiSensors = [];
+              context.sensorsList = new SensorCollection();
               addDefaultBoardSensors();
           }
           if (context.blocklyHelper) {
@@ -14549,8 +15256,7 @@ def detectBoard():
           $('#pihatsetup').click(function() {
               window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" + "   <div class=\"panel-heading\">" + "       <h2 class=\"sectionTitle\">" + "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" + strings.messages.nameandports + "       </h2>" + "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" + "   </div>" + "   <div class=\"panel-body\">" + "       <table id='sensorTable' style=\"display:table-header-group;\">" + "           <tr>" + "               <th>" + strings.messages.name + "</th>" + "               <th>" + strings.messages.port + "</th>" + "               <th>" + strings.messages.state + "</th>" + "           </tr>" + "       </table>" + "   <!--" + "       <div>" + "           <input type=\"checkbox\" id=\"buzzeraudio\" value=\"buzzeron\"> Output audio trought audio buzzer<br>" + "       </div>" + "       <div class=\"inlineButtons\">" + "           <button id=\"pisetupok\" class=\"btn\"><i class=\"fas fa-cog icon\"></i>Set</button>" + "       </div>" + "   -->" + "   </div>" + "</div>", function() {
                   let table = document.getElementById("sensorTable");
-                  for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                      var sensor = infos.quickPiSensors[iSensor];
+                  for (let sensor of context.sensorsList.all()){
                       function addNewRow() {
                           var row = table.insertRow();
                           var type = row.insertCell();
@@ -14657,26 +15363,26 @@ def detectBoard():
           if (boardDefaultSensors) {
               for(var i = 0; i < boardDefaultSensors.length; i++){
                   var sensor = boardDefaultSensors[i];
-                  let newSensor = {
+                  let newSensor = createSensor({
                       "type": sensor.type,
                       "port": sensor.port,
                       "builtin": true
-                  };
+                  }, context, strings);
                   if (sensor.subType) {
                       newSensor.subType = sensor.subType;
                   }
                   newSensor.name = getSensorSuggestedName(sensor.type, sensor.suggestedName);
-                  sensor.state = null;
-                  sensor.callsInTimeSlot = 0;
-                  sensor.lastTimeIncrease = 0;
-                  infos.quickPiSensors.push(newSensor);
+                  newSensor.state = null;
+                  newSensor.callsInTimeSlot = 0;
+                  newSensor.lastTimeIncrease = 0;
+                  context.sensorsList.add(newSensor);
               }
-              let newSensor = {
+              let newSensor = createSensor({
                   type: "cloudstore",
                   name: "cloud1",
                   port: "D5"
-              };
-              infos.quickPiSensors.push(newSensor);
+              }, context, strings);
+              context.sensorsList.add(newSensor);
           }
           if (infos.customSensors) ;
       // console.log(infos.quickPiSensors)
@@ -14828,8 +15534,7 @@ def detectBoard():
           // Do something here
           clearSensorPollInterval();
           if (context.display) ;
-          for(var i = 0; i < infos.quickPiSensors.length; i++){
-              var sensor = infos.quickPiSensors[i];
+          for (let sensor of context.sensorsList.all()){
               sensor.removed = true;
           }
       };
@@ -15007,8 +15712,7 @@ def detectBoard():
               });
               $('#screentooltip').remove();
               context.resetSensors();
-              for(var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++){
-                  var sensor = infos.quickPiSensors[iSensor];
+              for (let sensor of context.sensorsList.all()){
                   sensorHandler.drawSensor(sensor);
               }
           });
@@ -15171,7 +15875,18 @@ def detectBoard():
           var percentage = +state;
           var drawnElements = [];
           var deleteLastDrawnElements = true;
-          if (sensor.type == "accelerometer" || sensor.type == "gyroscope" || sensor.type == "magnetometer" || sensor.type == "ledrgb") {
+          const drawParameters = {
+              color,
+              deleteLastDrawnElements,
+              startx,
+              strokewidth,
+              ypositionmiddle,
+              drawnElements,
+              ypositiontop
+          };
+          if (sensor.drawTimelineState) {
+              sensor.drawTimelineState(sensorHandler, state, expectedState, type, drawParameters);
+          } else if (sensor.type == "accelerometer" || sensor.type == "gyroscope" || sensor.type == "magnetometer" || sensor.type == "ledrgb") {
               if (state != null) {
                   for(var i = 0; i < 3; i++){
                       var startx = context.timelineStartx + startTime * context.pixelsPerTime;
@@ -15220,7 +15935,7 @@ def detectBoard():
                                   stateText = sensorDef.getStateString(state[i]);
                               }
                               var paperText = context.paper.text(startx, ypositiontop + offset - 10, stateText);
-                              drawnElements.push(paperText);
+                              drawParameters.drawnElements.push(paperText);
                               context.sensorStates.push(paperText);
                               sensor.timelinelastxlabel[i] = startx;
                           }
@@ -15239,7 +15954,7 @@ def detectBoard():
                           "stroke-linejoin": "round",
                           "stroke-linecap": "round"
                       });
-                      drawnElements.push(stateline);
+                      drawParameters.drawnElements.push(stateline);
                       context.sensorStates.push(stateline);
                   }
                   sensor.lastAnalogState = state == null ? [
@@ -15292,7 +16007,7 @@ def detectBoard():
                           sensor.timelinestateup = true;
                       }
                       var paperText = context.paper.text(startx, y, stateText);
-                      drawnElements.push(paperText);
+                      drawParameters.drawnElements.push(paperText);
                       context.sensorStates.push(paperText);
                       sensor.timelinelastxlabel = startx;
                   }
@@ -15312,7 +16027,7 @@ def detectBoard():
                   "stroke-linejoin": "round",
                   "stroke-linecap": "round"
               });
-              drawnElements.push(stateline);
+              drawParameters.drawnElements.push(stateline);
               context.sensorStates.push(stateline);
           } else if (sensor.type == "stick") {
               var stateToFA = [
@@ -15356,7 +16071,7 @@ def detectBoard():
                           "stroke-linejoin": "round",
                           "stroke-linecap": "round"
                       });
-                      drawnElements.push(stateline);
+                      drawParameters.drawnElements.push(stateline);
                       context.sensorStates.push(stateline);
                       if (type == "expected") {
                           sensor.stateArrow = context.paper.text(startx, ypos + 7, stateToFA[i]);
@@ -15372,143 +16087,6 @@ def detectBoard():
                           sensor.stateArrow.node.style.fontWeight = "bold";
                       }
                   }
-              }
-          } else if (sensor.type == "screen" && state) {
-              var sensorDef = sensorHandler.findSensorDefinition(sensor);
-              if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) {
-                  sensor.lastScreenState = state;
-                  if (state.isDrawingData) {
-                      var stateBubble = context.paper.text(startx, ypositiontop + 10, '\uf303');
-                      stateBubble.attr({
-                          "font": "Font Awesome 5 Free",
-                          "stroke": color,
-                          "fill": color,
-                          "font-size": 4 * 2 + "px"
-                      });
-                      stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                      stateBubble.node.style.fontWeight = "bold";
-                      $(stateBubble.node).css("z-index", "1");
-                      function showPopup(event) {
-                          if (!sensor.showingTooltip) {
-                              $("body").append('<div id="screentooltip"></div>');
-                              $('#screentooltip').css("position", "absolute");
-                              $('#screentooltip').css("border", "1px solid gray");
-                              $('#screentooltip').css("background-color", "#efefef");
-                              $('#screentooltip').css("padding", "3px");
-                              $('#screentooltip').css("z-index", "1000");
-                              $('#screentooltip').css("width", "262px");
-                              $('#screentooltip').css("height", "70px");
-                              $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
-                              var canvas = document.createElement("canvas");
-                              canvas.id = "tooltipcanvas";
-                              canvas.width = 128 * 2;
-                              canvas.height = 32 * 2;
-                              $('#screentooltip').append(canvas);
-                              $(canvas).css("position", "absolute");
-                              $(canvas).css("z-index", "1500");
-                              $(canvas).css("left", 3).css("top", 3);
-                              canvas.getContext('2d');
-                              if (expectedState && type == "wrong") {
-                                  screenDrawing.renderDifferences(expectedState, state, canvas, 2);
-                              } else {
-                                  screenDrawing.renderToCanvas(state, canvas, 2);
-                              }
-                              sensor.showingTooltip = true;
-                          }
-                      }
-                      $(stateBubble.node).mouseenter(showPopup);
-                      $(stateBubble.node).click(showPopup);
-                      $(stateBubble.node).mouseleave(function(event) {
-                          sensor.showingTooltip = false;
-                          $('#screentooltip').remove();
-                      });
-                  } else {
-                      var stateBubble = context.paper.text(startx, ypositionmiddle + 10, '\uf27a');
-                      stateBubble.attr({
-                          "font": "Font Awesome 5 Free",
-                          "stroke": color,
-                          "fill": color,
-                          "font-size": strokewidth * 2 + "px"
-                      });
-                      stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                      stateBubble.node.style.fontWeight = "bold";
-                      function showPopup1() {
-                          if (!sensor.tooltip) {
-                              sensor.tooltipText = context.paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + (state.line2 ? state.line2 : ""));
-                              var textDimensions = sensor.tooltipText.getBBox();
-                              sensor.tooltip = context.paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
-                              sensor.tooltip.attr({
-                                  "stroke": "black",
-                                  "stroke-width": 2,
-                                  "fill": "white"
-                              });
-                              sensor.tooltipText.toFront();
-                          }
-                      }
-                      stateBubble.click(showPopup1);
-                      stateBubble.hover(showPopup1, function() {
-                          if (sensor.tooltip) {
-                              sensor.tooltip.remove();
-                              sensor.tooltip = null;
-                          }
-                          if (sensor.tooltipText) {
-                              sensor.tooltipText.remove();
-                              sensor.tooltipText = null;
-                          }
-                      });
-                  }
-                  drawnElements.push(stateBubble);
-                  context.sensorStates.push(stateBubble);
-              } else {
-                  deleteLastDrawnElements = false;
-              }
-          } else if (sensor.type == "cloudstore") {
-              var sensorDef = sensorHandler.findSensorDefinition(sensor);
-              if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) {
-                  sensor.lastScreenState = state;
-                  var stateBubble = context.paper.text(startx, ypositionmiddle + 10, '\uf044');
-                  stateBubble.attr({
-                      "font": "Font Awesome 5 Free",
-                      "stroke": color,
-                      "fill": color,
-                      "font-size": 4 * 2 + "px"
-                  });
-                  stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                  stateBubble.node.style.fontWeight = "bold";
-                  function showPopup2(event) {
-                      if (!sensor.showingTooltip) {
-                          $("body").append('<div id="screentooltip"></div>');
-                          $('#screentooltip').css("position", "absolute");
-                          $('#screentooltip').css("border", "1px solid gray");
-                          $('#screentooltip').css("background-color", "#efefef");
-                          $('#screentooltip').css("padding", "3px");
-                          $('#screentooltip').css("z-index", "1000");
-                          /*
-                              $('#screentooltip').css("width", "262px");
-                              $('#screentooltip').css("height", "70px");*/ $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
-                          if (expectedState && type == "wrong") {
-                              var div = LocalQuickStore.renderDifferences(expectedState, state);
-                              $('#screentooltip').append(div);
-                          } else {
-                              for(var property in state){
-                                  var div = document.createElement("div");
-                                  $(div).text(property + " = " + state[property]);
-                                  $('#screentooltip').append(div);
-                              }
-                          }
-                          sensor.showingTooltip = true;
-                      }
-                  }
-                  $(stateBubble.node).mouseenter(showPopup2);
-                  $(stateBubble.node).click(showPopup2);
-                  $(stateBubble.node).mouseleave(function(event) {
-                      sensor.showingTooltip = false;
-                      $('#screentooltip').remove();
-                  });
-                  drawnElements.push(stateBubble);
-                  context.sensorStates.push(stateBubble);
-              } else {
-                  deleteLastDrawnElements = false;
               }
           } else if (percentage != 0) {
               if (type == "wrong" || type == "actual") {
@@ -15530,13 +16108,13 @@ def detectBoard():
                       width: stateLenght
                   }, 200);
               }
-              drawnElements.push(c);
+              drawParameters.drawnElements.push(c);
               context.sensorStates.push(c);
           }
           if (type == 'actual' || type == 'wrong') {
               if (!sensor.drawnGradingElements) {
                   sensor.drawnGradingElements = [];
-              } else if (deleteLastDrawnElements) {
+              } else if (drawParameters.deleteLastDrawnElements) {
                   for(var i = 0; i < sensor.drawnGradingElements.length; i++){
                       var dge = sensor.drawnGradingElements[i];
                       if (dge.time >= startTime) {
@@ -15548,10 +16126,10 @@ def detectBoard():
                       }
                   }
               }
-              if (drawnElements.length) {
+              if (drawParameters.drawnElements.length) {
                   sensor.drawnGradingElements.push({
                       time: startTime,
-                      elements: drawnElements
+                      elements: drawParameters.drawnElements
                   });
               }
           }
@@ -15626,7 +16204,7 @@ def detectBoard():
               var type = "actual";
               // Check the new state
               var expectedState = context.getSensorExpectedState(name, context.currentTime);
-              if (expectedState !== null && !sensorDef.compareState(expectedState.state, newState)) {
+              if (expectedState !== null && !sensorDef.compareState(newState, expectedState.state)) {
                   type = "wrong";
               }
               drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type, false, expectedState && expectedState.state);
@@ -15836,7 +16414,6 @@ def detectBoard():
           return newName;
       }
       const customBlocks = mainBoard.getCustomBlocks(context, strings);
-      console.log('custom blocks', customBlocks);
       if (customBlocks.customBlocks) {
           context.customBlocks = customBlocks.customBlocks;
       }
@@ -15872,7 +16449,6 @@ def detectBoard():
               };
           }
       }
-      console.log('final context', context);
       // Color indexes of block categories (as a hue in the range 0–420)
       context.provideBlocklyColours = function() {
           window.Blockly.HSV_SATURATION = 0.65;
@@ -15972,7 +16548,8 @@ def detectBoard():
       QuickStore,
       getContext,
       quickPiStore: LocalQuickStore,
-      OutputGenerator
+      OutputGenerator,
+      screenDrawing
   };
   for (let [name, object] of Object.entries(exportToWindow)){
       window[name] = object;

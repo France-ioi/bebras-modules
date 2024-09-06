@@ -642,3 +642,36 @@ html {
 #port_dialog button:disabled {
   opacity: 20%;
 }
+
+#wifi_dialog .panel-body {
+  display: flex;
+  height: 100%;
+  margin-left: 0 !important;
+}
+#wifi_dialog .wifi-actuator {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex: 50%;
+  min-width: 0;
+}
+#wifi_dialog .wifi-sensor {
+  padding: 20px;
+  flex: 50%;
+  min-width: 0;
+}
+#wifi_dialog .wifi-button-group {
+  margin-top: 20px;
+  justify-content: center;
+  display: flex;
+  row-gap: 5px;
+  column-gap: 10px;
+  flex-wrap: wrap;
+}
+@media screen and (max-width: 481px) {
+  #wifi_dialog .panel-body {
+    flex-direction: column;
+  }
+  #wifi_dialog .wifi-actuator {
+    border-right: none;
+  }
+}
