@@ -344,12 +344,12 @@
 
     // grade
 
-    function useGraderData(answer, versions, score_settings, callback) {
+    function useGraderData(answer, versions, score_settings, callback, errorcb) {
         if(window.Quiz.grader.handler && window.Quiz.grader.data) {
             var res = window.Quiz.grader.handler(window.Quiz.grader.data, answer, versions, score_settings);
             return callback(res);
         }
-        console.error('Local Quiz grader not found');
+        console.error('Cannot evaluate : no local grader or data.');
         if(errorcb) { errorcb(); }
     }
 
