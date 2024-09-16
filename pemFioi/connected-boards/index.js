@@ -3215,11 +3215,14 @@ elif program_exists:
                       if (!sensor) {
                           throw `There is no sensor connected to the digital port D${self.pinNumber}`;
                       }
-                      let command = "turnPortOn(\"" + sensor.name + "\")";
-                      context.registerQuickPiEvent(sensor.name, true);
+                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+                      if (!sensorDef.disablePinControl) {
+                          context.registerQuickPiEvent(sensor.name, true);
+                      }
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           context.waitDelay(callback);
                       } else {
+                          let command = "turnPortOn(\"" + sensor.name + "\")";
                           let cb = context.runner.waitCallback(callback);
                           context.quickPiConnection.sendCommand(command, cb);
                       }
@@ -3230,7 +3233,10 @@ elif program_exists:
                           throw `There is no sensor connected to the digital port D${self.pinNumber}`;
                       }
                       let command = "turnPortOff(\"" + sensor.name + "\")";
-                      context.registerQuickPiEvent(sensor.name, false);
+                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+                      if (!sensorDef.disablePinControl) {
+                          context.registerQuickPiEvent(sensor.name, false);
+                      }
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           context.waitDelay(callback);
                       } else {
@@ -3594,7 +3600,7 @@ elif program_exists:
           classImplementations: {
               Response: {
                   __constructor: function*(self, statusCode, text) {
-                      self.statusCode = statusCode;
+                      self.status_code = statusCode;
                       self.text = text;
                   },
                   json: function*(self) {
@@ -3647,6 +3653,9 @@ elif program_exists:
                   const callback = args.pop();
                   const [url, headers] = args;
                   const sensor = context.sensorHandler.findSensorByType('wifi');
+                  if (!sensor) {
+                      throw `There is no Wi-Fi sensor to make the request.`;
+                  }
                   if (!sensor.state?.active) {
                       throw strings.messages.wifiNotActive;
                   }
@@ -3664,6 +3673,9 @@ elif program_exists:
                   const callback = args.pop();
                   const [url, data, headers] = args;
                   const sensor = context.sensorHandler.findSensorByType('wifi');
+                  if (!sensor) {
+                      throw `There is no Wi-Fi sensor to make the request.`;
+                  }
                   if (!sensor.state?.active) {
                       throw strings.messages.wifiNotActive;
                   }
@@ -3696,6 +3708,41 @@ elif program_exists:
               dumps: function(params, callback) {
                   const serialized = JSON.stringify(params);
                   context.waitDelay(callback, serialized);
+              }
+          }
+      };
+  }
+
+  function machinePulseModuleDefinition(context, strings) {
+      return {
+          blockDefinitions: {
+              sensors: [
+                  {
+                      name: 'time_pulse_us',
+                      params: [
+                          null,
+                          'Number',
+                          'Number'
+                      ],
+                      yieldsValue: 'int'
+                  }
+              ]
+          },
+          blockImplementations: {
+              time_pulse_us: function(pin, pulseLevel, timeoutUs, callback) {
+                  const sensor = context.sensorHandler.findSensorByPort(`D${pin.pinNumber}`);
+                  if (!sensor) {
+                      throw `There is no sensor connected to the digital port D${pin.pinNumber}`;
+                  }
+                  let command = "getDistance(\"" + sensor.name + "\")";
+                  if (!context.display || context.autoGrading || context.offLineMode) {
+                      let distance = context.getSensorState(sensor.name);
+                      const duration = distance / 343 * 2 / 100 * 1e6;
+                      context.waitDelay(callback, duration);
+                  } else {
+                      let cb = context.runner.waitCallback(callback);
+                      context.quickPiConnection.sendCommand(command, cb);
+                  }
               }
           }
       };
@@ -3929,6 +3976,7 @@ elif program_exists:
           const ledModule = thingzLedModuleDefinition(context, strings);
           const pinModule = machinePinModuleDefinition(context);
           const pwmModule = machinePwmModuleDefinition(context);
+          const pulseModule = machinePulseModuleDefinition(context);
           const utimeModule = utimeSleepModuleDefinition(context, strings);
           const wlanModule = networkWlanModuleDefinition(context, strings);
           const requestsModule = urequestsModuleDefinition(context, strings);
@@ -3956,13 +4004,15 @@ elif program_exists:
                   thingz: temperatureModule.blockImplementations,
                   utime: utimeModule.blockImplementations,
                   urequests: requestsModule.blockImplementations,
-                  ujson: jsonModule.blockImplementations
+                  ujson: jsonModule.blockImplementations,
+                  machine: pulseModule.blockImplementations
               },
               customBlocks: {
                   thingz: temperatureModule.blockDefinitions,
                   utime: utimeModule.blockDefinitions,
                   urequests: requestsModule.blockDefinitions,
-                  ujson: jsonModule.blockDefinitions
+                  ujson: jsonModule.blockDefinitions,
+                  machine: pulseModule.blockDefinitions
               }
           };
       }
@@ -12017,6 +12067,7 @@ def detectBoard():
               getStateFromPercentage: function(percentage) {
                   return Math.round(percentage * 500);
               },
+              disablePinControl: true,
               subTypes: [
                   {
                       subType: "vl53l0x",
