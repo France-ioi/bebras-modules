@@ -1970,6 +1970,7 @@ function Tezos(params) {
    const transactionTableColKeys = ["sender", "amount","recipient","parameters"];
    const startDate = params.startDate || Date.now();
    const signatureEnabled = (params.signatureEnabled !== undefined) ? params.signatureEnabled : true;
+   const nextBlockEnabled = (params.nextBlockEnabled !== undefined) ? params.nextBlockEnabled : true;
    // console.log(startDate)
 
    this.crossSrc = $("#cross").attr("src");
@@ -2280,7 +2281,7 @@ function Tezos(params) {
       }
       if(nextXBlocksEnabled){
          ids.push("nextXBlocks");
-      }else{
+      }else if(nextBlockEnabled){
          ids.push("nextBlock");
       }
       for(let iB = 0; iB < ids.length; iB++){
