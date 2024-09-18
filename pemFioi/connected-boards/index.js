@@ -30,430 +30,6 @@ var boardProgramming = (function (exports) {
       ConnectionMethod["Bluetooth"] = "bt";
   })(ConnectionMethod || (ConnectionMethod = {}));
 
-  function getSessionStorage(name) {
-      // Use a try in case it gets blocked
-      try {
-          return sessionStorage[name];
-      } catch (e) {
-          return null;
-      }
-  }
-  function setSessionStorage(name, value) {
-      // Use a try in case it gets blocked
-      try {
-          sessionStorage[name] = value;
-      } catch (e) {}
-  }
-
-  let SERVO_MIN_DUTY = 26;
-  let SERVO_MAX_DUTY = 124;
-  async function getSerial(filters) {
-      const allPorts = await navigator.serial.getPorts();
-      const savedBoard = getSessionStorage('galaxia_board');
-      let port;
-      if (null !== savedBoard) {
-          port = allPorts.find((port)=>savedBoard === JSON.stringify(port.getInfo()));
-      }
-      if (!port) {
-          port = await navigator.serial.requestPort({
-              filters: filters
-          });
-      }
-      await port.open({
-          baudRate: 115200
-      });
-      const info = port.getInfo();
-      setSessionStorage('galaxia_board', JSON.stringify(info));
-      return port;
-  }
-  async function serialWrite(port, data) {
-      const writer = port.writable.getWriter();
-      const encoder = new TextEncoder();
-      /*    let remainingData = data;
-        while(remainingData.length > 0) {
-            await writer.write(encoder.encode(remainingData.substring(0, 64)));
-            remainingData = remainingData.substring(64);
-        }*/ writer.write(encoder.encode(data));
-      await writer.ready;
-      writer.releaseLock();
-  }
-  let g_instance$1 = null;
-  const getGalaxiaConnection = function(userName, _onConnect, _onDisconnect, _onChangeBoard) {
-      this.onConnect = _onConnect;
-      this.onDisconnect = _onDisconnect;
-      if (g_instance$1) {
-          return g_instance$1;
-      }
-      this.resetProperties = function() {
-          this.connecting = false;
-          this.connected = false;
-          this.releasing = false;
-          this.serial = null;
-          this.currentOutput = "";
-          this.outputCallback = null;
-          this.executionQueue = [];
-          this.executing = false;
-      };
-      this.resetProperties();
-      this.onConnect = _onConnect;
-      this.onDisconnect = function() {
-          this.releaseLock();
-          _onDisconnect.apply(this, arguments);
-      };
-      this.onChangeBoard = _onChangeBoard;
-      this.processGalaxiaOutput = function(data) {
-          let text = new TextDecoder().decode(data);
-          this.currentOutput += text;
-          let lines = this.currentOutput.split('\r\n');
-          this.currentOutput = lines.join('\r\n');
-          window.currentOutput = this.currentOutput;
-          if (this.outputCallback && lines[lines.length - 1].startsWith('>>> ') && lines[lines.length - 2].startsWith(currentOutputId)) {
-              this.outputCallback(lines[lines.length - 4]);
-              this.outputCallback = null;
-          }
-      };
-      this.connect = async function(url) {
-          this.resetProperties();
-          this.connecting = true;
-          try {
-              this.serial = await getSerial([
-                  {
-                      usbProductId: 0x4003,
-                      usbVendorId: 0x303A
-                  }
-              ]);
-          } catch (e) {
-              this.connecting = false;
-              _onDisconnect(false);
-              return;
-          }
-          this.serial.addEventListener('disconnect', ()=>{
-              this.connected = false;
-              this.onDisconnect(true);
-          });
-          this.serialStartRead(this.serial);
-          await this.transferPythonLib();
-          this.connecting = false;
-          this.connected = true;
-          this.onConnect();
-      };
-      this.serialStartRead = async function(port, callback) {
-          this.reader = port.readable.getReader();
-          while(true){
-              const { value, done } = await this.reader.read();
-              this.processGalaxiaOutput(value);
-              if (done || this.releasing) {
-                  this.reader.cancel();
-                  break;
-              }
-          }
-      };
-      this.transferPythonLib = async function() {
-          await serialWrite(this.serial, "f = open(\"fioilib.py\", \"w\")\r\nf.write(" + JSON.stringify(pythonLib$1).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, 1000));
-          await serialWrite(this.serial, "exec(open(\"fioilib.py\", \"r\").read())\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, 1000));
-          await serialWrite(this.serial, "f = open(\"main.py\", \"w\")\r\nf.write(" + JSON.stringify(mainLib).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, 1000));
-      };
-      this.isAvailable = function(ipaddress, callback) {
-          callback(ipaddress == "localhost");
-      };
-      this.onclose = function() {};
-      this.wasLocked = function() {};
-      this.isConnecting = function() {
-          return this.connecting;
-      };
-      this.isConnected = function() {
-          return this.connected;
-      };
-      this.executeProgram = function(pythonProgram) {
-      // TODO
-      };
-      this.installProgram = function(pythonProgram, oninstall) {
-          let fullProgram = pythonProgram;
-          let cmds = [
-              "f = open(\"program.py\", \"w\")"
-          ];
-          while(fullProgram.length > 0){
-              cmds.push("f.write(" + JSON.stringify(fullProgram.substring(0, 128)) + ")");
-              fullProgram = fullProgram.substring(128);
-          }
-          cmds.push("f.close()");
-          let idx = -1;
-          function executeNext() {
-              idx += 1;
-              if (idx >= cmds.length) {
-                  oninstall();
-                  executeSerial("exec(open(\"program.py\", \"r\").read())", ()=>{});
-              }
-              executeSerial(cmds[idx] + "\r\n", function() {
-                  setTimeout(executeNext, 500);
-              });
-          }
-          executeNext();
-      };
-      this.runDistributed = function(pythonProgram, graphDefinition, oninstall) {
-          return;
-      };
-      this.stopProgram = function() {
-      // TODO
-      };
-      let releaseTimeout = null;
-      this.releaseLock = function() {
-          if (!this.serial) {
-              return;
-          }
-          let that = this;
-          this.releasing = true;
-          async function endRelease() {
-              if (!releaseTimeout) {
-                  return;
-              }
-              that.reader.cancel().catch(()=>{});
-              await new Promise((resolve)=>setTimeout(resolve, 100));
-              that.serial.close();
-              that.serial = null;
-              that.connecting = null;
-              that.connected = null;
-              releaseTimeout = null;
-              that.onDisconnect(false);
-          }
-          serialWrite(this.serial, "\x04").then(()=>{
-              that.reader.closed.then(()=>{
-                  // For some reason, if we don't use a timeout, the reader is still locked and we can't close the serial port
-                  setTimeout(endRelease, 100);
-              });
-          });
-          releaseTimeout = setTimeout(endRelease, 5000);
-      };
-      this.startNewSession = function() {
-      // TODO
-      };
-      this.startTransaction = function() {
-      // TODO
-      };
-      this.endTransaction = function() {
-      // TODO
-      };
-      let currentExecutionCallback = null;
-      let currentOutputId = "";
-      let nbCommandsExecuted = 0;
-      function executeSerial(command, callback) {
-          if (this.executing) {
-              this.executionQueue.push([
-                  command,
-                  callback
-              ]);
-              return;
-          }
-          this.executing = true;
-          let that = this;
-          nbCommandsExecuted += 1;
-          if (nbCommandsExecuted > 500) {
-              this.executionQueue.push([
-                  "\x04",
-                  ()=>{}
-              ]);
-              this.executionQueue.push([
-                  "exec(open(\"fioilib.py\", \"r\").read())\r\n",
-                  ()=>{}
-              ]);
-              nbCommandsExecuted = 0;
-          }
-          currentOutputId = Math.random().toString(36).substring(7);
-          currentExecutionCallback = callback;
-          serialWrite(this.serial, command + "\r\nprint(\"" + currentOutputId + "\")\r\n").then(()=>{
-              that.outputCallback = function(data) {
-                  if (currentExecutionCallback) {
-                      currentExecutionCallback(data);
-                  }
-                  that.executing = false;
-                  if (that.executionQueue.length > 0) {
-                      let [command, callback] = that.executionQueue.shift();
-                      executeSerial(command, callback);
-                  }
-              };
-          });
-      }
-      window.exec = executeSerial.bind(this);
-      this.genericSendCommand = function(command, callback) {
-          executeSerial(`print(${command})`, function(data) {
-              callback(JSON.stringify(JSON.parse(data)));
-          });
-      };
-      this.sendCommand = function(command, callback) {
-          if (command == "readAccelBMI160()") {
-              this.genericSendCommand(command, callback);
-          // callback(JSON.stringify([sensorValues.acx, sensorValues.acy, sensorValues.acz]));
-          // if (DEBUG_SILENCE_SENSORS) {
-          //   return callback(JSON.stringify([0, 0, 0]))
-          // }
-          // executeSerial("print([accelerometer.get_x(), accelerometer.get_y(), accelerometer.get_z()])",
-          //   function (data) {
-          //   console.log('old receive data', data);
-          //     callback(JSON.stringify(JSON.parse(data).map(x => Math.round(x / 10) / 10)));
-          //   });
-          // executeSerial("print(readAccelBMI160())",
-          //   function (data) {
-          //     callback(JSON.stringify(JSON.parse(data)));
-          //   });
-          } else if (command == "setLedState(\"led\",1)" || command == "turnLedOn()") {
-              executeSerial("led.set_colors(100, 20, 20)\r\nprint(True)", callback);
-          } else if (command == "setLedState(\"led\",0)" || command == "turnLedOff()") {
-              executeSerial("led.set_colors(0, 0, 0)\r\nprint(True)", callback);
-          } else if (command == "readAcceleration(\"x\")") {
-              executeSerial("print(accelerometer.get_x())", function(data) {
-                  callback(Math.round(JSON.parse(data) / 10) / 10);
-              });
-          } else if (command == "readAcceleration(\"y\")") {
-              executeSerial("print(accelerometer.get_y())", function(data) {
-                  callback(Math.round(JSON.parse(data) / 10) / 10);
-              });
-          } else if (command == "readAcceleration(\"z\")") {
-              executeSerial("print(accelerometer.get_z())", function(data) {
-                  callback(Math.round(JSON.parse(data) / 10) / 10);
-              });
-          } else if (command == "isButtonPressed(\"btnA\")") {
-              executeSerial("print(button_a.is_pressed())", function(data) {
-                  callback(data == 'True' ? 1 : 0);
-              });
-          } else if (command == "isButtonPressed(\"btnB\")") {
-              executeSerial("print(button_b.is_pressed())", function(data) {
-                  callback(data == 'True' ? 1 : 0);
-              });
-          } else if (command.startsWith("setServoAngle(\"servo\",")) {
-              let angle = parseInt(command.substring(22, command.length - 1));
-              if (!angle || angle < 0) {
-                  angle = 0;
-              }
-              if (angle > 180) {
-                  angle = 180;
-              }
-              let duty = Math.floor(0.025 * 1023 + angle * 0.1 * 1023 / 180);
-              executeSerial("pwm7.duty(" + duty + ")\r\nprint(True)", callback);
-          } else if (command == "getServoAngle(\"servo\")") {
-              executeSerial("print(pwm7.duty())", function(data) {
-                  let duty = parseInt(data);
-                  let angle = Math.floor((duty - SERVO_MIN_DUTY) * 180 / (SERVO_MAX_DUTY - SERVO_MIN_DUTY));
-                  callback(angle);
-              });
-          } else if (command.startsWith("setBuzzerState(\"buzzer\",")) {
-              let state = command.substring(24, command.length - 1);
-              let target = "off";
-              if (state == "True" || state == "1") {
-                  target = "on";
-              }
-              executeSerial("p7." + target + "()\r\nprint(True)", callback);
-          } else {
-              console.log("unknown command", command);
-              callback();
-          }
-      };
-      g_instance$1 = this;
-      return this;
-  };
-  let pythonLib$1 = `
-from machine import *
-from thingz import *
-
-#pwm7 = PWM(Pin(7), freq=50, duty=205)
-#pwm7 = PWM(Pin(7), freq=50, duty_u16=0)
-p7 = Pin(7, Pin.OUT)
-
-SERVO_MIN_DUTY = ${SERVO_MIN_DUTY}
-SERVO_MAX_DUTY = ${SERVO_MAX_DUTY}
-
-def readAcceleration(axis):
-    if axis == "x":
-        val = accelerometer.get_x()
-    elif axis == "y":
-        val = accelerometer.get_y()
-    elif axis == "z":
-        val = accelerometer.get_z()
-    else:
-        throw("Unknown axis")
-    return round(val/100, 1)
-
-def readAccelBMI160():
-    return [readAcceleration("x"), readAcceleration("y"), readAcceleration("z")]
-
-def setLedState(name, state):
-    if state == 1:
-        led.set_colors(100, 20, 20)
-    else:
-        led.set_colors(0, 0, 0)
-
-def turnLedOn():
-    setLedState("led", 1)
-
-def turnLedOff():
-    setLedState("led", 0)
-
-def isButtonPressed(name):
-    if name == "btnA":
-        return button_a.is_pressed()
-    elif name == "btnB":
-        return button_b.is_pressed()
-    else:
-        throw("Unknown button")
-
-def setServoAngle(name, angle):
-    if angle < 0:
-        angle = 0
-    if angle > 180:
-        angle = 180
-    
-    duty = round(SERVO_MIN_DUTY+angle*(SERVO_MAX_DUTY - SERVO_MIN_DUTY)/180);
-    pwm7.duty(duty)
-
-def getServoAngle(name):
-    duty = pwm7.duty()
-    angle = round((duty - SERVO_MIN_DUTY) * 180 / (SERVO_MAX_DUTY - SERVO_MIN_DUTY))
-    return angle
-
-def setBuzzerState(name, state):
-    if state == True or state == 1:
-        p7.on()
-    else:
-        p7.off()
-
-`;
-  let mainLib = `
-import os
-from machine import *
-from thingz import *
-
-program_exists = False
-
-try:
-    open("program.py", "r").close()
-    program_exists = True
-except OSError:
-    pass
-
-if button_a.is_pressed() and button_b.is_pressed():
-    if program_exists:
-        print("Removing program")
-        os.remove("program.py")
-elif program_exists:
-    exec(open("fioilib.py", "r").read(), globals())
-    exec(open("program.py", "r").read(), globals())
-
-` /*f = open("main.py", "w")
-  f.write("""
-  from machine import *
-  from thingz import *
-  import os
-  if button_a.is_pressed() and button_b.is_pressed():
-      if os.path.exists("main.py"):
-          print("Removing")
-          os.remove("main.py")
-  else:
-      print("Hello, world!")
-  """)
-  f.close()*/ ;
-
   const buzzerSound = {
       context: null,
       default_freq: 200,
@@ -2769,13 +2345,13 @@ elif program_exists:
               }
           },
           setInfraredState: function(name, state, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              context.registerQuickPiEvent(name, state ? true : false);
+              const sensor = sensorHandler.findSensorByName(name, true);
+              context.registerQuickPiEvent(name, !!state);
               if (!context.display || context.autoGrading || context.offLineMode) {
                   context.waitDelay(callback);
               } else {
                   let cb = context.runner.waitCallback(callback);
-                  sensorHandler.findSensorDefinition(sensor).setLiveState(sensor, state, cb);
+                  sensor.setLiveState(state, cb);
               }
           },
           onButtonPressed: function(name, func, callback) {
@@ -3136,17 +2712,17 @@ elif program_exists:
               Led: {
                   set_colors: function(self, red, green, blue, callback) {
                       const sensor = context.sensorHandler.findSensorByType('ledrgb');
-                      let command = "setLedColors(\"" + sensor.name + "\"," + red + "," + green + "," + blue + ")";
-                      context.registerQuickPiEvent(sensor.name, [
+                      const newState = [
                           red,
                           green,
                           blue
-                      ]);
+                      ];
+                      context.registerQuickPiEvent(sensor.name, newState);
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           context.waitDelay(callback);
                       } else {
                           let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
+                          sensor.setLiveState(newState, cb);
                       }
                   },
                   read_light_level: function(self, callback) {
@@ -3290,7 +2866,7 @@ elif program_exists:
                           throw "This sensor may not be controlled by a PWM";
                       }
                       const newState = sensorDef.getStateFromPwm(duty);
-                      let command = "pwmDuty(\"" + sensor.name + "\", " + duty + ")";
+                      let command = "pwmDuty(" + self.pin.pinNumber + ", " + duty + ")";
                       self.currentDuty = duty;
                       context.registerQuickPiEvent(sensor.name, newState);
                       if (!context.display || context.autoGrading || context.offLineMode) {
@@ -3748,7 +3324,488 @@ elif program_exists:
       };
   }
 
+  function getSessionStorage(name) {
+      // Use a try in case it gets blocked
+      try {
+          return sessionStorage[name];
+      } catch (e) {
+          return null;
+      }
+  }
+  function setSessionStorage(name, value) {
+      // Use a try in case it gets blocked
+      try {
+          sessionStorage[name] = value;
+      } catch (e) {}
+  }
+
+  async function getSerial(filters) {
+      const allPorts = await navigator.serial.getPorts();
+      const savedBoard = getSessionStorage('galaxia_board');
+      let port;
+      if (null !== savedBoard) {
+          port = allPorts.find((port)=>savedBoard === JSON.stringify(port.getInfo()));
+      }
+      if (!port) {
+          port = await navigator.serial.requestPort({
+              filters: filters
+          });
+      }
+      await port.open({
+          baudRate: 115200
+      });
+      const info = port.getInfo();
+      setSessionStorage('galaxia_board', JSON.stringify(info));
+      return port;
+  }
+  async function serialWrite(port, data) {
+      const writer = port.writable.getWriter();
+      const encoder = new TextEncoder();
+      /*    let remainingData = data;
+        while(remainingData.length > 0) {
+            await writer.write(encoder.encode(remainingData.substring(0, 64)));
+            remainingData = remainingData.substring(64);
+        }*/ writer.write(encoder.encode(data));
+      await writer.ready;
+      writer.releaseLock();
+  }
+  class GalaxiaConnection {
+      constructor(userName, _onConnect, _onDisconnect, _onChangeBoard){
+          this.connecting = false;
+          this.connected = false;
+          this.releasing = false;
+          this.currentOutput = "";
+          this.executing = false;
+          this._onConnect = _onConnect;
+          this._onDisconnect = _onDisconnect;
+          this._onChangeBoard = _onChangeBoard;
+          this.resetProperties();
+      }
+      resetProperties() {
+          this.connecting = false;
+          this.connected = false;
+          this.releasing = false;
+          this.serial = null;
+          this.currentOutput = "";
+          this.outputCallback = null;
+          this.executionQueue = [];
+          this.executing = false;
+          this.releaseTimeout = null;
+          this.currentExecutionCallback = null;
+          this.currentOutputId = "";
+          this.nbCommandsExecuted = 0;
+      }
+      onDisconnect(wasConnected, wrongversion = false) {
+          this.releaseLock();
+          this._onDisconnect.apply(this, arguments);
+      }
+      onChangeBoard(board) {
+          this._onChangeBoard.apply(this, arguments);
+      }
+      processGalaxiaOutput(data) {
+          let text = new TextDecoder().decode(data);
+          this.currentOutput += text;
+          let lines = this.currentOutput.split('\r\n');
+          this.currentOutput = lines.join('\r\n');
+          {
+              console.log(this.currentOutput);
+          }
+          window.currentOutput = this.currentOutput;
+          if (this.outputCallback && lines[lines.length - 1].startsWith('>>> ') && lines[lines.length - 2].startsWith(this.currentOutputId)) {
+              this.outputCallback(lines[lines.length - 4]);
+              this.outputCallback = null;
+          }
+      }
+      async connect(url) {
+          this.resetProperties();
+          this.connecting = true;
+          try {
+              this.serial = await getSerial([
+                  {
+                      usbProductId: 0x4003,
+                      usbVendorId: 0x303A
+                  }
+              ]);
+          } catch (e) {
+              this.connecting = false;
+              this._onDisconnect(false);
+              return;
+          }
+          this.serial.addEventListener('disconnect', ()=>{
+              this.connected = false;
+              this.onDisconnect(true);
+          });
+          this.serialStartRead(this.serial);
+          await this.transferPythonLib();
+          this.connecting = false;
+          this.connected = true;
+          this._onConnect();
+      }
+      async serialStartRead(port) {
+          this.reader = port.readable.getReader();
+          while(true){
+              const { value, done } = await this.reader.read();
+              this.processGalaxiaOutput(value);
+              if (done || this.releasing) {
+                  this.reader.cancel();
+                  break;
+              }
+          }
+      }
+      async transferPythonLib() {
+          const size = 1200; // Max 1kb size
+          const waitDelay = 500;
+          const numChunks = Math.ceil(pythonLib$1.length / size);
+          await serialWrite(this.serial, "f = open(\"fioilib.py\", \"w\")\r\n");
+          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
+          for(let i = 0, o = 0; i < numChunks; ++i, o += size){
+              const chunk = pythonLib$1.substring(o, o + size);
+              await serialWrite(this.serial, "f.write(" + JSON.stringify(chunk).replace(/\n/g, "\r\n") + ")\r\n");
+              await new Promise((resolve)=>setTimeout(resolve, waitDelay));
+          }
+          await serialWrite(this.serial, "f.close()\r\n");
+          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
+          await serialWrite(this.serial, "exec(open(\"fioilib.py\", \"r\").read())\r\n");
+          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
+          await serialWrite(this.serial, "f = open(\"main.py\", \"w\")\r\nf.write(" + JSON.stringify(mainLib).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n");
+          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
+      }
+      isAvailable(ipaddress, callback) {
+          callback(ipaddress == "localhost");
+      }
+      onclose() {}
+      wasLocked() {}
+      isConnecting() {
+          return this.connecting;
+      }
+      isConnected() {
+          return this.connected;
+      }
+      executeProgram(pythonProgram) {
+      // TODO
+      }
+      installProgram(pythonProgram, oninstall) {
+          let fullProgram = pythonProgram;
+          let cmds = [
+              "f = open(\"program.py\", \"w\")"
+          ];
+          while(fullProgram.length > 0){
+              cmds.push("f.write(" + JSON.stringify(fullProgram.substring(0, 128)) + ")");
+              fullProgram = fullProgram.substring(128);
+          }
+          cmds.push("f.close()");
+          let idx = -1;
+          const executeNext = ()=>{
+              idx += 1;
+              if (idx >= cmds.length) {
+                  oninstall();
+                  this.executeSerial("exec(open(\"program.py\", \"r\").read())", ()=>{});
+              }
+              this.executeSerial(cmds[idx] + "\r\n", ()=>{
+                  setTimeout(executeNext, 500);
+              });
+          };
+          executeNext();
+      }
+      runDistributed(pythonProgram, graphDefinition, oninstall) {
+          return;
+      }
+      stopProgram() {
+      // TODO
+      }
+      releaseLock() {
+          if (!this.serial) {
+              return;
+          }
+          this.releasing = true;
+          const endRelease = async ()=>{
+              if (!this.releaseTimeout) {
+                  return;
+              }
+              this.reader.cancel().catch(()=>{});
+              await new Promise((resolve)=>setTimeout(resolve, 100));
+              this.serial.close();
+              this.serial = null;
+              this.connecting = null;
+              this.connected = null;
+              this.releaseTimeout = null;
+              this.onDisconnect(false);
+          };
+          serialWrite(this.serial, "\x04").then(()=>{
+              this.reader.closed.then(()=>{
+                  // For some reason, if we don't use a timeout, the reader is still locked and we can't close the serial port
+                  setTimeout(endRelease, 100);
+              });
+          });
+          this.releaseTimeout = setTimeout(endRelease, 5000);
+      }
+      startNewSession() {
+      // TODO
+      }
+      startTransaction() {
+      // TODO
+      }
+      endTransaction() {
+      // TODO
+      }
+      executeSerial(command, callback) {
+          if (this.executing) {
+              this.executionQueue.push([
+                  command,
+                  callback
+              ]);
+              return;
+          }
+          this.executing = true;
+          let that = this;
+          this.nbCommandsExecuted += 1;
+          if (this.nbCommandsExecuted > 500) {
+              this.executionQueue.push([
+                  "\x04",
+                  ()=>{}
+              ]);
+              this.executionQueue.push([
+                  "exec(open(\"fioilib.py\", \"r\").read())\r\n",
+                  ()=>{}
+              ]);
+              this.nbCommandsExecuted = 0;
+          }
+          this.currentOutputId = Math.random().toString(36).substring(7);
+          this.currentExecutionCallback = callback;
+          serialWrite(this.serial, command + "\r\nprint(\"" + this.currentOutputId + "\")\r\n").then(()=>{
+              that.outputCallback = (data)=>{
+                  if (this.currentExecutionCallback) {
+                      this.currentExecutionCallback(data);
+                  }
+                  that.executing = false;
+                  if (that.executionQueue.length > 0) {
+                      let [command, callback] = that.executionQueue.shift();
+                      this.executeSerial(command, callback);
+                  }
+              };
+          });
+      }
+      convertResultData(data) {
+          if ('True' === data) {
+              return true;
+          }
+          if ('False' === data) {
+              return false;
+          }
+          return data;
+      }
+      genericSendCommand(command, callback) {
+          console.log('generic send command', command);
+          this.executeSerial(`print(${command})`, (data)=>{
+              const convertedData = this.convertResultData(data);
+              console.log('received data', {
+                  data,
+                  convertedData,
+                  command
+              });
+              callback(convertedData);
+          });
+      }
+      sendCommand(command, callback) {
+          if (-1 !== command.indexOf('sensorTable =')) {
+              this.executeSerial(command, callback);
+              return;
+          }
+          this.genericSendCommand(command, callback);
+      }
+  }
+  let pythonLib$1 = `
+
+try:
+    sensorTable
+except:
+    sensorTable = []
+
+from machine import *
+from thingz import *
+
+servo_angle = {}
+
+def normalizePin(pin):
+    returnpin = 0
+    hadporttype = False
+
+    pin = str(pin)
+
+    if pin.isdigit():
+        returnpin = pin
+    elif len(pin) >= 2 and pin[0].isalpha() and pin[1:].isdigit():
+        returnpin = pin[1:]
+    elif pin.upper().startswith("I2C"):
+        returnpin = pin[3:]
+    else:
+        returnpin = normalizePin(nameToPin(pin))
+
+    return int(returnpin)
+
+def nameToPin(name):
+    for sensor in sensorTable:
+        if sensor["name"] == name:
+            return sensor["port"]
+
+    return 0
+
+def nameToDef(name, type):
+    for sensor in sensorTable:
+        if sensor["name"] == name:
+            return sensor
+
+    for sensor in sensorTable:
+        if sensor["type"] == type:
+            return sensor
+
+    return None
+
+def readAcceleration(axis):
+    if axis == "x":
+        val = accelerometer.get_x()
+    elif axis == "y":
+        val = accelerometer.get_y()
+    elif axis == "z":
+        val = accelerometer.get_z()
+    else:
+        throw("Unknown axis")
+    return round(val/100, 1)
+
+def readAccelBMI160():
+    return [readAcceleration("x"), readAcceleration("y"), readAcceleration("z")]
+
+def setLedState(pin, state):
+    pin = normalizePin(pin)
+
+    led = Pin(pin, Pin.OUT)
+    if state:
+        led.on()
+    else:
+        led.off()
+
+def readLightIntensity(pin):
+	  return led.read_light_level()
+
+def readTemperature(pin):
+    return temperature()
+
+def turnLedOn():
+    setLedState("led", 1)
+
+def turnLedOff():
+    setLedState("led", 0)
+
+def setLedRgbState(pin, rgb):
+    led.set_colors(rgb[0], rgb[1], rgb[2])
+
+def setLedDimState(pin, state):
+    pwmDuty(pin, int(state*1023))
+ 
+def isButtonPressed(name):
+    if name == "button_a":
+        return button_a.is_pressed()
+    elif name == "button_b":
+        return button_b.is_pressed()
+    elif name == "touch_n":
+        return touch_n.is_touched()
+    elif name == "touch_s":
+        return touch_s.is_touched()
+    elif name == "touch_e":
+        return touch_e.is_touched()
+    elif name == "touch_w":
+        return touch_w.is_touched()
+    else:
+        throw("Unknown button")
+        
+def setServoAngle(pin, angle):
+    pin = normalizePin(pin)
+
+    if pin != 0:
+        print(pin)
+        servo_angle[pin] = 0
+
+        angle = int(angle)
+
+        if angle < 0:
+            angle = 0
+        elif angle > 180:
+            angle = 180
+            
+        pin = PWM(Pin(pin), freq=50, duty=0)
+        pin.duty(int(0.025*1023 + (angle*0.1*1023)/180))
+        
+def getServoAngle(pin):
+    pin = normalizePin(pin)
+    angle = 0
+
+    try:
+        angle = servo_angle[pin]
+    except:
+        pass
+
+    return angle
+
+def pwmDuty(pin, duty):
+    pin = normalizePin(pin)
+    if pin != 0:
+        print(pin)
+        print(duty)
+        pinElement = PWM(Pin(pin), freq=50, duty=0)
+        pinElement.duty(duty)
+
+def turnPortOn(pin):
+    pin = normalizePin(pin)
+
+    if pin != 0:
+        pinElement = Pin(pin, Pin.OUT)
+        pinElement.on()
+
+def turnPortOff(pin):
+    pin = normalizePin(pin)
+
+    if pin != 0:
+        pinElement = Pin(pin, Pin.OUT)
+        pinElement.off()
+
+`;
+  let mainLib = `
+import os
+from machine import *
+from thingz import *
+
+program_exists = False
+
+try:
+    open("program.py", "r").close()
+    program_exists = True
+except OSError:
+    pass
+
+if button_a.is_pressed() and button_b.is_pressed():
+    if program_exists:
+        print("Removing program")
+        os.remove("program.py")
+elif program_exists:
+    exec(open("fioilib.py", "r").read(), globals())
+    exec(open("program.py", "r").read(), globals())
+
+` /*f = open("main.py", "w")
+  f.write("""
+  from machine import *
+  from thingz import *
+  import os
+  if button_a.is_pressed() and button_b.is_pressed():
+      if os.path.exists("main.py"):
+          print("Removing")
+          os.remove("main.py")
+  else:
+      print("Hello, world!")
+  """)
+  f.close()*/ ;
+
   let galaxiaSvgInline = null;
+  let galaxiaConnection = null;
   class GalaxiaBoard extends AbstractBoard {
       init(selector, onUserEvent) {
           this.onUserEvent = onUserEvent;
@@ -3967,7 +4024,12 @@ elif program_exists:
           ];
       }
       getConnection() {
-          return getGalaxiaConnection;
+          if (!galaxiaConnection) {
+              galaxiaConnection = function(userName, _onConnect, _onDisconnect, _onChangeBoard) {
+                  return new GalaxiaConnection(userName, _onConnect, _onDisconnect, _onChangeBoard);
+              };
+          }
+          return galaxiaConnection;
       }
       getCustomBlocks(context, strings) {
           const accelerometerModule = thingzAccelerometerModuleDefinition(context, strings);
@@ -9518,7 +9580,7 @@ def detectBoard():
           };
       }
       setLiveState(state, callback) {
-          var command = `setLedRgbState("${this.name}", [0, 0, 0])`;
+          var command = `setLedRgbState("${this.name}", [${state.join(', ')}])`;
           this.context.quickPiConnection.sendCommand(command, callback);
       }
       getInitialState() {
@@ -9602,8 +9664,7 @@ def detectBoard():
           };
       }
       setLiveState(state, callback) {
-          var ledstate = state ? 1 : 0;
-          var command = "setLedState(\"" + this.name + "\"," + ledstate + ")";
+          const command = "setLedDimState(\"" + this.name + "\"," + state + ")";
           this.context.quickPiConnection.sendCommand(command, callback);
       }
       getInitialState() {
@@ -9928,8 +9989,12 @@ def detectBoard():
       }
       getLiveState(callback) {
           this.context.quickPiConnection.sendCommand("isButtonPressed(\"" + this.name + "\")", function(retVal) {
-              var intVal = parseInt(retVal, 10);
-              callback(intVal != 0);
+              if ('boolean' === typeof retVal) {
+                  callback(retVal);
+              } else {
+                  const intVal = parseInt(retVal, 10);
+                  callback(intVal != 0);
+              }
           });
       }
       draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
@@ -11663,8 +11728,12 @@ def detectBoard():
       }
       getLiveState(callback) {
           this.context.quickPiConnection.sendCommand("isButtonPressed(\"" + this.name + "\")", function(retVal) {
-              var intVal = parseInt(retVal, 10);
-              callback(intVal == 0);
+              if ('boolean' === typeof retVal) {
+                  callback(retVal);
+              } else {
+                  const intVal = parseInt(retVal, 10);
+                  callback(intVal == 0);
+              }
           });
       }
       draw(sensorHandler, { imgx, imgy, imgw, imgh, juststate, fadeopacity, state1x, state1y, sensorAttr }) {
@@ -13428,10 +13497,14 @@ def detectBoard():
               [ConnectionMethod.Bluetooth]: onPiconBtClick,
               [ConnectionMethod.WebSerial]: onPiconWebSerialClick
           };
+          const isConnected = context.quickPiConnection.isConnected();
+          if (!isConnected) {
+              setSessionStorage('connectionMethod', availableConnectionMethods[0].toLocaleUpperCase());
+          }
           if ((getSessionStorage('connectionMethod') ?? '').toLocaleLowerCase() in availableMethodsHandlers) {
               availableMethodsHandlers[getSessionStorage('connectionMethod').toLocaleLowerCase()]();
           }
-          if (context.quickPiConnection.isConnected()) {
+          if (isConnected) {
               if (getSessionStorage('connectionMethod') == "USB") {
                   $('#piconwifi').removeClass('active');
                   $('#piconusb').addClass('active');
@@ -13455,8 +13528,6 @@ def detectBoard():
               } else if (getSessionStorage('connectionMethod') == "LOCAL") {
                   $('#piconlocal').trigger("click");
               }
-          } else {
-              setSessionStorage('connectionMethod', availableConnectionMethods[0].toLocaleUpperCase());
           }
           if (context.quickPiConnection.isConnecting()) {
               showasConnecting(context);
