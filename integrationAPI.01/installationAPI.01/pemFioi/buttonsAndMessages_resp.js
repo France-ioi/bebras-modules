@@ -2689,4 +2689,14 @@ function drawStars(id, nbStars, starWidth, rate, mode,layout4) {
 
 window.platform.subscribe(displayHelper);
 
+// Add autoHeight to the metadata automatically
+if(window.task && window.task.getMetaData) {
+   var getMetaData = task.getMetaData;
+   task.getMetaData = function(callback) {
+      var metadata = getMetaData();
+      metadata.autoHeight = true;
+      callback(metadata);
+   }
+}
+
 })();
