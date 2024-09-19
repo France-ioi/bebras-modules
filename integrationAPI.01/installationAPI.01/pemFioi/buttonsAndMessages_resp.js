@@ -2693,9 +2693,10 @@ window.platform.subscribe(displayHelper);
 if(window.task && window.task.getMetaData) {
    var getMetaData = task.getMetaData;
    task.getMetaData = function(callback) {
-      var metadata = getMetaData();
-      metadata.autoHeight = true;
-      callback(metadata);
+      getMetaData(function(metadata) {
+         metadata.autoHeight = true;
+         callback(metadata);
+      });
    }
 }
 
