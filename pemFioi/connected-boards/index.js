@@ -3009,6 +3009,9 @@ var boardProgramming = (function (exports) {
                   },
                   active: function(self, active, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
                       let command = "wifiSetActive(\"" + sensor.name + "\", " + active + ")";
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           let cb = context.runner.waitCallback(callback);
@@ -3026,6 +3029,9 @@ var boardProgramming = (function (exports) {
                   },
                   scan: function(self, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
                       if (!sensor.state?.active) {
                           throw strings.messages.wifiNotActive;
                       }
@@ -3050,6 +3056,9 @@ var boardProgramming = (function (exports) {
                   },
                   connect: function(self, ssid, password, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
                       if (!sensor.state?.active) {
                           throw strings.messages.wifiNotActive;
                       }
@@ -3072,6 +3081,9 @@ var boardProgramming = (function (exports) {
                   },
                   isconnected: function(self, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           const state = context.getSensorState(sensor.name);
                           if (!state?.active) {
@@ -3088,6 +3100,9 @@ var boardProgramming = (function (exports) {
                   },
                   ifconfig: function(self, callback) {
                       const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           const state = context.getSensorState(sensor.name);
                           if (!state?.active) {
@@ -3125,17 +3140,18 @@ var boardProgramming = (function (exports) {
   function urequestsModuleDefinition(context, strings) {
       async function makeRequest(sensor, fetchParameters, callback) {
           const proxyUrl = fetchParameters.url;
-          context.registerQuickPiEvent(sensor.name, {
-              ...sensor.state,
-              lastRequest: {
-                  ...fetchParameters
-              }
-          });
           const fetchArguments = {
               method: fetchParameters.method,
               headers: getRealValue(fetchParameters.headers),
               body: getRealValue(fetchParameters.body)
           };
+          context.registerQuickPiEvent(sensor.name, {
+              ...sensor.state,
+              lastRequest: {
+                  url: proxyUrl,
+                  ...fetchArguments
+              }
+          });
           let result = null;
           try {
               // @ts-ignore
@@ -3407,9 +3423,6 @@ var boardProgramming = (function (exports) {
           this.currentOutput += text;
           let lines = this.currentOutput.split('\r\n');
           this.currentOutput = lines.join('\r\n');
-          {
-              console.log(this.currentOutput);
-          }
           window.currentOutput = this.currentOutput;
           if (this.outputCallback && lines[lines.length - 1].startsWith('>>> ') && lines[lines.length - 2].startsWith(this.currentOutputId)) {
               this.outputCallback(lines[lines.length - 4]);
