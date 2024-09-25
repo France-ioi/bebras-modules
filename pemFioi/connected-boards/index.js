@@ -2881,7 +2881,7 @@ var boardProgramming = (function (exports) {
       };
   }
 
-  function utimeSleepModuleDefinition(context, strings) {
+  function timeSleepModuleDefinition(context, strings) {
       const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
       return {
           blockDefinitions: {
@@ -2991,6 +2991,9 @@ var boardProgramming = (function (exports) {
                               ]
                           },
                           {
+                              name: "disconnect"
+                          },
+                          {
                               name: "isconnected",
                               yieldsValue: "bool"
                           },
@@ -3012,9 +3015,8 @@ var boardProgramming = (function (exports) {
                       if (!sensor) {
                           throw `There is no Wi-Fi sensor.`;
                       }
-                      let command = "wifiSetActive(\"" + sensor.name + "\", " + active + ")";
                       if (!context.display || context.autoGrading || context.offLineMode) {
-                          let cb = context.runner.waitCallback(callback);
+                          const cb = context.runner.waitCallback(callback);
                           setTimeout(()=>{
                               context.registerQuickPiEvent(sensor.name, {
                                   ...sensor.state,
@@ -3023,7 +3025,8 @@ var boardProgramming = (function (exports) {
                               cb();
                           }, 500);
                       } else {
-                          let cb = context.runner.waitCallback(callback);
+                          const cb = context.runner.waitCallback(callback);
+                          const command = `wifiSetActive("${sensor.name}", ${active ? 1 : 0})`;
                           context.quickPiConnection.sendCommand(command, cb);
                       }
                   },
@@ -3032,11 +3035,10 @@ var boardProgramming = (function (exports) {
                       if (!sensor) {
                           throw `There is no Wi-Fi sensor.`;
                       }
-                      if (!sensor.state?.active) {
-                          throw strings.messages.wifiNotActive;
-                      }
-                      let command = "wifiScan(\"" + sensor.name + "\")";
                       if (!context.display || context.autoGrading || context.offLineMode) {
+                          if (!sensor.state?.active) {
+                              throw strings.messages.wifiNotActive;
+                          }
                           context.registerQuickPiEvent(sensor.name, {
                               ...sensor.state,
                               scanning: true
@@ -3050,8 +3052,11 @@ var boardProgramming = (function (exports) {
                               cb();
                           }, 1000);
                       } else {
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
+                          const cb = context.runner.waitCallback(callback);
+                          const command = "wifiScan(\"" + sensor.name + "\")";
+                          context.quickPiConnection.sendCommand(command, (result)=>{
+                              cb(JSON.parse(result));
+                          });
                       }
                   },
                   connect: function(self, ssid, password, callback) {
@@ -3059,11 +3064,11 @@ var boardProgramming = (function (exports) {
                       if (!sensor) {
                           throw `There is no Wi-Fi sensor.`;
                       }
-                      if (!sensor.state?.active) {
-                          throw strings.messages.wifiNotActive;
-                      }
                       if (!context.display || context.autoGrading || context.offLineMode) {
-                          let cb = context.runner.waitCallback(callback);
+                          if (!sensor.state?.active) {
+                              throw strings.messages.wifiNotActive;
+                          }
+                          const cb = context.runner.waitCallback(callback);
                           setTimeout(()=>{
                               context.registerQuickPiEvent(sensor.name, {
                                   ...sensor.state,
@@ -3074,8 +3079,33 @@ var boardProgramming = (function (exports) {
                               cb();
                           }, 500);
                       } else {
-                          let cb = context.runner.waitCallback(callback);
-                          let command = "wifiConnect(\"" + sensor.name + "\", \"" + ssid + "\", \"" + password + "\")";
+                          const cb = context.runner.waitCallback(callback);
+                          const command = "wifiConnect(\"" + sensor.name + "\", \"" + ssid + "\", \"" + password + "\")";
+                          context.quickPiConnection.sendCommand(command, cb);
+                      }
+                  },
+                  disconnect: function(self, callback) {
+                      const sensor = context.sensorHandler.findSensorByType('wifi');
+                      if (!sensor) {
+                          throw `There is no Wi-Fi sensor.`;
+                      }
+                      if (!context.display || context.autoGrading || context.offLineMode) {
+                          if (!sensor.state?.active) {
+                              throw strings.messages.wifiNotActive;
+                          }
+                          const cb = context.runner.waitCallback(callback);
+                          setTimeout(()=>{
+                              context.registerQuickPiEvent(sensor.name, {
+                                  ...sensor.state,
+                                  connected: false,
+                                  ssid: null,
+                                  password: null
+                              });
+                              cb();
+                          }, 500);
+                      } else {
+                          const cb = context.runner.waitCallback(callback);
+                          const command = "wifiDisconnect(\"" + sensor.name + "\")";
                           context.quickPiConnection.sendCommand(command, cb);
                       }
                   },
@@ -3086,15 +3116,12 @@ var boardProgramming = (function (exports) {
                       }
                       if (!context.display || context.autoGrading || context.offLineMode) {
                           const state = context.getSensorState(sensor.name);
-                          if (!state?.active) {
-                              throw strings.messages.wifiNotActive;
-                          }
                           context.runner.noDelay(callback, !!state.connected);
                       } else {
-                          let command = "wifiIsConnected(\"" + sensor.name + "\")";
-                          let cb = context.runner.waitCallback(callback);
+                          const cb = context.runner.waitCallback(callback);
+                          const command = "wifiIsConnected(\"" + sensor.name + "\")";
                           context.quickPiConnection.sendCommand(command, function(returnVal) {
-                              cb(!!returnVal.connected);
+                              cb(!!returnVal);
                           });
                       }
                   },
@@ -3116,10 +3143,10 @@ var boardProgramming = (function (exports) {
                           ];
                           context.runner.noDelay(callback, ips);
                       } else {
-                          let command = "wifiIfconfig(\"" + sensor.name + "\")";
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, function(returnVal) {
-                              cb(returnVal);
+                          const command = "wifiIfConfig(\"" + sensor.name + "\")";
+                          const cb = context.runner.waitCallback(callback);
+                          context.quickPiConnection.sendCommand(command, (result)=>{
+                              cb(JSON.parse(result));
                           });
                       }
                   }
@@ -3137,37 +3164,56 @@ var boardProgramming = (function (exports) {
       }
       return object;
   }
-  function urequestsModuleDefinition(context, strings) {
+  function requestsModuleDefinition(context, strings) {
       async function makeRequest(sensor, fetchParameters, callback) {
-          const proxyUrl = fetchParameters.url;
+          const fetchUrl = fetchParameters.url;
           const fetchArguments = {
               method: fetchParameters.method,
               headers: getRealValue(fetchParameters.headers),
               body: getRealValue(fetchParameters.body)
           };
-          context.registerQuickPiEvent(sensor.name, {
-              ...sensor.state,
-              lastRequest: {
-                  url: proxyUrl,
-                  ...fetchArguments
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.registerQuickPiEvent(sensor.name, {
+                  ...sensor.state,
+                  lastRequest: {
+                      url: fetchUrl,
+                      ...fetchArguments
+                  }
+              });
+              let result = null;
+              try {
+                  // @ts-ignore
+                  result = await fetch(fetchUrl, fetchArguments);
+              } catch (e) {
+                  console.error(e);
+                  throw strings.messages.networkRequestFailed.format(fetchParameters.url);
               }
-          });
-          let result = null;
-          try {
-              // @ts-ignore
-              result = await fetch(proxyUrl, fetchArguments);
-          } catch (e) {
-              console.error(e);
-              throw strings.messages.networkRequestFailed.format(fetchParameters.url);
+              const text = await result.text();
+              callback({
+                  __className: 'Response',
+                  arguments: [
+                      result.status,
+                      text
+                  ]
+              });
+          } else {
+              let command;
+              if ('GET' === fetchArguments.method) {
+                  command = `requestsGet("${sensor.name}", "${fetchUrl}", '${JSON.stringify(fetchArguments.headers ?? {})}')`;
+              } else {
+                  command = `requestsPost("${sensor.name}", "${fetchUrl}", '${JSON.stringify(fetchArguments.body ?? {})}', '${JSON.stringify(fetchArguments.headers ?? {})}')`;
+              }
+              context.quickPiConnection.sendCommand(command, (result)=>{
+                  const [status, text] = JSON.parse(result);
+                  callback({
+                      __className: 'Response',
+                      arguments: [
+                          status,
+                          text
+                      ]
+                  });
+              });
           }
-          const text = await result.text();
-          callback({
-              __className: 'Response',
-              arguments: [
-                  result.status,
-                  text
-              ]
-          });
       }
       return {
           classDefinitions: {
@@ -3283,7 +3329,7 @@ var boardProgramming = (function (exports) {
       };
   }
 
-  function ujsonModuleDefinition(context, strings) {
+  function jsonModuleDefinition(context, strings) {
       return {
           blockDefinitions: {
               actuator: [
@@ -3326,7 +3372,7 @@ var boardProgramming = (function (exports) {
                   if (!sensor) {
                       throw `There is no sensor connected to the digital port D${pin.pinNumber}`;
                   }
-                  let command = "getDistance(\"" + sensor.name + "\")";
+                  let command = "getTimePulseUs(\"" + sensor.name + `", ${pulseLevel}, ${timeoutUs})`;
                   if (!context.display || context.autoGrading || context.offLineMode) {
                       let distance = context.getSensorState(sensor.name);
                       const duration = distance / 343 * 2 / 100 * 1e6;
@@ -3355,289 +3401,22 @@ var boardProgramming = (function (exports) {
       } catch (e) {}
   }
 
-  async function getSerial(filters) {
-      const allPorts = await navigator.serial.getPorts();
-      const savedBoard = getSessionStorage('galaxia_board');
-      let port;
-      if (null !== savedBoard) {
-          port = allPorts.find((port)=>savedBoard === JSON.stringify(port.getInfo()));
-      }
-      if (!port) {
-          port = await navigator.serial.requestPort({
-              filters: filters
-          });
-      }
-      await port.open({
-          baudRate: 115200
-      });
-      const info = port.getInfo();
-      setSessionStorage('galaxia_board', JSON.stringify(info));
-      return port;
-  }
-  async function serialWrite(port, data) {
-      const writer = port.writable.getWriter();
-      const encoder = new TextEncoder();
-      /*    let remainingData = data;
-        while(remainingData.length > 0) {
-            await writer.write(encoder.encode(remainingData.substring(0, 64)));
-            remainingData = remainingData.substring(64);
-        }*/ writer.write(encoder.encode(data));
-      await writer.ready;
-      writer.releaseLock();
-  }
-  class GalaxiaConnection {
-      constructor(userName, _onConnect, _onDisconnect, _onChangeBoard){
-          this.connecting = false;
-          this.connected = false;
-          this.releasing = false;
-          this.currentOutput = "";
-          this.executing = false;
-          this._onConnect = _onConnect;
-          this._onDisconnect = _onDisconnect;
-          this._onChangeBoard = _onChangeBoard;
-          this.resetProperties();
-      }
-      resetProperties() {
-          this.connecting = false;
-          this.connected = false;
-          this.releasing = false;
-          this.serial = null;
-          this.currentOutput = "";
-          this.outputCallback = null;
-          this.executionQueue = [];
-          this.executing = false;
-          this.releaseTimeout = null;
-          this.currentExecutionCallback = null;
-          this.currentOutputId = "";
-          this.nbCommandsExecuted = 0;
-      }
-      onDisconnect(wasConnected, wrongversion = false) {
-          this.releaseLock();
-          this._onDisconnect.apply(this, arguments);
-      }
-      onChangeBoard(board) {
-          this._onChangeBoard.apply(this, arguments);
-      }
-      processGalaxiaOutput(data) {
-          let text = new TextDecoder().decode(data);
-          this.currentOutput += text;
-          let lines = this.currentOutput.split('\r\n');
-          this.currentOutput = lines.join('\r\n');
-          window.currentOutput = this.currentOutput;
-          if (this.outputCallback && lines[lines.length - 1].startsWith('>>> ') && lines[lines.length - 2].startsWith(this.currentOutputId)) {
-              this.outputCallback(lines[lines.length - 4]);
-              this.outputCallback = null;
-          }
-      }
-      async connect(url) {
-          this.resetProperties();
-          this.connecting = true;
-          try {
-              this.serial = await getSerial([
-                  {
-                      usbProductId: 0x4003,
-                      usbVendorId: 0x303A
-                  }
-              ]);
-          } catch (e) {
-              this.connecting = false;
-              this._onDisconnect(false);
-              return;
-          }
-          this.serial.addEventListener('disconnect', ()=>{
-              this.connected = false;
-              this.onDisconnect(true);
-          });
-          this.serialStartRead(this.serial);
-          await this.transferPythonLib();
-          this.connecting = false;
-          this.connected = true;
-          this._onConnect();
-      }
-      async serialStartRead(port) {
-          this.reader = port.readable.getReader();
-          while(true){
-              const { value, done } = await this.reader.read();
-              this.processGalaxiaOutput(value);
-              if (done || this.releasing) {
-                  this.reader.cancel();
-                  break;
-              }
-          }
-      }
-      async transferPythonLib() {
-          const size = 1200; // Max 1kb size
-          const waitDelay = 500;
-          const numChunks = Math.ceil(pythonLib$1.length / size);
-          await serialWrite(this.serial, "f = open(\"fioilib.py\", \"w\")\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
-          for(let i = 0, o = 0; i < numChunks; ++i, o += size){
-              const chunk = pythonLib$1.substring(o, o + size);
-              await serialWrite(this.serial, "f.write(" + JSON.stringify(chunk).replace(/\n/g, "\r\n") + ")\r\n");
-              await new Promise((resolve)=>setTimeout(resolve, waitDelay));
-          }
-          await serialWrite(this.serial, "f.close()\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
-          await serialWrite(this.serial, "exec(open(\"fioilib.py\", \"r\").read())\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
-          await serialWrite(this.serial, "f = open(\"main.py\", \"w\")\r\nf.write(" + JSON.stringify(mainLib).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n");
-          await new Promise((resolve)=>setTimeout(resolve, waitDelay));
-      }
-      isAvailable(ipaddress, callback) {
-          callback(ipaddress == "localhost");
-      }
-      onclose() {}
-      wasLocked() {}
-      isConnecting() {
-          return this.connecting;
-      }
-      isConnected() {
-          return this.connected;
-      }
-      executeProgram(pythonProgram) {
-      // TODO
-      }
-      installProgram(pythonProgram, oninstall) {
-          let fullProgram = pythonProgram;
-          let cmds = [
-              "f = open(\"program.py\", \"w\")"
-          ];
-          while(fullProgram.length > 0){
-              cmds.push("f.write(" + JSON.stringify(fullProgram.substring(0, 128)) + ")");
-              fullProgram = fullProgram.substring(128);
-          }
-          cmds.push("f.close()");
-          let idx = -1;
-          const executeNext = ()=>{
-              idx += 1;
-              if (idx >= cmds.length) {
-                  oninstall();
-                  this.executeSerial("exec(open(\"program.py\", \"r\").read())", ()=>{});
-              }
-              this.executeSerial(cmds[idx] + "\r\n", ()=>{
-                  setTimeout(executeNext, 500);
-              });
-          };
-          executeNext();
-      }
-      runDistributed(pythonProgram, graphDefinition, oninstall) {
-          return;
-      }
-      stopProgram() {
-      // TODO
-      }
-      releaseLock() {
-          if (!this.serial) {
-              return;
-          }
-          this.releasing = true;
-          const endRelease = async ()=>{
-              if (!this.releaseTimeout) {
-                  return;
-              }
-              this.reader.cancel().catch(()=>{});
-              await new Promise((resolve)=>setTimeout(resolve, 100));
-              this.serial.close();
-              this.serial = null;
-              this.connecting = null;
-              this.connected = null;
-              this.releaseTimeout = null;
-              this.onDisconnect(false);
-          };
-          serialWrite(this.serial, "\x04").then(()=>{
-              this.reader.closed.then(()=>{
-                  // For some reason, if we don't use a timeout, the reader is still locked and we can't close the serial port
-                  setTimeout(endRelease, 100);
-              });
-          });
-          this.releaseTimeout = setTimeout(endRelease, 5000);
-      }
-      startNewSession() {
-      // TODO
-      }
-      startTransaction() {
-      // TODO
-      }
-      endTransaction() {
-      // TODO
-      }
-      executeSerial(command, callback) {
-          if (this.executing) {
-              this.executionQueue.push([
-                  command,
-                  callback
-              ]);
-              return;
-          }
-          this.executing = true;
-          let that = this;
-          this.nbCommandsExecuted += 1;
-          if (this.nbCommandsExecuted > 500) {
-              this.executionQueue.push([
-                  "\x04",
-                  ()=>{}
-              ]);
-              this.executionQueue.push([
-                  "exec(open(\"fioilib.py\", \"r\").read())\r\n",
-                  ()=>{}
-              ]);
-              this.nbCommandsExecuted = 0;
-          }
-          this.currentOutputId = Math.random().toString(36).substring(7);
-          this.currentExecutionCallback = callback;
-          serialWrite(this.serial, command + "\r\nprint(\"" + this.currentOutputId + "\")\r\n").then(()=>{
-              that.outputCallback = (data)=>{
-                  if (this.currentExecutionCallback) {
-                      this.currentExecutionCallback(data);
-                  }
-                  that.executing = false;
-                  if (that.executionQueue.length > 0) {
-                      let [command, callback] = that.executionQueue.shift();
-                      this.executeSerial(command, callback);
-                  }
-              };
-          });
-      }
-      convertResultData(data) {
-          if ('True' === data) {
-              return true;
-          }
-          if ('False' === data) {
-              return false;
-          }
-          return data;
-      }
-      genericSendCommand(command, callback) {
-          console.log('generic send command', command);
-          this.executeSerial(`print(${command})`, (data)=>{
-              const convertedData = this.convertResultData(data);
-              console.log('received data', {
-                  data,
-                  convertedData,
-                  command
-              });
-              callback(convertedData);
-          });
-      }
-      sendCommand(command, callback) {
-          if (-1 !== command.indexOf('sensorTable =')) {
-              this.executeSerial(command, callback);
-              return;
-          }
-          this.genericSendCommand(command, callback);
-      }
-  }
-  let pythonLib$1 = `
+  const galaxiaPythonLib = `
 
 try:
     sensorTable
 except:
     sensorTable = []
 
-from machine import *
 from thingz import *
+from machine import *
+from time import *
+from network import *
+from requests import *
+from json import *
 
 servo_angle = {}
+distance_last_value = {}
 
 def normalizePin(pin):
     returnpin = 0
@@ -3780,8 +3559,587 @@ def turnPortOff(pin):
     if pin != 0:
         pinElement = Pin(pin, Pin.OUT)
         pinElement.off()
+        
+def getTimePulseUs(pin, pulseLevel, timeoutUs):
+    pin = normalizePin(pin)
+    if pin != 0:
+        echo = Pin(pin, Pin.IN)
+        
+        return time_pulse_us(echo, pulseLevel, timeoutUs)
+        
+def readDistance(pin):
+  pin = normalizePin(pin)
+  if pin != 0:
+      trig = Pin(pin, Pin.OUT)
+      trig.off()
+      sleep_us(2)
+      trig.on()
+      sleep_us(10)
+      trig.off()
+      echo = Pin(pin, Pin.IN)
+      timeout_us = 30000
+      duration = time_pulse_us(echo, 1, timeout_us)/1e6 # t_echo in seconds
+      
+      last_value = 0
+      try:
+          last_value = distance_last_value[pin]
+      except:
+          pass
+        
+      if duration > 0:
+          distance = round(343 * duration/2 * 100, 1)
+          distance_last_value[pin] = distance
+          
+          return distance
+      else:
+          return last_value
+          
+def wifiSetActive(sensor, active):
+    wlan = WLAN(STA_IF)
+    wlan.active(True if 1 == active else False)
+          
+def wifiConnect(sensor, ssid, password):
+    wlan = WLAN(STA_IF)
+    wlan.disconnect()
+    wlan.connect(ssid, password)
+
+def wifiDisconnect(sensor):
+    wlan = WLAN(STA_IF)
+    wlan.disconnect()
+ 
+def wifiIsConnected(sensor):
+    wlan = WLAN(STA_IF)
+    
+    return wlan.isconnected()
+    
+def wifiGetActive(sensor):
+    wlan = WLAN(STA_IF)
+    
+    return wlan.active()
+
+def wifiGetStatus(sensor):
+    wlan = WLAN(STA_IF)
+    
+    return [wlan.active(), wlan.status(), wlan.config('essid')]
+
+def wifiIfConfig(sensor):
+    wlan = WLAN(STA_IF)
+    
+    return wlan.ifconfig()
+    
+def wifiScan(sensor):
+    wlan = WLAN(STA_IF)
+    
+    return wlan.scan()
+
+def requestsGet(sensor, url, headers):
+    response = get(url, headers=loads(headers))
+    
+    return [response.status_code, response.text]
+
+def requestsPost(sensor, url, data, headers):
+    data_parsed = loads(data)
+    data_encoded = '&'.join(k+"="+data_parsed[k] for k in data_parsed)
+    response = post(url, data=data_encoded, headers=loads(headers))
+    
+    return [response.status_code, response.text]
 
 `;
+
+  const galaxiaRequestsModule = `
+import socket
+
+
+class Response:
+    def __init__(self, f):
+        self.raw = f
+        self.encoding = "utf-8"
+        self._cached = None
+
+    def close(self):
+        if self.raw:
+            self.raw.close()
+            self.raw = None
+        self._cached = None
+
+    @property
+    def content(self):
+        if self._cached is None:
+            try:
+                self._cached = self.raw.read()
+            finally:
+                self.raw.close()
+                self.raw = None
+        return self._cached
+
+    @property
+    def text(self):
+        return str(self.content, self.encoding)
+
+    def json(self):
+        import json
+
+        return json.loads(self.content)
+
+
+def request(
+    method,
+    url,
+    data=None,
+    json=None,
+    headers=None,
+    stream=None,
+    auth=None,
+    timeout=None,
+    parse_headers=True,
+):
+    if headers is None:
+        headers = {}
+
+    redirect = None  # redirection url, None means no redirection
+    chunked_data = data and getattr(data, "__next__", None) and not getattr(data, "__len__", None)
+
+    if auth is not None:
+        import binascii
+
+        username, password = auth
+        formated = b"{}:{}".format(username, password)
+        formated = str(binascii.b2a_base64(formated)[:-1], "ascii")
+        headers["Authorization"] = "Basic {}".format(formated)
+
+    try:
+        proto, dummy, host, path = url.split("/", 3)
+    except ValueError:
+        proto, dummy, host = url.split("/", 2)
+        path = ""
+    if proto == "http:":
+        port = 80
+    elif proto == "https:":
+        import tls
+
+        port = 443
+    else:
+        raise ValueError("Unsupported protocol: " + proto)
+
+    if ":" in host:
+        host, port = host.split(":", 1)
+        port = int(port)
+
+    ai = socket.getaddrinfo(host, port, 0, socket.SOCK_STREAM)
+    ai = ai[0]
+
+    resp_d = None
+    if parse_headers is not False:
+        resp_d = {}
+
+    s = socket.socket(ai[0], socket.SOCK_STREAM, ai[2])
+
+    if timeout is not None:
+        # Note: settimeout is not supported on all platforms, will raise
+        # an AttributeError if not available.
+        s.settimeout(timeout)
+
+    try:
+        s.connect(ai[-1])
+        if proto == "https:":
+            context = tls.SSLContext(tls.PROTOCOL_TLS_CLIENT)
+            context.verify_mode = tls.CERT_NONE
+            s = context.wrap_socket(s, server_hostname=host)
+        s.write(b"%s /%s HTTP/1.0\\r\\n" % (method, path))
+
+        if "Host" not in headers:
+            headers["Host"] = host
+
+        if json is not None:
+            assert data is None
+            from json import dumps
+
+            data = dumps(json)
+
+            if "Content-Type" not in headers:
+                headers["Content-Type"] = "application/json"
+
+        if data:
+            if chunked_data:
+                if "Transfer-Encoding" not in headers and "Content-Length" not in headers:
+                    headers["Transfer-Encoding"] = "chunked"
+            elif "Content-Length" not in headers:
+                headers["Content-Length"] = str(len(data))
+
+        if "Connection" not in headers:
+            headers["Connection"] = "close"
+
+        # Iterate over keys to avoid tuple alloc
+        for k in headers:
+            s.write(k)
+            s.write(b": ")
+            s.write(headers[k])
+            s.write(b"\\r\\n")
+
+        s.write(b"\\r\\n")
+
+        if data:
+            if chunked_data:
+                if headers.get("Transfer-Encoding", None) == "chunked":
+                    for chunk in data:
+                        s.write(b"%x\\r\\n" % len(chunk))
+                        s.write(chunk)
+                        s.write(b"\\r\\n")
+                    s.write("0\\r\\n\\r\\n")
+                else:
+                    for chunk in data:
+                        s.write(chunk)
+            else:
+                s.write(data)
+
+        l = s.readline()
+        # print(l)
+        l = l.split(None, 2)
+        if len(l) < 2:
+            # Invalid response
+            raise ValueError("HTTP error: BadStatusLine:\\n%s" % l)
+        status = int(l[1])
+        reason = ""
+        if len(l) > 2:
+            reason = l[2].rstrip()
+        while True:
+            l = s.readline()
+            if not l or l == b"\\r\\n":
+                break
+            # print(l)
+            if l.startswith(b"Transfer-Encoding:"):
+                if b"chunked" in l:
+                    raise ValueError("Unsupported " + str(l, "utf-8"))
+            elif l.startswith(b"Location:") and not 200 <= status <= 299:
+                if status in [301, 302, 303, 307, 308]:
+                    redirect = str(l[10:-2], "utf-8")
+                else:
+                    raise NotImplementedError("Redirect %d not yet supported" % status)
+            if parse_headers is False:
+                pass
+            elif parse_headers is True:
+                l = str(l, "utf-8")
+                k, v = l.split(":", 1)
+                resp_d[k] = v.strip()
+            else:
+                parse_headers(l, resp_d)
+    except OSError:
+        s.close()
+        raise
+
+    if redirect:
+        s.close()
+        if status in [301, 302, 303]:
+            return request("GET", redirect, None, None, headers, stream)
+        else:
+            return request(method, redirect, data, json, headers, stream)
+    else:
+        resp = Response(s)
+        resp.status_code = status
+        resp.reason = reason
+        if resp_d is not None:
+            resp.headers = resp_d
+        return resp
+
+
+def head(url, **kw):
+    return request("HEAD", url, **kw)
+
+
+def get(url, **kw):
+    return request("GET", url, **kw)
+
+
+def post(url, **kw):
+    return request("POST", url, **kw)
+
+
+def put(url, **kw):
+    return request("PUT", url, **kw)
+
+
+def patch(url, **kw):
+    return request("PATCH", url, **kw)
+
+
+def delete(url, **kw):
+    return request("DELETE", url, **kw)
+`;
+
+  async function getSerial(filters) {
+      const allPorts = await navigator.serial.getPorts();
+      const savedBoard = getSessionStorage('galaxia_board');
+      let port;
+      if (null !== savedBoard) {
+          port = allPorts.find((port)=>savedBoard === JSON.stringify(port.getInfo()));
+      }
+      if (!port) {
+          port = await navigator.serial.requestPort({
+              filters: filters
+          });
+      }
+      await port.open({
+          baudRate: 115200
+      });
+      const info = port.getInfo();
+      setSessionStorage('galaxia_board', JSON.stringify(info));
+      return port;
+  }
+  async function serialWrite(port, data) {
+      const writer = port.writable.getWriter();
+      const encoder = new TextEncoder();
+      await writer.write(encoder.encode(data));
+      await writer.ready;
+      writer.releaseLock();
+  }
+  class GalaxiaConnection {
+      constructor(userName, _onConnect, _onDisconnect, _onChangeBoard){
+          this.connecting = false;
+          this.connected = false;
+          this.releasing = false;
+          this.currentOutputLine = '';
+          this.currentOutput = "";
+          this.executing = false;
+          this._onConnect = _onConnect;
+          this._onDisconnect = _onDisconnect;
+          this._onChangeBoard = _onChangeBoard;
+          this.resetProperties();
+      }
+      resetProperties() {
+          this.connecting = false;
+          this.connected = false;
+          this.releasing = false;
+          this.serial = null;
+          this.currentOutput = "";
+          this.currentOutputLine = '';
+          this.outputCallback = null;
+          this.executionQueue = [];
+          this.executing = false;
+          this.releaseTimeout = null;
+          this.currentExecutionCallback = null;
+          this.currentOutputId = "";
+          this.nbCommandsExecuted = 0;
+      }
+      onDisconnect(wasConnected, wrongversion = false) {
+          this.releaseLock();
+          this._onDisconnect.apply(this, arguments);
+      }
+      onChangeBoard(board) {
+          this._onChangeBoard.apply(this, arguments);
+      }
+      processGalaxiaOutput(data) {
+          let text = new TextDecoder().decode(data);
+          this.currentOutputLine += text;
+          let currentLines = this.currentOutputLine.split('\r\n');
+          if (currentLines.length > 1) {
+              this.currentOutputLine = [
+                  ...currentLines
+              ].pop();
+              const linesToAdd = currentLines.slice(0, -1).join('\r\n');
+              this.currentOutput += linesToAdd + '\r\n';
+              {
+                  console.log(linesToAdd);
+              }
+          }
+          let lines = this.currentOutput.split('\r\n');
+          this.currentOutput = lines.join('\r\n');
+          window.currentOutput = this.currentOutput;
+          if (this.outputCallback && this.currentOutputLine.startsWith('>>> ') && lines[lines.length - 2].startsWith(this.currentOutputId)) {
+              this.outputCallback(lines[lines.length - 4]);
+              this.outputCallback = null;
+          }
+      }
+      async connect(url) {
+          this.resetProperties();
+          this.connecting = true;
+          try {
+              this.serial = await getSerial([
+                  {
+                      usbProductId: 0x4003,
+                      usbVendorId: 0x303A
+                  }
+              ]);
+          } catch (e) {
+              this.connecting = false;
+              this._onDisconnect(false);
+              return;
+          }
+          this.serial.addEventListener('disconnect', ()=>{
+              this.connected = false;
+              this.onDisconnect(true);
+          });
+          this.serialStartRead(this.serial);
+          await this.transferPythonLib();
+          this.connecting = false;
+          this.connected = true;
+          this._onConnect();
+      }
+      async serialStartRead(port) {
+          this.reader = port.readable.getReader();
+          while(true){
+              const { value, done } = await this.reader.read();
+              this.processGalaxiaOutput(value);
+              if (done || this.releasing) {
+                  this.reader.cancel();
+                  break;
+              }
+          }
+      }
+      async transferPythonLib() {
+          await this.transferModule('fioilib.py', galaxiaPythonLib);
+          await this.transferModule('requests.py', galaxiaRequestsModule);
+          await new Promise((resolve)=>this.executeSerial("f = open(\"main.py\", \"w\")\r\nf.write(" + JSON.stringify(mainLib).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n", resolve));
+      }
+      async transferModule(moduleFile, moduleContent) {
+          const size = 1200; // Max 1kb size
+          const numChunks = Math.ceil(moduleContent.length / size);
+          await new Promise((resolve)=>this.executeSerial(`f = open("${moduleFile}", "w")\r\n`, resolve));
+          for(let i = 0, o = 0; i < numChunks; ++i, o += size){
+              const chunk = moduleContent.substring(o, o + size);
+              await new Promise((resolve)=>this.executeSerial("f.write(" + JSON.stringify(chunk).replace(/\n/g, "\r\n") + ")\r\n", resolve));
+          }
+          await new Promise((resolve)=>this.executeSerial("f.close()\r\n", resolve));
+          await new Promise((resolve)=>this.executeSerial(`exec(open("${moduleFile}", "r").read())\r\n`, resolve));
+      }
+      isAvailable(ipaddress, callback) {
+          callback(ipaddress == "localhost");
+      }
+      onclose() {}
+      wasLocked() {}
+      isConnecting() {
+          return this.connecting;
+      }
+      isConnected() {
+          return this.connected;
+      }
+      executeProgram(pythonProgram) {
+      // TODO
+      }
+      installProgram(pythonProgram, oninstall) {
+          this.transferModule('program.py', pythonProgram).then(oninstall);
+      // let fullProgram = pythonProgram;
+      // let cmds = [
+      //   "f = open(\"program.py\", \"w\")"
+      // ];
+      //
+      // while (fullProgram.length > 0) {
+      //   cmds.push("f.write(" + JSON.stringify(fullProgram.substring(0, 128)) + ")");
+      //   fullProgram = fullProgram.substring(128);
+      // }
+      // cmds.push("f.close()");
+      // let idx = -1;
+      //
+      // const executeNext = () => {
+      //   idx += 1;
+      //   if (idx >= cmds.length) {
+      //     oninstall();
+      //     this.executeSerial("exec(open(\"program.py\", \"r\").read())", () => {
+      //     });
+      //   }
+      //   this.executeSerial(cmds[idx] + "\r\n", () => {
+      //     setTimeout(executeNext, 500)
+      //   });
+      // }
+      //
+      // executeNext();
+      }
+      runDistributed(pythonProgram, graphDefinition, oninstall) {
+          return;
+      }
+      stopProgram() {
+      // TODO
+      }
+      releaseLock() {
+          if (!this.serial) {
+              return;
+          }
+          this.releasing = true;
+          const endRelease = async ()=>{
+              if (!this.releaseTimeout) {
+                  return;
+              }
+              this.reader.cancel().catch(()=>{});
+              await new Promise((resolve)=>setTimeout(resolve, 100));
+              this.serial.close();
+              this.serial = null;
+              this.connecting = null;
+              this.connected = null;
+              this.releaseTimeout = null;
+              this.onDisconnect(false);
+          };
+          serialWrite(this.serial, "\x04").then(()=>{
+              this.reader.closed.then(()=>{
+                  // For some reason, if we don't use a timeout, the reader is still locked and we can't close the serial port
+                  setTimeout(endRelease, 100);
+              });
+          });
+          this.releaseTimeout = setTimeout(endRelease, 5000);
+      }
+      startNewSession() {
+      // TODO
+      }
+      startTransaction() {
+      // TODO
+      }
+      endTransaction() {
+      // TODO
+      }
+      executeSerial(command, callback) {
+          if (this.executing) {
+              this.executionQueue.push([
+                  command,
+                  callback
+              ]);
+              return;
+          }
+          this.executing = true;
+          let that = this;
+          this.nbCommandsExecuted += 1;
+          if (this.nbCommandsExecuted > 500) {
+              this.executionQueue.push([
+                  "\x04",
+                  ()=>{}
+              ]);
+              this.executionQueue.push([
+                  "exec(open(\"fioilib.py\", \"r\").read())\r\n",
+                  ()=>{}
+              ]);
+              this.nbCommandsExecuted = 0;
+          }
+          this.currentOutputId = Math.random().toString(36).substring(7);
+          this.currentExecutionCallback = callback;
+          serialWrite(this.serial, command + "\r\nprint(\"" + this.currentOutputId + "\")\r\n").then(()=>{
+              that.outputCallback = (data)=>{
+                  if (this.currentExecutionCallback) {
+                      this.currentExecutionCallback(data);
+                  }
+                  that.executing = false;
+                  if (that.executionQueue.length > 0) {
+                      let [command, callback] = that.executionQueue.shift();
+                      this.executeSerial(command, callback);
+                  }
+              };
+          });
+      }
+      genericSendCommand(command, callback) {
+          this.executeSerial(`print(dumps(${command}))`, (data)=>{
+              let convertedData = data;
+              if ('false' === data) {
+                  convertedData = false;
+              } else if ('true' === data) {
+                  convertedData = true;
+              }
+              callback(convertedData);
+          });
+      }
+      sendCommand(command, callback) {
+          if (-1 !== command.indexOf('sensorTable =')) {
+              this.executeSerial(command, callback);
+              return;
+          }
+          this.genericSendCommand(command, callback);
+      }
+  }
   let mainLib = `
 import os
 from machine import *
@@ -3938,7 +4296,7 @@ elif program_exists:
           } else if (sensor === 'disconnected') {
               this.innerState.connected = false;
               this.setConnected(false);
-          } else if (sensor.name.substring(0, 3) == 'btn') {
+          } else if (sensor.name.substring(0, 7) == 'button_' || sensor.name.substring(0, 6) == 'touch_') {
               this.innerState[sensor.name] = sensor.state;
               if (!this.initialized) {
                   return;
@@ -4052,16 +4410,16 @@ elif program_exists:
           const pinModule = machinePinModuleDefinition(context);
           const pwmModule = machinePwmModuleDefinition(context);
           const pulseModule = machinePulseModuleDefinition(context);
-          const utimeModule = utimeSleepModuleDefinition(context, strings);
+          const timeModule = timeSleepModuleDefinition(context, strings);
           const wlanModule = networkWlanModuleDefinition(context, strings);
-          const requestsModule = urequestsModuleDefinition(context, strings);
-          const jsonModule = ujsonModuleDefinition(context);
+          const requestsModule = requestsModuleDefinition(context, strings);
+          const jsonModule = jsonModuleDefinition(context);
           return {
               customClasses: {
                   thingz: deepMerge(accelerometerModule.classDefinitions, buttonModule.classDefinitions, ledModule.classDefinitions),
                   machine: deepMerge(pinModule.classDefinitions, pwmModule.classDefinitions),
                   network: wlanModule.classDefinitions,
-                  urequests: requestsModule.classDefinitions
+                  requests: requestsModule.classDefinitions
               },
               customConstants: {
                   network: wlanModule.constants
@@ -4073,20 +4431,20 @@ elif program_exists:
                   thingz: deepMerge(accelerometerModule.classImplementations, buttonModule.classImplementations, ledModule.classImplementations),
                   machine: deepMerge(pinModule.classImplementations, pwmModule.classImplementations),
                   network: wlanModule.classImplementations,
-                  urequests: requestsModule.classImplementations
+                  requests: requestsModule.classImplementations
               },
               customBlockImplementations: {
                   thingz: temperatureModule.blockImplementations,
-                  utime: utimeModule.blockImplementations,
-                  urequests: requestsModule.blockImplementations,
-                  ujson: jsonModule.blockImplementations,
+                  time: timeModule.blockImplementations,
+                  requests: requestsModule.blockImplementations,
+                  json: jsonModule.blockImplementations,
                   machine: pulseModule.blockImplementations
               },
               customBlocks: {
                   thingz: temperatureModule.blockDefinitions,
-                  utime: utimeModule.blockDefinitions,
-                  urequests: requestsModule.blockDefinitions,
-                  ujson: jsonModule.blockDefinitions,
+                  time: timeModule.blockDefinitions,
+                  requests: requestsModule.blockDefinitions,
+                  json: jsonModule.blockDefinitions,
                   machine: pulseModule.blockDefinitions
               }
           };
@@ -11160,7 +11518,7 @@ def detectBoard():
       }
       getLiveState(callback) {
           this.context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
-              var array = JSON.parse(val);
+              const array = JSON.parse(val);
               callback(array);
           });
       }
@@ -12417,7 +12775,7 @@ def detectBoard():
               suggestedName: strings.messages.sensorNameWifi,
               description: strings.messages.wifi,
               isAnalog: false,
-              isSensor: false,
+              isSensor: true,
               portType: "D",
               selectorImages: [
                   "wifi.png"
@@ -12496,24 +12854,85 @@ def detectBoard():
               }
           };
       }
-      getInitialState() {
-          return {
-              active: false,
-              connected: false,
-              ssid: '',
-              password: ''
-          };
+      getLiveState(callback) {
+          this.context.quickPiConnection.sendCommand(`wifiGetStatus("${this.name}")`, (val)=>{
+              const [active, status, ssid] = JSON.parse(val);
+              callback({
+                  ...this.state,
+                  active,
+                  connected: 1010 === status,
+                  connecting: 1001 === status,
+                  ssid
+              });
+          });
       }
       setLiveState(state, callback) {
           var command = `setWifiState("${this.name}", [0, 0, 0])`;
           this.context.quickPiConnection.sendCommand(command, callback);
       }
       draw(sensorHandler, { imgx, imgy, imgw, imgh, fadeopacity, state1x, state1y }) {
-          if (this.stateText) this.stateText.remove();
+          if (this.stateText) {
+              this.stateText.remove();
+          }
+          if (!this.state) {
+              this.state = {
+                  active: false,
+                  connected: false,
+                  ssid: '',
+                  password: '',
+                  ssidInput: '',
+                  passwordInput: ''
+              };
+          }
+          const redrawModalState = ()=>{
+              $('#wifi_ssid').val(this.state.ssidInput);
+              $('#wifi_password').val(this.state.passwordInput);
+              if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
+                  $('#wifi_ssid').prop('disabled', false);
+                  $('#wifi_password').prop('disabled', false);
+              } else {
+                  $('#wifi_ssid').prop('disabled', true);
+                  $('#wifi_password').prop('disabled', true);
+              }
+              if (this.state.active) {
+                  if (this.state.connected) {
+                      $('#wifi_enable').hide();
+                      $('#wifi_disable').show();
+                      $('#wifi_connect').hide();
+                      $('#wifi_disconnect').show();
+                  } else {
+                      $('#wifi_enable').hide();
+                      $('#wifi_disable').show();
+                      $('#wifi_connect').show();
+                      $('#wifi_disconnect').hide();
+                  }
+              } else {
+                  $('#wifi_enable').show();
+                  $('#wifi_disable').hide();
+                  $('#wifi_connect').hide();
+                  $('#wifi_disconnect').hide();
+              }
+              if (this.state.activating) {
+                  $('#wifi_activating').show();
+                  $('#wifi_enable_icon').hide();
+              } else {
+                  $('#wifi_activating').hide();
+                  $('#wifi_enable_icon').show();
+              }
+              if (this.state.connecting) {
+                  $('#wifi_connecting').show();
+                  $('#wifi_connect_icon').hide();
+              } else {
+                  $('#wifi_connecting').hide();
+                  $('#wifi_connect_icon').show();
+              }
+              const realStatus = !this.state.active ? 'disabled' : this.state.connected ? 'connected' : 'disconnected';
+              $('#wifi_status').val(realStatus);
+          };
+          redrawModalState();
           if (!this.img || sensorHandler.isElementRemoved(this.img)) {
               this.img = this.context.paper.image(getImg('wifi.png'), imgx, imgy, imgw, imgh);
               this.focusrect.click(()=>{
-                  const state = this.state;
                   let wifiDialog = `
         <div class="content qpi" id="wifi_dialog">
           <div class="panel-heading" id="bim">
@@ -12581,50 +13000,14 @@ def detectBoard():
           </div>
         </div>
       `;
-                  const redrawModalState = ()=>{
-                      $('#wifi_ssid').val(state.ssid);
-                      $('#wifi_password').val(state.password);
-                      if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                          $('#wifi_ssid').prop('disabled', false);
-                          $('#wifi_password').prop('disabled', false);
-                      } else {
-                          $('#wifi_ssid').prop('disabled', true);
-                          $('#wifi_password').prop('disabled', true);
-                      }
-                      if (state.active) {
-                          if (state.connected) {
-                              $('#wifi_enable').hide();
-                              $('#wifi_disable').show();
-                              $('#wifi_connect').hide();
-                              $('#wifi_disconnect').show();
-                          } else {
-                              $('#wifi_enable').hide();
-                              $('#wifi_disable').show();
-                              $('#wifi_connect').show();
-                              $('#wifi_disconnect').hide();
-                          }
-                      } else {
-                          $('#wifi_enable').show();
-                          $('#wifi_disable').hide();
-                          $('#wifi_connect').hide();
-                          $('#wifi_disconnect').hide();
-                      }
-                      if (state.activating) {
-                          $('#wifi_activating').show();
-                          $('#wifi_enable_icon').hide();
-                      } else {
-                          $('#wifi_activating').hide();
-                          $('#wifi_enable_icon').show();
-                      }
-                      if (state.connecting) {
-                          $('#wifi_connecting').show();
-                          $('#wifi_connect_icon').hide();
-                      } else {
-                          $('#wifi_connecting').hide();
-                          $('#wifi_connect_icon').show();
-                      }
-                      const realStatus = !state.active ? 'disabled' : state.connected ? 'connected' : 'disconnected';
-                      $('#wifi_status').val(realStatus);
+                  const sendCommandAndFetchState = (command)=>{
+                      this.context.quickPiConnection.sendCommand(command, ()=>{
+                          this.getLiveState((returnVal)=>{
+                              this.state = returnVal;
+                              redrawModalState();
+                              sensorHandler.drawSensor(this);
+                          });
+                      });
                   };
                   window.displayHelper.showPopupDialog(wifiDialog, ()=>{
                       redrawModalState();
@@ -12634,62 +13017,101 @@ def detectBoard():
                       });
                       $('#wifi_enable').click(()=>{
                           if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                              this.state.activating = true;
-                              redrawModalState();
-                              setTimeout(()=>{
-                                  this.state.activating = false;
-                                  this.state.active = true;
-                                  sensorHandler.warnClientSensorStateChanged(this);
-                                  sensorHandler.getSensorDrawer().drawSensor(this);
+                              if (!this.context.display || this.context.autoGrading || this.context.offLineMode) {
+                                  this.state.activating = true;
                                   redrawModalState();
-                              }, 500);
+                                  setTimeout(()=>{
+                                      this.state.activating = false;
+                                      this.state.active = true;
+                                      sensorHandler.warnClientSensorStateChanged(this);
+                                      sensorHandler.getSensorDrawer().drawSensor(this);
+                                      redrawModalState();
+                                  }, 500);
+                              } else {
+                                  const command = `wifiSetActive("${this.name}", 1)`;
+                                  this.context.quickPiConnection.sendCommand(command, sendCommandAndFetchState);
+                              }
                           } else {
                               sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
                           }
                       });
                       $('#wifi_disable').click(()=>{
                           if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                              this.state.active = false;
-                              this.state.connected = false;
-                              sensorHandler.warnClientSensorStateChanged(this);
-                              sensorHandler.getSensorDrawer().drawSensor(this);
-                              redrawModalState();
+                              if (!this.context.display || this.context.autoGrading || this.context.offLineMode) {
+                                  this.state.active = false;
+                                  this.state.connected = false;
+                                  sensorHandler.warnClientSensorStateChanged(this);
+                                  sensorHandler.getSensorDrawer().drawSensor(this);
+                                  redrawModalState();
+                              } else {
+                                  const command = `wifiSetActive("${this.name}", 0)`;
+                                  sendCommandAndFetchState(command);
+                              }
                           } else {
                               sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
                           }
                       });
                       $('#wifi_connect').click(()=>{
                           if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                              this.state.connecting = true;
-                              redrawModalState();
-                              setTimeout(()=>{
-                                  this.state.connecting = false;
-                                  this.state.connected = true;
-                                  sensorHandler.warnClientSensorStateChanged(this);
-                                  sensorHandler.getSensorDrawer().drawSensor(this);
-                                  redrawModalState();
-                              }, 500);
+                              if (!this.context.display || this.context.autoGrading || this.context.offLineMode) {
+                                  if (this.state.connecting) {
+                                      this.state.connected = false;
+                                      this.state.connecting = false;
+                                      sensorHandler.warnClientSensorStateChanged(this);
+                                      sensorHandler.getSensorDrawer().drawSensor(this);
+                                      redrawModalState();
+                                  } else {
+                                      this.state.connecting = true;
+                                      redrawModalState();
+                                      setTimeout(()=>{
+                                          this.state.connecting = false;
+                                          this.state.connected = true;
+                                          sensorHandler.warnClientSensorStateChanged(this);
+                                          sensorHandler.getSensorDrawer().drawSensor(this);
+                                          redrawModalState();
+                                      }, 500);
+                                  }
+                              } else {
+                                  if (this.state.connecting) {
+                                      this.state.connecting = false;
+                                      const command = "wifiDisconnect(\"" + this.name + "\")";
+                                      sendCommandAndFetchState(command);
+                                      redrawModalState();
+                                  } else {
+                                      const ssid = $('#wifi_ssid').val();
+                                      const password = $('#wifi_password').val();
+                                      this.state.connecting = true;
+                                      const command = "wifiConnect(\"" + this.name + "\", \"" + ssid + "\", \"" + password + "\")";
+                                      sendCommandAndFetchState(command);
+                                      redrawModalState();
+                                  }
+                              }
                           } else {
                               sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
                           }
                       });
                       $('#wifi_disconnect').click(()=>{
                           if (!this.context.autoGrading && (!this.context.runner || !this.context.runner.isRunning())) {
-                              this.state.connected = false;
-                              sensorHandler.warnClientSensorStateChanged(this);
-                              sensorHandler.getSensorDrawer().drawSensor(this);
-                              redrawModalState();
+                              if (!this.context.display || this.context.autoGrading || this.context.offLineMode) {
+                                  this.state.connected = false;
+                                  sensorHandler.warnClientSensorStateChanged(this);
+                                  sensorHandler.getSensorDrawer().drawSensor(this);
+                                  redrawModalState();
+                              } else {
+                                  const command = "wifiDisconnect(\"" + this.name + "\")";
+                                  sendCommandAndFetchState(command);
+                              }
                           } else {
                               sensorHandler.getSensorDrawer().actuatorsInRunningModeError();
                           }
                       });
-                      $('#wifi_ssid').on('change', ()=>{
-                          this.state.ssid = $('#wifi_ssid').val();
+                      $('#wifi_ssid').on('input', ()=>{
+                          this.state.ssidInput = $('#wifi_ssid').val();
                           sensorHandler.warnClientSensorStateChanged(this);
                           sensorHandler.getSensorDrawer().drawSensor(this);
                       });
-                      $('#wifi_password').on('change', ()=>{
-                          this.state.password = $('#wifi_password').val();
+                      $('#wifi_password').on('input', ()=>{
+                          this.state.passwordInput = $('#wifi_password').val();
                           sensorHandler.warnClientSensorStateChanged(this);
                           sensorHandler.getSensorDrawer().drawSensor(this);
                       });
@@ -15359,6 +15781,33 @@ def detectBoard():
               }
           }
       };
+      function installPythonCode(code) {
+          if (context.runner) context.runner.stop();
+          context.installing = true;
+          $('#piinstallprogresss').show();
+          $('#piinstallcheck').hide();
+          context.quickPiConnection.installProgram(code, function() {
+              context.justinstalled = true;
+              $('#piinstallprogresss').hide();
+              $('#piinstallcheck').show();
+          });
+      }
+      function piInstallProgram() {
+          context.blocklyHelper.reportValues = false;
+          var python_code = context.generatePythonSensorTable();
+          python_code += "\n\n";
+          if (context.blocklyHelper.getCode) {
+              python_code += context.blocklyHelper.getCode('python');
+              python_code = python_code.replace("from quickpi import *", "");
+              installPythonCode(python_code);
+          } else {
+              window.task.getAnswer(function(answer) {
+                  python_code += JSON.parse(answer).easy.document.lines.join("\n");
+                  python_code = python_code.replace("from quickpi import *", "");
+                  installPythonCode(python_code);
+              });
+          }
+      }
       // Reset the context's display
       context.createDisplay = function() {
           // Do something here
@@ -15479,20 +15928,7 @@ def detectBoard():
               if (!context.quickPiConnection.isConnected()) {
                   showConfig(showConfigSettings);
               } else {
-                  context.blocklyHelper.reportValues = false;
-                  var python_code = context.generatePythonSensorTable();
-                  python_code += "\n\n";
-                  python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
-                  python_code = python_code.replace("from quickpi import *", "");
-                  if (context.runner) context.runner.stop();
-                  context.installing = true;
-                  $('#piinstallprogresss').show();
-                  $('#piinstallcheck').hide();
-                  context.quickPiConnection.installProgram(python_code, function() {
-                      context.justinstalled = true;
-                      $('#piinstallprogresss').hide();
-                      $('#piinstallcheck').show();
-                  });
+                  piInstallProgram();
               }
           });
           $('#pichangehat').click(()=>{
@@ -15610,33 +16046,7 @@ def detectBoard():
                   });
               });
           });
-          function installPythonCode(code) {
-              if (context.runner) context.runner.stop();
-              context.installing = true;
-              $('#piinstallprogresss').show();
-              $('#piinstallcheck').hide();
-              context.quickPiConnection.installProgram(code, function() {
-                  context.justinstalled = true;
-                  $('#piinstallprogresss').hide();
-                  $('#piinstallcheck').show();
-              });
-          }
-          $('#piinstall').click(function() {
-              context.blocklyHelper.reportValues = false;
-              var python_code = context.generatePythonSensorTable();
-              python_code += "\n\n";
-              if (context.blocklyHelper.getCode) {
-                  python_code += context.blocklyHelper.getCode('python');
-                  python_code = python_code.replace("from quickpi import *", "");
-                  installPythonCode(python_code);
-              } else {
-                  window.task.getAnswer(function(answer) {
-                      python_code += JSON.parse(answer).easy.document.lines.join("\n");
-                      python_code = python_code.replace("from quickpi import *", "");
-                      installPythonCode(python_code);
-                  });
-              }
-          });
+          $('#piinstall').click(piInstallProgram);
           if (parseInt(getSessionStorage('autoConnect'))) {
               if (!context.quickPiConnection.isConnected() && !context.quickPiConnection.isConnecting()) {
                   $('#piconnect').attr('disabled', 'disabled');
