@@ -1461,8 +1461,6 @@ var getContext = function(display, infos) {
        };
      });
 
-     processingInstance.redraw();
-
      var svg = canvasContext.getSvg();
 
      var svgData = svg.outerHTML;
