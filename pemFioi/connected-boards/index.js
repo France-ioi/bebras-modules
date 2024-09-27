@@ -3164,6 +3164,9 @@ var boardProgramming = (function (exports) {
       }
       return object;
   }
+  function formatString(str) {
+      return str.replace(/"/g, '\\"');
+  }
   function requestsModuleDefinition(context, strings) {
       async function makeRequest(sensor, fetchParameters, callback) {
           const fetchUrl = fetchParameters.url;
@@ -3173,6 +3176,9 @@ var boardProgramming = (function (exports) {
               body: getRealValue(fetchParameters.body)
           };
           if (!context.display || context.autoGrading || context.offLineMode) {
+              if (!sensor.state?.active) {
+                  throw strings.messages.wifiNotActive;
+              }
               context.registerQuickPiEvent(sensor.name, {
                   ...sensor.state,
                   lastRequest: {
@@ -3199,18 +3205,26 @@ var boardProgramming = (function (exports) {
           } else {
               let command;
               if ('GET' === fetchArguments.method) {
-                  command = `requestsGet("${sensor.name}", "${fetchUrl}", '${JSON.stringify(fetchArguments.headers ?? {})}')`;
+                  command = `requestsGet("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify(fetchArguments.headers ?? {}))}')`;
               } else {
-                  command = `requestsPost("${sensor.name}", "${fetchUrl}", '${JSON.stringify(fetchArguments.body ?? {})}', '${JSON.stringify(fetchArguments.headers ?? {})}')`;
+                  command = `requestsPost("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify(fetchArguments.body ?? {}))}', '${formatString(JSON.stringify(fetchArguments.headers ?? {}))}')`;
               }
-              context.quickPiConnection.sendCommand(command, (result)=>{
-                  const [status, text] = JSON.parse(result);
-                  callback({
-                      __className: 'Response',
-                      arguments: [
-                          status,
-                          text
-                      ]
+              await new Promise((resolve, reject)=>{
+                  context.quickPiConnection.sendCommand(command, (result)=>{
+                      try {
+                          const [status, text] = JSON.parse(result);
+                          callback({
+                              __className: 'Response',
+                              arguments: [
+                                  status,
+                                  text
+                              ]
+                          });
+                          resolve();
+                      } catch (e) {
+                          console.error(result);
+                          reject(result);
+                      }
                   });
               });
           }
@@ -3294,9 +3308,6 @@ var boardProgramming = (function (exports) {
                   if (!sensor) {
                       throw `There is no Wi-Fi sensor to make the request.`;
                   }
-                  if (!sensor.state?.active) {
-                      throw strings.messages.wifiNotActive;
-                  }
                   const cb = context.runner.waitCallback(callback);
                   return makeRequest(sensor, {
                       method: 'GET',
@@ -3313,9 +3324,6 @@ var boardProgramming = (function (exports) {
                   const sensor = context.sensorHandler.findSensorByType('wifi');
                   if (!sensor) {
                       throw `There is no Wi-Fi sensor to make the request.`;
-                  }
-                  if (!sensor.state?.active) {
-                      throw strings.messages.wifiNotActive;
                   }
                   const cb = context.runner.waitCallback(callback);
                   return makeRequest(sensor, {
