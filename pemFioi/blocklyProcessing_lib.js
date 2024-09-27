@@ -1510,9 +1510,7 @@ var getContext = function(display, infos) {
          if (context.display) {
             context.processing.previewInstance.redraw();
          }
-         //callback();
-         // why drawOnBuffer was here? ⇒ for the return value
-         context.waitDelay(callback, drawOnBuffer());
+         context.waitDelay(callback);
       }
    };
 
