@@ -3173,7 +3173,9 @@ var boardProgramming = (function (exports) {
           const fetchArguments = {
               method: fetchParameters.method,
               headers: getRealValue(fetchParameters.headers),
-              body: getRealValue(fetchParameters.body)
+              ...fetchParameters.body ? {
+                  body: getRealValue(fetchParameters.body)
+              } : {}
           };
           if (!context.display || context.autoGrading || context.offLineMode) {
               if (!sensor.state?.active) {
@@ -3189,7 +3191,12 @@ var boardProgramming = (function (exports) {
               let result = null;
               try {
                   // @ts-ignore
-                  result = await fetch(fetchUrl, fetchArguments);
+                  result = await fetch(fetchUrl, {
+                      ...fetchArguments,
+                      ...fetchArguments.body ? {
+                          body: new URLSearchParams(fetchArguments.body)
+                      } : {}
+                  });
               } catch (e) {
                   console.error(e);
                   throw strings.messages.networkRequestFailed.format(fetchParameters.url);
@@ -3646,9 +3653,7 @@ def requestsGet(sensor, url, headers):
     return [response.status_code, response.text]
 
 def requestsPost(sensor, url, data, headers):
-    data_parsed = loads(data)
-    data_encoded = '&'.join(k+"="+data_parsed[k] for k in data_parsed)
-    response = post(url, data=data_encoded, headers=loads(headers))
+    response = post(url, data=loads(data), headers=loads(headers))
     
     return [response.status_code, response.text]
 
