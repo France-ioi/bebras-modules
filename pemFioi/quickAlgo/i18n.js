@@ -38,7 +38,8 @@ var quickAlgoLanguageStrings = {
          not: "Opérateur logique de négation",
          and: "Opérateur logique ET",
          or: "Opérateur logique OU",
-         def: "Mot clé pour définir une fonction"
+         def: "Mot clé pour définir une fonction",
+         len: "Fonction qui renvoie la longueur de l'élément passé en paramètre"
          //list, set, _getitem_, _setitem_, lambda, break, continue, setattr, map, split
       },
       controls: {
