@@ -1439,6 +1439,13 @@ var getContext = function(display, infos) {
        return canvasContext;
      };
 
+     // Override Canvas2SVG translate method in the processing context, because
+     // it creates a bug in which the stroke color of some shapes are overriden
+     // by other shapes, resulting in losing the colors in the final SVG
+     // because of Processing adding an unnecessary translation (x,y) for rectangles
+     canvasContext.translate = function (x, y) {
+     };
+
      var processingInstance = new Processing(canvas, function(processing) {
        processing.setup = function() {
          processing.size(
@@ -1462,6 +1469,27 @@ var getContext = function(display, infos) {
      });
 
      var svg = canvasContext.getSvg();
+
+      // Clean SVG and remove everything that is not inside a <g transform="scale(1,1)">: it's only backgrounds added by processing lib
+      // that are tricky to remove
+     function findRightSvgBranch(parentElement) {
+        for (var a = 0; a < parentElement.children.length; a++) {
+           var child = parentElement.children[a];
+           if ('scale(1,1)' === child.getAttribute('transform')) {
+              return child;
+           }
+           var childBranch = findRightSvgBranch(child);
+           if (childBranch) {
+              return childBranch;
+           }
+        }
+
+        return null;
+     }
+
+     var svgRealContent = findRightSvgBranch(svg);
+     svg.innerHTML = "";
+     svg.appendChild(svgRealContent);
 
      var svgData = svg.outerHTML;
      var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
