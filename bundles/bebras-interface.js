@@ -3122,6 +3122,7 @@ var miniPlatformValidate = function(task) { return function(mode, success, error
          if (success) {
             success();
          }
+         return;
       } else {
          alreadyStayed = true;
       }
