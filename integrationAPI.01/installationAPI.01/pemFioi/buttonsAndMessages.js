@@ -736,7 +736,8 @@ window.displayHelper = {
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      window.platform.getTaskParams(null, null, function(taskParams) {
+
+      function processTaskParams(taskParams) {
          self.taskParams = taskParams;
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
@@ -775,7 +776,18 @@ window.displayHelper = {
          if (self.timeoutMinutes > 0) {
             self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
          }
-      });
+      };
+
+      if (!self.taskParams) {
+         self.taskParams = {};
+      }
+      if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
+         // Get the taskParams from the task if possible
+         // Avoids an async call in a function which isn't async
+         processTaskParams(window.task.displayedSubTask.taskParams);
+      } else {
+         window.platform.getTaskParams(null, null, processTaskParams);
+      }
    },
    unload: function() {
       if (this.taskDelayWarningTimeout) {

@@ -733,12 +733,24 @@ window.displayHelper = {
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      window.platform.getTaskParams(null, null, function(taskParams) {
+
+      function processTaskParams(taskParams) {
          self.taskParams = taskParams;
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
-      });
+      }
+
+      if (!self.taskParams) {
+         self.taskParams = {};
+      }
+      if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
+         // Get the taskParams from the task if possible
+         // Avoids an async call in a function which isn't async
+         processTaskParams(window.task.displayedSubTask.taskParams);
+      } else {
+         window.platform.getTaskParams(null, null, processTaskParams);
+      }
 
       $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
       $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
