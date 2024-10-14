@@ -3332,7 +3332,7 @@ var boardProgramming = (function (exports) {
                           },
                           {
                               name: "ifconfig",
-                              yieldsValue: "String"
+                              yieldsValue: "string"
                           }
                       ]
                   }
@@ -4707,7 +4707,13 @@ var boardProgramming = (function (exports) {
           boardCustomBlocks[boardCustomBlockName1] = {};
           for(var _iterator4 = _create_for_of_iterator_helper_loose$7(Object.entries(elements)), _step4; !(_step4 = _iterator4()).done;){
               var _step_value3 = _step4.value, moduleName1 = _step_value3[0], moduleDefinitionsList = _step_value3[1];
-              boardCustomBlocks[boardCustomBlockName1][moduleName1] = deepMerge.apply(void 0, [].concat(moduleDefinitionsList));
+              if (Array.isArray(moduleDefinitionsList[0])) {
+                  boardCustomBlocks[boardCustomBlockName1][moduleName1] = moduleDefinitionsList.reduce(function(cur, next) {
+                      return [].concat(cur, next);
+                  }, []);
+              } else {
+                  boardCustomBlocks[boardCustomBlockName1][moduleName1] = deepMerge.apply(void 0, [].concat(moduleDefinitionsList));
+              }
           }
       }
       return boardCustomBlocks;
@@ -10769,7 +10775,6 @@ var boardProgramming = (function (exports) {
       };
       _proto.draw = function draw(sensorHandler, param) {
           var imgx = param.imgx, imgy = param.imgy, imgw = param.imgw, imgh = param.imgh, juststate = param.juststate, fadeopacity = param.fadeopacity, state1x = param.state1x, state1y = param.state1y; param.sensorAttr;
-          console.log('unit', this.unit);
           if (this.stateText) this.stateText.remove();
           if (this.state == null) this.state = 0;
           if (!this.img || sensorHandler.isElementRemoved(this.img)) this.img = this.context.paper.image(getImg('sound.png'), imgx, imgy, imgw, imgh);
