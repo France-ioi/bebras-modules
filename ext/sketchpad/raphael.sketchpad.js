@@ -509,11 +509,22 @@
       var _opacity = 1.0;
       var _width = 5;
       var _offset = null;
+      var _max_length;
 
       // Drawing state
       var _drawing = false;
       var _c = null;
       var _points = [];
+
+      self.maxLength = function(value) {
+         if (value === undefined){
+               return _max_length;
+          }
+
+         _max_length = value;
+
+         return self;
+      };
 
       self.color = function(value) {
          if (value === undefined){
@@ -656,6 +667,11 @@
                }
             }*/
             //if (_points.length < 50) {
+            var l = _c.getTotalLength();
+            // console.log(l,self.maxLength())
+            if(self.maxLength() && l > self.maxLength()){
+               return
+            }
                _points.push(newPoint);
             //}
             _c.attr({ path: points_to_svg() });
