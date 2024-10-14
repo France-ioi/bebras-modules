@@ -2826,6 +2826,26 @@ var boardProgramming = (function (exports) {
   }
 
   function machinePwmModuleDefinition(context, strings) {
+      const pwmDuty = (self, duty, resolution, callback)=>{
+          const sensor = context.sensorHandler.findSensorByPort(`D${self.pin.pinNumber}`);
+          if (!sensor) {
+              throw `There is no sensor connected to the digital port D${self.pin.pinNumber}`;
+          }
+          const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+          if (!sensorDef.getStateFromPwm) {
+              throw "This sensor may not be controlled by a PWM";
+          }
+          const newState = sensorDef.getStateFromPwm(duty, resolution);
+          let command = "pwmDuty(" + self.pin.pinNumber + ", " + duty + ", " + resolution + ")";
+          self.currentDuty = duty;
+          context.registerQuickPiEvent(sensor.name, newState);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
       return {
           classDefinitions: {
               actuator: {
@@ -2844,6 +2864,12 @@ var boardProgramming = (function (exports) {
                               params: [
                                   "Number"
                               ]
+                          },
+                          {
+                              name: "duty_u16",
+                              params: [
+                                  "Number"
+                              ]
                           }
                       ]
                   }
@@ -2857,24 +2883,10 @@ var boardProgramming = (function (exports) {
                       self.currentDuty = duty;
                   },
                   duty: function(self, duty, callback) {
-                      const sensor = context.sensorHandler.findSensorByPort(`D${self.pin.pinNumber}`);
-                      if (!sensor) {
-                          throw `There is no sensor connected to the digital port D${self.pin.pinNumber}`;
-                      }
-                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
-                      if (!sensorDef.getStateFromPwm) {
-                          throw "This sensor may not be controlled by a PWM";
-                      }
-                      const newState = sensorDef.getStateFromPwm(duty);
-                      let command = "pwmDuty(" + self.pin.pinNumber + ", " + duty + ")";
-                      self.currentDuty = duty;
-                      context.registerQuickPiEvent(sensor.name, newState);
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
+                      pwmDuty(self, duty, Math.pow(2, 10), callback);
+                  },
+                  duty_u16: function(self, duty, callback) {
+                      pwmDuty(self, duty, Math.pow(2, 16), callback);
                   }
               }
           }
@@ -3625,13 +3637,16 @@ def getServoAngle(pin):
 
     return angle
 
-def pwmDuty(pin, duty):
+def pwmDuty(pin, duty, resolution = 1024):
     pin = normalizePin(pin)
     if pin != 0:
         print(pin)
         print(duty)
         pinElement = PWM(Pin(pin), freq=50, duty=0)
-        pinElement.duty(duty)
+        if resolution == 1024:
+            pinElement.duty(duty)
+        else:
+            pinElement.duty_u16(duty)
 
 def turnPortOn(pin):
     pin = normalizePin(pin)
@@ -4916,6 +4931,7 @@ elif program_exists:
           "pin.off": "pin.off() description",
           "pwm.__constructor": "pwm = PWM(pin, freq, duty) description",
           "pwm.duty": "pwm.duty(duty) description",
+          "pwm.duty_u16": "pwm.duty_u16(duty) description",
           "wlan.__constructor": "wlan = WLAN(interface) description",
           "wlan.active": "wlan.active(active) description",
           "wlan.connect": "wlan.connect(ssid, password) description",
@@ -10259,8 +10275,8 @@ def detectBoard():
               getStateFromPercentage: function(percentage) {
                   return percentage;
               },
-              getStateFromPwm: function(duty) {
-                  return duty / 1023;
+              getStateFromPwm: function(duty, pwmResolution) {
+                  return duty / (pwmResolution - 1);
               },
               getStateString: function(state) {
                   return Math.round(state * 100) + "%";
@@ -11242,8 +11258,8 @@ def detectBoard():
               getStateString: function(state) {
                   return "" + state + "°";
               },
-              getStateFromPwm: function(pwmDuty) {
-                  return 180 * (pwmDuty - 0.025 * 1023) / (0.1 * 1023);
+              getStateFromPwm: function(pwmDuty, pwmResolution) {
+                  return Math.round(180 * (pwmDuty - 0.025 * (pwmResolution - 1)) / (0.1 * (pwmResolution - 1)));
               }
           };
       }
