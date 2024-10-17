@@ -2540,11 +2540,14 @@ window.displayHelper = {
 
    displayError: function(msg) {
       var that = this;
-      if(this.responsive){
+      if (!this.responsive) {
+         $("#displayHelper_graderMessage").html(msg);
+      }
+
+      function showError() {
          $("#error").html('<i class="fas fa-exclamation-triangle"></i><span id="errorMsg">'+msg+'</span> <i class="fas fa-times"></i>');
          if (msg) {
             $('#error').css('max-width', '');
-            $("#error").show();
             // Check how much space the error banner takes and push buttons
             var errorWidth = $("#error").outerWidth();
             var dhaWidth = $("#displayHelperAnswering").outerWidth();
@@ -2557,14 +2560,21 @@ window.displayHelper = {
             } else {
                $('#displayHelperAnswering').removeClass('forceRight');
             }
+            $("#error").fadeIn(400);
          } else {
-            this.hideError();
+            that.hideError();
          }
          $('#error').click(function() {
             that.hideError();
          });
-      }else{
-         $("#displayHelper_graderMessage").html(msg);
+      }
+
+      if ($('#error').is(':visible') && $('#error').html() != '') {
+         $('#error').fadeOut(400, function () {
+            showError();
+         });
+      } else {
+         showError();
       }
    },
 
