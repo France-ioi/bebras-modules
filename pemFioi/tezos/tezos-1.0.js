@@ -148,8 +148,8 @@ const taskStrings = {
       return str
    },
    errorBalance: function(cur,tar) {
-      let str = (cur == tar) ? "equal" : "lower than";
-      return "You didn't earn any tez. Your balance of "+cur+" tez is "+str+" your initial balance of "+tar+" tez."
+      let str = (cur == tar) ? "equal to" : "lower than";
+      return "You didn't earn any tez. Your balance of "+cur+" tez is "+str+" the target of "+tar+" tez."
    },
    errorOwner: "You are not the owner of the auction contract",
    cantSign: "You can't sign this transaction, as the sender account doesn't belong to you."
