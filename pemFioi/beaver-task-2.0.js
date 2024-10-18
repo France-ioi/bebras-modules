@@ -175,7 +175,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if (!taskParams.options) {
             taskParams.options = {};
          }
-         taskParams.options = Object.assign({}, urlOptions, taskParams.options);
+
+         taskParams.options = $.extend({}, urlOptions, taskParams.options);
          if (taskParams.options.level) {
             window.forcedLevel = taskParams.options.level;
          }
