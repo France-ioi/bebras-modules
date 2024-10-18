@@ -3042,13 +3042,10 @@ var boardProgramming = (function (exports) {
                           throw `There is no Wi-Fi sensor.`;
                       }
                       if (!context.display || context.autoGrading || context.offLineMode) {
-                          const cb = context.runner.waitCallback(callback);
-                          setTimeout(()=>{
-                              context.registerQuickPiEvent(sensor.name, _extends$4({}, sensor.state, {
-                                  active: !!active
-                              }));
-                              cb();
-                          }, 500);
+                          context.registerQuickPiEvent(sensor.name, _extends$4({}, sensor.state, {
+                              active: !!active
+                          }));
+                          context.waitDelay(callback);
                       } else {
                           const cb = context.runner.waitCallback(callback);
                           const command = `wifiSetActive("${sensor.name}", ${active ? 1 : 0})`;
@@ -10348,12 +10345,6 @@ def detectBoard():
       const { startx, ypositionmiddle, color, strokewidth } = drawParameters;
       const sensorDef = sensorHandler.findSensorDefinition(this);
       if (type != "actual" || !sensor.lastState || !sensorDef.compareState(sensor.lastState, state)) {
-          console.trace('draw bubble', {
-              state,
-              expectedState,
-              type,
-              drawParameters
-          });
           this.lastWifiState = state;
           let stateBubble = sensor.context.paper.text(startx, ypositionmiddle + 10, '\uf27a');
           stateBubble.attr({
@@ -16263,14 +16254,14 @@ elif program_exists:
           var expectedStateStr = "" + failInfo.expected;
           var sensorDef = sensorHandler.findSensorDefinition(failInfo.sensor);
           if (sensorDef) {
-              if (sensorDef.isSensor) {
-                  return strings.messages.wrongStateSensor.format(failInfo.name, failInfo.time);
-              }
               if (sensorDef.getWrongStateString) {
                   var sensorWrongStr = sensorDef.getWrongStateString(failInfo);
                   if (sensorWrongStr) {
                       return sensorWrongStr;
                   }
+              }
+              if (sensorDef.isSensor) {
+                  return strings.messages.wrongStateSensor.format(failInfo.name, failInfo.time);
               }
               if (sensorDef.getStateString) {
                   actualStateStr = sensorDef.getStateString(failInfo.actual);
