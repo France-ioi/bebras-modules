@@ -30,6 +30,7 @@ window.displayHelper = {
    previousMessages: {},
    popupMessageShown: false,
    alwaysAskLevelChange: false,
+   taskParams: {},
 
    thresholds: {},
    // Legacy settings for old tasks ; new ones are expected to use thresholds
@@ -778,9 +779,6 @@ window.displayHelper = {
          }
       };
 
-      if (!self.taskParams) {
-         self.taskParams = {};
-      }
       if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
          // Get the taskParams from the task if possible
          // Avoids an async call in a function which isn't async
@@ -1679,7 +1677,11 @@ window.displayHelper = {
             }
          }
       }
-      scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
+      scoreDiffMsg += " " + this.graderScore;
+      if (this.taskParams && this.taskParams.maxScore) {
+         // taskParams may not always be loaded there
+         scoreDiffMsg += this.strings.outOf + this.taskParams.maxScore + ".";
+      }
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' +  this.strings.reloadValidAnswer + '</a>';
@@ -1752,7 +1754,7 @@ window.displayHelper = {
       switch (taskMode) {
          case 'saved_unchanged':
             var color = 'red';
-            if (this.submittedScore == this.taskParams.maxScore) {
+            if (this.submittedScore == (this.taskParams.maxScore || 0)) {
                color = 'green';
             } else if (this.submittedScore > 0) {
                color = '#ff8c00';
