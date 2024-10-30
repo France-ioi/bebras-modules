@@ -344,6 +344,15 @@ Beav.Navigator.getVersion = function(){
    return M
 }
 
+Beav.Navigator.isIE = function () {
+   // case for IE11 which has trident
+   var version = Beav.Navigator.getVersion();
+   if (typeof version == 'string' && version.substring(0, 2).toLowerCase() == 'ie') {
+      return true
+   }
+   return version[0].toLowerCase() == 'msie' || version[0].toLowerCase() == 'ie';
+}
+
 Beav.Navigator.supportsResponsive = function() {
    if(Beav.Navigator.isIE8()){
       return false
