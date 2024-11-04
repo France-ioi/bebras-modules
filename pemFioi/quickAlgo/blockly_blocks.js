@@ -419,7 +419,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
-            block.blocklyJson.message0 = context.strings.label[block.name];
+            block.blocklyJson.message0 = context.strings.label[objectName + '.' + block.name] ? context.strings.label[objectName + '.' + block.name] : context.strings.label[block.name];
 // TODO: Load default colours + custom styles
             if (typeof block.blocklyJson.message0 == "undefined") {
                block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
