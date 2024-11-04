@@ -4712,7 +4712,7 @@ elif program_exists:
   var langFr = {
       label: {
           // Labels for the blocks
-          sleep: "attendre %1 millisecondes",
+          'quickpi.sleep': "attendre %1 millisecondes",
           currentTime: "temps écoulé en millisecondes",
           turnLedOn: "allumer la LED",
           turnLedOff: "éteindre la LED",
@@ -4796,7 +4796,7 @@ elif program_exists:
           displayText: "displayText",
           displayText2Lines: "displayText",
           readTemperature: "readTemperature",
-          sleep: "sleep",
+          'quickpi.sleep': "sleep",
           setServoAngle: "setServoAngle",
           readRotaryAngle: "readRotaryAngle",
           readDistance: "readDistance",
@@ -4866,7 +4866,8 @@ elif program_exists:
           displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
           displayText2Lines: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
           readTemperature: "readTemperature(thermometer) retourne la température ambiante",
-          sleep: "sleep(milliseconds) met en pause l'exécution pendant une durée en ms",
+          'quickpi.sleep': "sleep(milliseconds) met en pause l'exécution pendant une durée en ms",
+          'time.sleep': "sleep(seconds) met en pause l'exécution pendant une durée en secondes",
           setServoAngle: "setServoAngle(servo, angle) change l'angle du servomoteur",
           readRotaryAngle: "readRotaryAngle(potentiometer) retourne la position potentiomètre",
           readDistance: "readDistance(distanceSensor) retourne la distance mesurée",
@@ -5164,7 +5165,7 @@ elif program_exists:
   var langEs = {
       label: {
           // Labels for the blocks
-          sleep: "esperar %1 milisegundos",
+          'quickpi.sleep': "esperar %1 milisegundos",
           currentTime: "tiempo transcurrido en milisegundos",
           turnLedOn: "encender el LED",
           turnLedOff: "apagar el LED",
@@ -5242,7 +5243,7 @@ elif program_exists:
           displayText: "displayText",
           displayText2Lines: "displayText",
           readTemperature: "readTemperature",
-          sleep: "sleep",
+          'quickpi.sleep': "sleep",
           setServoAngle: "setServoAngle",
           readRotaryAngle: "readRotaryAngle",
           readDistance: "readDistance",
@@ -5309,7 +5310,7 @@ elif program_exists:
           displayText: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
           displayText2Lines: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
           readTemperature: "readTemperature(thermometer) devuelve la temperatura ambiente",
-          sleep: "sleep(milliseconds) pausa la ejecución por un tiempo en milisegundos",
+          'quickpi.sleep': "sleep(milliseconds) pausa la ejecución por un tiempo en milisegundos",
           setServoAngle: "setServoAngle(servo, angle) cambiar el ángulo del servomotor",
           readRotaryAngle: "readRotaryAngle(potentiometer) devuelve la posición del potenciómetro",
           readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
@@ -5561,7 +5562,7 @@ elif program_exists:
   var langIt = {
       label: {
           // Labels for the blocks
-          sleep: "attendi %1 millisecondei",
+          'quickpi.sleep': "attendi %1 millisecondei",
           currentTime: "tempo calcolato in millisecondi",
           turnLedOn: "accendi il LED",
           turnLedOff: "spegni il LED",
@@ -5639,7 +5640,7 @@ elif program_exists:
           displayText: "displayText",
           displayText2Lines: "displayText",
           readTemperature: "readTemperature",
-          sleep: "sleep",
+          'quickpi.sleep': "sleep",
           setServoAngle: "setServoAngle",
           readRotaryAngle: "readRotaryAngle",
           readDistance: "readDistance",
@@ -5706,7 +5707,7 @@ elif program_exists:
           displayText: "displayText(line1, line2) mostra una o due righe di testo. La line2 è opzionale",
           displayText2Lines: "displayText(line1, line2) mostra una o due righe di testo. La line2 è opzionale",
           readTemperature: "readTemperature(thermometer) riporta la temperatura ambiente",
-          sleep: "sleep(milliseconds) mette in pausa l'esecuzione per una durata in ms",
+          'quickpi.sleep': "sleep(milliseconds) mette in pausa l'esecuzione per una durata in ms",
           setServoAngle: "setServoAngle(servo, angle) cambia l'angolo del servomotore",
           readRotaryAngle: "readRotaryAngle(potentiometer) riporta la posizione del potenziometro",
           readDistance: "readDistance(distanceSensor) riporta la distanza misurata",
