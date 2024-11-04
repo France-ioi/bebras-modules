@@ -149,6 +149,28 @@ Beav.Array.shuffle = function(t, randomSeed) {
    }
 };
 
+Beav.Array.pickRandomNTimes = function (t, rng, n, diffN) {
+   // Pick a random index from t, n times, different from at least diffN previous indexes
+   // Useful to have a task which randomly cycles through the elements of t,
+   // without giving the same task instance as the previous diffN ones
+   var previousIndexes = [];
+   var index = 0;
+   if (n < 1) { n += 100; }
+   for (var i = 0; i < n; i++) {
+      index = rng.nextInt(0, Math.max(0, t.length - previousIndexes.length - 1));
+      var sortedPreviousIndexes = previousIndexes.slice();
+      sortedPreviousIndexes.sort();
+      for (var j = 0; j < sortedPreviousIndexes.length; j++) {
+         if (index >= sortedPreviousIndexes[j]) {
+            index++;
+         }
+      }
+      previousIndexes.push(index);
+      previousIndexes = previousIndexes.slice(-diffN);
+   }
+   return t[index];
+}
+
 
 /**********************************************************************************/
 /* Matrix */
