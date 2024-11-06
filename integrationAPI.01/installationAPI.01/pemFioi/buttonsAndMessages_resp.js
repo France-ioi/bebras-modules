@@ -971,9 +971,8 @@ window.displayHelper = {
       };
       if (!this.taskParams) {
          if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
-            // Get the taskParams from the task if possible
-            // Avoids an async call in a function which isn't async
-            processTaskParams(window.task.displayedSubTask.taskParams);
+            this.taskParams = window.task.displayedSubTask.taskParams;
+            callSetupLevels();
          } else {
             window.platform.getTaskParams(null, null, function (taskParams) {
                self.taskParams = taskParams;
@@ -2585,6 +2584,7 @@ window.displayHelper = {
    },
 
    hideError: function () {
+      $("#error").stop(true, true);
       $("#error").hide();
       $('#displayHelperAnswering').removeClass('forceRight');
    }
