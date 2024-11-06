@@ -31,6 +31,7 @@ window.displayHelper = {
    popupMessageShown: false,
    alwaysAskLevelChange: false,
    taskParams: {},
+   taskParamsInitialised: false,
 
    thresholds: {},
    // Legacy settings for old tasks ; new ones are expected to use thresholds
@@ -740,6 +741,7 @@ window.displayHelper = {
 
       function processTaskParams(taskParams) {
          self.taskParams = taskParams;
+         self.taskParamsInitialised = true;
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
@@ -858,11 +860,16 @@ window.displayHelper = {
          }
          self.doSetupLevels(initLevel);
       };
-      if (!this.taskParams) {
-         window.platform.getTaskParams(null, null, function(taskParams) {
-            self.taskParams = taskParams;
+      if (!this.taskParamsInitialised) {
+         if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
+            self.taskParams = window.task.displayedSubTask.taskParams;
             callSetupLevels();
-         });
+         } else {
+            window.platform.getTaskParams(null, null, function (taskParams) {
+               self.taskParams = taskParams;
+               callSetupLevels();
+            });
+         }
       } else {
          callSetupLevels();
       }
