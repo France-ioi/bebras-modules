@@ -165,6 +165,10 @@ Beav.Array.pickRandomNTimes = function (t, rng, n, diffN) {
             index++;
          }
       }
+      if (index > t.length - 1) {
+         // Happens if we ask for more different indexes than there are items in the list
+         index = t.length - 1;
+      }
       previousIndexes.push(index);
       previousIndexes = previousIndexes.slice(-diffN);
    }
