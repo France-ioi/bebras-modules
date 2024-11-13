@@ -379,6 +379,11 @@ Beav.Navigator.isIE = function () {
    return version[0].toLowerCase() == 'msie' || version[0].toLowerCase() == 'ie';
 }
 
+Beav.Navigator.isSafari = function () {
+   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+   return isSafari
+}
+
 Beav.Navigator.supportsResponsive = function() {
    if(Beav.Navigator.isIE8()){
       return false
