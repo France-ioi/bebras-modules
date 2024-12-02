@@ -230,27 +230,27 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
-   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
-      return;
-   }
-   if (mode == 'stay') {
-      if (alreadyStayed) {
-         platform.trigger('validate', [mode]);
-         if (success) {
-            success();
-         }
-      } else {
-         alreadyStayed = true;
-      }
-   }
-   if (mode == 'cancel') {
-      alreadyStayed = false;
-   }
-   platform.trigger('validate', [mode]);
-   if (success) {
-      success();
-   }
+  if (!success) { success = function () { }; }
+  if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
+    return;
+  }
+  if (mode == 'cancel') {
+    alreadyStayed = false;
+  }
+  if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
+    platform.trigger('validate', [mode]);
+    success();
+  } else {
+    // Try to validate
+    task.getAnswer(function (answer) {
+      task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
+        success();
+      })
+    });
+  }
+  if (mode == 'stay') {
+    alreadyStayed = true;
+  }
 };
 
 function getUrlParameter(sParam)
