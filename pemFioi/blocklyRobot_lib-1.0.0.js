@@ -206,6 +206,7 @@ var getContext = function(display, infos, curLevel) {
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser d'objet ici",
                failureDropPlatform: "Il y a déjà une plateforme ici",
+               failureDropWater: "Il y a déjà de l'eau ici",
                failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
@@ -2084,19 +2085,83 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       flowers: {
+         newBlocks: [
+            {
+               name: "onMarkerDry",
+               strings: {
+                 fr: {
+                   label: "sur terre sèche",
+                   code: "surTerreSeche",
+                   description: "surTerreSeche(): Le robot est-il sur de la terre sèche ?"
+                 }
+               },
+               category: "robot",
+               type: "sensors",
+               block: {
+                 name: "onMarkerDry",
+                 yieldsValue: true
+               },
+               func: function(callback) {
+                 this.callCallback(callback, this.isOn(function(obj) {return obj.isMarkerDry===true;}));
+               }
+             },
+             {
+               name: "onMarkerSoil",
+               strings: {
+                 fr: {
+                   label: "sur terre",
+                   code: "surTerre",
+                   description: "surTerre(): Le robot est-il sur de la terre ?"
+                 }
+               },
+               category: "robot",
+               type: "sensors",
+               block: {
+                 name: "onMarkerSoil",
+                 yieldsValue: true
+               },
+               func: function(callback) {
+                 this.callCallback(callback, this.isOn(function(obj) {return obj.isMarkerSoil===true;}));
+               }
+             },
+             {
+               name: "dropWater",
+               strings: {
+                  fr: {
+                    label: "arroser",
+                    code: "arroser",
+                    description: "arroser(): Le robot arrose la case."
+                  }
+                },
+               category: "robot",
+               type: "actions",
+               block: { name: "dropWater" },
+               func: function(callback) {
+                  var coords = {row: this.getRobot().row, col: this.getRobot().col};
+                  if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isWater === true; }).length != 0) {
+                     this.leave(window.languageStrings.messages.failureDropWater);
+                  }
+                  this.dropObject({type: "water"}, coords);
+                  this.callCallback(callback);
+               }
+             }
+         ],
          bagInit: {
            count: 200,
            type: "flower"
          },
+         ignoreBag: true,
          backgroundColor: "#BFF4A6",
          borderColor: "#A5D88B",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 3 },
-            marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
-            flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
+            marker: { num: 2, img: "marker.png", side: 60, isContainer: true, containerSize: 1, isMarkerSoil: true, containerFilter: function(obj){return obj.isFlower === true;}, zOrder: 0 },
+            flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isFlower: true, isObstacle: true, zOrder: 1 },
             fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 },
             number: { num: 6, side: 60, zOrder: 1 },
-            mask: {num: 7, img: "mask.png", side: 60, isMask: true, zOrder: 2 }
+            mask: {num: 7, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
+            water: { num: 8, img: "water.png", side: 60, isWithdrawable: true, isWater: true, zOrder: 1 },
+            marker_dry: { num: 9, img: "marker_dry.png", side: 60, isContainer: true, containerSize: 1, isMarkerDry: true, containerFilter: function(obj){return obj.isWater === true;}, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
