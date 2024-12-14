@@ -220,6 +220,7 @@ var getContext = function(display, infos) {
             penup: '@() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
             pendown: '@() la tortue place son pinceau dans la position où il laisse une trace.',
             colourvalue: '@(colorName) la trace du pinceau aura la couleur indiquée en paramètre. Exemple : @(\'red\')',
+            colourRGB: '@(red, green, blue) la trace du pinceau aura la couleur avec les composantes rouge, verte et bleue indiquées en paramètres. Exemple : @(255, 255, 0)',
             inputvalue: '@() lire un nombre en entrée.',
             jump: '@(x, y) la tortue est placée aux coordonnées données.',
          },
