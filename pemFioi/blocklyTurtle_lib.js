@@ -226,6 +226,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme de la tortue",
          exportAsSvg: "Exporter en SVG",
+         exportAsPng: "Exporter en PNG",
          messages: {
             paintingWrong: "La tortue n'a pas tout dessiné correctement.",
             paintingCorrect: "Bravo! La tortue a tout dessiné correctement.",
@@ -414,6 +415,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Program of the turtle",
          exportAsSvg: "Export to SVG",
+         exportAsPng: "Export to PNG",
          messages: {
             paintingWrong: "The turtle didn't draw everything correctly.",
             paintingCorrect: "Congratulations, the turtle has drawn everything correctly.",
@@ -557,10 +559,17 @@ var getContext = function(display, infos) {
       $("#grid").html("<div id='output'  style='height: 304px;width: 304px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
 
       if (infos.buttonExportAsSvg) {
-         var exportButton = $('<button id="exportAsSvg" style="margin-top: 10px">' + strings.exportAsSvg + '</button>');
+         var exportButton = $('<div><button id="exportAsSvg" style="margin-top: 10px">' + strings.exportAsSvg + '</button></div>');
          $('#grid').append(exportButton);
          $('#exportAsSvg').click(function(e) {
            context.exportAsSvg();
+         });
+      }
+      if (infos.buttonExportAsPng) {
+         var exportButton = $('<div><button id="exportAsPng" style="margin-top: 10px">' + strings.exportAsPng + '</button></div>');
+         $('#grid').append(exportButton);
+         $('#exportAsPng').click(function(e) {
+            context.exportAsPng();
          });
       }
 
@@ -596,6 +605,18 @@ var getContext = function(display, infos) {
      document.body.appendChild(downloadLink);
      downloadLink.click();
      document.body.removeChild(downloadLink);
+   };
+
+   context.exportAsPng = function () {
+      var downloadLink = document.createElement('a');
+      var canvas = context.turtle.displayTurtle.drawingContext.canvas;
+      var dataURL = canvas.toDataURL('image/png');
+      var pngUrl = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+      downloadLink.href = pngUrl;
+      downloadLink.download = "turtle.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
    };
 
    context.exportGridAsSvg = function (option) {
