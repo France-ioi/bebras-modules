@@ -230,7 +230,7 @@ var getContext = function(display, infos) {
          messages: {
             paintingWrong: "La tortue n'a pas tout dessiné correctement.",
             paintingCorrect: "Bravo! La tortue a tout dessiné correctement.",
-            paintingFree: "La tortue a tracé le dessin que vous avez programmé. Si vous voulez le garder, cliquez sur le bouton \"Exporter en SVG\"."
+            paintingFree: "La tortue a tracé le dessin que vous avez programmé. Si vous voulez le garder, cliquez sur le bouton \"Exporter\"."
          }
       },
       de: {
