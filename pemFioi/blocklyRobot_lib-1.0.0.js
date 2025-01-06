@@ -175,6 +175,7 @@ var getContext = function(display, infos, curLevel) {
                shoot: "tirerLaser(direction) fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
+               withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
