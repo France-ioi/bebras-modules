@@ -524,9 +524,11 @@ Beav.Task.scoreInterpolate = function(minScore, maxScore, minResult, maxResult, 
 
 Beav.Geometry = new Object();
 
-Beav.Geometry.distance = function(x1,y1,x2,y2,z1,z2) {
-   z1 = z1 || 0;
-   z2 = z2 || 0;
+Beav.Geometry.distance = function(x1,y1,x2,y2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
+};
+
+Beav.Geometry.distance3D = function(x1,y1,z1,x2,y2,z2) {
    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2) + Math.pow(z2 - z1,2));
 };
 
