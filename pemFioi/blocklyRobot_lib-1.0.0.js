@@ -175,7 +175,8 @@ var getContext = function(display, infos, curLevel) {
                shoot: "tirerLaser(direction) fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
-               withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot"
+               withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot",
+               dropObject: "deposerObjet() dépose l'objet sur la case du robot"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -1190,6 +1191,12 @@ var getContext = function(display, infos, curLevel) {
                failureDropObject: "Il y a déjà une roue ici !",
                failureDropPlatform: "Il y a déjà une plateforme ici !",
                emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
+            },
+            description: {
+               withdrawObject: "ramasserRoue() ramasse la roue sur la case du robot",
+               dropObject: "deposerRoue() dépose la roue sur la case du robot",
+               onObject: "surObjet() teste si le robot est sur une case avec une roue dentée",
+               onContainer: "surConteneur() teste si le robot est sur une case avec une machine"
             }
          },
 
