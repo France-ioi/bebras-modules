@@ -532,6 +532,15 @@ Beav.Geometry.distance3D = function(x1,y1,z1,x2,y2,z2) {
    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2) + Math.pow(z2 - z1,2));
 };
 
+Beav.Geometry.distanceND = function(pos1,pos2) {
+   var nbDim = pos1.length;
+   var sum = 0;
+   for(var iD = 0; iD < nbDim; iD++){
+      sum += Math.pow(pos2[iD] - pos1[iD], 2);
+   }
+   return Math.sqrt(sum);
+};
+
 /*
    This is used to handle drag on devices that have both a touch screen and a mouse.
    Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
