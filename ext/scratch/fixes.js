@@ -290,6 +290,55 @@ if (this.isDeletable()) {
 }
 };
 
+// Make sure the events are always reenabled even if an error is thrown
+Blockly.BlockSvg.terminateDrag = function () {
+  Blockly.BlockSvg.onMouseUpWrapper_ && (Blockly.unbindEvent_(Blockly.BlockSvg.onMouseUpWrapper_), Blockly.BlockSvg.onMouseUpWrapper_ = null);
+  Blockly.BlockSvg.onMouseMoveWrapper_ && (Blockly.unbindEvent_(Blockly.BlockSvg.onMouseMoveWrapper_), Blockly.BlockSvg.onMouseMoveWrapper_ = null);
+  var a = Blockly.selected;
+  if (Blockly.dragMode_ == Blockly.DRAG_FREE && a) {
+    if (Blockly.replacementMarker_) {
+      Blockly.BlockSvg.removeReplacementMarker();
+    } else if (Blockly.insertionMarker_) {
+      Blockly.Events.disable();
+      try {
+        if (Blockly.insertionMarkerConnection_) {
+          Blockly.BlockSvg.disconnectInsertionMarker();
+        }
+        Blockly.insertionMarker_.dispose();
+        Blockly.insertionMarker_ = null;
+      } finally {
+        Blockly.Events.enable();
+      }
+    }
+
+    var b = a.getRelativeToSurfaceXY(), b = goog.math.Coordinate.difference(b, a.dragStartXY_),
+      c = new Blockly.Events.Move(a);
+    c.oldCoordinate = a.dragStartXY_;
+    c.recordNew();
+    Blockly.Events.fire(c);
+    a.moveConnections_(b.x, b.y);
+    delete a.draggedBubbles_;
+    a.setDragging_(!1);
+    a.moveOffDragSurface_();
+    a.render();
+    a.workspace.setResizesEnabled(!0);
+    var d = Blockly.Events.getGroup();
+    setTimeout(function () {
+      Blockly.Events.setGroup(d);
+      a.snapToGrid();
+      Blockly.Events.setGroup(!1)
+    }, Blockly.BUMP_DELAY / 2);
+    setTimeout(function () {
+      Blockly.Events.setGroup(d);
+      a.bumpNeighbours_();
+      Blockly.Events.setGroup(!1)
+    }, Blockly.BUMP_DELAY)
+  }
+  Blockly.dragMode_ = Blockly.DRAG_NONE;
+  Blockly.Css.setCursor(Blockly.Css.Cursor.OPEN)
+};
+
+
 
 // Modify updateColour to leave placeholders alone
 Blockly.BlockSvg.prototype.updateColour = function() {
