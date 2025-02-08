@@ -269,8 +269,10 @@ class screenDrawing {
 
         static renderToCanvas(state, canvas, scale) {
             var ctx = canvas.getContext('2d');
+            var data = state.getData(scale);
 
-            ctx.putImageData(state.getData(scale), 0, 0);
+            if (!data) { return; }
+            ctx.putImageData(data, 0, 0);
         }
 
     static renderDifferences(dataExpected, dataWrong, canvas, scale) {
