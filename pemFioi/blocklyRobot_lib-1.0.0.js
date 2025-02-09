@@ -1101,19 +1101,19 @@ var getContext = function(display, infos, curLevel) {
       fishing: {
          fr: {
             label: {
-               withdrawObject: "prendre les poissons",
-               dropObject: "déposer les poissons",
+               withdrawObject: "prendre le poisson",
+               dropObject: "déposer le poisson",
                withdrawNum_noShadow: "prendre %1 poissons",
                dropNum_noShadow: "déposer %1 poissons",
                nbWithdrawables: "nombre de poissons sur la case",
                containerSize: "nombre de poissons commandés",
-               onObject: "poissons sur la case",
+               onObject: "poisson sur la case",
                onContainer: "sur une île",
             },
             code: {
-               withdrawObject: "prendrePoissons",
-               dropObject: "deposerPoissons",
-               onObject: "surPoissons",
+               withdrawObject: "prendrePoisson",
+               dropObject: "deposerPoisson",
+               onObject: "surPoisson",
                onContainer: "surIle",
                nbWithdrawables: "nbPoissonsSur",
                containerSize: "nbPoissonsCommandes",
@@ -1121,9 +1121,9 @@ var getContext = function(display, infos, curLevel) {
                withdrawNum_noShadow: "prendre"
             },
             description: {
-               withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
-               dropObject: "deposerPoissons() dépose sur la case les poissons transportés",
-               onObject: "surPoissons() indique s'il y a un ou des poissons sur la case",
+               withdrawObject: "prendrePoisson() prend les poissons qui se trouvent sur la case",
+               dropObject: "deposerPoisson() dépose sur la case les poissons transportés",
+               onObject: "surPoisson() indique s'il y a un ou des poissons sur la case",
                onContainer: "surIle() indique s'il y a une île sur la case",
                nbWithdrawables: "nbPoissonsSur() indique combien de poissons sont sur la case",
                containerSize: "nbPoissonsCommandes() indique il faut livrer de poissons sur l'île",
@@ -1394,23 +1394,18 @@ var getContext = function(display, infos, curLevel) {
              label: {
                dropObject: "peindre la case",
                onContainer: "sur une case marquée",
-               readNumber: "nombre de la case"
+               readNumber: "nombre de la case",
              },
              code: {
                 dropObject: "peindreCase",
                 onContainer: "surCaseMarquee",
-               readNumber: "nombreSurCase"
-            },
-            description: {
-               dropObject: "peindreCase() peint la case sous le robot",
-               onContainer: "surCaseMarquee() indique si le robot est sur une case marquée",
-               readNumber: "nombreSurCase() renvoie le nombre écrit sur la case sous le robot"
+                readNumber: "nombreSurCase",
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
                failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
                failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
-                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets"
+               failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
          },
 
@@ -1424,12 +1419,6 @@ var getContext = function(display, infos, curLevel) {
                 dropObject: "pintarCasilla",
                 onContainer: "sobreCasillaMarcada",
                 readNumber: "númeroEnCasilla",
-            },
-            description: {
-               dropObject: "pintarCasilla() pinta la casilla bajo el robot",
-               onContainer: "sobreCasillaMarcada() indica si el robot está sobre una casilla marcada",
-               readNumber: "númeroEnCasilla() devuelve el número escrito en la casilla bajo el robot",
-
              },
              messages: {
                successContainersFilled: "Bravo, ¡su robot ha pintado el patrón!",
