@@ -1399,7 +1399,13 @@ var getContext = function(display, infos, curLevel) {
              code: {
                 dropObject: "peindreCase",
                 onContainer: "surCaseMarquee",
-                readNumber: "nombreSurCase",
+                readNumber: "nombreSurCase"
+            },
+            description: {
+               dropObject: "peindreCase() peint la case sous le robot",
+               onContainer: "surCaseMarquee() indique si le robot est sur une case marquée",
+               readNumber: "nombreSurCase() renvoie le nombre écrit sur la case sous le robot"
+
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
@@ -1420,6 +1426,11 @@ var getContext = function(display, infos, curLevel) {
                 onContainer: "sobreCasillaMarcada",
                 readNumber: "númeroEnCasilla",
              },
+            description: {
+               dropObject: "pintarCasilla() pinta la casilla bajo el robot",
+               onContainer: "sobreCasillaMarcada() indica si el robot está sobre una casilla marcada",
+               readNumber: "númeroEnCasilla() devuelve el número escrito en la casilla bajo el robot",
+            },
              messages: {
                successContainersFilled: "Bravo, ¡su robot ha pintado el patrón!",
                failureContainersFilled: "El robot no pintó las casillas correctas.",
