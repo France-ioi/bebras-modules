@@ -1121,8 +1121,8 @@ var getContext = function(display, infos, curLevel) {
                withdrawNum_noShadow: "prendre"
             },
             description: {
-               withdrawObject: "prendrePoisson() prend les poissons qui se trouvent sur la case",
-               dropObject: "deposerPoisson() dépose sur la case les poissons transportés",
+               withdrawObject: "prendrePoisson() prend le poisson qui se trouve sur la case",
+               dropObject: "deposerPoisson() dépose sur la case un poisson transporté",
                onObject: "surPoisson() indique s'il y a un ou des poissons sur la case",
                onContainer: "surIle() indique s'il y a une île sur la case",
                nbWithdrawables: "nbPoissonsSur() indique combien de poissons sont sur la case",
