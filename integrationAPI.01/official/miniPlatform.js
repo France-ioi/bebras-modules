@@ -432,7 +432,7 @@ var chooseView = (function () {
 
 window.task_token = new TaskToken({
    itemUrl: window.location.href,
-   randomSeed: Math.floor(Math.random() * 10)
+   randomSeed: getUrlParameterByName('randomSeed') ? Number(getUrlParameterByName('randomSeed')) : Math.floor(Math.random() * 10)
 }, demo_key);
 
 
