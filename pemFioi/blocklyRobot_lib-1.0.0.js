@@ -176,7 +176,10 @@ var getContext = function(display, infos, curLevel) {
                shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
                withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot",
-               dropObject: "deposerObjet() dépose l'objet sur la case du robot"
+               dropObject: "deposerObjet() dépose l'objet sur la case du robot",
+               platformInFront: "plateformeDevant() teste s'il y a une plateforme devant le robot",
+               platformAbove: "plateformeDessus() teste s'il y a une plateforme au-dessus du robot",
+               dropPlatformInFront: "construirePlateformeDevant() construit une plateforme sur la case devant le robot"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
