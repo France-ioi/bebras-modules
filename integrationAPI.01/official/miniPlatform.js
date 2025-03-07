@@ -171,7 +171,7 @@ function getLanguageString(key) {
             } catch(e) {}
             var hintsReq = JSON.parse(this.data.sHintsRequested);
             var exists = hintsReq.find(function(h) {
-                return h == hint_params;
+               return JSON.stringify(h) == JSON.stringify(hint_params);
             });
             if(!exists) {
                 hintsReq.push(hint_params);
