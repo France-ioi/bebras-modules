@@ -507,7 +507,9 @@ var getContext = function(display, infos) {
          context.defaultGridInfos = gridInfos;
       }
 
-      context.turtle.canvasSize = gridInfos.options && gridInfos.options['canvas_size'] ? gridInfos.options['canvas_size'] : constants.DEFAULT_CANVAS_SIZE;
+      context.turtle.canvasSize = gridInfos.options && gridInfos.options['canvas_size'] ?
+        gridInfos.options['canvas_size'] :
+        (infos.options && infos.options['canvas_size'] ? infos.options['canvas_size'] : constants.DEFAULT_CANVAS_SIZE);
 
       if (context.display && gridInfos) {
          context.resetDisplay();
