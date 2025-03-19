@@ -2,8 +2,8 @@
 
 var makeTurtle = function(coords) {
    this.reset = function(stepsize, newcoords) {
-      this.x = 150;
-      this.y = 150;
+      this.x = this.drawingContext && this.drawingContext.canvas.width ? this.drawingContext.canvas.width / 2 : 150;
+      this.y = this.drawingContext && this.drawingContext.canvas.height ? this.drawingContext.canvas.height / 2 : 150;
 
       this.directionDeg = 0;
       this.direction = 0;
@@ -14,7 +14,7 @@ var makeTurtle = function(coords) {
          this.y = initcoords.y;
 
          if (initcoords.dir) {
-           this.directionDeg = initcoords.dir,
+           this.directionDeg = initcoords.dir;
            this.direction = this.directionDeg*Math.PI/180;
         }
       }
@@ -22,8 +22,9 @@ var makeTurtle = function(coords) {
       this.paint = true;
       this.stepsize = 5;
 
-      if (this.drawingContext)
-         this.drawingContext.clearRect(0, 0, 300, 300);
+      if (this.drawingContext) {
+         this.drawingContext.clearRect(0, 0, this.drawingContext.canvas.width, this.drawingContext.canvas.height);
+      }
       if (this.turtle) {
          this.turtle.src = this.turtle.getAttribute("pendown");
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
@@ -128,6 +129,13 @@ var makeTurtle = function(coords) {
 
 
 var getContext = function(display, infos) {
+   var constants = {
+      DEFAULT_CANVAS_SIZE: {
+         width: 300, //px
+         height: 300 //px
+      },
+   };
+
    var localLanguageStrings = {
       fr: {
          turnleft: "droite ↺",
@@ -499,6 +507,8 @@ var getContext = function(display, infos) {
          context.defaultGridInfos = gridInfos;
       }
 
+      context.turtle.canvasSize = gridInfos.options && gridInfos.options['canvas_size'] ? gridInfos.options['canvas_size'] : constants.DEFAULT_CANVAS_SIZE;
+
       if (context.display && gridInfos) {
          context.resetDisplay();
 
@@ -511,10 +521,10 @@ var getContext = function(display, infos) {
 
       function createMeACanvas() {
          var canvas = document.createElement('canvas');
-         canvas.width = 300;
-         canvas.height = 300;
-         canvas.style.width = "300px";
-         canvas.style.height = "300px";
+         canvas.width = context.turtle.canvasSize.width;
+         canvas.height = context.turtle.canvasSize.height;
+         canvas.style.width = context.turtle.canvasSize.width + "px";
+         canvas.style.height = context.turtle.canvasSize.height + "px";
          canvas.style.border = "1px solid black";
          canvas.style.display = "none";
 
@@ -541,7 +551,7 @@ var getContext = function(display, infos) {
       if (window.C2S) {
          // Canvas2SVG library is loaded, we create the SVG at the same time
          context.turtle.svgTurtle = new makeTurtle(infos.coords);
-         context.turtle.svgTurtle.setDrawingContext(new window.C2S(300, 300));
+         context.turtle.svgTurtle.setDrawingContext(new window.C2S(context.turtle.canvasSize.width, context.turtle.canvasSize.height));
          context.turtle.svgTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
       }
    };
@@ -556,7 +566,7 @@ var getContext = function(display, infos) {
       if ($("#turtleUpImg").length > 0) {
          turtleUpFileName = $("#turtleUpImg").attr("src");
       }
-      $("#grid").html("<div id='output'  style='height: 304px;width: 304px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
+      $("#grid").html("<div id='output'  style='height: " + (context.turtle.canvasSize.height + 4) + "px;width: " + (context.turtle.canvasSize.width + 4) + "px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='" + context.turtle.canvasSize.width + "' height='" + context.turtle.canvasSize.height + "' style='width:" + context.turtle.canvasSize.width + "px;height:" + context.turtle.canvasSize.height + "px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='" + context.turtle.canvasSize.width + "' height='" + context.turtle.canvasSize.height + "' style='width:" + context.turtle.canvasSize.width + "px;height:" + context.turtle.canvasSize.height + "px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='" + context.turtle.canvasSize.width + "' height='" + context.turtle.canvasSize.height + "' style='width:" + context.turtle.canvasSize.width + "px;height:" + context.turtle.canvasSize.height + "px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='" + context.turtle.canvasSize.width + "' height='" + context.turtle.canvasSize.height + "' style='width:" + context.turtle.canvasSize.width + "px;height:" + context.turtle.canvasSize.height + "px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
 
       if (infos.buttonExportAsSvg) {
          var exportButton = $('<div><button id="exportAsSvg" style="margin-top: 10px">' + strings.exportAsSvg + '</button></div>');
@@ -638,8 +648,8 @@ var getContext = function(display, infos) {
          var bgimg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
          bgimg.setAttribute('x', 0);
          bgimg.setAttribute('y', 0);
-         bgimg.setAttribute('width', 300);
-         bgimg.setAttribute('height', 300);
+         bgimg.setAttribute('width', context.turtle.canvasSize.width);
+         bgimg.setAttribute('height', context.turtle.canvasSize.height);
          bgimg.setAttribute('style', 'opacity: 0.4; filter: alpha(opacity=10);');
          bgimg.setAttribute('xlink:href', context.infos.overlayFileName);
          svg.prepend(bgimg);
