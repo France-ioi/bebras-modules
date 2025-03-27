@@ -73,131 +73,131 @@ var getContext = function(display, infos, curLevel) {
       none: {
          fr: {
             label: {
-               row: "ligne du robot",
-               col: "colonne du robot",
-               wait: "attendre",
-               north: "avancer vers le nord",
-               south: "avancer vers le sud",
-               east: "avancer vers l'est",
-               west: "avancer vers l'ouest",
-               left: "tourner à gauche",
-               right: "tourner à droite",
-               turnAround: "faire demi-tour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacle devant",
-               obstacleEast: "obstacle à l'est",
-               obstacleWest: "obstacle à l'ouest",
-               obstacleNorth: "obstacle au nord",
-               obstacleSouth: "obstacle au sud",
-               obstacleRight: "obstacle à droite",
-               obstacleLeft: "obstacle à gauche",
-               gridEdgeEast: "bord de la grille à l'est",
-               gridEdgeWest: "bord de la grille à l'ouest",
-               gridEdgeNorth: "bord de la grille au nord",
-               gridEdgeSouth: "bord de la grille au sud",
-               platformInFront: "plateforme devant",
-               platformAbove: "plateforme au-dessus",
-               withdrawObject: "ramasser l'objet",
-               dropObject: "déposer l'objet",
-               onObject: "sur un objet",
-               onContainer: "sur un conteneur",
-               onNumber: "sur un nombre",
-               onWritable: "sur un tableau",
-               onLauncher: "sur un lanceur laser",
-               writeNumber: "écrire le nombre",
-               readNumber: "nombre de la case",
-               pushObject: "pousser l'objet",
-               pushableInFront: "poussable devant",
-               dropNum: "déposer %1 objets",
-               dropNum_noShadow: "déposer %1 objets",
-               nbWithdrawables: "nombre d'objets sur la case",
-               nbInBag: "nombre d'objets dans le sac",
-               containerSize: "nombre d'objets à déposer sur la case",
-               withdrawNum: "ramasser %1 objets",
-               withdrawNum_noShadow: "ramasser %1 objets",
-               shoot: "tirer au laser dans la direction %1",
-               shoot_noShadow: "tirer au laser dans la direction %1",
-               shootCondition: "retour départ tir direction %1",
-               shootCondition_noShadow: "retour départ tir direction %1",
-               connect: "brancher un câble",
-               onMale: "sur une prise mâle",
-               onFemale: "sur une prise femelle",
-               dropPlatformInFront: "construire une plateforme devant",
-               dropPlatformAbove: "construire une plateforme au-dessus",
+               // row: "ligne du robot",
+               // col: "colonne du robot",
+               // wait: "attendre",
+               // north: "avancer vers le nord",
+               // south: "avancer vers le sud",
+               // east: "avancer vers l'est",
+               // west: "avancer vers l'ouest",
+               // left: "tourner à gauche",
+               // right: "tourner à droite",
+               // turnAround: "faire demi-tour",
+               // forward: "avancer",
+               // backwards: "reculer",
+               // jump: "sauter",
+               // obstacleInFront: "obstacle devant",
+               // obstacleEast: "obstacle à l'est",
+               // obstacleWest: "obstacle à l'ouest",
+               // obstacleNorth: "obstacle au nord",
+               // obstacleSouth: "obstacle au sud",
+               // obstacleRight: "obstacle à droite",
+               // obstacleLeft: "obstacle à gauche",
+               // gridEdgeEast: "bord de la grille à l'est",
+               // gridEdgeWest: "bord de la grille à l'ouest",
+               // gridEdgeNorth: "bord de la grille au nord",
+               // gridEdgeSouth: "bord de la grille au sud",
+               // platformInFront: "plateforme devant",
+               // platformAbove: "plateforme au-dessus",
+               // withdrawObject: "ramasser l'objet",
+               // dropObject: "déposer l'objet",
+               // onObject: "sur un objet",
+               // onContainer: "sur un conteneur",
+               // onNumber: "sur un nombre",
+               // onWritable: "sur un tableau",
+               // onLauncher: "sur un lanceur laser",
+               // writeNumber: "écrire le nombre",
+               // readNumber: "nombre de la case",
+               // pushObject: "pousser l'objet",
+               // pushableInFront: "poussable devant",
+               // dropNum: "déposer %1 objets",
+               // dropNum_noShadow: "déposer %1 objets",
+               // nbWithdrawables: "nombre d'objets sur la case",
+               // nbInBag: "nombre d'objets dans le sac",
+               // containerSize: "nombre d'objets à déposer sur la case",
+               // withdrawNum: "ramasser %1 objets",
+               // withdrawNum_noShadow: "ramasser %1 objets",
+               // shoot: "tirer au laser dans la direction %1",
+               // shoot_noShadow: "tirer au laser dans la direction %1",
+               // shootCondition: "retour départ tir direction %1",
+               // shootCondition_noShadow: "retour départ tir direction %1",
+               // connect: "brancher un câble",
+               // onMale: "sur une prise mâle",
+               // onFemale: "sur une prise femelle",
+               // dropPlatformInFront: "construire une plateforme devant",
+               // dropPlatformAbove: "construire une plateforme au-dessus",
                
-               getNbItems: "nombre de points"
+               getNbItems: "nombre de points",
+               getNbClusters: "nombre de clusters",
+               getX: "coordonnée x du point %1",
+               getY: "coordonnée y du point %1",
+               log: "log %1"
             },
             code: {
-               row: "ligneRobot",
-               col: "colonneRobot",
-               wait: "attendre",
-               north: "nord",
-               south: "sud",
-               east: "est",
-               west: "ouest",
-               left: "tournerGauche",
-               right: "tournerDroite",
-               turnAround: "demiTour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleEst",
-               obstacleWest: "obstacleOuest",
-               obstacleNorth: "obstacleNord",
-               obstacleSouth: "obstacleSud",
-               obstacleRight: "obstacleDroite",
-               obstacleLeft: "obstacleGauche",
-               gridEdgeEast: "bordGrilleEst",
-               gridEdgeWest: "bordGrilleOuest",
-               gridEdgeNorth: "bordGrilleNord",
-               gridEdgeSouth: "bordGrilleSud",
-               platformInFront: "plateformeDevant",
-               platformAbove: "plateformeDessus",
-               withdrawObject: "ramasserObjet",
-               dropObject: "deposerObjet",
-               onObject: "surObjet",
-               onContainer: "surConteneur",
-               onNumber: "surNombre",
-               onWritable: "surTableau",
-               onLauncher: "surLanceur",
-               writeNumber: "ecrireNombre",
-               readNumber: "nombreSurCase",
-               pushObject: "pousserObjet",
-               pushableInFront: "poussableDevant",
-               dropNum: "deposer",
-               dropNum_noShadow: "deposer",
-               containerSize: "nbObjetsADeposer",
-               nbInBag: "nbObjetsDansSac",
-               nbWithdrawables: "nbObjetsSur",
-               withdrawNum: "ramasser",
-               withdrawNum_noShadow: "ramasser",
-               shoot: "tirerLaser",
-               shoot_noShadow: "tirerLaser",
-               shootCondition: "tirerCondition",
-               shootCondition_noShadow: "tirerCondition",
-               connect: "brancherCable",
-               onMale: "surMale",
-               onFemale: "surFemelle",
-               dropPlatformInFront: "construirePlateformeDevant",
-               dropPlatformAbove: "construirePlateformeAuDessus",
+               // row: "ligneRobot",
+               // col: "colonneRobot",
+               // wait: "attendre",
+               // north: "nord",
+               // south: "sud",
+               // east: "est",
+               // west: "ouest",
+               // left: "tournerGauche",
+               // right: "tournerDroite",
+               // turnAround: "demiTour",
+               // forward: "avancer",
+               // backwards: "reculer",
+               // jump: "sauter",
+               // obstacleInFront: "obstacleDevant",
+               // obstacleEast: "obstacleEst",
+               // obstacleWest: "obstacleOuest",
+               // obstacleNorth: "obstacleNord",
+               // obstacleSouth: "obstacleSud",
+               // obstacleRight: "obstacleDroite",
+               // obstacleLeft: "obstacleGauche",
+               // gridEdgeEast: "bordGrilleEst",
+               // gridEdgeWest: "bordGrilleOuest",
+               // gridEdgeNorth: "bordGrilleNord",
+               // gridEdgeSouth: "bordGrilleSud",
+               // platformInFront: "plateformeDevant",
+               // platformAbove: "plateformeDessus",
+               // withdrawObject: "ramasserObjet",
+               // dropObject: "deposerObjet",
+               // onObject: "surObjet",
+               // onContainer: "surConteneur",
+               // onNumber: "surNombre",
+               // onWritable: "surTableau",
+               // onLauncher: "surLanceur",
+               // writeNumber: "ecrireNombre",
+               // readNumber: "nombreSurCase",
+               // pushObject: "pousserObjet",
+               // pushableInFront: "poussableDevant",
+               // dropNum: "deposer",
+               // dropNum_noShadow: "deposer",
+               // containerSize: "nbObjetsADeposer",
+               // nbInBag: "nbObjetsDansSac",
+               // nbWithdrawables: "nbObjetsSur",
+               // withdrawNum: "ramasser",
+               // withdrawNum_noShadow: "ramasser",
+               // shoot: "tirerLaser",
+               // shoot_noShadow: "tirerLaser",
+               // shootCondition: "tirerCondition",
+               // shootCondition_noShadow: "tirerCondition",
+               // connect: "brancherCable",
+               // onMale: "surMale",
+               // onFemale: "surFemelle",
+               // dropPlatformInFront: "construirePlateformeDevant",
+               // dropPlatformAbove: "construirePlateformeAuDessus",
 
-               getNbItems: "getNbItems"
+               getNbItems: "getNbItems",
+               getNbClusters: "getNbClusters",
+               getX: "getX",
+               getY: "getY",
+               log: "log"
             },
             description: {
-               forward: "avancer() fait avancer le robot d'une case",
-               backwards: "reculer() fait reculer le robot d'une case",
-               left: "tournerGauche() fait se tourner le robot d'un quart de tour à gauche",
-               right: "tournerDroite() fait se tourner le robot d'un quart de tour à droite",
-               row: "ligneRobot() retourne le numéro de la ligne du robot",
-               col: "colonneRobot() retourne le numéro de la colonne du robot",
-               turnAround: "demiTour() fait faire demi-tour au robot",
-               east: "est() déplace le robot d'une case vers l'est",
-               west: "ouest() déplace le robot d'une case vers l'ouest",
-               north: "nord() déplace le robot d'une case vers le nord",
-               south: "sud() déplace le robot d'une case vers le sud",
+               getX: "@(idItem) retourne l'abscisse du point",
+               getY: "@(idItem) retourne l'ordonnée du point",
+               log: "@(msg)"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -1673,699 +1673,770 @@ var getContext = function(display, infos, curLevel) {
       loadContext(infos.contextType);
    }
    
+   // infos.newBlocks.push({
+   //    name: "row",
+   //    type: "sensors",
+   //    block: { name: "row", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       this.callCallback(callback, 1 + this.getRobot().row);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "col",
+   //    type: "sensors",
+   //    block: { name: "col", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       this.callCallback(callback, 1 + this.getRobot().col);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "wait",
+   //    type: "actions",
+   //    block: { name: "wait" },
+   //    func: function(callback) {
+   //       this.advanceTime(1);
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "north",
+   //    type: "actions",
+   //    block: { name: "north" },
+   //    func: function(callback) {
+   //       this.north(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "south",
+   //    type: "actions",
+   //    block: { name: "south" },
+   //    func: function(callback) {
+   //       this.south(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "east",
+   //    type: "actions",
+   //    block: { name: "east" },
+   //    func: function(callback) {
+   //       this.east(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "west",
+   //    type: "actions",
+   //    block: { name: "west" },
+   //    func: function(callback) {
+   //       this.west(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "left",
+   //    type: "actions",
+   //    block: { name: "left" },
+   //    func: function(callback) {
+   //       this.turnLeft(callback);
+   //    }
+   // });
+
+   // infos.newBlocks.push({
+   //    name: "right",
+   //    type: "actions",
+   //    block: { name: "right" },
+   //    func: function(callback) {
+   //       this.turnRight(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "turnAround",
+   //    type: "actions",
+   //    block: { name: "turnAround" },
+   //    func: function(callback) {
+   //       this.turnAround(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "forward",
+   //    type: "actions",
+   //    block: { name: "forward" },
+   //    func: function(callback) {
+   //       this.forward(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "backwards",
+   //    type: "actions",
+   //    block: { name: "backwards" },
+   //    func: function(callback) {
+   //       this.backwards(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "jump",
+   //    type: "actions",
+   //    block: { name: "jump" },
+   //    func: function(callback) {
+   //       this.jump(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleInFront",
+   //    type: "sensors",
+   //    block: { name: "obstacleInFront", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.obstacleInFront());
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleEast",
+   //    type: "sensors",
+   //    block: { name: "obstacleEast", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleWest",
+   //    type: "sensors",
+   //    block: { name: "obstacleWest", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleNorth",
+   //    type: "sensors",
+   //    block: { name: "obstacleNorth", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleSouth",
+   //    type: "sensors",
+   //    block: { name: "obstacleSouth", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleRight",
+   //    type: "sensors",
+   //    block: { name: "obstacleRight", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       var coords = this.coordsInFront(1);
+   //       this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "obstacleLeft",
+   //    type: "sensors",
+   //    block: { name: "obstacleLeft", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       var coords = this.coordsInFront(3);
+   //       this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "gridEdgeEast",
+   //    type: "sensors",
+   //    block: { name: "gridEdgeEast", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "gridEdgeWest",
+   //    type: "sensors",
+   //    block: { name: "gridEdgeWest", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "gridEdgeNorth",
+   //    type: "sensors",
+   //    block: { name: "gridEdgeNorth", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "gridEdgeSouth",
+   //    type: "sensors",
+   //    block: { name: "gridEdgeSouth", yieldsValue: true },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
+   //    }
+   // });
+      
+   // infos.newBlocks.push({
+   //    name: "platformInFront",
+   //    type: "sensors",
+   //    block: { name: "platformInFront", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.platformInFront());
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "platformAbove",
+   //    type: "sensors",
+   //    block: { name: "platformAbove", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.platformAbove());
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "withdrawObject",
+   //    type: "actions",
+   //    block: { name: "withdrawObject" },
+   //    func: function(callback) {
+   //       this.withdraw();
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropObject",
+   //    type: "actions",
+   //    block: { name: "dropObject" },
+   //    func: function(callback) {
+   //       this.drop();
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onObject",
+   //    type: "sensors",
+   //    block: { name: "onObject", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onContainer",
+   //    type: "sensors",
+   //    block: { name: "onContainer", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onNumber",
+   //    type: "sensors",
+   //    block: { name: "onNumber", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
+   //    }
+   // });
+	
+	// infos.newBlocks.push({
+   //    name: "onLauncher",
+   //    type: "sensors",
+   //    block: { name: "onLauncher", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onWritable",
+   //    type: "sensors",
+   //    block: { name: "onWritable", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "writeNumber",
+   //    type: "actions",
+   //    block: { name: "writeNumber", params: [null] },
+   //    func: function(value, callback) {
+   //       var robot = this.getRobot();
+   //       this.writeNumber(robot.row, robot.col, value);
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "readNumber",
+   //    type: "sensors",
+   //    block: { name: "readNumber", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.readNumber(robot.row, robot.col));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "nbWithdrawables",
+   //    type: "sensors",
+   //    block: { name: "nbWithdrawables", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWithdrawable === true; }).length);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "nbInBag",
+   //    type: "sensors",
+   //    block: { name: "nbInBag", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       this.callCallback(callback, context.bag.length);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "containerSize",
+   //    type: "sensors",
+   //    block: { name: "containerSize", yieldsValue: 'int' },
+   //    func: function(callback) {
+   //       var robot = this.getRobot();
+   //       var containers = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isContainer === true; });
+         
+   //       if(containers.length == 0) {
+   //          this.callCallback(callback, 0);
+   //          return;
+   //       }
+         
+   //       this.callCallback(callback, containers[0].containerSize);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "pushObject",
+   //    type: "actions",
+   //    block: { name: "pushObject" },
+   //    func: function(callback) {
+   //       this.pushObject(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "pushableInFront",
+   //    type: "sensors",
+   //    block: { name: "pushableInFront", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropInFront",
+   //    type: "actions",
+   //    block: { name: "dropInFront" },
+   //    func: function(callback) {
+   //       this.drop(1, this.coordsInFront());
+   //       this.callCallback(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropAbove",
+   //    type: "actions",
+   //    block: { name: "dropAbove" },
+   //    func: function(callback) {
+   //       this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
+   //       this.callCallback(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "withdrawNum_noShadow",
+   //    type: "actions",
+   //    block: { 
+   //       name: "withdrawNum_noShadow", 
+   //       params: [null]
+   //    },
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       for(var i = 0;i < value;i++) {
+   //          this.withdraw();
+   //       }
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "withdrawNum",
+   //    type: "actions",
+   //    block: { name: "withdrawNum", params: [null], blocklyXml: "<block type='withdrawNum_noShadow'>" +
+   //                            "  <value name='PARAM_0'>" +
+   //                            "    <shadow type='math_number'>" +
+   //                            "      <field name='NUM'>0</field>" +
+   //                            "    </shadow>" +
+   //                            "  </value>" +
+   //                            "</block>"},
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       for(var i = 0;i < value;i++) {
+   //          this.withdraw();
+   //       }
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropNum_noShadow",
+   //    type: "actions",
+   //    block: { 
+   //       name: "dropNum_noShadow", 
+   //       params: [null]
+   //    },
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       this.drop(value);
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropNum",
+   //    type: "actions",
+   //    block: { name: "dropNum", params: [null], blocklyXml: "<block type='dropNum_noShadow'>" +
+   //                            "  <value name='PARAM_0'>" +
+   //                            "    <shadow type='math_number'>" +
+   //                            "      <field name='NUM'>0</field>" +
+   //                            "    </shadow>" +
+   //                            "  </value>" +
+   //                            "</block>"},
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       this.drop(value);
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "shoot_noShadow",
+   //    type: "actions",
+   //    block: { 
+   //       name: "shoot_noShadow", 
+   //       params: [null]
+   //    },
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+   //          this.shoot(this.getRobot().row, this.getRobot().col, value);
+   //          if(this.display) {
+   //             var robot = this.getRobot();
+   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+   //                return obj.isLaser === true;
+   //             });
+               
+   //             if(lasers.length != 0) {
+   //                lasers[0].element.toFront();
+   //             }
+               
+   //             robot.element.toFront();
+   //          }
+   //       }
+   //       else {
+   //          throw(window.languageStrings.messages.failureLaser);
+   //       }
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "shoot",
+   //    type: "actions",
+   //    block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
+   //                            "  <value name='PARAM_0'>" +
+   //                            "    <shadow type='math_number'>" +
+   //                            "      <field name='NUM'>0</field>" +
+   //                            "    </shadow>" +
+   //                            "  </value>" +
+   //                            "</block>"},
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+   //          this.shoot(this.getRobot().row, this.getRobot().col, value);
+   //          if(this.display) {
+   //             var robot = this.getRobot();
+   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+   //                return obj.isLaser === true;
+   //             });
+               
+   //             if(lasers.length != 0) {
+   //                lasers[0].element.toFront();
+   //             }
+               
+   //             robot.element.toFront();
+   //          }
+   //       }
+   //       else {
+   //          throw(window.languageStrings.messages.failureLaser);
+   //       }
+   //       this.waitDelay(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "shootCondition_noShadow",
+   //    type: "actions",
+   //    block: { 
+   //       name: "shootCondition_noShadow", 
+   //       params: [null],
+   //       yieldsValue: true
+   //    },
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+         
+   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+   //          var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+   //          if(this.display) {
+   //             var robot = this.getRobot();
+   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+   //                return obj.isLaser === true;
+   //             });
+               
+   //             if(lasers.length != 0) {
+   //                lasers[0].element.toFront();
+   //             }
+               
+   //             robot.element.toFront();
+   //          }
+   //          this.waitDelay(callback, retour);
+   //       }
+   //       else {
+   //          throw(window.languageStrings.messages.failureLaser);
+   //          this.callCallback(callback);
+   //       }
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "shootCondition",
+   //    type: "actions",
+   //    block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
+   //                            "  <value name='PARAM_0'>" +
+   //                            "    <shadow type='math_number'>" +
+   //                            "      <field name='NUM'>0</field>" +
+   //                            "    </shadow>" +
+   //                            "  </value>" +
+   //                            "</block>"},
+   //    func: function(value, callback) {
+   //       if((typeof value) == "function") {
+   //          this.callCallback(value);
+   //          return;
+   //       }
+         
+   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+   //          var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+   //          if(this.display) {
+   //             var robot = this.getRobot();
+   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+   //                return obj.isLaser === true;
+   //             });
+               
+   //             if(lasers.length != 0) {
+   //                lasers[0].element.toFront();
+   //             }
+               
+   //             robot.element.toFront();
+   //          }
+   //          this.waitDelay(callback, retour);
+   //       }
+   //       else {
+   //          throw(window.languageStrings.messages.failureLaser);
+   //          this.callCallback(callback);
+   //       }
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "connect",
+   //    type: "actions",
+   //    block: { name: "connect" },
+   //    func: function(callback) {
+   //       this.connect();
+   //       this.callCallback(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onMale",
+   //    type: "sensors",
+   //    block: { name: "onMale", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "onFemale",
+   //    type: "sensors",
+   //    block: { name: "onFemale", yieldsValue: true },
+   //    func: function(callback) {
+   //       this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropPlatformInFront",
+   //    type: "actions",
+   //    block: { name: "dropPlatformInFront" },
+   //    func: function(callback) {
+   //       if(this.nbPlatforms == 0)
+   //          throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            
+   //       var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
+   //       if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+   //          throw(window.languageStrings.messages.failureDropPlatform);
+   //       }
+   //       this.nbPlatforms -= 1;
+   //       this.dropObject({type: "platform"}, coords);
+   //       this.callCallback(callback);
+   //    }
+   // });
+   
+   // infos.newBlocks.push({
+   //    name: "dropPlatformAbove",
+   //    type: "actions",
+   //    block: { name: "dropPlatformAbove" },
+   //    func: function(callback) {
+   //       if(this.nbPlatforms == 0)
+   //          throw(window.languageStrings.messages.failureNotEnoughPlatform);
+            
+   //       var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
+   //       if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+   //          throw(window.languageStrings.messages.failureDropPlatform);
+   //       }
+   //       this.nbPlatforms -= 1;
+   //       this.dropObject({type: "platform"}, coords);
+   //       this.callCallback(callback);
+   //    }
+   // });
+
    infos.newBlocks.push({
-      name: "row",
+      name: "getNbItems",
       type: "sensors",
-      block: { name: "row", yieldsValue: 'int' },
+      block: { name: "getNbItems", yieldsValue: 'int' },
       func: function(callback) {
-         this.callCallback(callback, 1 + this.getRobot().row);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "col",
-      type: "sensors",
-      block: { name: "col", yieldsValue: 'int' },
-      func: function(callback) {
-         this.callCallback(callback, 1 + this.getRobot().col);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "wait",
-      type: "actions",
-      block: { name: "wait" },
-      func: function(callback) {
-         this.advanceTime(1);
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "north",
-      type: "actions",
-      block: { name: "north" },
-      func: function(callback) {
-         this.north(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "south",
-      type: "actions",
-      block: { name: "south" },
-      func: function(callback) {
-         this.south(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "east",
-      type: "actions",
-      block: { name: "east" },
-      func: function(callback) {
-         this.east(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "west",
-      type: "actions",
-      block: { name: "west" },
-      func: function(callback) {
-         this.west(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "left",
-      type: "actions",
-      block: { name: "left" },
-      func: function(callback) {
-         this.turnLeft(callback);
+         // console.log(context.nbPoints)
+         this.callCallback(callback, context.nbPoints);
       }
    });
 
    infos.newBlocks.push({
-      name: "right",
-      type: "actions",
-      block: { name: "right" },
-      func: function(callback) {
-         this.turnRight(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "turnAround",
-      type: "actions",
-      block: { name: "turnAround" },
-      func: function(callback) {
-         this.turnAround(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "forward",
-      type: "actions",
-      block: { name: "forward" },
-      func: function(callback) {
-         this.forward(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "backwards",
-      type: "actions",
-      block: { name: "backwards" },
-      func: function(callback) {
-         this.backwards(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "jump",
-      type: "actions",
-      block: { name: "jump" },
-      func: function(callback) {
-         this.jump(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleInFront",
+      name: "getNbClusters",
       type: "sensors",
-      block: { name: "obstacleInFront", yieldsValue: true },
+      block: { name: "getNbItems", yieldsValue: 'int' },
       func: function(callback) {
-         this.callCallback(callback, this.obstacleInFront());
+         // console.log(context.k)
+         this.callCallback(callback, context.k);
       }
    });
-   
+
    infos.newBlocks.push({
-      name: "obstacleEast",
+      name: "getX",
       type: "sensors",
-      block: { name: "obstacleEast", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleWest",
-      type: "sensors",
-      block: { name: "obstacleWest", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleNorth",
-      type: "sensors",
-      block: { name: "obstacleNorth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleSouth",
-      type: "sensors",
-      block: { name: "obstacleSouth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleRight",
-      type: "sensors",
-      block: { name: "obstacleRight", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         var coords = this.coordsInFront(1);
-         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "obstacleLeft",
-      type: "sensors",
-      block: { name: "obstacleLeft", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         var coords = this.coordsInFront(3);
-         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeEast",
-      type: "sensors",
-      block: { name: "gridEdgeEast", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeWest",
-      type: "sensors",
-      block: { name: "gridEdgeWest", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeNorth",
-      type: "sensors",
-      block: { name: "gridEdgeNorth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeSouth",
-      type: "sensors",
-      block: { name: "gridEdgeSouth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
-      }
-   });
-      
-   infos.newBlocks.push({
-      name: "platformInFront",
-      type: "sensors",
-      block: { name: "platformInFront", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.platformInFront());
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "platformAbove",
-      type: "sensors",
-      block: { name: "platformAbove", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.platformAbove());
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "withdrawObject",
-      type: "actions",
-      block: { name: "withdrawObject" },
-      func: function(callback) {
-         this.withdraw();
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropObject",
-      type: "actions",
-      block: { name: "dropObject" },
-      func: function(callback) {
-         this.drop();
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onObject",
-      type: "sensors",
-      block: { name: "onObject", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onContainer",
-      type: "sensors",
-      block: { name: "onContainer", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onNumber",
-      type: "sensors",
-      block: { name: "onNumber", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
-      }
-   });
-	
-	infos.newBlocks.push({
-      name: "onLauncher",
-      type: "sensors",
-      block: { name: "onLauncher", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onWritable",
-      type: "sensors",
-      block: { name: "onWritable", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "writeNumber",
-      type: "actions",
-      block: { name: "writeNumber", params: [null] },
-      func: function(value, callback) {
-         var robot = this.getRobot();
-         this.writeNumber(robot.row, robot.col, value);
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "readNumber",
-      type: "sensors",
-      block: { name: "readNumber", yieldsValue: 'int' },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.readNumber(robot.row, robot.col));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "nbWithdrawables",
-      type: "sensors",
-      block: { name: "nbWithdrawables", yieldsValue: 'int' },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWithdrawable === true; }).length);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "nbInBag",
-      type: "sensors",
-      block: { name: "nbInBag", yieldsValue: 'int' },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, context.bag.length);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "containerSize",
-      type: "sensors",
-      block: { name: "containerSize", yieldsValue: 'int' },
-      func: function(callback) {
-         var robot = this.getRobot();
-         var containers = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isContainer === true; });
-         
-         if(containers.length == 0) {
-            this.callCallback(callback, 0);
-            return;
-         }
-         
-         this.callCallback(callback, containers[0].containerSize);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "pushObject",
-      type: "actions",
-      block: { name: "pushObject" },
-      func: function(callback) {
-         this.pushObject(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "pushableInFront",
-      type: "sensors",
-      block: { name: "pushableInFront", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropInFront",
-      type: "actions",
-      block: { name: "dropInFront" },
-      func: function(callback) {
-         this.drop(1, this.coordsInFront());
-         this.callCallback(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropAbove",
-      type: "actions",
-      block: { name: "dropAbove" },
-      func: function(callback) {
-         this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
-         this.callCallback(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "withdrawNum_noShadow",
-      type: "actions",
       block: { 
-         name: "withdrawNum_noShadow", 
-         params: [null]
-      },
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         for(var i = 0;i < value;i++) {
-            this.withdraw();
-         }
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "withdrawNum",
-      type: "actions",
-      block: { name: "withdrawNum", params: [null], blocklyXml: "<block type='withdrawNum_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         for(var i = 0;i < value;i++) {
-            this.withdraw();
-         }
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropNum_noShadow",
-      type: "actions",
-      block: { 
-         name: "dropNum_noShadow", 
-         params: [null]
-      },
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         this.drop(value);
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropNum",
-      type: "actions",
-      block: { name: "dropNum", params: [null], blocklyXml: "<block type='dropNum_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         this.drop(value);
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "shoot_noShadow",
-      type: "actions",
-      block: { 
-         name: "shoot_noShadow", 
-         params: [null]
-      },
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-               
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-               
-               robot.element.toFront();
-            }
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-         }
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "shoot",
-      type: "actions",
-      block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-               
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-               
-               robot.element.toFront();
-            }
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-         }
-         this.waitDelay(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "shootCondition_noShadow",
-      type: "actions",
-      block: { 
-         name: "shootCondition_noShadow", 
+         name: "getX", 
          params: [null],
-         yieldsValue: true
+         yieldsValue: 'int'
       },
       func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
+         var { pointData } = context;
+         var pos = pointData[value];
+         if(!pos) {
+            this.callCallback(callback, false);
+            return
          }
-         
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-               
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-               
-               robot.element.toFront();
-            }
-            this.waitDelay(callback, retour);
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-            this.callCallback(callback);
-         }
+         this.callCallback(callback, pos.x);
       }
    });
-   
+
    infos.newBlocks.push({
-      name: "shootCondition",
-      type: "actions",
-      block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
+      name: "getY",
+      type: "sensors",
+      block: { 
+         name: "getY", 
+         params: [null],
+         yieldsValue: 'int'
+      },
       func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
+         var { pointData } = context;
+         var pos = pointData[value]
+         if(!pos) {
+            this.callCallback(callback, false);
+            return
          }
-         
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-               
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-               
-               robot.element.toFront();
-            }
-            this.waitDelay(callback, retour);
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-            this.callCallback(callback);
-         }
+         this.callCallback(callback, pos.y);
       }
    });
-   
+
    infos.newBlocks.push({
-      name: "connect",
+      name: "log",
       type: "actions",
-      block: { name: "connect" },
-      func: function(callback) {
-         this.connect();
-         this.callCallback(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onMale",
-      type: "sensors",
-      block: { name: "onMale", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "onFemale",
-      type: "sensors",
-      block: { name: "onFemale", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropPlatformInFront",
-      type: "actions",
-      block: { name: "dropPlatformInFront" },
-      func: function(callback) {
-         if(this.nbPlatforms == 0)
-            throw(window.languageStrings.messages.failureNotEnoughPlatform);
-            
-         var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
-         if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-            throw(window.languageStrings.messages.failureDropPlatform);
-         }
-         this.nbPlatforms -= 1;
-         this.dropObject({type: "platform"}, coords);
-         this.callCallback(callback);
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "dropPlatformAbove",
-      type: "actions",
-      block: { name: "dropPlatformAbove" },
-      func: function(callback) {
-         if(this.nbPlatforms == 0)
-            throw(window.languageStrings.messages.failureNotEnoughPlatform);
-            
-         var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
-         if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-            throw(window.languageStrings.messages.failureDropPlatform);
-         }
-         this.nbPlatforms -= 1;
-         this.dropObject({type: "platform"}, coords);
+      block: { 
+         name: "log", 
+         params: [null]
+      },
+      func: function(value, callback) {
+         console.log("log",value);
          this.callCallback(callback);
       }
    });
@@ -2523,7 +2594,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.reset = function(gridInfos) {
-      console.log("reset");
+      console.log("reset",scale);
       // console.log(gridInfos,infos);
 
       if(gridInfos) {
@@ -2577,9 +2648,9 @@ var getContext = function(display, infos, curLevel) {
          if(paper !== undefined)
             paper.remove();
          // paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-         paper = this.raphaelFactory.create("paperMain", "grid", infos.paperW * scale, infos.paperH * scale);
+         paper = this.raphaelFactory.create("paperMain", "grid", infos.paperW, infos.paperH);
          initCanvas();
-         resetBoard();
+         // resetBoard();
          // resetItems();
          context.updateScale();
          $("#nbMoves").html(context.nbMoves);
@@ -2732,11 +2803,11 @@ var getContext = function(display, infos, curLevel) {
       $("#grid").prepend("<canvas id=canvas></canvas>");
       
       var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
-      $("#canvas").attr({ width: pointAreaW, height: pointAreaH })
+      $("#canvas").attr({ width: pointAreaW*scale, height: pointAreaH*scale })
       .css({ 
          position: "absolute",
-         left: xPointArea+"px",
-         top: yPointArea+"px",
+         left: xPointArea*scale+"px",
+         top: yPointArea*scale+"px"
       });
    };
 
@@ -2775,6 +2846,87 @@ var getContext = function(display, infos, curLevel) {
          // console.log(coo)
          drawCentroid(iC,coo.x,coo.y);
       }
+   };
+
+   function updateCanvas() {
+      var { classColor, colorRGB,
+         xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var w = Math.round(pointAreaW*scale);
+      var h = Math.round(pointAreaH*scale);
+      var x0 = Math.round(xPointArea*scale);
+      var y0 = Math.round(yPointArea*scale);
+      // console.log("updateCanvas",x0,y0,w,h)
+      var tmpCanvas = document.getElementById('canvas');
+      var ctx = tmpCanvas.getContext('2d');
+      var imgData = ctx.createImageData(w,h);
+      var dat = imgData.data;
+   //    // console.log(answer.params)
+      for(var i = 0; i < dat.length; i += 4) {
+         var x = x0 + Math.floor((i/4)%w);
+         var y = y0 + Math.floor(i/(4*w));
+         var { id } = findClosestCentroid({x,y});
+         var col = classColor[id];
+         // if(i == 0)
+         //    console.log(id,col,dat[i])
+         var op = 0.3;
+         for(var j = 0; j < 3; j++){
+            dat[i + j] = colorRGB[col][j];
+         }
+         dat[i + 3] = Math.round(255*op); 
+      }
+      ctx.putImageData(imgData, 0, 0); 
+   };
+
+   function updatePoints(centPos) {
+      var { k, nbPoints, centroidPos, pointData } = context;
+      var centPos = centPos || centroidPos;
+      var score = 0;
+      var classPoints = [];
+      for(var iC = 0; iC < k; iC++){
+         classPoints[iC] = [];
+      }
+      for(var iP = 0; iP < nbPoints; iP++){
+         var orPos = pointData[iP];
+         var pos = {};
+         pos.x = orPos.x*scale;
+         pos.y = orPos.y*scale;
+         var { id, d } = findClosestCentroid(pos,centPos);
+         classPoints[id].push(iP);
+         score += d*d;
+         // if(noVisual)
+         //    continue;
+         // console.log(id)
+         for(var iC = 0; iC < k; iC++){
+            if(iC == id){
+               points[iP][iC].show();
+            }else{
+               points[iP][iC].hide();
+            }
+         }
+      }
+      score = Math.round(score);
+      return { score, classPoints }
+   };
+
+   function findClosestCentroid(pos,centPos) {
+      var { x, y } = pos;
+      var { k, centroidPos } = context;
+      var dim = 2;
+      var minD = Infinity;
+      var cID;
+      var centPos = centPos || centroidPos;
+      for(var iC = 0; iC < k; iC++){
+         var cPos = centPos[iC];
+         var coo = getCoordinatesFromPos(cPos);
+         var d = (dim == 2) ? 
+            Beav.Geometry.distance(x,y,coo.x*scale,coo.y*scale) :
+            Math.abs(x - coo.x);
+         if(d < minD){
+            minD = d;
+            cID = iC;
+         }
+      }
+      return { id: cID, d: minD }
    };
 
    function drawCentroid(id,cx,cy,bar) {
@@ -3017,56 +3169,51 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(window.quickAlgoResponsive) {
-         var areaWidth = Math.max(200, $('#grid').width()-24);
-         var areaHeight = Math.max(150, $('#grid').height()-24);
+         var areaWidth = Math.max(200, $('.gridArea').width());
+         $(".gridArea").css({
+            display: "flex",
+            "flex-direction": "column",
+            "align-items": "center"
+         });
+         $('#grid').css("width","auto");
       } else {
          var areaWidth = 400;
          var areaHeight = 600;
       }
       var { paperW, paperH } = infos;
-      var paperRatio = paperW/paperH;
+      // var paperRatio = paperW/paperH;
       scale = areaWidth/paperW;
-      // var newCellSide = 0;
-      // if(context.nbCols && context.nbRows) {
-      //    var marginAsCols = (infos.leftMargin + infos.rightMargin) / infos.cellSide;
-      //    var marginAsRows = (infos.topMargin + infos.bottomMargin) / infos.cellSide;
-      //    newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
-      // }
-      // scale = newCellSide / infos.cellSide;
+
       // console.log("updateScale",scale,areaWidth,areaHeight)
       var paperWidth = paperW * scale;
       var paperHeight = paperH * scale;
       paper.setSize(paperWidth, paperHeight);
 
-      // frame.attr({width: paperWidth, height: paperHeight});
-
-      // var { centroidPos, k } = context;
-      // for(var iC = 0; iC < k; iC++){
-      //    var pos = centroidPos[iC];
-      //    var coo = getCoordinatesFromPos(pos);
-      //    coo.x = coo.x*scale;
-      //    coo.y = coo.y*scale;
-      //    // console.log(coo)
-      //    drawCentroid(iC,coo.x,coo.y);
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      // var x = xPointArea*scale;
+      // var y = yPointArea*scale;
+      // var width = pointAreaW*scale;
+      // var height = pointAreaH*scale;
+      // if(!frame){
+      //    frame = paper.rect(0,0,0,0);
       // }
+      // frame.attr({x, y, width, height });
+
       initCentroids();
       initPoints();
       
-      // for(var iRow = 0;iRow < context.nbRows;iRow++) {
-      //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
-      //       if(cells[iRow][iCol] === undefined)
-      //          continue;
-      //       var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
-      //       var y = (infos.cellSide * iRow + infos.topMargin) * scale;
-      //       cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
-      //    }
-      // }
-      $("#canvas").attr({ width: infos.pointAreaW*scale, height: infos.pointAreaH*scale })
-      .css({ 
-         left: infos.xPointArea*scale+"px",
-         top: infos.yPointArea*scale+"px",
-      });
+      initCanvas();
+      // $("#canvas").attr({ width, height })
+      // .css({ 
+      //    left: x+"px",
+      //    top: y+"px",
+      // });
+      updateCanvas();
+      updatePoints();
+
       var textFontSize = {"font-size": infos.cellSide * scale / 2};
+
+
       // if(infos.showLabels) {
       //    for(var iRow = 0;iRow < context.nbRows;iRow++) {
       //       var x = (infos.leftMargin - infos.cellSide / 2) * scale;
@@ -4124,8 +4271,8 @@ var contextParams = {
          ignoreInvalidMoves: false,
          checkEndEveryTurn: false,
          // cellSide: 60,
-         // paperW: 770,
-         // paperH: 400,
+         paperW: 770,
+         paperH: 600,
          // marginX: 20,
          // marginY: 20
       },
@@ -4161,29 +4308,27 @@ var contextParams = {
                "stroke-dasharray": ["-"]
             }
          },
-         // backgroundColor: "#1f003c",
-         // borderColor: "#2d0073",
-         hasGravity: true,
-         bagSize: 1,
-         containerSize: 1,
-         itemTypes: {
-            robot: { img: "castle_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, offsetY: 3, zOrder: 3 },
-            platform: { num: 2, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
-            hearth: { num: 4, img: "hearth.png", side: 60, isContainer: true, zOrder: 1},
-            wood: { num:5, img: "firewood.png", side: 60, isWithdrawable: true, zOrder: 2},
-            // projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
-            // door: { num: 8, img: "door.png", side: 60, isExit: true, zOrder: 1},
-            // dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
-            // dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
-            projectile_generator: {num: 7, side: 60, action: function(item, time) {
-               if(item.period == undefined)
-                  item.period = 1;
-               if(item.start == undefined)
-                  item.start = 1;
-               if(time % item.period == item.start) 
-                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
-            }}
-         },
+         // hasGravity: true,
+         // bagSize: 1,
+         // containerSize: 1,
+         // itemTypes: {
+         //    robot: { img: "castle_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, offsetY: 3, zOrder: 3 },
+         //    platform: { num: 2, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
+         //    hearth: { num: 4, img: "hearth.png", side: 60, isContainer: true, zOrder: 1},
+         //    wood: { num:5, img: "firewood.png", side: 60, isWithdrawable: true, zOrder: 2},
+         //    // projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
+         //    // door: { num: 8, img: "door.png", side: 60, isExit: true, zOrder: 1},
+         //    // dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+         //    // dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+         //    projectile_generator: {num: 7, side: 60, action: function(item, time) {
+         //       if(item.period == undefined)
+         //          item.period = 1;
+         //       if(item.start == undefined)
+         //          item.start = 1;
+         //       if(time % item.period == item.start) 
+         //          this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
+         //    }}
+         // },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       // arrows: {
