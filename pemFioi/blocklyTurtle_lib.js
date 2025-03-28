@@ -173,6 +173,7 @@ var getContext = function(display, infos) {
             peneither: "%1",
             colour2: "setze Farbe",
             colourRGB: "mettre la couleur RGB ( %1, %2, %3 )",
+            colourRGBAmount: "mettre la couleur RGB ( %1, %2, %3 )",
             colourvalue: "mettre la couleur %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -207,6 +208,7 @@ var getContext = function(display, infos) {
             peneither: "stift",
             colour2: "setzeFarbe",
             colourRGB: "couleurRGB",
+            colourRGBAmount: "couleurRGB",
             colourvalue: "couleur",
             turn: "drehe",
             alert: "alert",
@@ -229,6 +231,7 @@ var getContext = function(display, infos) {
             pendown: '@() la tortue place son pinceau dans la position où il laisse une trace.',
             colourvalue: '@(colorName) la trace du pinceau aura la couleur indiquée en paramètre. Exemple : @(\'red\')',
             colourRGB: '@(red, green, blue) la trace du pinceau aura la couleur avec les composantes rouge, verte et bleue indiquées en paramètres. Exemple : @(255, 255, 0)',
+            colourRGBAmount: '@(red, green, blue) la trace du pinceau aura la couleur avec les composantes rouge, verte et bleue indiquées en paramètres. Exemple : @(255, 255, 0)',
             inputvalue: '@() lire un nombre en entrée.',
             jump: '@(x, y) la tortue est placée aux coordonnées données.',
          },
@@ -286,6 +289,7 @@ var getContext = function(display, infos) {
             peneither: "%1",
             colour2: "setze Farbe",
             colourRGB: "setze Farbe RGB ( %1, %2, %3 )",
+            colourRGBAmount: "setze Farbe RGB ( %1, %2, %3 )",
             colourvalue: "setze Farbe %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -329,6 +333,7 @@ var getContext = function(display, infos) {
             peneither: "stift",
             colour2: "setzeFarbe",
             colourRGB: "setzeFarbeRGB",
+            colourRGBAmount: "setzeFarbeRGB",
             colourvalue: "setzeFarbe",
             turn: "drehe",
             alert: "alert",
@@ -379,6 +384,7 @@ var getContext = function(display, infos) {
             peneither: "%1",
             colour2: "setze Farbe",
             colourRGB: "use color RGB ( %1, %2, %3 )",
+            colourRGBAmount: "use color RGB ( %1, %2, %3 )",
             colourvalue: "use color %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
@@ -412,6 +418,7 @@ var getContext = function(display, infos) {
             peneither: "stift",
             colour2: "setzeFarbe",
             colourRGB: "colorRGB",
+            colourRGBAmount: "colorRGB",
             colourvalue: "color",
             turn: "drehe",
             alert: "alert",
@@ -846,6 +853,8 @@ var getContext = function(display, infos) {
       context.waitDelay(callback);
    }
 
+   context.turtle.colourRGBAmount = context.turtle.colourRGB;
+
    var defaultMoveAmount = 1;
    if(context.infos.defaultMoveAmount != undefined)
       defaultMoveAmount = context.infos.defaultMoveAmount;
@@ -914,6 +923,22 @@ var getContext = function(display, infos) {
             { name: "colour2", params: [null]},
             { name: "colourvalue", params: [null], blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}},
             { name: "colourRGB", params: [null, null, null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 0},{"type": "field_number", "name": "PARAM_1", "value": 0},{"type": "field_number", "name": "PARAM_2", "value": 0}]}},
+            {
+               name: "colourRGBAmount",
+               params: [null, null, null],
+               blocklyJson: {
+                  "args0": [
+                    {"type": "input_value", "name": "PARAM_0", "value": 0},
+                    {"type": "input_value", "name": "PARAM_1", "value": 0},
+                    {"type": "input_value", "name": "PARAM_2", "value": 0}
+                 ]
+               },
+               blocklyXml: "<block type='colourRGBAmount'>" +
+                 "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                 "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                 "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
+                 "</block>"
+            }
          ],
          turtleInput: [
             { name: "inputvalue", yieldsValue: true }
