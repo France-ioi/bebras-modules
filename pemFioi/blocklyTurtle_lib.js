@@ -179,7 +179,8 @@ var getContext = function(display, infos) {
             alert: "messagebox",
             log: "logge",
             inputvalue: "lire un nombre sur l'entrée",
-            jump: "aller à la position (%1,%2)"
+            jump: "aller à la position (%1,%2)",
+            jumpAmount: "aller à la position (%1,%2)"
          },
          code: {
             move: "avancer",
@@ -214,7 +215,8 @@ var getContext = function(display, infos) {
             alert: "alert",
             log: "log",
             inputvalue: "eingabewert",
-			   jump: "jump"
+			   jump: "jump",
+            jumpAmount: "jump",
          },
          description: {
             moveamount: '@(steps) la tortue avance du nombre de pas indiqué en paramètre. Exemple : @(50)',
@@ -234,6 +236,7 @@ var getContext = function(display, infos) {
             colourRGBAmount: '@(red, green, blue) la trace du pinceau aura la couleur avec les composantes rouge, verte et bleue indiquées en paramètres. Exemple : @(255, 255, 0)',
             inputvalue: '@() lire un nombre en entrée.',
             jump: '@(x, y) la tortue est placée aux coordonnées données.',
+            jumpAmount: '@(x, y) la tortue est placée aux coordonnées données.'
          },
          startingBlockName: "Programme de la tortue",
          exportAsSvg: "Exporter en SVG",
@@ -824,6 +827,7 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_pentasimple = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_Ntimes30 = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_Ntimes30 = context.turtle.turnrightamount;
+   context.turtle.jumpAmount = context.turtle.jump;
 
    context.turtle.colour2 = function(colour, callback) {
       if (typeof callback == "undefined") {
@@ -938,7 +942,21 @@ var getContext = function(display, infos) {
                  "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                  "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
                  "</block>"
-            }
+            },
+            { 
+               name: "jumpAmount", 
+               params: [null, null], 
+               blocklyJson: {
+                  "args0": [
+                     {"type": "input_value", "name": "PARAM_0", "value": 0},
+                     {"type": "input_value", "name": "PARAM_1", "value": 0}
+                  ]
+               },
+               blocklyXml: "<block type='jumpAmount'>" +
+                 "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                 "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                 "</block>"
+            },
          ],
          turtleInput: [
             { name: "inputvalue", yieldsValue: true }
