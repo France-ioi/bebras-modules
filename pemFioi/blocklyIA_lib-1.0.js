@@ -84,14 +84,16 @@ var getContext = function(display, infos, curLevel) {
                getY: "getY",
                log: "log",
                distance: "distance",
-               showCentroid: "showCentroid"
+               showCentroid: "showCentroid",
+               setCluster: "setCluster"
             },
             description: {
                getX: "@(idItem) retourne l'abscisse du point",
                getY: "@(idItem) retourne l'ordonnée du point",
                log: "@(msg)",
                distance: "@(x1,y1,x2,y2)",
-               showCentroid: "@(idCluster,x,y)"
+               showCentroid: "@(idCluster,x,y)",
+               setCluster: "@(idItem,idCluster)"
             },
             messages: {
                maxNbCentroids: function(max) {
@@ -103,7 +105,8 @@ var getContext = function(display, infos, curLevel) {
                },
                outOfRange: function(name,min,max) {
                   return "La valeur de "+name+" doit être comprise entre "+min+" et "+max
-               }
+               },
+               invalidId: "Identifiant invalide"
             },
             // startingBlockName: "Programme du robot"
          },
@@ -2106,8 +2109,7 @@ var getContext = function(display, infos, curLevel) {
       type: "sensors",
       block: { name: "getNbItems", yieldsValue: 'int' },
       func: function(callback) {
-         // console.log(context.k)
-         this.callCallback(callback, context.k);
+         this.callCallback(callback, context.nbClusters);
       }
    });
 
@@ -2161,15 +2163,15 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(id,x,y, callback) {
          // console.log(id,x,y)
-         var { k, maxNbCentroids } = context;
+         var { k, nbClusters } = context;
          if(!Number.isInteger(id)){
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(id > k){
             throw(window.languageStrings.messages.noConsecutiveId(id,id - 1));
          }
-         if(id >= maxNbCentroids){
-            throw(window.languageStrings.messages.maxNbCentroids(maxNbCentroids));
+         if(id >= nbClusters){
+            throw(window.languageStrings.messages.maxNbCentroids(nbClusters));
          }
          var { xRange, yRange } = infos;
          if(x < xRange[0] || x > xRange[1]){
@@ -2188,6 +2190,32 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "setCluster",
+      type: "actions",
+      block: { 
+         name: "setCluster", 
+         params: [null,null],
+         // yieldsValue: 'int'
+      },
+      func: function(idItem,idCluster,callback) {
+         var { k, nbPoints } = context;
+         if(!Number.isInteger(idItem) || !Number.isInteger(idCluster)){
+            throw(window.languageStrings.messages.noIntegerId);
+         }
+         if(idItem >= nbPoints || idItem < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         if(idCluster >= k || idCluster < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         context.classPoints[idItem] = idCluster + 1;
+         updatePoint(idItem);
+
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
       name: "distance",
       type: "actions",
       block: { 
@@ -2196,7 +2224,7 @@ var getContext = function(display, infos, curLevel) {
          yieldsValue: 'int'
       },
       func: function(x1,y1,x2,y2, callback) {
-         var d = Beav.distance(x1,y1,x2,y2);
+         var d = Beav.Geometry.distance(x1,y1,x2,y2);
          this.callCallback(callback, Math.round(d));
       }
    });
@@ -2244,10 +2272,6 @@ var getContext = function(display, infos, curLevel) {
       context.importLanguageStrings(infos.languageStrings.blocklyRobot_lib, strings);
    }
    
-   // var cells = [];
-   // var colsLabels = [];
-   // var rowsLabels = [];
-   // var cardLabels = [];
    var scale = 1;
    var paper;
    var canvas;
@@ -2317,14 +2341,17 @@ var getContext = function(display, infos, curLevel) {
 
       if(gridInfos) {
          context.nbPoints = gridInfos.nbPoints;
-         context.maxNbCentroids = gridInfos.maxNbCentroids;
+         context.nbClusters = gridInfos.nbClusters;
       }
       context.centroidPos  = [];
       context.k = 0;
+      context.classPoints = [];
 
-      if(!context.pointData)
+      if(!context.pointData){
          context.pointData = initPointData();
-      // console.log(context.pointData)
+         context.bestScore = findBestScore();
+         console.log(context.bestScore)
+      }
 
       
       if(context.display) {
@@ -2341,7 +2368,7 @@ var getContext = function(display, infos, curLevel) {
          // $("#nbMoves").html(context.nbMoves);
       }
       else {
-         resetItems();
+         // resetItems();
       }
    };
 
@@ -2379,39 +2406,9 @@ var getContext = function(display, infos, curLevel) {
       initPoints();
       
       initCanvas();
-      // $("#canvas").attr({ width, height })
-      // .css({ 
-      //    left: x+"px",
-      //    top: y+"px",
-      // });
       updateCanvas();
-      updatePoints([]);
+      updatePoints();
 
-      var textFontSize = {"font-size": infos.cellSide * scale / 2};
-
-
-      // if(infos.showLabels) {
-      //    for(var iRow = 0;iRow < context.nbRows;iRow++) {
-      //       var x = (infos.leftMargin - infos.cellSide / 2) * scale;
-      //       var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
-      //       rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
-      //    }
-      //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
-      //       var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
-      //       var y = (infos.topMargin - infos.cellSide / 2) * scale;
-      //       colsLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
-      //    }
-      // }
-      // if (infos.showCardinals) {
-      //    var middleX = (infos.leftMargin + infos.cellSide * context.nbCols / 2) * scale;
-      //    var middleY = (infos.topMargin + infos.cellSide * context.nbRows / 2) * scale;
-      //    cardLabels[0].attr({x: middleX, y: (infos.topMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide / 2) * scale}).attr(textFontSize);
-      //    cardLabels[1].attr({x: middleX, y: paperHeight + (infos.cellSide / 2 - infos.bottomMargin) * scale}).attr(textFontSize);
-      //    cardLabels[2].attr({x: (infos.leftMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide * 1.8 / 2) * scale, y: middleY}).attr(textFontSize);
-      //    cardLabels[3].attr({x: paperWidth + (infos.cellSide / 2 - infos.rightMargin) * scale, y: middleY}).attr(textFontSize);
-      // }
-      
-      redisplayAllItems();      
    };
 
    context.redrawDisplay = function() {
@@ -2464,25 +2461,6 @@ var getContext = function(display, infos, curLevel) {
          paper.remove();
       }
    };
-   
-   // var itemAttributes = function(item) {
-   //    var itemType = infos.itemTypes[item.type];
-   //    var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
-   //    var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
-   //    var xClip = x;
-   //    if(item.dir != undefined) {
-   //       var dirToState = [0, 2, 4, 6];
-   //       x = x - (dirToState[item.dir] * item.side * scale);
-   //    }
-   //    var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
-   //    if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
-   //       x += item.side * scale / 2;
-   //       y += item.side * scale / 2;
-   //    }
-      
-   //    var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
-   //    return ret;
-   // };
 
    function initPointData() {
       // console.log("initPointData")
@@ -2567,7 +2545,7 @@ var getContext = function(display, infos, curLevel) {
 
    function initPoints() {
       // console.log("initPoints")
-      var { nbPoints, pointData, k } = context;
+      var { nbPoints, pointData, nbClusters } = context;
       var { pointR, classShape, classColor, pointAttr, crossAttr,
          xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
 
@@ -2583,7 +2561,7 @@ var getContext = function(display, infos, curLevel) {
          var y = pos.y*scale;
          // if(dim == 1)
          //    pos.y = yPoint1D;
-         for(var iC = 0; iC <= k; iC++){
+         for(var iC = 0; iC <= nbClusters; iC++){
             if(points[iP][iC]){
                points[iP][iC].remove();
             }
@@ -2642,18 +2620,78 @@ var getContext = function(display, infos, curLevel) {
       ctx.putImageData(imgData, 0, 0); 
    };
 
-   function updatePoints(centPos) {
-      var { k, nbPoints, centroidPos, pointData } = context;
+   function updatePoints() {
+      var { nbPoints } = context;
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      // var x = xPointArea*scale;
+      // var y = yPointArea*scale;
+      // var w = pointAreaW*scale;
+      // var h = pointAreaH*scale;
+      // var centPos = centPos || centroidPos;
+      // var score = 0;
+      // var classPoints = [];
+      // // console.log(x,y,w,h)
+      // for(var iC = 0; iC <= k; iC++){
+      //    classPoints[iC] = [];
+      // }
+      for(var iP = 0; iP < nbPoints; iP++){
+         updatePoint(iP);
+         // var orPos = pointData[iP];
+         // var pos = {};
+         // pos.x = orPos.x*scale;
+         // pos.y = orPos.y*scale;
+         // var { id, d } = findClosestCentroid(pos,centPos);
+         // classPoints[id].push(iP);
+         // score += d*d;
+         // // if(noVisual)
+         // //    continue;
+         // // console.log(id)
+         // for(var iC = 0; iC <= k; iC++){
+         //    var obj = points[iP][iC];
+         //    if(iC == id){
+         //       obj.show();
+         //    }else{
+         //       obj.hide();
+         //    }
+         //    obj.attr("clip-rect",[x,y,w,h]);
+         // }
+      }
+      // score = Math.round(score);
+      // return { score, classPoints }
+   };
+
+   function updatePoint(iP) {
       var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
       var x = xPointArea*scale;
       var y = yPointArea*scale;
       var w = pointAreaW*scale;
       var h = pointAreaH*scale;
-      var centPos = centPos || centroidPos;
+      var { classPoints, nbClusters } = context;
+      var cla = classPoints[iP] || 0;
+      // console.log(iP,cla)
+      for(var iC = 0; iC <= nbClusters; iC++){
+         var obj = points[iP][iC];
+         if(iC == cla){
+            obj.show();
+         }else{
+            obj.hide();
+         }
+         obj.attr("clip-rect",[x,y,w,h]);
+      }
+   };
+
+   context.updateScore = function(centPos) {
+      var { nbPoints, pointData } = context;
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var x = xPointArea*scale;
+      var y = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+      var centPos = centPos || context.centroidPos;
       var score = 0;
       var classPoints = [];
-      // console.log(x,y,w,h)
-      for(var iC = 0; iC <= k; iC++){
+      // // console.log(x,y,w,h)
+      for(var iC = 0; iC < centPos.length; iC++){
          classPoints[iC] = [];
       }
       for(var iP = 0; iP < nbPoints; iP++){
@@ -2662,20 +2700,10 @@ var getContext = function(display, infos, curLevel) {
          pos.x = orPos.x*scale;
          pos.y = orPos.y*scale;
          var { id, d } = findClosestCentroid(pos,centPos);
+         // console.log(id,d)
+         id--;
          classPoints[id].push(iP);
          score += d*d;
-         // if(noVisual)
-         //    continue;
-         // console.log(id)
-         for(var iC = 0; iC <= k; iC++){
-            var obj = points[iP][iC];
-            if(iC == id){
-               obj.show();
-            }else{
-               obj.hide();
-            }
-            obj.attr("clip-rect",[x,y,w,h]);
-         }
       }
       score = Math.round(score);
       return { score, classPoints }
@@ -2683,27 +2711,66 @@ var getContext = function(display, infos, curLevel) {
 
    function findClosestCentroid(pos,centPos) {
       var { x, y } = pos;
-      var { k, centroidPos } = context;
+      var { centroidPos } = context;
       
-      if(k == 0)
+      var centPos = centPos || centroidPos;
+      if(centPos.length == 0)
          return { id: 0, d: 1000 }
 
       var dim = 2;
       var minD = Infinity;
       var cID;
-      var centPos = centPos || centroidPos;
-      for(var iC = 0; iC < k; iC++){
+      for(var iC = 0; iC < centPos.length; iC++){
          var cPos = centPos[iC];
          var coo = getCoordinatesFromPos(cPos);
-         var d = (dim == 2) ? 
-            Beav.Geometry.distance(x,y,coo.x*scale,coo.y*scale) :
-            Math.abs(x - coo.x);
+         var d = Beav.Geometry.distance(x,y,coo.x*scale,coo.y*scale);
          if(d < minD){
             minD = d;
             cID = iC + 1;
          }
       }
       return { id: cID, d: minD }
+   };
+
+   function findBestScore() {
+      var { nbClusters, nbClusters } = context;
+      var { xRange, yRange } = infos;
+      var count = 0;
+      var centPos = [];
+      for(var iC = 0; iC < nbClusters; iC++){
+         var x = xRange[0] + (iC + 1)*(xRange[1] - xRange[0])/(nbClusters + 1);
+         var y = yRange[0] + (iC + 1)*(yRange[1] - yRange[0])/(nbClusters + 1);
+         centPos[iC] = {x,y};
+      }
+      do{
+         var {score,classPoints} = context.updateScore(centPos);
+         var prevSco = score;
+         for(var iC = 0; iC < nbClusters; iC++){
+            var {x,y} = findBarycenterCoo(iC,classPoints);
+            centPos[iC] = getPosFromCoordinates({ x, y });
+         }
+         var {score} = context.updateScore(centPos);
+         var newSco = score;
+         count++;
+         console.log(prevSco,newSco,count)
+      }while(prevSco != newSco && count < 50)
+      return score
+   };
+
+   function findBarycenterCoo(id,classPoints) {
+      var cp = classPoints[id];
+      var x = 0;
+      var y = 0;
+      for(var iP = 0; iP < cp.length; iP++){
+         var pID = cp[iP];
+         var pos = context.pointData[pID];
+         x += pos.x;
+         y += pos.y;
+      }
+      x = x/cp.length;
+      y = y/cp.length;
+
+      return {x,y}
    };
 
    function drawCentroid(id,cx,cy,bar) {
@@ -2764,6 +2831,20 @@ var getContext = function(display, infos, curLevel) {
       var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
       x = Math.round(x);
       y = Math.round(y);
+      return { x, y }
+   };
+
+   function getPosFromCoordinates(coo) {
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
+      // var x0 = xPointArea;
+      // var y0 = yPointArea;
+      // var w = pointsAreaW;
+      // var h = pointsAreaH;
+
+      // var x = xRange[0] + (coo.x - x0)/w;
+      // var y = yRange[0] + (coo.y - y0)/h;
+      var x = Math.round(getPosFromCoordinate(coo.x,0));
+      var y = Math.round(getPosFromCoordinate(coo.y,1));
       return { x, y }
    };
 
@@ -2829,57 +2910,57 @@ var getContext = function(display, infos, curLevel) {
 
 
    
-   var resetItem = function(initItem, redisplay) {
-      if(redisplay === undefined)
-         redisplay = true;
-      var item = {};
-      context.items.push(item);
-      for(var property in initItem) {
-         item[property] = initItem[property];
-      }
+   // var resetItem = function(initItem, redisplay) {
+   //    if(redisplay === undefined)
+   //       redisplay = true;
+   //    var item = {};
+   //    context.items.push(item);
+   //    for(var property in initItem) {
+   //       item[property] = initItem[property];
+   //    }
       
-      item.side = 0;
-      item.offsetX = 0;
-      item.offsetY = 0;
-      item.nbStates = 1;
-      item.zOrder = 0;
-      for(var property in infos.itemTypes[item.type]) {
-         item[property] = infos.itemTypes[item.type][property];
-      }
+   //    item.side = 0;
+   //    item.offsetX = 0;
+   //    item.offsetY = 0;
+   //    item.nbStates = 1;
+   //    item.zOrder = 0;
+   //    for(var property in infos.itemTypes[item.type]) {
+   //       item[property] = infos.itemTypes[item.type][property];
+   //    }
       
-      if(context.display && redisplay) {
-         redisplayItem(item);
-      }
-   };
+   //    if(context.display && redisplay) {
+   //       redisplayItem(item);
+   //    }
+   // };
    
-   var resetItems = function() {
-      // context.items = [];
-      // var itemTypeByNum = {};
-      // for(var type in infos.itemTypes) {
-      //    var itemType = infos.itemTypes[type];
-      //    if(itemType.num != undefined) {
-      //       itemTypeByNum[itemType.num] = type;
-      //    }
-      // }
-      // for(var iRow = 0;iRow < context.nbRows;iRow++) {
-      //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
-      //       var itemTypeNum = context.tiles[iRow][iCol];
-      //       if(itemTypeByNum[itemTypeNum] != undefined) {
-      //          resetItem({
-      //             row: iRow,
-      //             col: iCol,
-      //             type: itemTypeByNum[itemTypeNum]
-      //          }, false);
-      //       }
-      //    }
-      // }
-      // for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
-      //    resetItem(context.initItems[iItem], false);
-      // }
+   // var resetItems = function() {
+   //    context.items = [];
+   //    var itemTypeByNum = {};
+   //    for(var type in infos.itemTypes) {
+   //       var itemType = infos.itemTypes[type];
+   //       if(itemType.num != undefined) {
+   //          itemTypeByNum[itemType.num] = type;
+   //       }
+   //    }
+   //    for(var iRow = 0;iRow < context.nbRows;iRow++) {
+   //       for(var iCol = 0;iCol < context.nbCols;iCol++) {
+   //          var itemTypeNum = context.tiles[iRow][iCol];
+   //          if(itemTypeByNum[itemTypeNum] != undefined) {
+   //             resetItem({
+   //                row: iRow,
+   //                col: iCol,
+   //                type: itemTypeByNum[itemTypeNum]
+   //             }, false);
+   //          }
+   //       }
+   //    }
+   //    for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
+   //       resetItem(context.initItems[iItem], false);
+   //    }
       
-      // if(context.display)
-      //    redisplayAllItems();
-   };
+   //    if(context.display)
+   //       redisplayAllItems();
+   // };
    
    var resetItemsZOrder = function(row, col) {
       var cellItems = [];
@@ -3069,606 +3150,606 @@ var getContext = function(display, infos, curLevel) {
       return selected;
    };
    
-   // context.isOn = function(filter) {
-   //    var item = context.getRobot();
-   //    return context.hasOn(item.row, item.col, filter);
-   // };
+   context.isOn = function(filter) {
+      var item = context.getRobot();
+      return context.hasOn(item.row, item.col, filter);
+   };
    
-   // context.isInFront = function(filter) {
-   //    var coords = context.coordsInFront();
-   //    return context.hasOn(coords.row, coords.col, filter);
-   // };
+   context.isInFront = function(filter) {
+      var coords = context.coordsInFront();
+      return context.hasOn(coords.row, coords.col, filter);
+   };
    
-   // context.isInGrid = function(row, col) {
-   //    if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
-   //       return false;
-   //    }
-   //    if (context.tiles[row][col] == 0) {
-   //       return false;
-   //    }
-   //    return true;
-   // };
+   context.isInGrid = function(row, col) {
+      if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
+         return false;
+      }
+      if (context.tiles[row][col] == 0) {
+         return false;
+      }
+      return true;
+   };
    
-   // context.tryToBeOn = function(row, col) {
-   //    // Returns whether the robot can move to row, col
-   //    // true : yes, false : no but move ignored, string : no and throw error
-   //    if(!context.isInGrid(row, col)) {
-   //       if(infos.ignoreInvalidMoves)
-   //          return false;
-   //       return strings.messages.leavesGrid;
-   //    }
+   context.tryToBeOn = function(row, col) {
+      // Returns whether the robot can move to row, col
+      // true : yes, false : no but move ignored, string : no and throw error
+      if(!context.isInGrid(row, col)) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         return strings.messages.leavesGrid;
+      }
       
-   //    if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
-   //       if(infos.ignoreInvalidMoves)
-   //          return false;
-   //       return strings.messages.obstacle;
-   //    }
+      if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         return strings.messages.obstacle;
+      }
       
-   //    if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
-   //       if(infos.ignoreInvalidMoves)
-   //          return false;
-   //       return strings.messages.failureProjectile;
-   //    }
-   //    return true;
-   // };
+      if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         return strings.messages.failureProjectile;
+      }
+      return true;
+   };
    
-   // context.coordsInFront = function(dDir, mult) {
-   //    if(dDir === undefined)
-   //       dDir = 0;
-   //    if(mult === undefined)
-   //       mult = 1;
-   //    var item = context.getRobot();
-   //    var lookDir = (item.dir + dDir + 4) % 4;
-   //    var delta = [[0,1],[1,0],[0,-1],[-1,0]];
-   //    return {
-   //       row: item.row + delta[lookDir][0] * mult,
-   //       col: item.col + delta[lookDir][1] * mult
-   //    };
-   // };
+   context.coordsInFront = function(dDir, mult) {
+      if(dDir === undefined)
+         dDir = 0;
+      if(mult === undefined)
+         mult = 1;
+      var item = context.getRobot();
+      var lookDir = (item.dir + dDir + 4) % 4;
+      var delta = [[0,1],[1,0],[0,-1],[-1,0]];
+      return {
+         row: item.row + delta[lookDir][0] * mult,
+         col: item.col + delta[lookDir][1] * mult
+      };
+   };
    
-   // context.isCrossing = function(wireA, wireB) {
-   //    function crossProduct(pointA, pointB, pointC) {
-   //       return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
-   //    }
+   context.isCrossing = function(wireA, wireB) {
+      function crossProduct(pointA, pointB, pointC) {
+         return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
+      }
       
-   //    function onLine(segment, point) {
-   //       return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
-   //        && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
-   //    }
+      function onLine(segment, point) {
+         return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
+          && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
+      }
       
-   //    if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
-   //       return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
-   //    }
-   //    return (crossProduct(wireA[0], wireA[1], wireB[0])
-   //    * crossProduct(wireA[0], wireA[1], wireB[1]) <= 0) &&
-   //    (crossProduct(wireB[0], wireB[1], wireA[0])
-   //    * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
-   // }
+      if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
+         return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
+      }
+      return (crossProduct(wireA[0], wireA[1], wireB[0])
+      * crossProduct(wireA[0], wireA[1], wireB[1]) <= 0) &&
+      (crossProduct(wireB[0], wireB[1], wireA[0])
+      * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
+   }
    
-   // context.moveRobot = function(newRow, newCol, newDir, callback) {
-   //    var iRobot = context.getRobotId();
-   //    var item = context.items[iRobot];
-   //    if (context.display) 
-   //       item.element.toFront();
-   //    var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
+   context.moveRobot = function(newRow, newCol, newDir, callback) {
+      var iRobot = context.getRobotId();
+      var item = context.items[iRobot];
+      if (context.display) 
+         item.element.toFront();
+      var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
       
-   //    if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
-   //       if(item.dir !== undefined)
-   //          item.dir = newDir;
-   //       if(context.display) {
-   //          var attr = itemAttributes(item);
-   //          item.element.attr(attr);
-   //       }
-   //    }
+      if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
+         if(item.dir !== undefined)
+            item.dir = newDir;
+         if(context.display) {
+            var attr = itemAttributes(item);
+            item.element.attr(attr);
+         }
+      }
       
-   //    if(item.dir !== undefined)
-   //       item.dir = newDir;
+      if(item.dir !== undefined)
+         item.dir = newDir;
       
-   //    item.row = newRow;
-   //    item.col = newCol;
+      item.row = newRow;
+      item.col = newCol;
       
-   //    context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
+      context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
       
-   //    if(context.display) {
-   //       attr = itemAttributes(item);
-   //       if(infos.actionDelay > 0) {
-   //          if(animate) {
-   //             context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
-   //          } else {
-   //             context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
-   //                item.element.attr(attr);
-   //             }, infos.actionDelay / 2);
-   //          }
-   //       } else {
-   //          item.element.attr(attr);
-   //       }
-   //       $("#nbMoves").html(context.nbMoves);
-   //    }
+      if(context.display) {
+         attr = itemAttributes(item);
+         if(infos.actionDelay > 0) {
+            if(animate) {
+               context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
+            } else {
+               context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
+                  item.element.attr(attr);
+               }, infos.actionDelay / 2);
+            }
+         } else {
+            item.element.attr(attr);
+         }
+         $("#nbMoves").html(context.nbMoves);
+      }
       
-   //    context.advanceTime(1);
-   //    if(callback) {
-   //       context.waitDelay(callback);
-   //    }
-   // };
+      context.advanceTime(1);
+      if(callback) {
+         context.waitDelay(callback);
+      }
+   };
    
-   // context.moveItem = function(item, newRow, newCol) {
-   //    var animate = (item.row != newRow) || (item.col != newCol);
-   //    var robot = context.getRobot();
-   //    if(context.display) {
-   //       resetItemsZOrder(newRow, newCol);
-   //       resetItemsZOrder(item.row, item.col);
-   //       resetItemsZOrder(robot.row, robot.col);
-   //    }
-   //    item.row = newRow;
-   //    item.col = newCol;
+   context.moveItem = function(item, newRow, newCol) {
+      var animate = (item.row != newRow) || (item.col != newCol);
+      var robot = context.getRobot();
+      if(context.display) {
+         resetItemsZOrder(newRow, newCol);
+         resetItemsZOrder(item.row, item.col);
+         resetItemsZOrder(robot.row, robot.col);
+      }
+      item.row = newRow;
+      item.col = newCol;
       
-   //    if(context.display) {
-   //       if(animate) {
-   //          attr = itemAttributes(item);
-   //          context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
-   //       }
-   //       else {
-   //          attr = itemAttributes(item);
-   //          if(infos.actionDelay > 0) {
-   //             context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
-   //                item.element.attr(attr);
-   //             }, infos.actionDelay / 2);
-   //          } else {
-   //             item.element.attr(attr);
-   //          }
-   //       }
-   //    }
-   // };
+      if(context.display) {
+         if(animate) {
+            attr = itemAttributes(item);
+            context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
+         }
+         else {
+            attr = itemAttributes(item);
+            if(infos.actionDelay > 0) {
+               context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
+                  item.element.attr(attr);
+               }, infos.actionDelay / 2);
+            } else {
+               item.element.attr(attr);
+            }
+         }
+      }
+   };
    
-   // context.moveProjectile = function(item) {
-   //    if(!context.isInGrid(item.row + 1, item.col)) {
-   //       context.destroy(item);
-   //    }
+   context.moveProjectile = function(item) {
+      if(!context.isInGrid(item.row + 1, item.col)) {
+         context.destroy(item);
+      }
       
-   //    if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
-   //       context.destroy(item);
-   //       context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
-   //       return;
-   //    }
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
+         return;
+      }
       
-   //    if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
-   //       context.destroy(item);
-   //       context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
-   //       return;
-   //    }
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
+         return;
+      }
       
-   //    context.moveItem(item, item.row + 1, item.col);
-   //    return;
-   // };
+      context.moveItem(item, item.row + 1, item.col);
+      return;
+   };
    
-   // context.destroy = function(item) {
-   //    context.setIndexes();
-   //    context.items.splice(item.index, 1);
+   context.destroy = function(item) {
+      context.setIndexes();
+      context.items.splice(item.index, 1);
 
-   //    if(context.display) {
-   //       item.element.remove();
-   //    }
-   // };
+      if(context.display) {
+         item.element.remove();
+      }
+   };
    
-   // context.fall = function(item, row, col, callback) {
-   //    var startRow = row;
-   //    var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
+   context.fall = function(item, row, col, callback) {
+      var startRow = row;
+      var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
       
-   //    while(context.isInGrid(row + 1, col) && platforms.length == 0) {
-   //       row++;
-   //       platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
-   //    }
+      while(context.isInGrid(row + 1, col) && platforms.length == 0) {
+         row++;
+         platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
+      }
       
-   //    if(!context.isInGrid(row + 1, col)) {
-   //       throw(context.strings.messages.falls);
-   //    }
+      if(!context.isInGrid(row + 1, col)) {
+         throw(context.strings.messages.falls);
+      }
       
-   //    if(row - startRow > infos.maxFallAltitude) {
-   //       throw(context.strings.messages.willFallAndCrash);
-   //    }
-   //    context.nbMoves++;
-   //    context.moveRobot(row, col, item.dir, callback);
-   // };
+      if(row - startRow > infos.maxFallAltitude) {
+         throw(context.strings.messages.willFallAndCrash);
+      }
+      context.nbMoves++;
+      context.moveRobot(row, col, item.dir, callback);
+   };
    
-   // context.jump = function(callback) {
-   //    if(!infos.hasGravity) {
-   //       throw("Error: can't jump without gravity");
-   //    }
+   context.jump = function(callback) {
+      if(!infos.hasGravity) {
+         throw("Error: can't jump without gravity");
+      }
       
-   //    var item = context.getRobot();
-   //    if(!context.isInGrid(item.row - 1, item.col)) {
-   //       throw(context.strings.messages.jumpOutsideGrid);
-   //    }
-   //    var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
-   //    if(obstacle.length > 0) {
-   //       throw(context.strings.messages.jumpObstacleBlocking);
-   //    }
-   //    var platforms = context.getItemsOn(item.row - 1, item.col, function(obj) { return obj.isObstacle === true; });
-   //    if(platforms.length == 0) {
-   //       throw(context.strings.messages.jumpNoPlatform);
-   //    }
-   //    context.nbMoves++;
-   //    context.moveRobot(item.row - 2, item.col, item.dir, callback);
-   // };
+      var item = context.getRobot();
+      if(!context.isInGrid(item.row - 1, item.col)) {
+         throw(context.strings.messages.jumpOutsideGrid);
+      }
+      var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
+      if(obstacle.length > 0) {
+         throw(context.strings.messages.jumpObstacleBlocking);
+      }
+      var platforms = context.getItemsOn(item.row - 1, item.col, function(obj) { return obj.isObstacle === true; });
+      if(platforms.length == 0) {
+         throw(context.strings.messages.jumpNoPlatform);
+      }
+      context.nbMoves++;
+      context.moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
    
-   // context.withdraw = function(filter, errorWhenEmpty) {
-   //    if(filter === undefined) {
-   //       filter = function(obj) { return true; };
-   //    }
-   //    if(errorWhenEmpty === undefined) {
-   //       errorWhenEmpty = true;
-   //    }
-   //    var item = context.getRobot();
-   //    var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
-   //    if(withdrawables.length == 0) {
-   //       if(errorWhenEmpty)
-   //          throw(context.strings.messages.nothingToPickUp);
-   //       return;
-   //    }
+   context.withdraw = function(filter, errorWhenEmpty) {
+      if(filter === undefined) {
+         filter = function(obj) { return true; };
+      }
+      if(errorWhenEmpty === undefined) {
+         errorWhenEmpty = true;
+      }
+      var item = context.getRobot();
+      var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
+      if(withdrawables.length == 0) {
+         if(errorWhenEmpty)
+            throw(context.strings.messages.nothingToPickUp);
+         return;
+      }
       
-   //    if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
-   //       throw(context.strings.messages.tooManyObjects);
-   //    }
+      if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
+         throw(context.strings.messages.tooManyObjects);
+      }
       
-   //    var withdrawable = withdrawables[0];
-   //    context.setIndexes();
-   //    context.items.splice(withdrawable.index, 1);
-   //    context.bag.push(withdrawable);
+      var withdrawable = withdrawables[0];
+      context.setIndexes();
+      context.items.splice(withdrawable.index, 1);
+      context.bag.push(withdrawable);
       
-   //    if(context.display) {
-   //       function removeWithdrawable() {
-   //          withdrawable.element.remove();
-   //          var items = context.getItemsOn(item.row, item.col);
-   //          for(var i = 0; i < items.length ; i++) {
-   //             redisplayItem(items[i]);
-   //          }
-   //       }
+      if(context.display) {
+         function removeWithdrawable() {
+            withdrawable.element.remove();
+            var items = context.getItemsOn(item.row, item.col);
+            for(var i = 0; i < items.length ; i++) {
+               redisplayItem(items[i]);
+            }
+         }
 
-   //       if (infos.actionDelay > 0) {
-   //          context.delayFactory.createTimeout("takeItem_" + Math.random(), removeWithdrawable, infos.actionDelay);
-   //       } else {
-   //          removeWithdrawable();
-   //       }
-   //    }
-   // };
+         if (infos.actionDelay > 0) {
+            context.delayFactory.createTimeout("takeItem_" + Math.random(), removeWithdrawable, infos.actionDelay);
+         } else {
+            removeWithdrawable();
+         }
+      }
+   };
    
-   // context.checkContainer = function(coords) {
-   //    var containers = context.getItemsOn(coords.row, coords.col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-   //    if(containers.length != 0) {
+   context.checkContainer = function(coords) {
+      var containers = context.getItemsOn(coords.row, coords.col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
+      if(containers.length != 0) {
          
-   //       var container = containers[0];
-   //       if(container.containerSize == undefined && container.containerFilter == undefined) {
-   //          container.containerSize = 1;
-   //       }
-   //       var filter;
-   //       if(container.containerFilter == undefined)
-   //          filter = function(obj) { return obj.isWithdrawable === true; };
-   //       else
-   //          filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+         var container = containers[0];
+         if(container.containerSize == undefined && container.containerFilter == undefined) {
+            container.containerSize = 1;
+         }
+         var filter;
+         if(container.containerFilter == undefined)
+            filter = function(obj) { return obj.isWithdrawable === true; };
+         else
+            filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
          
-   //       if(container.containerSize != undefined && context.getItemsOn(coords.row, coords.col, filter).length > container.containerSize) {
-   //          throw(window.languageStrings.messages.failureDropObject);
-   //          return;
-   //       }
+         if(container.containerSize != undefined && context.getItemsOn(coords.row, coords.col, filter).length > container.containerSize) {
+            throw(window.languageStrings.messages.failureDropObject);
+            return;
+         }
 
          
 
-   //       if(container.containerFilter != undefined) {
-   //          if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) }) && (context.infos.blockingFilter !== false)) {
+         if(container.containerFilter != undefined) {
+            if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) }) && (context.infos.blockingFilter !== false)) {
 
-   //             throw(window.languageStrings.messages.failureDropObject);
-   //             return;
-   //          }
-   //       }
-   //    }
-   // };
+               throw(window.languageStrings.messages.failureDropObject);
+               return;
+            }
+         }
+      }
+   };
    
-   // context.drop = function(count, coords, filter) {
-   //    if(count === undefined) {
-   //       count = 1;
-   //    }
-   //    if(filter === undefined) {
-   //       filter = function(obj) { return true; };
-   //    }
-   //    if(coords == undefined) {
-   //       var item = context.getRobot();
-   //       coords = {row: item.row, col: item.col};
-   //    }
+   context.drop = function(count, coords, filter) {
+      if(count === undefined) {
+         count = 1;
+      }
+      if(filter === undefined) {
+         filter = function(obj) { return true; };
+      }
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
       
-   //    for(var i = 0;i < count;i++) {
-   //       if(context.bag.length == 0) {
-   //          throw(context.strings.messages.emptyBag);
-   //       }
+      for(var i = 0;i < count;i++) {
+         if(context.bag.length == 0) {
+            throw(context.strings.messages.emptyBag);
+         }
          
-   //       var object = context.bag.pop();
-   //       object.row = coords.row;
-   //       object.col = coords.col;
-   //       var itemsOn = context.getItemsOn(coords.row, coords.col);
-   //       var maxi = object.zOrder;
-   //       for(var item in itemsOn) {
-   //          if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
-   //             maxi = itemsOn[item].zOrder;
-   //          }
-   //          redisplayItem(item);
-   //       }
+         var object = context.bag.pop();
+         object.row = coords.row;
+         object.col = coords.col;
+         var itemsOn = context.getItemsOn(coords.row, coords.col);
+         var maxi = object.zOrder;
+         for(var item in itemsOn) {
+            if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+               maxi = itemsOn[item].zOrder;
+            }
+            redisplayItem(item);
+         }
          
-   //       object.zOrder = maxi + 0.000001;
-   //       resetItem(object, true);
+         object.zOrder = maxi + 0.000001;
+         resetItem(object, true);
          
-   //       context.checkContainer(coords);
-   //    }
+         context.checkContainer(coords);
+      }
       
-   //    redisplayItem(this.getRobot());
-   // };
+      redisplayItem(this.getRobot());
+   };
    
-   // context.dropObject = function(object, coords) {
-   //    if(coords == undefined) {
-   //       var item = context.getRobot();
-   //       coords = {row: item.row, col: item.col};
-   //    }
+   context.dropObject = function(object, coords) {
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
       
-   //    if(!context.isInGrid(coords.row, coords.col)) {
-   //       throw(window.languageStrings.messages.failureDropOutside);
-   //       return;
-   //    }
+      if(!context.isInGrid(coords.row, coords.col)) {
+         throw(window.languageStrings.messages.failureDropOutside);
+         return;
+      }
       
-   //    object.row = coords.row;
-   //    object.col = coords.col;
+      object.row = coords.row;
+      object.col = coords.col;
       
-   //    var itemsOn = context.getItemsOn(coords.row, coords.col);
-   //    var maxi = object.zOrder;
-   //    if(maxi === undefined) {
-   //       maxi = 0;
-   //    }
-   //    for(var item in itemsOn) {
-   //       if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
-   //          maxi = itemsOn[item].zOrder;
-   //       }
-   //       redisplayItem(item);
-   //    }
-   //    resetItem(object, true);
-   //    context.checkContainer(coords);
-   //    redisplayItem(this.getRobot());
-   // };
+      var itemsOn = context.getItemsOn(coords.row, coords.col);
+      var maxi = object.zOrder;
+      if(maxi === undefined) {
+         maxi = 0;
+      }
+      for(var item in itemsOn) {
+         if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+            maxi = itemsOn[item].zOrder;
+         }
+         redisplayItem(item);
+      }
+      resetItem(object, true);
+      context.checkContainer(coords);
+      redisplayItem(this.getRobot());
+   };
    
-   // context.turnLeft = function(callback) {
-   //    var robot = context.getRobot();
-   //    context.moveRobot(robot.row, robot.col, (robot.dir + 3) % 4, callback);
-   // };
+   context.turnLeft = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 3) % 4, callback);
+   };
    
-   // context.turnRight = function(callback) {
-   //    var robot = context.getRobot();
-   //    context.moveRobot(robot.row, robot.col, (robot.dir + 1) % 4, callback);
-   // };
+   context.turnRight = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 1) % 4, callback);
+   };
    
-   // context.turnAround = function(callback) {
-   //    var robot = context.getRobot();
-   //    context.moveRobot(robot.row, robot.col, (robot.dir + 2) % 4, callback);
-   // };
+   context.turnAround = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 2) % 4, callback);
+   };
    
-   // context.forward = function(callback) {
-   //    var robot = context.getRobot();
-   //    var coords = context.coordsInFront();
-   //    var ttbo = context.tryToBeOn(coords.row, coords.col);
-   //    if(ttbo === true) {
-   //       if(infos.hasGravity) {
-   //          context.fall(robot, coords.row, coords.col, callback);
-   //       } else {
-   //          context.nbMoves++;
-   //          context.moveRobot(coords.row, coords.col, robot.dir, callback);
-   //       }
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
-   //       throw ttbo;
-   //    }
-   // };
+   context.forward = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront();
+      var ttbo = context.tryToBeOn(coords.row, coords.col);
+      if(ttbo === true) {
+         if(infos.hasGravity) {
+            context.fall(robot, coords.row, coords.col, callback);
+         } else {
+            context.nbMoves++;
+            context.moveRobot(coords.row, coords.col, robot.dir, callback);
+         }
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
+         throw ttbo;
+      }
+   };
    
-   // context.backwards = function(callback) {
-   //    var robot = context.getRobot();
-   //    var coords = context.coordsInFront(2);
-   //    var ttbo = context.tryToBeOn(coords.row, coords.col);
-   //    if(ttbo === true) {
-   //       if(infos.hasGravity) {
-   //          context.fall(robot, coords.row, coords.col, callback);
-   //       } else {
-   //          context.nbMoves++;
-   //          context.moveRobot(coords.row, coords.col, robot.dir, callback);
-   //       }
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
-   //       throw ttbo;
-   //    }
-   // };
+   context.backwards = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront(2);
+      var ttbo = context.tryToBeOn(coords.row, coords.col);
+      if(ttbo === true) {
+         if(infos.hasGravity) {
+            context.fall(robot, coords.row, coords.col, callback);
+         } else {
+            context.nbMoves++;
+            context.moveRobot(coords.row, coords.col, robot.dir, callback);
+         }
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(robot.row + (coords.row - robot.row) / 4, robot.col + (coords.col - robot.col) / 4, robot.dir);
+         throw ttbo;
+      }
+   };
    
-   // context.north = function(callback) {
-   //    var item = context.getRobot();
-   //    var ttbo = context.tryToBeOn(item.row - 1, item.col);
-   //    if(ttbo === true) {
-   //       context.nbMoves++;
-   //       context.moveRobot(item.row - 1, item.col, 3, callback);
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(item.row - 1/4, item.col, 3);
-   //       throw ttbo;
-   //    }
-   // };
+   context.north = function(callback) {
+      var item = context.getRobot();
+      var ttbo = context.tryToBeOn(item.row - 1, item.col);
+      if(ttbo === true) {
+         context.nbMoves++;
+         context.moveRobot(item.row - 1, item.col, 3, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row - 1/4, item.col, 3);
+         throw ttbo;
+      }
+   };
    
-   // context.south = function(callback) {
-   //    var item = context.getRobot();
-   //    var ttbo = context.tryToBeOn(item.row + 1, item.col);
-   //    if(ttbo === true) {
-   //       context.nbMoves++;
-   //       context.moveRobot(item.row + 1, item.col, 1, callback);
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(item.row + 1/4, item.col, 1);
-   //       throw ttbo;
-   //    }
-   // };
+   context.south = function(callback) {
+      var item = context.getRobot();
+      var ttbo = context.tryToBeOn(item.row + 1, item.col);
+      if(ttbo === true) {
+         context.nbMoves++;
+         context.moveRobot(item.row + 1, item.col, 1, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row + 1/4, item.col, 1);
+         throw ttbo;
+      }
+   };
    
-   // context.east = function(callback) {
-   //    var item = context.getRobot();
-   //    var ttbo = context.tryToBeOn(item.row, item.col + 1);
-   //    if(ttbo === true) {
-   //       context.nbMoves++;
-   //       context.moveRobot(item.row, item.col + 1, 0, callback);
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(item.row, item.col + 1/4, 0);
-   //       throw ttbo;
-   //    }
-   // };
+   context.east = function(callback) {
+      var item = context.getRobot();
+      var ttbo = context.tryToBeOn(item.row, item.col + 1);
+      if(ttbo === true) {
+         context.nbMoves++;
+         context.moveRobot(item.row, item.col + 1, 0, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row, item.col + 1/4, 0);
+         throw ttbo;
+      }
+   };
    
-   // context.west = function(callback) {
-   //    var item = context.getRobot();
-   //    var ttbo = context.tryToBeOn(item.row, item.col - 1);
-   //    if(ttbo === true) {
-   //       context.nbMoves++;
-   //       context.moveRobot(item.row, item.col - 1, 2, callback);
-   //    } else if(ttbo === false) {
-   //       context.waitDelay(callback);
-   //    } else {
-   //       context.moveRobot(item.row, item.col - 1/4, 2);
-   //       throw ttbo;
-   //    }
-   // };
+   context.west = function(callback) {
+      var item = context.getRobot();
+      var ttbo = context.tryToBeOn(item.row, item.col - 1);
+      if(ttbo === true) {
+         context.nbMoves++;
+         context.moveRobot(item.row, item.col - 1, 2, callback);
+      } else if(ttbo === false) {
+         context.waitDelay(callback);
+      } else {
+         context.moveRobot(item.row, item.col - 1/4, 2);
+         throw ttbo;
+      }
+   };
    
-   // context.obstacleInFront = function() {
-   //    return context.isInFront(function(obj) { return obj.isObstacle === true; });
-   // };
+   context.obstacleInFront = function() {
+      return context.isInFront(function(obj) { return obj.isObstacle === true; });
+   };
    
-   // context.platformInFront = function() {
-   //    var coords = context.coordsInFront();
-   //    return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
-   // };
+   context.platformInFront = function() {
+      var coords = context.coordsInFront();
+      return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
+   };
    
-   // context.platformAbove = function() {
-   //    var robot = context.getRobot();
-   //    return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
-   // };
+   context.platformAbove = function() {
+      var robot = context.getRobot();
+      return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
+   };
    
-   // context.writeNumber = function(row, col, value) {
-   //    var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
+   context.writeNumber = function(row, col, value) {
+      var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
       
-   //    if(numbers.length == 0) {
-   //       throw(strings.messages.failureWriteHere);
-   //    }
+      if(numbers.length == 0) {
+         throw(strings.messages.failureWriteHere);
+      }
       
-   //    var number = numbers[0];
-   //    number.value = value;
-   //    if(context.display) {
-   //       redisplayItem(number);
-   //    }
-   // };
+      var number = numbers[0];
+      number.value = value;
+      if(context.display) {
+         redisplayItem(number);
+      }
+   };
    
-   // context.readNumber = function(row, col) {
-   //    var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
+   context.readNumber = function(row, col) {
+      var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
       
-   //    if(numbers.length == 0) {
-   //       throw(strings.messages.failureReadHere);
-   //    }
+      if(numbers.length == 0) {
+         throw(strings.messages.failureReadHere);
+      }
       
-   //    return parseInt(numbers[0].value);
-   // };
+      return parseInt(numbers[0].value);
+   };
    
-   // context.pushObject = function(callback) {
-   //    var robot = context.getRobot();
-   //    var coords = context.coordsInFront();
+   context.pushObject = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront();
       
-   //    var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
+      var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
       
-   //    if(items.length == 0) {
-   //       throw(strings.messages.failureNothingToPush);
-   //    }
+      if(items.length == 0) {
+         throw(strings.messages.failureNothingToPush);
+      }
       
-   //    var coordsAfter = context.coordsInFront(0, 2);
+      var coordsAfter = context.coordsInFront(0, 2);
       
-   //    if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
-   //       throw(strings.messages.failureWhilePushing);
-   //    if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
-   //       throw(strings.messages.failureWhilePushing);
-   //    if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
-   //       throw(strings.messages.failureWhilePushing);
+      if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
+         throw(strings.messages.failureWhilePushing);
+      if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
+         throw(strings.messages.failureWhilePushing);
+      if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
+         throw(strings.messages.failureWhilePushing);
       
-   //    context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
+      context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
       
-   //    context.forward(callback);
-   // };
+      context.forward(callback);
+   };
    
-   // context.shoot = function(lig, col, dir) {
-   //    dir = dir % 8;
-   //    var dirs = [
-   //       [-1, 0],
-   //       [-1, 1],
-   //       [0, 1],
-   //       [1, 1],
-   //       [1, 0],
-   //       [1, -1],
-   //       [0, -1],
-   //       [-1, -1]
-   //    ];
+   context.shoot = function(lig, col, dir) {
+      dir = dir % 8;
+      var dirs = [
+         [-1, 0],
+         [-1, 1],
+         [0, 1],
+         [1, 1],
+         [1, 0],
+         [1, -1],
+         [0, -1],
+         [-1, -1]
+      ];
       
-   //    var lights = context.getItemsOn(lig, col, function(obj) {
-   //       return obj.isLight === true;
-   //    });
+      var lights = context.getItemsOn(lig, col, function(obj) {
+         return obj.isLight === true;
+      });
       
-   //    for(var light in lights) {
-   //       lights[light].state = 1;
-   //       lights[light].img = lights[light].states[lights[light].state];
-   //       if(context.display)
-   //          redisplayItem(lights[light]);
-   //    }
+      for(var light in lights) {
+         lights[light].state = 1;
+         lights[light].img = lights[light].states[lights[light].state];
+         if(context.display)
+            redisplayItem(lights[light]);
+      }
       
-   //    var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
-   //    var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
+      var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
+      var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
       
-   //    var taille = infos.cellSide;
+      var taille = infos.cellSide;
       
-   //    var findRobot = false;
+      var findRobot = false;
       
-   //    var plig = lig + dirs[dir][0];
-   //    var pcol = col + dirs[dir][1];
-   //    if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
-   //       taille /= 2;
+      var plig = lig + dirs[dir][0];
+      var pcol = col + dirs[dir][1];
+      if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
+         taille /= 2;
          
-   //       findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
-   //    }
-   //    else {
-   //       var pdir = dir;
-   //       var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
-   //       if(mirrors.length != 0) {
-   //          pdir = mirrors[0].mirrorFunction(dir);
-   //       }
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+      }
+      else {
+         var pdir = dir;
+         var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
+         if(mirrors.length != 0) {
+            pdir = mirrors[0].mirrorFunction(dir);
+         }
          
-   //       findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
          
-   //       if(context.shoot(plig, pcol, pdir)) {
-   //          findRobot = true;
-   //       }
-   //    }
+         if(context.shoot(plig, pcol, pdir)) {
+            findRobot = true;
+         }
+      }
       
-   //    var dx = (taille * dirs[dir][1]) * scale;
-   //    var dy = (taille * dirs[dir][0]) * scale;
+      var dx = (taille * dirs[dir][1]) * scale;
+      var dy = (taille * dirs[dir][0]) * scale;
       
-   //    if(context.display && paper != undefined) {
-   //       var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+      if(context.display && paper != undefined) {
+         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
          
-   //       segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
+         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
          
-   //       context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
-   //          segment.remove();
-   //       }, infos.actionDelay * 2);
-   //    }
+         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+            segment.remove();
+         }, infos.actionDelay * 2);
+      }
       
-   //    return findRobot;
-   // };
+      return findRobot;
+   };
    
    context.connect = function() {
       var robot = context.getRobot();
@@ -3754,172 +3835,174 @@ var getResources = function(subTask) {
    return res
 };
 
-// var robotEndConditions = {
-//    checkReachExit: function(context, lastTurn) {
-//       var robot = context.getRobot();
-//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successReachExit);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureReachExit);
-//       }
-//    },
-//    checkPickedAllWithdrawables: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-//                solved = false;
-//             }
-//          }
-//       }
+var robotEndConditions = {
+   checkReachExit: function(context, lastTurn) {
+      var robot = context.getRobot();
+      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+         context.success = true;
+         throw(window.languageStrings.messages.successReachExit);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachExit);
+      }
+   },
+   checkPickedAllWithdrawables: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+               solved = false;
+            }
+         }
+      }
       
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successPickedAllWithdrawables);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-//       }
-//    },
-//    checkPlugsWired: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
-//                solved = false;
-//             }
-//          }
-//       }
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+      }
+   },
+   checkPlugsWired: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
+               solved = false;
+            }
+         }
+      }
       
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successPlugsWired);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failurePlugsWired);
-//       }
-//    },
-//    checkContainersFilled: function(context, lastTurn) {
-//       var solved = true;
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPlugsWired);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePlugsWired);
+      }
+   },
+   checkContainersFilled: function(context, lastTurn) {
+      var solved = true;
       
-//       var messages = [
-//          window.languageStrings.messages.failureContainersFilled,
-//          window.languageStrings.messages.failureContainersFilledLess,
-//          window.languageStrings.messages.failureContainersFilledBag
-//       ];
-//       var message = 2;
-//       if (context.infos.maxMoves != undefined) {
-//          if (context.nbMoves > context.infos.maxMoves) {
-//             context.success = false;
-//             throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
-//          }
-//       }
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-//             if(containers.length != 0) {
-//                var container = containers[0];
-//                if(container.containerSize == undefined && container.containerFilter == undefined) {
-//                   container.containerSize = 1;
-//                }
-//                var filter;
-//                if(container.containerFilter == undefined)
-//                   filter = function(obj) { return obj.isWithdrawable === true; };
-//                else
-//                   filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+      var messages = [
+         window.languageStrings.messages.failureContainersFilled,
+         window.languageStrings.messages.failureContainersFilledLess,
+         window.languageStrings.messages.failureContainersFilledBag
+      ];
+      var message = 2;
+      if (context.infos.maxMoves != undefined) {
+         if (context.nbMoves > context.infos.maxMoves) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
+         }
+      }
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
+            if(containers.length != 0) {
+               var container = containers[0];
+               if(container.containerSize == undefined && container.containerFilter == undefined) {
+                  container.containerSize = 1;
+               }
+               var filter;
+               if(container.containerFilter == undefined)
+                  filter = function(obj) { return obj.isWithdrawable === true; };
+               else
+                  filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
                
-//                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
-//                   solved = false;
-//                   message = Math.min(message, 1);
-//                }
-//                else if(context.getItemsOn(row, col, filter).length == 0) {
-//                   solved = false;
-//                   message = Math.min(message, 0);
-//                }
+               if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
+                  solved = false;
+                  message = Math.min(message, 1);
+               }
+               else if(context.getItemsOn(row, col, filter).length == 0) {
+                  solved = false;
+                  message = Math.min(message, 0);
+               }
                
-//                if(container.containerFilter != undefined) {
-//                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
-//                      solved = false;
-//                      message = Math.min(message, 0);
-//                   }
-//                   for(var item in context.bag) {
-//                      if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
-//                         solved = false;
-//                         message = Math.min(message, 2);
-//                      }
-//                   }
-//                }
-//             }
-//             else {
-//                if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
-//                   solved = false;
-//                   message = Math.min(message, 0);
-//                }
-//             }
-//          }
-//       }
+               if(container.containerFilter != undefined) {
+                  if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
+                     solved = false;
+                     message = Math.min(message, 0);
+                  }
+                  for(var item in context.bag) {
+                     if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
+                        solved = false;
+                        message = Math.min(message, 2);
+                     }
+                  }
+               }
+            }
+            else {
+               if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
+                  solved = false;
+                  message = Math.min(message, 0);
+               }
+            }
+         }
+      }
       
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successContainersFilled);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(messages[message]);
-//       }
-//    },
-//    checkBothReachAndCollect: function(context, lastTurn) {
-//       var robot = context.getRobot();
-//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
-//          var solved = true;
-//          for(var row = 0;row < context.nbRows;row++) {
-//             for(var col = 0;col < context.nbCols;col++) {
-//                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-//                   solved = false;
-//                   throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-//                }
-//             }
-//          }
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successContainersFilled);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(messages[message]);
+      }
+   },
+   checkBothReachAndCollect: function(context, lastTurn) {
+      var robot = context.getRobot();
+      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+         var solved = true;
+         for(var row = 0;row < context.nbRows;row++) {
+            for(var col = 0;col < context.nbCols;col++) {
+               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+                  solved = false;
+                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+               }
+            }
+         }
          
-//          if(solved) {
-//             context.success = true;
-//             throw(window.languageStrings.messages.successPickedAllWithdrawables);
-//          }
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureReachExit);
-//       }
-//    },
-//    checkLights: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
-//                solved = false;
-//             }
-//          }
-//       }
+         if(solved) {
+            context.success = true;
+            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         }
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachExit);
+      }
+   },
+   checkLights: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
+               solved = false;
+            }
+         }
+      }
       
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successLights);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureLights);
-//       }
-//    }
-// };
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successLights);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureLights);
+      }
+   }
+};
 
 var endConditions = {
    checkScore: function(context, lastTurn) {
       context.success = false;
+      var { score } = context.updateScore();
+      console.log(score)
       throw("test");
    }
 };
