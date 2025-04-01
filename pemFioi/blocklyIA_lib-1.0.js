@@ -85,6 +85,7 @@ var getContext = function(display, infos, curLevel) {
                log: "log",
                distance: "distance",
                showCentroid: "showCentroid",
+               showDistance: "showDistance",
                setCluster: "setCluster"
             },
             description: {
@@ -93,6 +94,7 @@ var getContext = function(display, infos, curLevel) {
                log: "@(msg)",
                distance: "@(x1,y1,x2,y2)",
                showCentroid: "@(idCluster,x,y)",
+               showDistance: "@(idItem,idCluster)",
                setCluster: "@(idItem,idCluster)"
             },
             messages: {
@@ -121,493 +123,36 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                
             },
-            cardinals: {
-               north: "North",
-               south: "South",
-               west: "West",
-               east: "East"
-            },
-            startingBlockName: "Program of the robot"
+            // startingBlockName: "Program of the robot"
          },
          
          es: {
             label: {
-               row: "fila del robot",
-               col: "columna del robot",
-               north: "avanzar hacia arriba",
-               south: "avanzar hacia abajo",
-               east: "avanzar hacia la derecha",
-               west: "avanzar hacia la izquierda",
-               left: "girar a la izquierda",
-               right: "girar a la derecha",
-               turnAround: "dar media vuelta",
-               forward: "avanzar",
-               backwards: "retroceder",
-               jump: "saltar",
-               obstacleInFront: "obstáculo adelante",
-               obstacleEast: "obstáculo a la derecha",
-               obstacleWest: "obstáculo a la izquierda",
-               obstacleNorth: "obstáculo arriba",
-               obstacleSouth: "obstáculo abajo",
-               obstacleRight: "obstáculo a la derecha",
-               obstacleLeft: "obstáculo a la izquierda",
-               gridEdgeEast: "borde de la cuadrícula a la derecha",
-               gridEdgeWest: "borde de la cuadrícula a la izquierda",
-               gridEdgeNorth: "borde de la cuadrícula arriba",
-               gridEdgeSouth: "borde de la cuadrícula abajo",
-               platformInFront: "plataforma adelante",
-               platformAbove: "plataforma arriba",
-               withdrawObject: "recoger el objeto",
-               dropObject: "soltar el objeto",
-               onObject: "sobre un objeto",
-               onContainer: "sobre un contenedor",
-               onNumber: "sobre un número",
-               onWritable: "sobre un cuadro",
-               onLauncher: "sobre un lanzador láser",
-               writeNumber: "escribir el número",
-               readNumber: "número en la casilla",
-               pushObject: "empujar el objeto",
-               pushableInFront: "objeto empujable adelante",
-               shoot: "disparar el láser en la dirección %1",
-               shoot_noShadow: "disparar el laser en la dirección %1",
-               shootCondition: "dirección del tiro de retorno %1",
-               shootCondition_noShadow: "dirección del tiro de retorno %1",
-               dropPlatformInFront: "construir una plataforma adelante",
-               dropPlatformAbove: "construir una plataforma arriba"
             },
             code: {
-               row: "filaRobot",
-               col: "columnaRobot",
-               north: "arriba",
-               south: "abajo",
-               east: "derecha",
-               west: "izquierda",
-               left: "girarIzquierda",
-               right: "girarDerecha",
-               turnAround: "mediaVuelta",
-               forward: "avanzar",
-               backwards: "retroceder",
-               jump: "saltar",
-               obstacleInFront: "obstaculoAdelante",
-               obstacleRight: "obstaculoDerechaRel",
-               obstacleLeft: "obstaculoIzquierdaRel",
-               obstacleEast: "obstaculoDerecha",
-               obstacleWest: "obstaculoIzquierda",
-               obstacleNorth: "obstaculoArriba",
-               obstacleSouth: "obstaculoAbajo",
-               gridEdgeEast: "bordeCuadriculaDerecha",
-               gridEdgeWest: "bordeCuadriculaIzquierda",
-               gridEdgeNorth: "bordeCuadriculaArriba",
-               gridEdgeSouth: "bordeCuadriculaAbajo",
-               platformInFront: "plataformaAdelante",
-               platformAbove: "plataformaArriba",
-               withdrawObject: "recogerObjeto",
-               dropObject: "soltarObjeto",
-               onObject: "sobreObjeto",
-               onContainer: "sobreContenedor",
-               onNumber: "sobreNumero",
-               onWritable: "sobreCuadro",
-               onLauncher: "sobreLanzador",
-               writeNumber: "escribirNumero",
-               readNumber: "leerNumero",
-               pushObject: "empujarObjeto",
-               pushableInFront: "empujableAdelante",
-               shoot: "dispararLaser",
-               shoot_noShadow: "dispararLaser",
-               shootCondition: "condicionDisparo",
-               shootCondition_noShadow: "condicionDisparo",
-               dropPlatformInFront: "construirPlataformaAdelante",
-               dropPlatformAbove: "construirPlataformaArriba"
             },
             messages: {
-               leavesGrid: "¡El robot salió de la cuadrícula!",
-               obstacle: "¡El robot intenta moverse sobre un obstáculo!",
-               nothingToPickUp: "No hay algo para recoger",
-               nothingToLookAt: "No hay carta ni contenedor en esta casilla",
-               falls: "¡El robot va a caer al vacío!",
-               willFallAndCrash: "¡El robot va a caer y chocar!",
-               jumpOutsideGrid: "¡El robot intenta saltar fuera de la cuadrícula!",
-               jumpObstacleBlocking: "El robot intenta saltar pero hay un obstáculo que lo bloquea",
-               jumpNoPlatform: "¡El robot intenta saltar pero no hay una plataforma arriba!",
-               tooManyObjects: "¡El robot intenta transportar demasiados objetos al mismo tiempo!",
-               emptyBag: "El robot intenta soltar un objeto, ¡pero no carga nada!",
-               successReachExit: "Bravo, ¡su robot a llegado a la salida!",
-               failureReachExit: "Su robot no ha llegado a la salida.",
-               successPickedAllWithdrawables: "Bravo, su robot ha recogido todo!",
-               failurePickedAllWithdrawables: "Su robot no ha recogido todo.",
-               successContainersFilled: "Bravo, su robot ha llenado todos los contenedores",
-               failureContainersFilled: "Hay un objeto fuera de los contenedores",
-               failureContainersFilledLess: "Su robot no ha llenado todos los contenedores",
-               failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
-               failureUnfilteredObject: "Su robot ha recogido un objeto inválido",
-               failureTooManyMoves: "Su robot ha realizado demasiados desplazamientos.",
-               failureWriteHere: "¡Su robot no puede escribir aquí!",
-               failureReadHere: "¡No hay un número aquí!",
-               successNumbersWritten: "Bravo, su robot ha escrito los números correctos!",
-               failureNumbersWritten: "Su robot no ha escrito los números correctos!",
-               failureNothingToPush: "¡No hay un objeto que empujar!",
-               failureWhilePushing: "¡El robot no puede empujar este objeto!",
-               failureDropObject: "No es posible poner el objeto aquí",
-               failureDropPlatform: "No es posible poner el objeto aquí",
-               failureDropOutside: "Su robot intenta poner un objeto fuera de la cuadrícula",
-               failureNotEnoughPlatform: "No hay suficiente plataforma",
-               failureLights: "Aún faltan lugares que iluminar.",
-               successLights: "Bravo, ¡su robot ha iluminado todos los lugares!",
-               failureLaser: "¡El robot debe encontrarse sobre una terminal láser para poder disparar!"
             },
-            cardinals: {
-               north: "Norte",
-               south: "Sur",
-               west: "Oeste",
-               east: "Este"
-            },
-            startingBlockName: "Programa del robot"
+            // startingBlockName: "Programa del robot"
          },
          de: {
             label: {
-               row: "Zeile des Roboters",
-               col: "Spalte des Roboters",
-               north: "gehe nach oben",
-               south: "gehe nach unten",
-               east: "gehe nach rechts",
-               west: "gehe nach links",
-               left: "drehe nach links",
-               right: "drehe nach rechts",
-               turnAround: "drehe um",
-               forward: "gehe",
-               backwards: "gehe rückwärts",
-               jump: "springe",
-               obstacleInFront: "vor Hindernis",
-               obstacleEast: "Hindernis rechts",
-               obstacleWest: "Hindernis links",
-               obstacleNorth: "Hindernis oben",
-               obstacleSouth: "Hindernis unten",
-               obstacleRight: "Hindernis rechts",
-               obstacleLeft: "Hindernis links",
-               gridEdgeAbove: "unter Rand des Gitters",
-               gridEdgeBelow: "über Rand des Gitters",
-               gridEdgeEast: "links vom Gitterrand",
-               gridEdgeWest: "rechts vom Gitterrand",
-               platformInFront: "vor Plattform",
-               platformAbove: "Plattform darüber",
-               withdrawObject: "hebe Objekt auf",
-               dropObject: "lege Objekt ab",
-               onObject: "auf Objekt",
-               onContainer: "auf Kiste",
-               onNumber: "auf Zahl",
-               onWritable: "auf Tafel",
-               onLauncher: "sur un lanceur laser", // TODO :: translate
-               writeNumber: "schreibe Zahl",
-               readNumber: "Zahl auf dem Feld",
-               pushObject: "schiebe Kiste",
-               pushableInFront: "vor Kiste",
-               shoot: "schieße Laser in Richtung %1",
-               shoot_noShadow: "schieße Laser in Richtung %1",
-               shootCondition: "Rückkehr von der Schießrichtung %1",
-               shootCondition_noShadow: "Rückkehr von der Schießrichtung %1"
             },
             code: {
-               row: "ligneRobot",
-               col: "colonneRobot",
-               north: "haut",
-               south: "bas",
-               east: "droite",
-               west: "gauche",
-               left: "tournerGauche",
-               right: "tournerDroite",
-               turnAround: "demiTour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleDroite",
-               obstacleWest: "obstacleGauche",
-               obstacleNorth: "obstacleHaut",
-               obstacleSouth: "obstacleBas",
-               obstacleRight: "obstacleDroiteRel",
-               obstacleLeft: "obstacleGaucheRel",
-               gridEdgeEast: "bordGrilleDroite",
-               gridEdgeWest: "bordGrilleGauche",
-               gridEdgeNorth: "bordGrilleHaut",
-               gridEdgeSouth: "bordGrilleBas",
-               platformInFront: "plateformeDevant",
-               platformAbove: "plateformeDessus",
-               withdrawObject: "ramasserObjet",
-               dropObject: "deposerObjet",
-               onObject: "surObjet",
-               onContainer: "surConteneur",
-               onNumber: "surNombre",
-               onWritable: "surTableau",
-               onLauncher: "surLanceur", 
-               writeNumber: "ecrireNombre",
-               readNumber: "nombreSurCase",
-               pushObject: "pousserObjet",
-               pushableInFront: "poussableDevant",
-               shoot: "tirerLaser",
-               shoot_noShadow: "tirerLaser",
-               shootCondition: "tirerCondition",
-               shootCondition_noShadow: "tirerCondition"
             },
             messages: {
-               leavesGrid: "Der Roboter hat das Gitter verlassen!",
-               obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
-               nothingToPickUp: "An dieser Stelle gibt es nichts zum aufheben!",
-               nothingToLookAt: "An dieser Stelle gibt es nichts zum betrachten!",
-               falls: "Der Roboter fällt in den Abgrund!",
-               willFallAndCrash: "Der Roboter würde hier runterfallen und kaputt gehen!",
-               jumpOutsideGrid: "Der Roboter versucht, aus dem Gitter zu springen!",
-               jumpObstacleBlocking: "Der Roboter kann hier nicht springen, weil ein Hindernis ihn blockiert.",
-               jumpNoPlatform: "Der Roboter kann hier nicht springen, weil über ihm keine Plattform ist.",
-               tooManyObjects: "Der Roboter kann nicht so viele Objekte auf einmal tragen!",
-               emptyBag: "Der Roboter kann nichts ablegen, weil er gar nichts transportiert!",
-               successReachExit: "Bravo! Der Roboter hat den Ausgang erreicht.",
-               failureReachExit: "Der Roboter hat den Ausgang nicht erreich!",
-               successPickedAllWithdrawables: "Bravo! Der Roboter hat alles eingesammelt.",
-               failurePickedAllWithdrawables: "Der Roboter hat nicht alles eingesammelt!",
-               successContainersFilled: "Gut gemacht! Der Roboter hat alle Behälter gefüllt.",
-               failureContainersFilled: "Es befindet sich ein Objekt außerhalb der Behälter.",
-               failureContainersFilledLess: "Der Roboter hat nicht alle Behälter gefüllt.",
-               failureContainersFilledBag: "Der Roboter hat nicht alle Objekte platziert.",
-               failureUnfilteredObject: "Dein Roboter hat ein nicht erlaubtes Objekt aufgehoben!",
-               failureTooManyMoves: "Votre robot a effectué trop de déplacements.",
-               failureWriteHere: "Der Roboter kann an dieser Stelle nicht schreiben!",
-               failureReadHere: "An dieser Stelle steht keine Zahl!",
-               successNumbersWritten: "Bravo! Der Roboter hat die richtigen Zahlen geschrieben.",
-               failureNumbersWritten: "Dein Roboter hat nicht die richtigen Zahlen geschrieben!",
-               failureNothingToPush: "An dieser Stelle gibt es nichts zum Schieben!",
-               failureWhilePushing: "Der Roboter hat es nicht geschafft, das Objekt zu schieben!",
-               failureDropObject: "An dieser Stelle kann kein Objekt abgelegt werden!",
-               failureDropPlatform: "An dieser Stelle kann kein Objekt abgelegt werden!",
-               failureDropOutside: "Der Roboter hat versucht ein Objekt vom Gitterrand zu schieben!",
-               failureNotEnoughPlatform: "Nicht genügend Plattformen!",
-               failureLights: "Der Roboter hat nicht alles beleuchtet!",
-               successLights: "Bravo! Der Roboter hat alles beleuchtet.",
-               failureLaser: "Der Roboter muss auf einem Laser stehen, um schießen zu können!",
             },
-            cardinals: {
-               north: "Norden",
-               south: "Süden",
-               west: "Westen",
-               east: "Osten"
-            },
-            startingBlockName: "Roboter-Programm"
+            // startingBlockName: "Roboter-Programm"
          },
          it: {
             label: {
-               row: "ligne du robot",
-               col: "colonne du robot",
-               wait: "attendre",
-               north: "andare avanti",
-               south: "avanzare verso il basso",
-               east: "avanza a destra",
-               west: "avancer vers la gauche",
-               left: "tourner à gauche",
-               right: "tourner à droite",
-               turnAround: "faire demi-tour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacle devant",
-               obstacleEast: "obstacle à droite",
-               obstacleWest: "obstacle à gauche",
-               obstacleNorth: "obstacle en haut",
-               obstacleSouth: "obstacle en bas",
-               obstacleRight: "obstacle à droite",
-               obstacleLeft: "obstacle à gauche",
-               gridEdgeEast: "bord de la grille à droite",
-               gridEdgeWest: "bord de la grille à gauche",
-               gridEdgeNorth: "bord de la grille en haut",
-               gridEdgeSouth: "bord de la grille en bas",
-               platformInFront: "plateforme devant",
-               platformAbove: "plateforme au-dessus",
-               withdrawObject: "ramasser l'objet",
-               dropObject: "dipingi la scatola",
-               onObject: "su un marmo",
-               onContainer: "su un buco",
-               onNumber: "sur un nombre",
-               onWritable: "sur un tableau",
-               onLauncher: "sur un lanceur laser",
-               writeNumber: "scrivere numero",
-               readNumber: "numero sulla casella",
-               pushObject: "pousser l'objet",
-               pushableInFront: "poussable devant",
-               shoot: "tirer au laser dans la direction %1",
-               shoot_noShadow: "tirer au laser dans la direction %1",
-               shootCondition: "retour départ tir direction %1",
-               shootCondition_noShadow: "retour départ tir direction %1",
-               connect: "brancher un câble",
-               onMale: "sur une prise mâle",
-               onFemale: "sur une prise femelle"
             },
             code: {
-               row: "ligneRobot",
-               col: "colonneRobot",
-               wait: "attendre",
-               north: "haut",
-               south: "bas",
-               east: "droite",
-               west: "gauche",
-               left: "tournerGauche",
-               right: "tournerDroite",
-               turnAround: "demiTour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleDroite",
-               obstacleWest: "obstacleGauche",
-               obstacleNorth: "obstacleHaut",
-               obstacleSouth: "obstacleBas",
-               obstacleRight: "obstacleDroiteRel",
-               obstacleLeft: "obstacleGaucheRel",
-               gridEdgeEast: "bordGrilleDroite",
-               gridEdgeWest: "bordGrilleGauche",
-               gridEdgeNorth: "bordGrilleHaut",
-               gridEdgeSouth: "bordGrilleBas",
-               platformInFront: "plateformeDevant",
-               platformAbove: "plateformeDessus",
-               withdrawObject: "ramasserObjet",
-               dropObject: "deposerObjet",
-               onObject: "surObjet",
-               onContainer: "surConteneur",
-               onNumber: "surNombre",
-               onWritable: "surTableau",
-               onLauncher: "surLanceur",
-               writeNumber: "ecrireNombre",
-               readNumber: "nombreSurCase",
-               pushObject: "pousserObjet",
-               pushableInFront: "poussableDevant",
-               shoot: "tirerLaser",
-               shoot_noShadow: "tirerLaser",
-               shootCondition: "tirerCondition",
-               shootCondition_noShadow: "tirerCondition",
-               connect: "brancherCable",
-               onMale: "surMale",
-               onFemale: "surFemelle"
             },
             messages: {
-               leavesGrid: "Le robot sort de la grille !",
-               obstacle: "Le robot essaie de se déplacer sur un obstacle !",
-               nothingToPickUp: "Il n'y a rien à ramasser !",
-               nothingToLookAt: "Il n'y a ni carte ni conteneur sur cette case",
-               falls: "Le robot va se jeter dans le vide !",
-               willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
-               jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
-               jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
-               jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
-               tooManyObjects: "Le robot essaie de transporter trop d'objets à la fois !",
-               emptyBag: "Le robot essaie de déposer un objet alors qu'il n'en transporte pas !",
-               successReachExit: "Bravo, votre robot a atteint la sortie !",
-               failureReachExit: "Votre robot n'a pas atteint la sortie.",
-               successPickedAllWithdrawables: "Bravo, votre robot a tout ramassé !",
-               failurePickedAllWithdrawables: "Votre robot n'a pas tout ramassé.",
-               successContainersFilled: "Bravo, votre robot a rempli tous les conteneurs",
-               failureContainersFilled: "Il y a un objet hors des conteneurs",
-               failureContainersFilledLess: "Votre robot n'a pas rempli tous les conteneurs",
-               failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
-               failureUnfilteredObject: "Votre robot a ramassé un objet invalide",
-               failureTooManyMoves: "Votre robot a effectué trop de déplacements.",
-               failureWriteHere: "Votre robot ne peut pas écrire ici !",
-               failureReadHere: "Il n'y a pas de nombre écrit ici !",
-               successNumbersWritten: "Bravo, votre robot a écrit les bons nombres !",
-               failureNumbersWritten: "Votre robot n'a pas écrit les bons nombres !",
-               failureNothingToPush: "Il n'y a pas d'objet à pousser !",
-               failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
-               failureDropObject: "On ne peut pas poser d'objet ici",
-               failureDropPlatform: "On ne peut pas construire de plateforme ici",
-               failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
-               failureNotEnoughPlatform: "Pas assez de plateformes",
-               failureLights: "Il reste des spots à allumer.",
-               successLights: "Bravo, votre robot a allumé tous les spots !",
-               failureLaser: "Le robot doit se trouver sur une borne laser pour pouvoir tirer !",
-               failureNoPlug: "Le robot doit se trouver sur une prise pour pouvoir brancher un câble !",
-               failureAlreadyWired: "Cette prise est déjà connectée à un câble !",
-               failureWrongPlugType: "On ne peut pas connecter ces prises ensemble !",
-               successPlugsWired: "La machine est réparée !",
-               failurePlugsWired: "La machine ne fonctionne pas car des prises n'ont pas été connectées !",
-               failureWireCrossing: "Impossible de relier ces deux prises, deux câbles vont s'intersecter !",
-               failureWireTooLong: "Impossible de relier ces deux prises car elles sont trop éloignées !",
-               failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
-               failureProjectile: "Le robot s'est pris un projectile !",
-               failureRewrite: "Le robot a essayé de repeindre une case."
             },
-            cardinals: {
-               north: "Nord",
-               south: "Sud",
-               west: "Ovest",
-               east: "Est"
-            },
-            startingBlockName: "Programme du robot"
+            // startingBlockName: "Programme du robot"
          },
-      },
-      arrows: {
-         fr: {
-            messages: {
-               obstacle: "Le robot va sortir du parcours fléché !",
-               successReachExit: "Bravo, votre robot a récupéré le coffre !",
-               failureReachExit: "Votre robot s'est perdu en chemin."
-            }
-         },
-         en: {
-            messages: {
-               obstacle: "The robot will get out of the marked track!",
-               successReachExit: "Congratulations, your robot collected the safe!",
-               failureReachExit: "Yout robot got lost."
-            }
-         },
-
-         es: {
-            messages: {
-               obstacle: "¡El robot va a salirse del camino marcado!",
-               successReachExit: "Bravo, ¡su robot ha recuperado el cofre!",
-               failureReachExit: "Su robot se perdió en el camino."
-            }
-         }  
-      },
-      cards: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser la carte",
-               dropObject: "déposer la carte",
-               onObject: "sur une carte",
-               onContainer: "sur un emplacement de dépôt",
-            },
-             messages: {
-               successContainersFilled: "Bravo, votre robot a rangé les cartes au bon endroit !",
-               failureContainersFilled: "Il y a des cartes mal rangées",
-               failureContainersFilledLess: "Il y a encore des cartes à ranger.",
-               failureContainersFilledBag: "Votre robot doit déposer sa carte."
-            }
-         },
-         en: {
-            label: {
-               withdrawObject: "pick up the card",
-               dropObject: "drop the card",
-               onObject: "on a card",
-               onContainer: "on a placeholder",
-            },
-             messages: {
-               successContainersFilled: "Congratulations, your robot placed all the cards at the right location!",
-               failureContainersFilled: "Some cards are misplaced",
-               failureContainersFilledLess: "There are still misplaced cards.",
-               failureContainersFilledBag: "Your robot must drop its card."
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger la carta",
-               dropObject: "soltar la carta",
-               onObject: "sobre una carta",
-               onContainer: "en un sitio de depósito",
-            },
-             messages: {
-               successContainersFilled: "Bravo, su robot ha ordenado las cartas en un buen lugar!",
-               failureContainersFilled: "Hay cartas ordenadas incorrectamente.",
-               failureContainersFilledLess: "Aún quedan cartas sin ordenar.",
-               failureContainersFilledBag: "Su robot debe depositar su carta."
-            }
-         }
       },
       castle: {
          fr: {
@@ -682,673 +227,6 @@ var getContext = function(display, infos, curLevel) {
             } 
          }
       },
-      chticode_abs: {
-         fr: {
-            label: {
-               
-            },
-             messages: {
-               successPickedAllWithdrawables: "Bravo, votre robot a réussi la mission !",
-               failureReachExit: "Votre robot n'a pas atteint la case verte."
-            }
-         },
-         en: {
-            label: {
-               
-            },
-             messages: {
-               successPickedAllWithdrawables: "Congratulations, your robot succeeded this mission!",
-               failureReachExit: "Your robot didn't reach the green cell."
-            }
-         },
-
-         es: {
-            label: {
-               
-            },
-             messages: {
-               successPickedAllWithdrawables: "Bravo, ¡su robot ha completado la misión!",
-               failureReachExit: "Su robot no llegó a la casilla verde."
-            }
-         }
-      },
-      chticode_rel: {
-         fr: {
-            label: {
-               
-            },
-             messages: {
-               successReachExit: "Bravo, votre robot a atteint la case verte !",
-               failureReachExit: "Votre robot n'a pas atteint la case verte."
-            }
-         },
-         en: {
-            label: {
-               
-            },
-             messages: {
-               successReachExit: "Congratulations, your robot reached the green cells!",
-               failureReachExit: "Your robot didn't reach the green cell."
-            }
-         },
-
-         es: {
-            label: {
-               
-            },
-             messages: {
-               successReachExit: "Bravo, ¡su robot llegó a la casilla verde!",
-               failureReachExit: "Su robot no ha llegado a la casilla verde."
-            }
-         }
-      },
-      cones: {
-         fr: {
-            label: {
-               dropObject: "déposer un plot",
-               onContainer: "sur une case marquée",
-               obstacleInFront: "plot devant"
-            },
-            code: {
-               dropObject: "deposerPlot",
-               onContainer: "surCaseMarquee",
-               obstacleInFront: "plotDevant"
-            },
-            messages: {
-               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
-               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
-            }
-         },
-
-         en: {
-            label: {
-               dropObject: "drop a cone",
-               onContainer: "on a marked cell",
-               obstacleInFront: "cone ahead"
-            },
-            code: {
-               dropObject: "dropCone",
-               onContainer: "onMarkedCell",
-               obstacleInFront: "coneAhead"
-            },
-            messages: {
-               successContainersFilled: "Congratulations, your robot dropped cones on the marked cells!",
-               failureContainersFilled: "Some cones are missing or are misplaced."
-            }
-         },
-
-         es: {
-            label: {
-               dropObject: "soltar un cono",
-               onContainer: "sobre una casilla marcada",
-               obstacleInFront: "cono adelante"
-            },
-            code: {
-               dropObject: "soltarCono",
-               onContainer: "sobreCasillaMarcada",
-               obstacleInFront: "conoAdelante"
-            },
-            messages: {
-               successContainersFilled: "Bravo, ¡Su robot ha puesto los conos en las casillas correctas!",
-               failureContainersFilled: "Aún hay conos en lugares incorrectos."
-            }
-         }
-      },   
-      flowers: {
-         fr: {
-            label: {
-               dropObject: "semer une graine",
-               onContainer: "terre sur la case",
-               obstacleInFront: "fleur devant"
-            },
-            code: {
-               dropObject: "semerGraine",
-               onContainer: "terreSurCase",
-               obstacleInFront: "fleurDevant"
-            },
-            description: {
-               dropObject: "semerGraine() sème une graine sur la case du robot",
-               onContainer: "terreSurCase() indique s'il y a de la terre sur la case du robot",
-               obstacleInFront: "fleurDevant() indique s'il y a une fleur sur la case devant le robot"
-            },
-            messages: {
-               successContainersFilled: "Bravo, votre robot est un bon jardinier !",
-               failureContainersFilled: "Votre robot a semé hors des zones de terre.",
-               failureContainersFilledLess: "Il reste de la terre vide de fleur !",
-               failureDropObject: "Il y a déjà une fleur ici !",
-					obstacle: "Attention à la fleur !",
-            }
-         },
-         en: {
-            label: {
-               dropObject: "plant a seed",
-               onContainer: "soil on the cell",
-               obstacleInFront: "flower ahead"
-            },
-            code: {
-               dropObject: "plantSeed",
-               onContainer: "soilOnCell",
-               obstacleInFront: "flowerAhead"
-            },
-            messages: {
-               successContainersFilled: "Congratulations, your robot is a good gardener!",
-               failureContainersFilled: "Your robot dropped seeds where there is no soil.",
-               failureContainersFilledLess: "Some soil spots don't have any flower!",
-               failureDropObject: "There is already a flower here !",
-					obstacle: "Be careful, there's a flower!",
-            }
-         },
-
-         es: {
-            label: {
-               dropObject: "sembrar una semilla",
-               onContainer: "tierra en la casilla",
-               obstacleInFront: "flor adelante"
-            },
-            code: {
-               dropObject: "sembrarSemilla",
-               onContainer: "tierraEnCasilla",
-               obstacleInFront: "florAdelante"
-            },
-            messages: {
-               successContainersFilled: "Bravo, ¡el robot es un gran jardinero!",
-               failureContainersFilled: "El robot ha sembrado fuera de las casillas con tierra",
-               failureDropObject: "Ya hay una flor aqui !",
-               failureContainersFilledLess: "¡Aún hay tierra sin flores!"
-            }
-         }
-      },   
-      course: {
-         fr: {
-            messages: {
-               successReachExit: "Bravo, le robot a atteint la case verte !",
-               failureReachExit: "Le robot n'est pas arrivé sur la case verte.",
-               obstacle: "Le robot tente de foncer dans un mur !"
-            }
-         },
-         en: {
-            messages: {
-               successReachExit: "Congratulations, the robot reached the green cell!",
-               failureReachExit: "The robot didn't reach the green cell.",
-               obstacle: "The robot is attemting to run into a wall!"
-            }
-         },
-
-         es: {
-            messages: {
-               successReachExit: "Bravo, ¡El robot llegó a la casilla verde!",
-               failureReachExit: "El robot no llegó a la casilla verde.",
-               obstacle: "¡El robot intenta traspasar un muro!"
-            }
-         }
-      },
-      dominoes: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser le domino",
-            },
-            code: {
-               withdrawObject: "ramasserDomino"
-            },
-            messages: {
-               "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
-               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
-            }
-         },
-         en: {
-            label: {
-               withdrawObject: "pick the domino",
-            },
-            code: {
-               withdrawObject: "pickDomino"
-            },
-            messages: {
-               "successPickedAllWithdrawables": "Congratulations, the robot picked all the requested dominoes!",
-               "failurePickedAllWithdrawables": "The robot didn't pick up the requested dominoes!"
-            }
-         },
-         es: {
-            label: {
-               withdrawObject: "recoger el dominó",
-            },
-            code: {
-               withdrawObject: "recogerDomino"
-            },
-            messages: {
-               "successPickedAllWithdrawables": "Bravo, ¡el robot recogió todos los dominó requeridos!",
-               "failurePickedAllWithdrawables": "El robot no recogió todos los dominó requeridos."
-            }
-         }
-      },
-      fishing: {
-         fr: {
-            label: {
-               withdrawObject: "prendre les poissons",
-               dropObject: "déposer les poissons",
-               withdrawNum_noShadow: "prendre %1 poissons",
-               dropNum_noShadow: "déposer %1 poissons",
-               nbWithdrawables: "nombre de poissons sur la case",
-               containerSize: "nombre de poissons commandés",
-               onObject: "poissons sur la case",
-               onContainer: "sur une île",
-            },
-            code: {
-               withdrawObject: "prendrePoissons",
-               dropObject: "deposerPoissons",
-               onObject: "surPoissons",
-               onContainer: "surIle",
-               nbWithdrawables: "nbPoissonsSur",
-               containerSize: "nbPoissonsCommandes",
-               withdrawNum: "prendre",
-            },
-            description: {
-               withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
-               dropObject: "deposerPoissons() dépose sur la case les poissons transportés",
-               onObject: "surPoissons() indique s'il y a un ou des poissons sur la case",
-               onContainer: "surIle() indique s'il y a une île sur la case",
-               nbWithdrawables: "nbPoissonsSur() indique combien de poissons sont sur la case",
-               containerSize: "nbPoissonsCommandes() indique il faut livrer de poissons sur l'île",
-               dropNum: "deposer(nbPoissons) dépose nbPoissons poissons sur la case",
-               withdrawNum: "prendre(nbPoissons) prend nbPoissons poissons sur la case",
-            },
-            messages: {
-               emptyBag: "Le robot ne porte pas de poisson !",
-
-               tooManyObjects: "Le robot porte déjà un poisson !",
-               successContainersFilled: "Bravo, votre robot a apporté du poisson sur toutes les îles !",
-               failureContainersFilled: "Votre robot a remis du poisson à l'eau !",
-               failureContainersFilledLess: "Il reste encore au moins un poisson à apporter sur une île.",
-               failureContainersFilledBag: "Il faut apporter les poissons sur une île !",
-               failureDropObject: "Cette île a déjà reçu assez de poissons.",
-               nothingToPickUp: "Pas de poisson ici !",
-               failureContainersFilledBag: "Votre robot a pris trop de poissons.",
-               failureDropObject: "Votre robot essaie de déposer trop de poissons sur cette île."
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger la bola",
-               dropObject: "soltar la bola",
-               onObject: "sobre una bola",
-               onContainer: "sobre un agujero",
-            },
-            code: {
-               withdrawObject: "recogerBola",
-               dropObject: "soltarBola",
-               onObject: "sobreBola",
-               onContainer: "sobreAgujero",
-            },   
-            messages: {
-               emptyBag: "¡El robot no carga ninguna bola!",
-               tooManyObjects: "¡El robot ya está cargando una bola!",
-               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
-               failureContainersFilled: "Hay bolas en lugares incorrectos.",
-               failureContainersFilledLess: "Aún falta colocar una bola.",
-               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
-            }
-         }
-      },
-      
-      marbles: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser la bille",
-               dropObject: "déposer la bille",
-               onObject: "sur une bille",
-               onContainer: "sur un trou",
-            },
-            code: {
-               withdrawObject: "ramasserBille",
-               dropObject: "deposerBille",
-               onObject: "surBille",
-               onContainer: "surTrou",
-            },   
-            description: {
-               withdrawObject: "ramasserBille() ramasse la bille de la case du robot",
-               dropObject: "deposerBille() dépose la bille transportée sur la case du robot",
-               onObject: "surBille() indique une bille est sur la case du robot",
-               onContainer: "surTrou() indique s'il y a un trou sur la case du robot",
-            },   
-            messages: {
-               emptyBag: "Le robot ne porte pas de bille !",
-               tooManyObjects: "Le robot porte déjà une bille !",
-               successContainersFilled: "Bravo, vous avez rangé les billes !",
-               failureContainersFilled: "Les billes ne sont pas toutes bien rangées.",
-               failureContainersFilledLess: "Il reste une bille à ranger.",
-               failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger la bola",
-               dropObject: "soltar la bola",
-               onObject: "sobre una bola",
-               onContainer: "sobre un agujero",
-            },
-            code: {
-               withdrawObject: "recogerBola",
-               dropObject: "soltarBola",
-               onObject: "sobreBola",
-               onContainer: "sobreAgujero",
-            },   
-            messages: {
-               emptyBag: "¡El robot no carga ninguna bola!",
-               tooManyObjects: "¡El robot ya está cargando una bola!",
-               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
-               failureContainersFilled: "Hay bolas en lugares incorrectos.",
-               failureContainersFilledLess: "Aún falta colocar una bola.",
-               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
-            }
-         }
-      },
-      objects_in_space: {
-         fr: {
-            label: {
-               obstacleInFront: "astéroïde devant"
-            },
-            code: {
-               obstacleInFront: "asteroideDevant"
-            },
-            messages: {
-               obstacle: "Attention à l'astéroïde !"
-            }
-         },
-
-         es: {
-            label: {
-               obstacleInFront: "asteroide adelante"
-            },
-            code: {
-               obstacleInFront: "asteroideAdelante"
-            },
-            messages: {
-               obstacle: "¡Cuidado con el asteroide!"
-            }
-         }
-      },
-      packages: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser le livre",
-               dropObject: "déposer le livre",
-               withdrawNum_noShadow: "ramasser %1 livres",
-               dropNum_noShadow: "déposer %1 livres",
-               nbWithdrawables: "nombre de livres sur la case",
-               containerSize: "nombre de livres commandés",
-               onObject: "livres sur la case",
-               onContainer: "sur un carton",
-            },
-            code: {
-               withdrawObject: "ramasserLivre",
-               dropObject: "deposerLivre",
-               onObject: "surLivres",
-               onContainer: "surCarton",
-               nbWithdrawables: "nbLivresSur",
-               containerSize: "nbLivresCommandes",
-            },
-            description: {
-               withdrawObject: "ramasserLivre() ramasse le livre qui se trouve sur la case",
-               dropObject: "deposerLivre() dépose sur la case le livre transporté",
-               onObject: "surLivres() indique s'il y a un ou des livres sur la case",
-               onContainer: "surCarton() indique s'il y a un carton sur la case",
-               nbWithdrawables: "nbLivresSur() indique combien de livres sont sur la case",
-               containerSize: "nbLivresCommandes() indique combien de livres sont commandés pour ce carton",
-               dropNum: "deposer(nbLivres) dépose nLivres livres sur la case",
-               withdrawNum: "ramasser(nbLivres) ramasse nbLivres livres sur la case",
-            },
-            messages: {
-               emptyBag: "Le robot ne porte pas de livre !",
-               tooManyObjects: "Le robot porte déjà un livre !",
-               successContainersFilled: "Bravo, tous les cartons sont pleins. Les colis vont pouvoir être livrés !",
-               failureContainersFilled: "Tous les livres n'ont pas été mis en carton.",
-               failureContainersFilledLess: "Il y a au moins un carton qui n'est pas plein.",
-               failureContainersFilledBag: "Votre robot a ramassé trop de livres.",
-               failureDropObject: "Ce colis est déjà plein. Votre robot essaie de déposer trop de livres.",
-               nothingToPickUp: "Il n'y a plus de livre ici !"
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger la bola",
-               dropObject: "soltar la bola",
-               onObject: "sobre una bola",
-               onContainer: "sobre un agujero",
-            },
-            code: {
-               withdrawObject: "recogerBola",
-               dropObject: "soltarBola",
-               onObject: "sobreBola",
-               onContainer: "sobreAgujero",
-            },   
-            messages: {
-               emptyBag: "¡El robot no carga ninguna bola!",
-               tooManyObjects: "¡El robot ya está cargando una bola!",
-               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
-               failureContainersFilled: "Hay bolas en lugares incorrectos.",
-               failureContainersFilledLess: "Aún falta colocar una bola.",
-               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
-            }
-         }
-      },
-      paint: {
-         fr: {
-             label: {
-               dropObject: "peindre la case",
-               onContainer: "sur une case marquée",
-               readNumber: "nombre de la case",
-             },
-             code: {
-                dropObject: "peindreCase",
-                onContainer: "surCaseMarquee",
-                readNumber: "nombreSurCase",
-             },
-             messages: {
-               successContainersFilled: "Bravo, votre robot a peint le motif !",
-               failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
-               failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
-               failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
-             }
-         },
-
-         es: {
-             label: {
-               dropObject: "pintar la casilla",
-               onContainer: "sobre una casilla marcada",
-               readNumber: "número en la casilla",
-             },
-             code: {
-                dropObject: "pintarCasilla",
-                onContainer: "sobreCasillaMarcada",
-                readNumber: "númeroEnCasilla",
-             },
-             messages: {
-               successContainersFilled: "Bravo, ¡su robot ha pintado el patrón!",
-               failureContainersFilled: "El robot no pintó las casillas correctas.",
-               failureContainersFilledLess: "Su robot no ha pintado todas las casillas marcadas.",
-               failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
-             }
-         }  
-      },
-      pixelArt: {
-         fr: {
-            messages: {
-               successContainersFilled: "Bravo, votre dessin est identique au modèle. Quel artiste !",
-               failureContainersFilled: "Regardez bien le modèle, votre dessin n'est pas identique.",
-				   failureContainersFilledLess: "Le dessin n'est pas fini !",
-				   failureDropObject: "Le robot n'a pas peint la case de la bonne couleur.",
-            }
-         }
-      },
-      rocket: {
-         fr: {
-            label: {
-               obstacleRight: "asteroïde à droite",
-               obstacleInFront: "asteroïde devant",
-            },
-            messages: {
-               successReachExit: "Bravo, le robot a rejoint la fusée !",
-               failureReachExit: "Le robot est perdu dans l'espace. Recommencez pour l'aider à rejoindre la fusée.",
-               obstacle: "Attention à l'astéroïde !"
-            }
-         },
-
-         es: {
-            label: {
-               obstacleRight: "asteroide a la derecha",
-               obstacleInFront: "asteroide adelante",
-            },
-            messages: {
-               successReachExit: "Bravo, ¡el robot llegó al cohete!",
-               failureReachExit: "El robot está perdido en el espacio. Vuelva a comenzar para ayudarle a llegar al cohete.",
-               obstacle: "¡Cuidado con el asteroide!"
-            }
-         }
-      },
-      sokoban: {
-         fr: {
-            label: {
-               pushObject: "pousser la caisse",
-               onContainer: "sur une case marquée",
-               pushableInFront: "caisse devant",
-               obstacleInFront: "obstacle devant",
-               readNumber: "nombre de la case"
-            },
-            code: {
-               pushObject: "pousserCaisse",
-               onContainer: "surCaseMarquee",
-               pushableInFront: "caisseDevant",
-               obstacleInFront: "obstacleDevant",
-               readNumber: "nombreSurCase"
-            },
-            description: {
-               onContainer: "surCaseMarquee() indique si le robot se trouve sur une case marquée",
-               pushableInFront: "caisseDevant() indique si le robot est juste devant une caisse",
-               pushObject: "pousserCaisse() avance le robot en poussant la caisse qui est devant",               
-            },
-            messages: {
-               successContainersFilled: "Bravo, les caisses sont bien rangées !",
-               failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
-               failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
-               failureWhilePushing: "Le robot ne peut pas pousser ici !",
-               obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
-            }
-         },
-
-         en: {
-            label: {
-               pushObject: "push the box",
-               onContainer: "on a marked cell",
-               pushableInFront: "in front of a box",
-               obstacleInFront: "in front of an obstacle",
-               readNumber: "number on the cell"
-            },
-            code: {
-               pushObject: "pushBox",
-               onContainer: "onMarkedCell",
-               pushableInFront: "boxAhead",
-               obstacleInFront: "obstacleAhead",
-               readNumber: "numberOnCell"
-            },   
-            messages: {
-               successContainersFilled: "Congratulations, the boxes are correctly placed!",
-               failureContainersFilled: "There are still boxes that are not places correctly.",
-               failureNothingToPush: "There is no box to push here!",
-               failureWhilePushing: "The robot can't push here!",
-               obstacle: "The robot is trying to move into a wall or a box!"
-            }
-         },
-
-         es: {
-            label: {
-               pushObject: "empujar la caja",
-               onContainer: "sobre una casilla marcada",
-               pushableInFront: "caja adelante",
-               obstacleInFront: "obstáculo adelante",
-               readNumber: "número en la casilla"
-            },
-            code: {
-               pushObject: "empujarCaja",
-               onContainer: "sobreCasillaMarcada",
-               pushableInFront: "cajaAdelante",
-               obstacleInFront: "obstáculoAdelante",
-               readNumber: "númeroEnCasilla"
-            },   
-            messages: {
-               successContainersFilled: "Bravo, ¡las cajas están bien ordenadas!",
-               failureContainersFilled: "Aún hay cajas que no están en su lugar.",
-               failureNothingToPush: "¡Aquí no hay caja para empujar!",
-               failureWhilePushing: "¡El robot no puede empujar aquí!",
-               obstacle: "El robot intenta traspasar un muro o una caja!"
-            }
-         }
-      },
-      veterinary: {
-         fr: {
-            label: {
-               withdrawObject: "ramasser le bois",
-               dropObject: "donner le bois au castor",
-               withdrawNum_noShadow: "ramasser %1 bûches",
-               dropNum_noShadow: "donner %1 bûches",
-               nbWithdrawables: "nombre de bûches sur la case",
-               containerSize: "nombre de bûches demandé",
-               onObject: "sur du bois",
-               onContainer: "chez un castor",
-            },
-            code: {
-               withdrawObject: "ramasserBois",
-               dropObject: "donnerBois",
-               onObject: "surBois",
-               onContainer: "chezCastor",
-               nbWithdrawables: "nbBuchesSur",
-               containerSize: "nbBuchesADeposer",
-            },
-            description: {
-               withdrawObject: "ramasserBois() ramasse le bois qui se trouve sur la case",
-               dropObject: "donnerBois() dépose sur la case le bois transporté",
-               onObject: "surBois() indique s'il y a du bois sur la case",
-               onContainer: "chezCastor() indique s'il y a un castor sur la case",
-               nbWithdrawables: "nbBuchesSur() indique combien de bûches sont sur la case",
-               containerSize: "nbBuchesADeposer() indique combien de bûches sont demandées sur la case",
-               dropNum: "deposer(nbBuches) dépose nbBuches bûches sur la case",
-               withdrawNum: "ramasser(nbBuches) ramasse nbBuches bûches sur la case",
-            },
-            messages: {
-               emptyBag: "Le robot ne porte pas de bois !",
-               tooManyObjects: "Le robot porte déjà du bois !",
-               successContainersFilled: "Bravo, tous les castors ont du bois. Ils remercient votre robot !",
-               failureContainersFilled: "Tout le bois n'a pas été distribué.",
-               failureContainersFilledLess: "Il reste du bois à distribuer.",
-               failureContainersFilledBag: "Il faut donner le bois au castor !",
-               failureDropObject: "Ce castor a déjà du bois.",
-            }
-         },
-
-         es: {
-            label: {
-               withdrawObject: "recoger la bola",
-               dropObject: "soltar la bola",
-               onObject: "sobre una bola",
-               onContainer: "sobre un agujero",
-            },
-            code: {
-               withdrawObject: "recogerBola",
-               dropObject: "soltarBola",
-               onObject: "sobreBola",
-               onContainer: "sobreAgujero",
-            },   
-            messages: {
-               emptyBag: "¡El robot no carga ninguna bola!",
-               tooManyObjects: "¡El robot ya está cargando una bola!",
-               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
-               failureContainersFilled: "Hay bolas en lugares incorrectos.",
-               failureContainersFilledLess: "Aún falta colocar una bola.",
-               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
-            }
-         }
-      },
    };
    
    var iconSrc = $("img[src$='icon.png']").attr("src");
@@ -1397,703 +275,6 @@ var getContext = function(display, infos, curLevel) {
       loadContext(infos.contextType);
    }
    
-   // infos.newBlocks.push({
-   //    name: "row",
-   //    type: "sensors",
-   //    block: { name: "row", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       this.callCallback(callback, 1 + this.getRobot().row);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "col",
-   //    type: "sensors",
-   //    block: { name: "col", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       this.callCallback(callback, 1 + this.getRobot().col);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "wait",
-   //    type: "actions",
-   //    block: { name: "wait" },
-   //    func: function(callback) {
-   //       this.advanceTime(1);
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "north",
-   //    type: "actions",
-   //    block: { name: "north" },
-   //    func: function(callback) {
-   //       this.north(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "south",
-   //    type: "actions",
-   //    block: { name: "south" },
-   //    func: function(callback) {
-   //       this.south(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "east",
-   //    type: "actions",
-   //    block: { name: "east" },
-   //    func: function(callback) {
-   //       this.east(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "west",
-   //    type: "actions",
-   //    block: { name: "west" },
-   //    func: function(callback) {
-   //       this.west(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "left",
-   //    type: "actions",
-   //    block: { name: "left" },
-   //    func: function(callback) {
-   //       this.turnLeft(callback);
-   //    }
-   // });
-
-   // infos.newBlocks.push({
-   //    name: "right",
-   //    type: "actions",
-   //    block: { name: "right" },
-   //    func: function(callback) {
-   //       this.turnRight(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "turnAround",
-   //    type: "actions",
-   //    block: { name: "turnAround" },
-   //    func: function(callback) {
-   //       this.turnAround(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "forward",
-   //    type: "actions",
-   //    block: { name: "forward" },
-   //    func: function(callback) {
-   //       this.forward(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "backwards",
-   //    type: "actions",
-   //    block: { name: "backwards" },
-   //    func: function(callback) {
-   //       this.backwards(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "jump",
-   //    type: "actions",
-   //    block: { name: "jump" },
-   //    func: function(callback) {
-   //       this.jump(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleInFront",
-   //    type: "sensors",
-   //    block: { name: "obstacleInFront", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.obstacleInFront());
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleEast",
-   //    type: "sensors",
-   //    block: { name: "obstacleEast", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleWest",
-   //    type: "sensors",
-   //    block: { name: "obstacleWest", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleNorth",
-   //    type: "sensors",
-   //    block: { name: "obstacleNorth", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleSouth",
-   //    type: "sensors",
-   //    block: { name: "obstacleSouth", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleRight",
-   //    type: "sensors",
-   //    block: { name: "obstacleRight", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       var coords = this.coordsInFront(1);
-   //       this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "obstacleLeft",
-   //    type: "sensors",
-   //    block: { name: "obstacleLeft", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       var coords = this.coordsInFront(3);
-   //       this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "gridEdgeEast",
-   //    type: "sensors",
-   //    block: { name: "gridEdgeEast", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "gridEdgeWest",
-   //    type: "sensors",
-   //    block: { name: "gridEdgeWest", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "gridEdgeNorth",
-   //    type: "sensors",
-   //    block: { name: "gridEdgeNorth", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "gridEdgeSouth",
-   //    type: "sensors",
-   //    block: { name: "gridEdgeSouth", yieldsValue: true },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
-   //    }
-   // });
-      
-   // infos.newBlocks.push({
-   //    name: "platformInFront",
-   //    type: "sensors",
-   //    block: { name: "platformInFront", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.platformInFront());
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "platformAbove",
-   //    type: "sensors",
-   //    block: { name: "platformAbove", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.platformAbove());
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "withdrawObject",
-   //    type: "actions",
-   //    block: { name: "withdrawObject" },
-   //    func: function(callback) {
-   //       this.withdraw();
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropObject",
-   //    type: "actions",
-   //    block: { name: "dropObject" },
-   //    func: function(callback) {
-   //       this.drop();
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onObject",
-   //    type: "sensors",
-   //    block: { name: "onObject", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onContainer",
-   //    type: "sensors",
-   //    block: { name: "onContainer", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onNumber",
-   //    type: "sensors",
-   //    block: { name: "onNumber", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
-   //    }
-   // });
-	
-	// infos.newBlocks.push({
-   //    name: "onLauncher",
-   //    type: "sensors",
-   //    block: { name: "onLauncher", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onWritable",
-   //    type: "sensors",
-   //    block: { name: "onWritable", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "writeNumber",
-   //    type: "actions",
-   //    block: { name: "writeNumber", params: [null] },
-   //    func: function(value, callback) {
-   //       var robot = this.getRobot();
-   //       this.writeNumber(robot.row, robot.col, value);
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "readNumber",
-   //    type: "sensors",
-   //    block: { name: "readNumber", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.readNumber(robot.row, robot.col));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "nbWithdrawables",
-   //    type: "sensors",
-   //    block: { name: "nbWithdrawables", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWithdrawable === true; }).length);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "nbInBag",
-   //    type: "sensors",
-   //    block: { name: "nbInBag", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       this.callCallback(callback, context.bag.length);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "containerSize",
-   //    type: "sensors",
-   //    block: { name: "containerSize", yieldsValue: 'int' },
-   //    func: function(callback) {
-   //       var robot = this.getRobot();
-   //       var containers = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isContainer === true; });
-         
-   //       if(containers.length == 0) {
-   //          this.callCallback(callback, 0);
-   //          return;
-   //       }
-         
-   //       this.callCallback(callback, containers[0].containerSize);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "pushObject",
-   //    type: "actions",
-   //    block: { name: "pushObject" },
-   //    func: function(callback) {
-   //       this.pushObject(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "pushableInFront",
-   //    type: "sensors",
-   //    block: { name: "pushableInFront", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropInFront",
-   //    type: "actions",
-   //    block: { name: "dropInFront" },
-   //    func: function(callback) {
-   //       this.drop(1, this.coordsInFront());
-   //       this.callCallback(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropAbove",
-   //    type: "actions",
-   //    block: { name: "dropAbove" },
-   //    func: function(callback) {
-   //       this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
-   //       this.callCallback(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "withdrawNum_noShadow",
-   //    type: "actions",
-   //    block: { 
-   //       name: "withdrawNum_noShadow", 
-   //       params: [null]
-   //    },
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       for(var i = 0;i < value;i++) {
-   //          this.withdraw();
-   //       }
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "withdrawNum",
-   //    type: "actions",
-   //    block: { name: "withdrawNum", params: [null], blocklyXml: "<block type='withdrawNum_noShadow'>" +
-   //                            "  <value name='PARAM_0'>" +
-   //                            "    <shadow type='math_number'>" +
-   //                            "      <field name='NUM'>0</field>" +
-   //                            "    </shadow>" +
-   //                            "  </value>" +
-   //                            "</block>"},
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       for(var i = 0;i < value;i++) {
-   //          this.withdraw();
-   //       }
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropNum_noShadow",
-   //    type: "actions",
-   //    block: { 
-   //       name: "dropNum_noShadow", 
-   //       params: [null]
-   //    },
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       this.drop(value);
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropNum",
-   //    type: "actions",
-   //    block: { name: "dropNum", params: [null], blocklyXml: "<block type='dropNum_noShadow'>" +
-   //                            "  <value name='PARAM_0'>" +
-   //                            "    <shadow type='math_number'>" +
-   //                            "      <field name='NUM'>0</field>" +
-   //                            "    </shadow>" +
-   //                            "  </value>" +
-   //                            "</block>"},
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       this.drop(value);
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "shoot_noShadow",
-   //    type: "actions",
-   //    block: { 
-   //       name: "shoot_noShadow", 
-   //       params: [null]
-   //    },
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-   //          this.shoot(this.getRobot().row, this.getRobot().col, value);
-   //          if(this.display) {
-   //             var robot = this.getRobot();
-   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-   //                return obj.isLaser === true;
-   //             });
-               
-   //             if(lasers.length != 0) {
-   //                lasers[0].element.toFront();
-   //             }
-               
-   //             robot.element.toFront();
-   //          }
-   //       }
-   //       else {
-   //          throw(window.languageStrings.messages.failureLaser);
-   //       }
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "shoot",
-   //    type: "actions",
-   //    block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
-   //                            "  <value name='PARAM_0'>" +
-   //                            "    <shadow type='math_number'>" +
-   //                            "      <field name='NUM'>0</field>" +
-   //                            "    </shadow>" +
-   //                            "  </value>" +
-   //                            "</block>"},
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-   //          this.shoot(this.getRobot().row, this.getRobot().col, value);
-   //          if(this.display) {
-   //             var robot = this.getRobot();
-   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-   //                return obj.isLaser === true;
-   //             });
-               
-   //             if(lasers.length != 0) {
-   //                lasers[0].element.toFront();
-   //             }
-               
-   //             robot.element.toFront();
-   //          }
-   //       }
-   //       else {
-   //          throw(window.languageStrings.messages.failureLaser);
-   //       }
-   //       this.waitDelay(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "shootCondition_noShadow",
-   //    type: "actions",
-   //    block: { 
-   //       name: "shootCondition_noShadow", 
-   //       params: [null],
-   //       yieldsValue: true
-   //    },
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-         
-   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-   //          var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-   //          if(this.display) {
-   //             var robot = this.getRobot();
-   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-   //                return obj.isLaser === true;
-   //             });
-               
-   //             if(lasers.length != 0) {
-   //                lasers[0].element.toFront();
-   //             }
-               
-   //             robot.element.toFront();
-   //          }
-   //          this.waitDelay(callback, retour);
-   //       }
-   //       else {
-   //          throw(window.languageStrings.messages.failureLaser);
-   //          this.callCallback(callback);
-   //       }
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "shootCondition",
-   //    type: "actions",
-   //    block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
-   //                            "  <value name='PARAM_0'>" +
-   //                            "    <shadow type='math_number'>" +
-   //                            "      <field name='NUM'>0</field>" +
-   //                            "    </shadow>" +
-   //                            "  </value>" +
-   //                            "</block>"},
-   //    func: function(value, callback) {
-   //       if((typeof value) == "function") {
-   //          this.callCallback(value);
-   //          return;
-   //       }
-         
-   //       if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-   //          var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-   //          if(this.display) {
-   //             var robot = this.getRobot();
-   //             var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-   //                return obj.isLaser === true;
-   //             });
-               
-   //             if(lasers.length != 0) {
-   //                lasers[0].element.toFront();
-   //             }
-               
-   //             robot.element.toFront();
-   //          }
-   //          this.waitDelay(callback, retour);
-   //       }
-   //       else {
-   //          throw(window.languageStrings.messages.failureLaser);
-   //          this.callCallback(callback);
-   //       }
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "connect",
-   //    type: "actions",
-   //    block: { name: "connect" },
-   //    func: function(callback) {
-   //       this.connect();
-   //       this.callCallback(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onMale",
-   //    type: "sensors",
-   //    block: { name: "onMale", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "onFemale",
-   //    type: "sensors",
-   //    block: { name: "onFemale", yieldsValue: true },
-   //    func: function(callback) {
-   //       this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropPlatformInFront",
-   //    type: "actions",
-   //    block: { name: "dropPlatformInFront" },
-   //    func: function(callback) {
-   //       if(this.nbPlatforms == 0)
-   //          throw(window.languageStrings.messages.failureNotEnoughPlatform);
-            
-   //       var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
-   //       if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-   //          throw(window.languageStrings.messages.failureDropPlatform);
-   //       }
-   //       this.nbPlatforms -= 1;
-   //       this.dropObject({type: "platform"}, coords);
-   //       this.callCallback(callback);
-   //    }
-   // });
-   
-   // infos.newBlocks.push({
-   //    name: "dropPlatformAbove",
-   //    type: "actions",
-   //    block: { name: "dropPlatformAbove" },
-   //    func: function(callback) {
-   //       if(this.nbPlatforms == 0)
-   //          throw(window.languageStrings.messages.failureNotEnoughPlatform);
-            
-   //       var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
-   //       if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-   //          throw(window.languageStrings.messages.failureDropPlatform);
-   //       }
-   //       this.nbPlatforms -= 1;
-   //       this.dropObject({type: "platform"}, coords);
-   //       this.callCallback(callback);
-   //    }
-   // });
-
    infos.newBlocks.push({
       name: "getNbItems",
       type: "sensors",
@@ -2121,14 +302,16 @@ var getContext = function(display, infos, curLevel) {
          params: [null],
          yieldsValue: 'int'
       },
-      func: function(value, callback) {
+      func: function(id, callback) {
          var { pointData } = context;
-         var pos = pointData[value];
+         var pos = pointData[id];
          if(!pos) {
             this.callCallback(callback, false);
             return
          }
          var x = getPosFromCoordinate(pos.x,0);
+         highlightPoint(id);
+         highlightCoordinate(id,0);
          this.callCallback(callback, Math.round(x));
       }
    });
@@ -2141,14 +324,16 @@ var getContext = function(display, infos, curLevel) {
          params: [null],
          yieldsValue: 'int'
       },
-      func: function(value, callback) {
+      func: function(id, callback) {
          var { pointData } = context;
-         var pos = pointData[value]
+         var pos = pointData[id]
          if(!pos) {
             this.callCallback(callback, false);
             return
          }
          var y = getPosFromCoordinate(pos.y,1);
+         highlightPoint(id);
+         highlightCoordinate(id,1);
          this.callCallback(callback, Math.round(y));
       }
    });
@@ -2184,6 +369,30 @@ var getContext = function(display, infos, curLevel) {
          context.k = context.centroidPos.length;
          initCentroids();
          updateCanvas();
+
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "showDistance",
+      type: "actions",
+      block: { 
+         name: "showDistance", 
+         params: [null,null],
+      },
+      func: function(idItem,idCluster,callback) {
+         var { k, nbPoints } = context;
+         if(!Number.isInteger(idItem) || !Number.isInteger(idCluster)){
+            throw(window.languageStrings.messages.noIntegerId);
+         }
+         if(idItem >= nbPoints || idItem < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         if(idCluster >= k || idCluster < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         showDist(idItem,idCluster);
 
          this.callCallback(callback);
       }
@@ -2278,6 +487,10 @@ var getContext = function(display, infos, curLevel) {
    var frame; // dev
    var centroids = [];
    var points = [];
+   var pointHighlight;
+   var coordinateHighlight;
+   var centroidHighlight;
+   var distanceObj;
 
    var rng = new RandomGenerator(0);
    
@@ -2346,11 +559,12 @@ var getContext = function(display, infos, curLevel) {
       context.centroidPos  = [];
       context.k = 0;
       context.classPoints = [];
+      context.allowInfiniteLoop = true;
 
       if(!context.pointData){
          context.pointData = initPointData();
-         context.bestScore = findBestScore();
-         console.log(context.bestScore)
+         // context.bestScore = findBestScore();
+         // console.log(context.bestScore)
       }
 
       
@@ -2463,7 +677,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function initPointData() {
-      // console.log("initPointData")
+      console.log("initPointData")
       var pointData;
       var { nbPoints } = context;
       // do{
@@ -2484,6 +698,7 @@ var getContext = function(display, infos, curLevel) {
       
       // target = Math.round(bestScore*targetFactor);
       // console.log(score,target)
+         // console.log(pointData)
          return pointData
 
       function getRandomPos() {
@@ -2622,42 +837,9 @@ var getContext = function(display, infos, curLevel) {
 
    function updatePoints() {
       var { nbPoints } = context;
-      // var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
-      // var x = xPointArea*scale;
-      // var y = yPointArea*scale;
-      // var w = pointAreaW*scale;
-      // var h = pointAreaH*scale;
-      // var centPos = centPos || centroidPos;
-      // var score = 0;
-      // var classPoints = [];
-      // // console.log(x,y,w,h)
-      // for(var iC = 0; iC <= k; iC++){
-      //    classPoints[iC] = [];
-      // }
       for(var iP = 0; iP < nbPoints; iP++){
          updatePoint(iP);
-         // var orPos = pointData[iP];
-         // var pos = {};
-         // pos.x = orPos.x*scale;
-         // pos.y = orPos.y*scale;
-         // var { id, d } = findClosestCentroid(pos,centPos);
-         // classPoints[id].push(iP);
-         // score += d*d;
-         // // if(noVisual)
-         // //    continue;
-         // // console.log(id)
-         // for(var iC = 0; iC <= k; iC++){
-         //    var obj = points[iP][iC];
-         //    if(iC == id){
-         //       obj.show();
-         //    }else{
-         //       obj.hide();
-         //    }
-         //    obj.attr("clip-rect",[x,y,w,h]);
-         // }
       }
-      // score = Math.round(score);
-      // return { score, classPoints }
    };
 
    function updatePoint(iP) {
@@ -2732,16 +914,19 @@ var getContext = function(display, infos, curLevel) {
       return { id: cID, d: minD }
    };
 
-   function findBestScore() {
-      var { nbClusters, nbClusters } = context;
+   context.findBestScore = function() {
+      var { nbClusters, nbClusters, centroidPos } = context;
       var { xRange, yRange } = infos;
       var count = 0;
-      var centPos = [];
-      for(var iC = 0; iC < nbClusters; iC++){
-         var x = xRange[0] + (iC + 1)*(xRange[1] - xRange[0])/(nbClusters + 1);
-         var y = yRange[0] + (iC + 1)*(yRange[1] - yRange[0])/(nbClusters + 1);
-         centPos[iC] = {x,y};
-      }
+      var centPos = centroidPos;
+      var xRan = xRange[1] - xRange[0];
+      var yRan = yRange[1] - yRange[0];
+      // for(var iC = 0; iC < nbClusters; iC++){
+      //    var x = xRange[0] + xRan/nbClusters + 2*(iC%2)*xRan/nbClusters;
+      //    var y = yRange[0] + yRan/nbClusters + 2*Math.floor(iC/2)*yRan/nbClusters;
+      //    // console.log(x,y)
+      //    centPos[iC] = {x,y};
+      // }
       do{
          var {score,classPoints} = context.updateScore(centPos);
          var prevSco = score;
@@ -2771,6 +956,52 @@ var getContext = function(display, infos, curLevel) {
       y = y/cp.length;
 
       return {x,y}
+   };
+
+   function getCoordinatesFromPos(pos) {
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
+      var x0 = xPointArea;
+      var y0 = yPointArea;
+      var w = pointAreaW;
+      var h = pointAreaH;
+      // console.log(x0,y0,w,h)
+
+      var x = x0 + w*(pos.x - xRange[0])/(xRange[1] - xRange[0]);
+      var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
+      x = Math.round(x);
+      y = Math.round(y);
+      return { x, y }
+   };
+
+   function getPosFromCoordinates(coo) {
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
+      // var x0 = xPointArea;
+      // var y0 = yPointArea;
+      // var w = pointsAreaW;
+      // var h = pointsAreaH;
+
+      // var x = xRange[0] + (coo.x - x0)/w;
+      // var y = yRange[0] + (coo.y - y0)/h;
+      var x = Math.round(getPosFromCoordinate(coo.x,0));
+      var y = Math.round(getPosFromCoordinate(coo.y,1));
+      return { x, y }
+   };
+
+   function getPosFromCoordinate(val,ax) {
+      var { xRange, yRange, xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var ran, min, le
+      if(ax == 0){
+         ran = xRange;
+         le = pointAreaW;
+         min = xPointArea;
+      }else{
+         ran = yRange;
+         le = pointAreaH;
+         min = yPointArea;
+      }
+
+      var res = ran[0] + (ran[1] - ran[0])*(val - min)/le;
+      return res
    };
 
    function drawCentroid(id,cx,cy,bar) {
@@ -2819,94 +1050,122 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function getCoordinatesFromPos(pos) {
-      var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
-      var x0 = xPointArea;
-      var y0 = yPointArea;
-      var w = pointAreaW;
-      var h = pointAreaH;
-      // console.log(x0,y0,w,h)
+   function highlightPoint(id) {
+      if(pointHighlight){
+         pointHighlight.remove();
+         pointHighlight = null;
+      }
+      var { pointData } = context;
+      var { pointHighlightAttr, pointR } = infos;
+      var pos = pointData[id];
+      var x = pos.x*scale;
+      var y = pos.y*scale;
 
-      var x = x0 + w*(pos.x - xRange[0])/(xRange[1] - xRange[0]);
-      var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
-      x = Math.round(x);
-      y = Math.round(y);
-      return { x, y }
+      var r = pointR*1.5;
+
+      pointHighlight = paper.circle(x,y,r).attr(pointHighlightAttr);
    };
 
-   function getPosFromCoordinates(coo) {
-      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
-      // var x0 = xPointArea;
-      // var y0 = yPointArea;
-      // var w = pointsAreaW;
-      // var h = pointsAreaH;
-
-      // var x = xRange[0] + (coo.x - x0)/w;
-      // var y = yRange[0] + (coo.y - y0)/h;
-      var x = Math.round(getPosFromCoordinate(coo.x,0));
-      var y = Math.round(getPosFromCoordinate(coo.y,1));
-      return { x, y }
-   };
-
-   function getPosFromCoordinate(val,ax) {
-      var { xRange, yRange, xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
-      var ran, min, le
+   function highlightCoordinate(id,ax) {
+      if(coordinateHighlight){
+         coordinateHighlight.remove();
+         coordinateHighlight = null;
+      }
+      if(distanceObj){
+         distanceObj.remove();
+         distanceObj = null;
+      }
+      var { pointData } = context;
+      var { coordinateHighlightAttr, xPointArea, yPointArea } = infos;
+      
+      var pos = pointData[id];
+      var x = pos.x*scale;
+      var y = pos.y*scale;
       if(ax == 0){
-         ran = xRange;
-         le = pointAreaW;
-         min = xPointArea;
+         var x0 = xPointArea*scale;
+         var p = ["M",x0,y,"H",x];
       }else{
-         ran = yRange;
-         le = pointAreaH;
-         min = yPointArea;
+         var y0 = yPointArea*scale;
+         var p = ["M",x,y0,"V",y];
       }
 
-      var res = ran[0] + (ran[1] - ran[0])*(val - min)/le;
-      return res
+      coordinateHighlight = paper.path(p).attr(coordinateHighlightAttr);
+   };
+
+   function showDist(idItem,idCluster) {
+      if(coordinateHighlight){
+         coordinateHighlight.remove();
+         coordinateHighlight = null;
+      }
+      if(distanceObj){
+         distanceObj.remove();
+         distanceObj = null;
+      }
+
+      var { pointData, centroidPos } = context;
+      var { distanceAttr } = infos;
+      
+      var pos1 = pointData[idItem];
+      var x1 = pos1.x*scale;
+      var y1 = pos1.y*scale;
+
+      var pos2 = centroidPos[idCluster];
+      var coo = getCoordinatesFromPos(pos2);
+      var x2 = coo.x*scale;
+      var y2 = coo.y*scale;
+
+      distanceObj = paper.path(["M",x1,y1,"L",x2,y2]).attr(distanceAttr);
+   };
+
+   function removeHighlight() {
+      if(pointHighlight){
+         pointHighlight.remove();
+         pointHighlight = null;
+      }
    };
    
-   var resetBoard = function() {
-      // var { paperW, paperH } = infos;
-      // frame = paper.rect(0,0,paperW, paperH).attr("stroke-width", "5");
+   // var resetBoard = function() {
+   //    // var { paperW, paperH } = infos;
+   //    // frame = paper.rect(0,0,paperW, paperH).attr("stroke-width", "5");
 
-      // initCentroids();
-      // for(var iRow = 0;iRow < context.nbRows;iRow++) {
-      //    cells[iRow] = [];
-      //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
-      //       cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
-      //       if(context.tiles[iRow][iCol] == 0)
-      //          cells[iRow][iCol].attr({'stroke-width': '0'});
-      //       if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
-      //          cells[iRow][iCol].attr({'fill': infos.backgroundColor});
-      //       if(infos.noBorders) {
-      //          if (context.tiles[iRow][iCol] != 0) {
-      //             cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
-      //          }
-      //       } else {
-      //          if (infos.borderColor) {
-      //             cells[iRow][iCol].attr({'stroke': infos.borderColor});
-      //          }
-      //       }
+   //    // initCentroids();
+   //    // for(var iRow = 0;iRow < context.nbRows;iRow++) {
+   //    //    cells[iRow] = [];
+   //    //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
+   //    //       cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
+   //    //       if(context.tiles[iRow][iCol] == 0)
+   //    //          cells[iRow][iCol].attr({'stroke-width': '0'});
+   //    //       if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
+   //    //          cells[iRow][iCol].attr({'fill': infos.backgroundColor});
+   //    //       if(infos.noBorders) {
+   //    //          if (context.tiles[iRow][iCol] != 0) {
+   //    //             cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
+   //    //          }
+   //    //       } else {
+   //    //          if (infos.borderColor) {
+   //    //             cells[iRow][iCol].attr({'stroke': infos.borderColor});
+   //    //          }
+   //    //       }
             
-      //    }
-      // }
-      // if(infos.showLabels) {
-      //    for(var iRow = 0;iRow < context.nbRows;iRow++) {
-      //       rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
-      //    }
-      //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
-      //       colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
-      //    }
-      // }
-      // if (infos.showCardinals) {
-      //    cardLabels = [
-      //       paper.text(0, 0, strings.cardinals.north),
-      //       paper.text(0, 0, strings.cardinals.south),
-      //       paper.text(0, 0, strings.cardinals.west),
-      //       paper.text(0, 0, strings.cardinals.east)
-      //       ];
-      // }
-   };
+   //    //    }
+   //    // }
+   //    // if(infos.showLabels) {
+   //    //    for(var iRow = 0;iRow < context.nbRows;iRow++) {
+   //    //       rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+   //    //    }
+   //    //    for(var iCol = 0;iCol < context.nbCols;iCol++) {
+   //    //       colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
+   //    //    }
+   //    // }
+   //    // if (infos.showCardinals) {
+   //    //    cardLabels = [
+   //    //       paper.text(0, 0, strings.cardinals.north),
+   //    //       paper.text(0, 0, strings.cardinals.south),
+   //    //       paper.text(0, 0, strings.cardinals.west),
+   //    //       paper.text(0, 0, strings.cardinals.east)
+   //    //       ];
+   //    // }
+   // };
 
 
    
@@ -3683,139 +1942,139 @@ var getContext = function(display, infos, curLevel) {
       context.forward(callback);
    };
    
-   context.shoot = function(lig, col, dir) {
-      dir = dir % 8;
-      var dirs = [
-         [-1, 0],
-         [-1, 1],
-         [0, 1],
-         [1, 1],
-         [1, 0],
-         [1, -1],
-         [0, -1],
-         [-1, -1]
-      ];
+   // context.shoot = function(lig, col, dir) {
+   //    dir = dir % 8;
+   //    var dirs = [
+   //       [-1, 0],
+   //       [-1, 1],
+   //       [0, 1],
+   //       [1, 1],
+   //       [1, 0],
+   //       [1, -1],
+   //       [0, -1],
+   //       [-1, -1]
+   //    ];
       
-      var lights = context.getItemsOn(lig, col, function(obj) {
-         return obj.isLight === true;
-      });
+   //    var lights = context.getItemsOn(lig, col, function(obj) {
+   //       return obj.isLight === true;
+   //    });
       
-      for(var light in lights) {
-         lights[light].state = 1;
-         lights[light].img = lights[light].states[lights[light].state];
-         if(context.display)
-            redisplayItem(lights[light]);
-      }
+   //    for(var light in lights) {
+   //       lights[light].state = 1;
+   //       lights[light].img = lights[light].states[lights[light].state];
+   //       if(context.display)
+   //          redisplayItem(lights[light]);
+   //    }
       
-      var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
-      var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
+   //    var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
+   //    var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
       
-      var taille = infos.cellSide;
+   //    var taille = infos.cellSide;
       
-      var findRobot = false;
+   //    var findRobot = false;
       
-      var plig = lig + dirs[dir][0];
-      var pcol = col + dirs[dir][1];
-      if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
-         taille /= 2;
+   //    var plig = lig + dirs[dir][0];
+   //    var pcol = col + dirs[dir][1];
+   //    if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
+   //       taille /= 2;
          
-         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
-      }
-      else {
-         var pdir = dir;
-         var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
-         if(mirrors.length != 0) {
-            pdir = mirrors[0].mirrorFunction(dir);
-         }
+   //       findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+   //    }
+   //    else {
+   //       var pdir = dir;
+   //       var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
+   //       if(mirrors.length != 0) {
+   //          pdir = mirrors[0].mirrorFunction(dir);
+   //       }
          
-         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+   //       findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
          
-         if(context.shoot(plig, pcol, pdir)) {
-            findRobot = true;
-         }
-      }
+   //       if(context.shoot(plig, pcol, pdir)) {
+   //          findRobot = true;
+   //       }
+   //    }
       
-      var dx = (taille * dirs[dir][1]) * scale;
-      var dy = (taille * dirs[dir][0]) * scale;
+   //    var dx = (taille * dirs[dir][1]) * scale;
+   //    var dy = (taille * dirs[dir][0]) * scale;
       
-      if(context.display && paper != undefined) {
-         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+   //    if(context.display && paper != undefined) {
+   //       var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
          
-         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
+   //       segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
          
-         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
-            segment.remove();
-         }, infos.actionDelay * 2);
-      }
+   //       context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+   //          segment.remove();
+   //       }, infos.actionDelay * 2);
+   //    }
       
-      return findRobot;
-   };
+   //    return findRobot;
+   // };
    
-   context.connect = function() {
-      var robot = context.getRobot();
+   // context.connect = function() {
+   //    var robot = context.getRobot();
       
-      var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
+   //    var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
       
-      if(plugs.length == 0) {
-         throw(strings.messages.failureNoPlug);
-      }
+   //    if(plugs.length == 0) {
+   //       throw(strings.messages.failureNoPlug);
+   //    }
       
-      var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
+   //    var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
       
-      if(wires.length != 0) {
-         throw(strings.messages.failureAlreadyWired);
-      }
+   //    if(wires.length != 0) {
+   //       throw(strings.messages.failureAlreadyWired);
+   //    }
       
-      this.dropObject({type: "wire", zOrder: 1});
+   //    this.dropObject({type: "wire", zOrder: 1});
       
-      if(this.last_connect !== undefined) {
-         if(this.last_connect.plugType + plugs[0].plugType != 0)
-            throw(strings.messages.failureWrongPlugType);
+   //    if(this.last_connect !== undefined) {
+   //       if(this.last_connect.plugType + plugs[0].plugType != 0)
+   //          throw(strings.messages.failureWrongPlugType);
             
-         function segmentLength(segment) {
-            return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
-         }
+   //       function segmentLength(segment) {
+   //          return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
+   //       }
          
-         var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
+   //       var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
          
-         if(segmentLength(wire) > infos.maxWireLength) {
-            throw(strings.messages.failureWireTooLong);
-         }
+   //       if(segmentLength(wire) > infos.maxWireLength) {
+   //          throw(strings.messages.failureWireTooLong);
+   //       }
          
-         var totalLength = segmentLength(wire);
-         for(var iWire = 0;iWire < this.wires.length;iWire++) {
-            if(this.isCrossing(wire, this.wires[iWire])) {
-               throw(strings.messages.failureWireCrossing);
-            }
-            totalLength += segmentLength(this.wires[iWire]);
-         }
+   //       var totalLength = segmentLength(wire);
+   //       for(var iWire = 0;iWire < this.wires.length;iWire++) {
+   //          if(this.isCrossing(wire, this.wires[iWire])) {
+   //             throw(strings.messages.failureWireCrossing);
+   //          }
+   //          totalLength += segmentLength(this.wires[iWire]);
+   //       }
          
-         if(totalLength > infos.maxTotalLength) {
-            throw(strings.messages.failureTotalLengthExceeded);
-         }
+   //       if(totalLength > infos.maxTotalLength) {
+   //          throw(strings.messages.failureTotalLengthExceeded);
+   //       }
          
-         this.wires.push(wire);
+   //       this.wires.push(wire);
          
-         var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
-         var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
-         var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
-         var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
+   //       var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
+   //       var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
+   //       var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
+   //       var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
          
-         var wire_item = {zOrder: 2};
-         wire_item.redisplay = function() {
-            wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
-            wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
-         };
+   //       var wire_item = {zOrder: 2};
+   //       wire_item.redisplay = function() {
+   //          wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
+   //          wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
+   //       };
          
-         this.multicell_items.push(wire_item);
-         redisplayAllItems();
+   //       this.multicell_items.push(wire_item);
+   //       redisplayAllItems();
          
-         this.last_connect = undefined;
-      }
-      else {
-         this.last_connect = plugs[0];
-      }
-   };
+   //       this.last_connect = undefined;
+   //    }
+   //    else {
+   //       this.last_connect = plugs[0];
+   //    }
+   // };
       
    return context;
 };
@@ -3835,242 +2094,245 @@ var getResources = function(subTask) {
    return res
 };
 
-var robotEndConditions = {
-   checkReachExit: function(context, lastTurn) {
-      var robot = context.getRobot();
-      if(context.isOn(function(obj) { return obj.isExit === true; })) {
-         context.success = true;
-         throw(window.languageStrings.messages.successReachExit);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
-      }
-   },
-   checkPickedAllWithdrawables: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-               solved = false;
-            }
-         }
-      }
+// var robotEndConditions = {
+//    checkReachExit: function(context, lastTurn) {
+//       var robot = context.getRobot();
+//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
+//          context.success = true;
+//          throw(window.languageStrings.messages.successReachExit);
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(window.languageStrings.messages.failureReachExit);
+//       }
+//    },
+//    checkPickedAllWithdrawables: function(context, lastTurn) {
+//       var solved = true;
+//       for(var row = 0;row < context.nbRows;row++) {
+//          for(var col = 0;col < context.nbCols;col++) {
+//             if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+//                solved = false;
+//             }
+//          }
+//       }
       
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successPickedAllWithdrawables);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-      }
-   },
-   checkPlugsWired: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
-               solved = false;
-            }
-         }
-      }
+//       if(solved) {
+//          context.success = true;
+//          throw(window.languageStrings.messages.successPickedAllWithdrawables);
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+//       }
+//    },
+//    checkPlugsWired: function(context, lastTurn) {
+//       var solved = true;
+//       for(var row = 0;row < context.nbRows;row++) {
+//          for(var col = 0;col < context.nbCols;col++) {
+//             if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
+//                solved = false;
+//             }
+//          }
+//       }
       
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successPlugsWired);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failurePlugsWired);
-      }
-   },
-   checkContainersFilled: function(context, lastTurn) {
-      var solved = true;
+//       if(solved) {
+//          context.success = true;
+//          throw(window.languageStrings.messages.successPlugsWired);
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(window.languageStrings.messages.failurePlugsWired);
+//       }
+//    },
+//    checkContainersFilled: function(context, lastTurn) {
+//       var solved = true;
       
-      var messages = [
-         window.languageStrings.messages.failureContainersFilled,
-         window.languageStrings.messages.failureContainersFilledLess,
-         window.languageStrings.messages.failureContainersFilledBag
-      ];
-      var message = 2;
-      if (context.infos.maxMoves != undefined) {
-         if (context.nbMoves > context.infos.maxMoves) {
-            context.success = false;
-            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
-         }
-      }
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-            if(containers.length != 0) {
-               var container = containers[0];
-               if(container.containerSize == undefined && container.containerFilter == undefined) {
-                  container.containerSize = 1;
-               }
-               var filter;
-               if(container.containerFilter == undefined)
-                  filter = function(obj) { return obj.isWithdrawable === true; };
-               else
-                  filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+//       var messages = [
+//          window.languageStrings.messages.failureContainersFilled,
+//          window.languageStrings.messages.failureContainersFilledLess,
+//          window.languageStrings.messages.failureContainersFilledBag
+//       ];
+//       var message = 2;
+//       if (context.infos.maxMoves != undefined) {
+//          if (context.nbMoves > context.infos.maxMoves) {
+//             context.success = false;
+//             throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
+//          }
+//       }
+//       for(var row = 0;row < context.nbRows;row++) {
+//          for(var col = 0;col < context.nbCols;col++) {
+//             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
+//             if(containers.length != 0) {
+//                var container = containers[0];
+//                if(container.containerSize == undefined && container.containerFilter == undefined) {
+//                   container.containerSize = 1;
+//                }
+//                var filter;
+//                if(container.containerFilter == undefined)
+//                   filter = function(obj) { return obj.isWithdrawable === true; };
+//                else
+//                   filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
                
-               if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
-                  solved = false;
-                  message = Math.min(message, 1);
-               }
-               else if(context.getItemsOn(row, col, filter).length == 0) {
-                  solved = false;
-                  message = Math.min(message, 0);
-               }
+//                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
+//                   solved = false;
+//                   message = Math.min(message, 1);
+//                }
+//                else if(context.getItemsOn(row, col, filter).length == 0) {
+//                   solved = false;
+//                   message = Math.min(message, 0);
+//                }
                
-               if(container.containerFilter != undefined) {
-                  if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
-                     solved = false;
-                     message = Math.min(message, 0);
-                  }
-                  for(var item in context.bag) {
-                     if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
-                        solved = false;
-                        message = Math.min(message, 2);
-                     }
-                  }
-               }
-            }
-            else {
-               if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
-                  solved = false;
-                  message = Math.min(message, 0);
-               }
-            }
-         }
-      }
+//                if(container.containerFilter != undefined) {
+//                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
+//                      solved = false;
+//                      message = Math.min(message, 0);
+//                   }
+//                   for(var item in context.bag) {
+//                      if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
+//                         solved = false;
+//                         message = Math.min(message, 2);
+//                      }
+//                   }
+//                }
+//             }
+//             else {
+//                if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
+//                   solved = false;
+//                   message = Math.min(message, 0);
+//                }
+//             }
+//          }
+//       }
       
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successContainersFilled);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(messages[message]);
-      }
-   },
-   checkBothReachAndCollect: function(context, lastTurn) {
-      var robot = context.getRobot();
-      if(context.isOn(function(obj) { return obj.isExit === true; })) {
-         var solved = true;
-         for(var row = 0;row < context.nbRows;row++) {
-            for(var col = 0;col < context.nbCols;col++) {
-               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-                  solved = false;
-                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-               }
-            }
-         }
+//       if(solved) {
+//          context.success = true;
+//          throw(window.languageStrings.messages.successContainersFilled);
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(messages[message]);
+//       }
+//    },
+//    checkBothReachAndCollect: function(context, lastTurn) {
+//       var robot = context.getRobot();
+//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
+//          var solved = true;
+//          for(var row = 0;row < context.nbRows;row++) {
+//             for(var col = 0;col < context.nbCols;col++) {
+//                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+//                   solved = false;
+//                   throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+//                }
+//             }
+//          }
          
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
-         }
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
-      }
-   },
-   checkLights: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
-               solved = false;
-            }
-         }
-      }
+//          if(solved) {
+//             context.success = true;
+//             throw(window.languageStrings.messages.successPickedAllWithdrawables);
+//          }
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(window.languageStrings.messages.failureReachExit);
+//       }
+//    },
+//    checkLights: function(context, lastTurn) {
+//       var solved = true;
+//       for(var row = 0;row < context.nbRows;row++) {
+//          for(var col = 0;col < context.nbCols;col++) {
+//             if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
+//                solved = false;
+//             }
+//          }
+//       }
       
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successLights);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureLights);
-      }
-   }
-};
+//       if(solved) {
+//          context.success = true;
+//          throw(window.languageStrings.messages.successLights);
+//       }
+//       if(lastTurn) {
+//          context.success = false;
+//          throw(window.languageStrings.messages.failureLights);
+//       }
+//    }
+// };
 
 var endConditions = {
    checkScore: function(context, lastTurn) {
       context.success = false;
+      var { nbPoints, centroidPos, nbClusters } = context;
+
       var { score } = context.updateScore();
-      console.log(score)
+      var bestScore  = context.findBestScore();
+      console.log(score/nbPoints,bestScore/nbPoints)
       throw("test");
    }
 };
 
 
-var robotEndFunctionGenerator = {
-   allFilteredPicked: function(filter) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var row = 0;row < context.nbRows;row++) {
-            for(var col = 0;col < context.nbCols;col++) {
-               var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
-               if(filtered.length != 0) {
-                  solved = false;
-               }
-            }
-         }
+// var robotEndFunctionGenerator = {
+//    allFilteredPicked: function(filter) {
+//       return function(context, lastTurn) {
+//          var solved = true;
+//          for(var row = 0;row < context.nbRows;row++) {
+//             for(var col = 0;col < context.nbCols;col++) {
+//                var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
+//                if(filtered.length != 0) {
+//                   solved = false;
+//                }
+//             }
+//          }
          
-         for(var item in context.bag) {
-            if(!filter(context.bag[item])) {
-               context.success = false;
-               throw(window.languageStrings.messages.failureUnfilteredObject);
-            }
-         }
+//          for(var item in context.bag) {
+//             if(!filter(context.bag[item])) {
+//                context.success = false;
+//                throw(window.languageStrings.messages.failureUnfilteredObject);
+//             }
+//          }
          
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
-         }
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-         }
-      };
-   },
-   allNumbersWritten: function(numbers) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var iNumber in numbers) {
-            var number = numbers[iNumber];
-            var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
-            if(items.length == 0)
-               throw("Error: no number here");
+//          if(solved) {
+//             context.success = true;
+//             throw(window.languageStrings.messages.successPickedAllWithdrawables);
+//          }
+//          if(lastTurn) {
+//             context.success = false;
+//             throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+//          }
+//       };
+//    },
+//    allNumbersWritten: function(numbers) {
+//       return function(context, lastTurn) {
+//          var solved = true;
+//          for(var iNumber in numbers) {
+//             var number = numbers[iNumber];
+//             var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
+//             if(items.length == 0)
+//                throw("Error: no number here");
             
-            var expected;
-            if(typeof number.value === "number") {
-               expected = number.value;
-            } else {
-               expected = number.value.bind(context)();
-            }
+//             var expected;
+//             if(typeof number.value === "number") {
+//                expected = number.value;
+//             } else {
+//                expected = number.value.bind(context)();
+//             }
             
-            if(expected != items[0].value) {
-               solved = false;
-            }
-         }
+//             if(expected != items[0].value) {
+//                solved = false;
+//             }
+//          }
          
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successNumbersWritten);
-         }
+//          if(solved) {
+//             context.success = true;
+//             throw(window.languageStrings.messages.successNumbersWritten);
+//          }
          
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failureNumbersWritten);
-         }
-      };
-   }
-};
+//          if(lastTurn) {
+//             context.success = false;
+//             throw(window.languageStrings.messages.failureNumbersWritten);
+//          }
+//       };
+//    }
+// };
 
 var contextParams = {
       none: {
@@ -4080,8 +2342,6 @@ var contextParams = {
          checkEndEveryTurn: false,
          paperW: 770,
          paperH: 600,
-         // marginX: 20,
-         // marginY: 20
       },
       "k-means": {
          xRange: [0,1000],
@@ -4114,6 +2374,20 @@ var contextParams = {
                "stroke-width": 1,
                "stroke-dasharray": ["-"]
             }
+         },
+         pointHighlightAttr: {
+            stroke: colors.black,
+            "stroke-width": 2
+         },
+         coordinateHighlightAttr: {
+            stroke: colors.black,
+            "stroke-width": 1,
+            "stroke-dasharray": ["-"]
+         },
+         distanceAttr: {
+            stroke: colors.black,
+            "stroke-width": 1,
+            "stroke-dasharray": ["-"]
          },
          // checkEndCondition: robotEndConditions.checkContainersFilled
          checkEndCondition: endConditions.checkScore
