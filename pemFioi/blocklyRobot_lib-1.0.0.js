@@ -2067,6 +2067,7 @@ var getContext = function(display, infos, curLevel) {
             BG: { num: 9, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
             BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
             BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
+            mask: {num: 12, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
             board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
