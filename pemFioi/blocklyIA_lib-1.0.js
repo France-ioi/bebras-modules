@@ -179,6 +179,7 @@ var getContext = function(display, infos, curLevel) {
             code: {
                getNbKnownItems: "getNbKnownItems",
                getNbItemsToPredict: "getNbItemsToPredict",
+               getNbNeighbors: "getNbNeighbors",
                getDistance: "getDistance",
                getClass: "getClass",
                predictClass: "predictClass",
@@ -187,7 +188,7 @@ var getContext = function(display, infos, curLevel) {
             },
             description: {
                getDistance: "@(idItem1,idItem2) retourne la distance entre 2 points",
-               getClass: "@(idItem)"
+               getClass: "@(idItem)",
                predictClass: "@(idItem,idClass)",
                highlightItemToPredict: "@(idItem)",
                highlightNearest: "@(idItem1,idItem2)"
@@ -274,7 +275,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "getNbKnownItems", yieldsValue: 'int' },
       func: function(callback) {
          // console.log(context.nbPoints)
-         this.callCallback(callback, context.k);
+         this.callCallback(callback, context.nbKnownItems);
       }
    });
 
@@ -285,6 +286,16 @@ var getContext = function(display, infos, curLevel) {
       func: function(callback) {
          // console.log(context.nbPoints)
          this.callCallback(callback, context.nbItemsToPredict);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "getNbNeighbors",
+      type: "sensors",
+      block: { name: "getNbNeighbors", yieldsValue: 'int' },
+      func: function(callback) {
+         // console.log(context.nbPoints)
+         this.callCallback(callback, context.k);
       }
    });
 
@@ -358,6 +369,8 @@ var getContext = function(display, infos, curLevel) {
          var pos2 = getPosFromCoordinates(coo2);
          var d = Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y)
 
+         showDist({coo1,coo2 });
+
          this.callCallback(callback, Math.round(d));
       }
    });
@@ -422,7 +435,7 @@ var getContext = function(display, infos, curLevel) {
          params: [null,null],
       },
       func: function(idItem,idCluster,callback) {
-         var { k, nbPoints } = context;
+         var { k, nbPoints, pointData, centroidPos } = context;
          if(!Number.isInteger(idItem) || !Number.isInteger(idCluster)){
             throw(window.languageStrings.messages.noIntegerId);
          }
@@ -432,8 +445,10 @@ var getContext = function(display, infos, curLevel) {
          if(idCluster >= k || idCluster < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-         showDist(idItem,idCluster);
-
+         var coo1 = pointData[idItem];
+         var pos2 = centroidPos[idCluster];
+         var coo2 = getCoordinatesFromPos(pos2);
+         showDist({coo1,coo2, showText: true, nearest: false });
          this.callCallback(callback);
       }
    });
@@ -473,18 +488,20 @@ var getContext = function(display, infos, curLevel) {
          // yieldsValue: 'int'
       },
       func: function(idItem,idClass,callback) {
-         var { nbClusters, nbPoints } = context;
+         var { nbClusters, nbPoints, pointData } = context;
          if(!Number.isInteger(idItem) || !Number.isInteger(idClass)){
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbPoints || idItem < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-         if(idClass >= nbClusters || idCluster < 0){
+         if(idClass > nbClusters || idClass < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-         // context.classPoints[idItem] = idCluster + 1;
-         // updatePoint(idItem);
+         console.log(idItem,idClass)
+         highlightPoint(idItem);
+         pointData[idItem].class = idClass;
+         updatePoint(idItem);
 
          this.callCallback(callback);
       }
@@ -506,9 +523,11 @@ var getContext = function(display, infos, curLevel) {
          if(idItem >= nbPoints || idItem < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-
-         // context.classPoints[idItem] = idCluster + 1;
-         // updatePoint(idItem);
+         if(nearestObj){
+            nearestObj.remove();
+            nearestObj = null;
+         }
+         highlightPoint(idItem);
 
          this.callCallback(callback);
       }
@@ -523,16 +542,18 @@ var getContext = function(display, infos, curLevel) {
          // yieldsValue: 'int'
       },
       func: function(id1,id2,callback) {
-         var { nbPoints } = context;
+         var { nbPoints, pointData } = context;
          if(!Number.isInteger(id1) || !Number.isInteger(id2)){
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(id1 >= nbPoints || id1 < 0 || id2 >= nbPoints || id2 < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-         
-         // context.classPoints[idItem] = idCluster + 1;
-         // updatePoint(idItem);
+         var coo1 = pointData[id1]
+         var coo2 = pointData[id2]
+
+         showDist({coo1,coo2, nearest: true });
+
 
          this.callCallback(callback);
       }
@@ -606,6 +627,7 @@ var getContext = function(display, infos, curLevel) {
    var coordinateHighlight;
    var centroidHighlight;
    var distanceObj;
+   var nearestObj;
 
    var rng = new RandomGenerator(0);
    
@@ -690,8 +712,9 @@ var getContext = function(display, infos, curLevel) {
             context.nbClusters = gridInfos.nbClusters;
             context.k = gridInfos.k;
             context.nbItemsToPredict = gridInfos.nbItemsToPredict;
+            context.nbKnownItems = context.nbPoints - context.nbItemsToPredict;
          }
-         // context.allowInfiniteLoop = true;
+         context.allowInfiniteLoop = true;
          if(!context.pointData){
             context.pointData = initPointData();
          }
@@ -811,40 +834,42 @@ var getContext = function(display, infos, curLevel) {
 
    function initPointData() {
       // console.log("initPointData")
-      var pointData;
-      var { nbPoints } = context;
-      pointData = [];
-
-      for(var n = 0; n < nbPoints; n++){
-         var pos = getRandomPos();
-         pointData.push(pos);
-      }
+      var pointData = [];
 
       var { contextType } = infos;
+      if(contextType == "k-means"){
+         var { nbPoints } = context;
+         for(var n = 0; n < nbPoints; n++){
+            var pos = getRandomPos();
+            pointData.push(pos);
+         }
+      }else
+
       if(contextType == "knn"){
-         var { nbClusters } = context;
+         var { nbClusters, nbKnownItems, nbPoints } = context;
+         for(var n = 0; n < nbKnownItems; n++){
+            var pos = getRandomPos();
+            pointData.push(pos);
+         }
          var centerIDs = [];
          for(var iC = 0; iC < nbClusters; iC++){
             do{
-               var id = rng.nextInt(0,nbPoints - 1);
+               var id = rng.nextInt(0,nbKnownItems - 1);
             }while(centerIDs.includes(id));
             centerIDs[iC] = id;
-            pointData[id].class = iC;
+            pointData[id].class = iC + 1;
          }
-         for(var iP = 0; iP < nbPoints; iP++){
+         for(var iP = 0; iP < nbKnownItems; iP++){
             if(centerIDs.includes(iP))
                continue;
             var id = getClosestPoint(iP,centerIDs,pointData);
             pointData[iP].class = pointData[id].class;
          }
 
-         for(var id of centerIDs){
-            var cla = pointData[id].class;
-            var newClass; 
-            do{
-               newClass = rng.nextInt(0,nbClusters - 1);
-            }while(newClass == cla);
-            pointData[id].class = newClass;
+         for(var iP = nbKnownItems; iP < nbPoints; iP++){
+            var pos = getRandomPos();
+            pos.class = 0;
+            pointData[iP] = pos;
          }
          // console.log(centerIDs)
       }
@@ -930,7 +955,7 @@ var getContext = function(display, infos, curLevel) {
       //    frame.remove();
       // frame = paper.rect(xPointArea*scale,yPointArea*scale,pointAreaW*scale,pointAreaH*scale);
       
-      var nbClass = (contextType == "k-means") ? nbClusters + 1 : nbClusters;
+      var nbClass = nbClusters + 1;
       for(var iP = 0; iP < nbPoints; iP++){
          if(!points[iP])
             points[iP] = [];
@@ -1024,12 +1049,11 @@ var getContext = function(display, infos, curLevel) {
       var { classPoints, nbClusters, pointData } = context;
       if(contextType == "k-means"){
          var cla = classPoints[iP] || 0;
-         var nbClass = nbClusters + 1;
       }else{
          var cla = pointData[iP].class;
-         var nbClass = nbClusters;
       }
-      // console.log(iP,cla)
+      var nbClass = nbClusters + 1;
+      // console.log("updatePoint",iP,cla)
       for(var iC = 0; iC < nbClass; iC++){
          var obj = points[iP][iC];
          if(iC == cla){
@@ -1292,9 +1316,11 @@ var getContext = function(display, infos, curLevel) {
       coordinateHighlight = paper.path(p).attr(coordinateHighlightAttr);
    };
 
-   function showDist(idItem,idCluster) {
+   function showDist(params) {
+      // console.log("showDist",context.display)
       if(!context.display)
          return
+      var { coo1, coo2, showText, nearest } = params;
       if(coordinateHighlight){
          coordinateHighlight.remove();
          coordinateHighlight = null;
@@ -1304,33 +1330,40 @@ var getContext = function(display, infos, curLevel) {
          distanceObj = null;
       }
 
-      var { pointData, centroidPos } = context;
-      var { distanceAttr } = infos;
-      var a = distanceAttr;
+      var a = (nearest) ? infos.nearestAttr : infos.distanceAttr;
       
-      var coo1 = pointData[idItem];
       var x1 = coo1.x*scale;
       var y1 = coo1.y*scale;
 
-      var pos2 = centroidPos[idCluster];
-      var coo = getCoordinatesFromPos(pos2);
-      var x2 = coo.x*scale;
-      var y2 = coo.y*scale;
+      var x2 = coo2.x*scale;
+      var y2 = coo2.y*scale;
 
       var line = paper.path(["M",x1,y1,"L",x2,y2]).attr(a.line);
 
-      var pos1 = getPosFromCoordinates(coo1);
-      // console.log(pos1,pos2)
-      var d = Math.round(Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y));
-      var xt = (x1 + x2)/2;
-      var yt = (y1 + y2)/2;
-      var text = paper.text(xt,yt,d).attr(a.text);
-      var bbox = text.getBBox();
-      var back = paper.rect(bbox.x - 2,bbox.y - 2,bbox.width + 4,bbox.height + 4).attr(a.back);
-      text.toFront();
+      var obj;
+      if(showText){
+         var pos1 = getPosFromCoordinates(coo1);
+         var pos2 = getPosFromCoordinates(coo2);
+         // console.log(pos1,pos2)
+         var d = Math.round(Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y));
+         var xt = (x1 + x2)/2;
+         var yt = (y1 + y2)/2;
+         var text = paper.text(xt,yt,d).attr(a.text);
+         var bbox = text.getBBox();
+         var back = paper.rect(bbox.x - 2,bbox.y - 2,bbox.width + 4,bbox.height + 4).attr(a.back);
+         text.toFront();
+         obj = paper.set(line,back,text);
+      }else{
+         obj = line;
+      }
 
-      
-      distanceObj = paper.set(line,back,text);
+      if(nearest){
+         if(!nearestObj)
+            nearestObj = paper.set();
+         nearestObj.push(obj);
+      }else{
+         distanceObj = obj;
+      }
    };
 
    context.removeHighlight = function() {
@@ -1702,10 +1735,14 @@ var contextParams = {
          xRange: [0,1000],
          yRange: [0,1000],
          pointR: 5,
-         classColor: [ "blue", "yellow", "green", "purple", "pink" ],
-         classShape: [ "circle", "square", "diamond", "triangle"],
+         classColor: [ "black", "blue", "yellow", "green", "purple", "pink" ],
+         classShape: [ "cross", "circle", "square", "diamond", "triangle"],
          pointAttr: {
             stroke: "none",
+         },
+         crossAttr: {
+            "stroke-width": 3,
+            "stroke-linecap": "round"
          },
          backAttr: {
             "stroke": "none",
@@ -1725,6 +1762,21 @@ var contextParams = {
                stroke: colors.black,
                "stroke-width": 1,
                "stroke-dasharray": ["-"]
+            },
+            text: {
+               "font-size": 16,
+               // "font-weight": "bold",
+               fill: "white"
+            },
+            back: {
+               fill: colors.black,
+               r: 3
+            }
+         },
+         nearestAttr: {
+            line: {
+               stroke: colors.black,
+               "stroke-width": 2,
             },
             text: {
                "font-size": 16,
