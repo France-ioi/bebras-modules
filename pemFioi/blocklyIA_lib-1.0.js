@@ -194,20 +194,8 @@ var getContext = function(display, infos, curLevel) {
                highlightNearest: "@(idItem1,idItem2)"
             },
             messages: {
-               // maxNbCentroids: function(max) {
-               //    return "Vous ne pouvez pas placer plus de "+max+" centroïdes"
-               // },
-               // noIntegerId: "L'identifiant doit être un entier",
-               // noConsecutiveId: function(id,prev) {
-               //    return "Vous devez placer l'id "+prev+" avant l'id "+id
-               // },
-               // outOfRange: function(name,min,max) {
-               //    return "La valeur de "+name+" doit être comprise entre "+min+" et "+max
-               // },
-               // invalidId: "Identifiant invalide",
-               // failureNbCentroids: "Le nombre de centroïdes est incorrect",
-               // failureMissingItem: "Un des points n'a pas de classe",
-               // failureScore: "La position des centroïdes n'est pas optimisée",
+               failureMissingItem: "Un des points à prédire n'a pas de classe",
+               failureWrongClass: "La classe du point en rouge est incorrecte"
             }
          },
       },
@@ -324,7 +312,7 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          var x = getPosFromCoordinate(pos.x,0);
-         highlightPoint(id);
+         this.highlightPoint(id);
          highlightCoordinate(id,0);
          this.callCallback(callback, Math.round(x));
       }
@@ -346,7 +334,7 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          var y = getPosFromCoordinate(pos.y,1);
-         highlightPoint(id);
+         this.highlightPoint(id);
          highlightCoordinate(id,1);
          this.callCallback(callback, Math.round(y));
       }
@@ -498,8 +486,8 @@ var getContext = function(display, infos, curLevel) {
          if(idClass > nbClusters || idClass < 0){
             throw(window.languageStrings.messages.invalidId);
          }
-         console.log(idItem,idClass)
-         highlightPoint(idItem);
+         // console.log(idItem,idClass)
+         this.highlightPoint(idItem);
          pointData[idItem].class = idClass;
          updatePoint(idItem);
 
@@ -527,7 +515,7 @@ var getContext = function(display, infos, curLevel) {
             nearestObj.remove();
             nearestObj = null;
          }
-         highlightPoint(idItem);
+         this.highlightPoint(idItem);
 
          this.callCallback(callback);
       }
@@ -718,6 +706,10 @@ var getContext = function(display, infos, curLevel) {
          if(!context.pointData){
             context.pointData = initPointData();
          }
+         for(var iP = context.nbKnownItems; iP < context.nbPoints; iP++){
+            context.pointData[iP].class = 0;
+         }
+
          break;
       }
 
@@ -867,7 +859,22 @@ var getContext = function(display, infos, curLevel) {
          }
 
          for(var iP = nbKnownItems; iP < nbPoints; iP++){
-            var pos = getRandomPos();
+            do{
+               var tooClose = false;
+               var pos = getRandomPos();
+               for(var jP = nbKnownItems; jP < nbPoints; jP++){
+                  if(jP == iP)
+                     continue;
+                  var pos2 = pointData[jP];
+                  if(!pos2)
+                     continue;
+                  var d = Beav.Geometry.distance(pos.x,pos.y,pos2.x,pos2.y);
+                  if(d < 2*infos.marginX){
+                     tooClose = true;
+                     break;
+                  }
+               }
+            }while(tooClose);
             pos.class = 0;
             pointData[iP] = pos;
          }
@@ -1138,6 +1145,39 @@ var getContext = function(display, infos, curLevel) {
       return closest
    };
 
+   context.findNeighbors = function(id,k) {
+      var { pointData, nbKnownItems } = this;
+      var neighbors = [];
+
+      var pos1 = pointData[id];
+      for(var ip = 0; ip < nbKnownItems; ip++){
+         if(ip == id)
+            continue;
+         var pos2 = pointData[ip];
+         var d = Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y);
+         var dat = { ip, d };
+         if(neighbors.length == 0){
+            neighbors.push(dat);
+         }else{
+            var insert = false;
+            for(var iN = 0; iN < neighbors.length; iN++){
+               var nDat = neighbors[iN];
+               if(d < nDat.d){
+                  neighbors.splice(iN,0,dat);
+                  insert = true;
+                  break;
+               }
+            }
+            if(!insert){
+               neighbors.push(dat);
+            }
+         }
+      }
+      neighbors.splice(k);
+      // console.log(neighbors);
+      return neighbors
+   };
+
    context.findBestScore = function() {
       var { nbClusters, nbClusters, centroidPos } = context;
       var { xRange, yRange } = infos;
@@ -1145,12 +1185,7 @@ var getContext = function(display, infos, curLevel) {
       var centPos = centroidPos;
       var xRan = xRange[1] - xRange[0];
       var yRan = yRange[1] - yRange[0];
-      // for(var iC = 0; iC < nbClusters; iC++){
-      //    var x = xRange[0] + xRan/nbClusters + 2*(iC%2)*xRan/nbClusters;
-      //    var y = yRange[0] + yRan/nbClusters + 2*Math.floor(iC/2)*yRan/nbClusters;
-      //    // console.log(x,y)
-      //    centPos[iC] = {x,y};
-      // }
+
       do{
          var {score,classPoints} = context.updateScore(centPos);
          var prevSco = score;
@@ -1270,7 +1305,8 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   function highlightPoint(id) {
+   // function highlightPoint(id,err) {
+   context.highlightPoint = function(id,err) {
       if(!context.display)
          return
       if(pointHighlight){
@@ -1278,14 +1314,16 @@ var getContext = function(display, infos, curLevel) {
          pointHighlight = null;
       }
       var { pointData } = context;
-      var { pointHighlightAttr, pointR } = infos;
+      var { pointHighlightAttr, pointR, errorAttr } = infos;
       var pos = pointData[id];
       var x = pos.x*scale;
       var y = pos.y*scale;
 
       var r = pointR*1.5;
 
-      pointHighlight = paper.circle(x,y,r).attr(pointHighlightAttr);
+      var a = (err) ? errorAttr : pointHighlightAttr;
+
+      pointHighlight = paper.circle(x,y,r).attr(a);
    };
 
    function highlightCoordinate(id,ax) {
@@ -1380,6 +1418,10 @@ var getContext = function(display, infos, curLevel) {
       if(distanceObj){
          distanceObj.remove();
          distanceObj = null;
+      }
+      if(nearestObj){
+         nearestObj.remove();
+         nearestObj = null;
       }
    };
    
@@ -1566,7 +1608,7 @@ var getContext = function(display, infos, curLevel) {
 // };
 
 var endConditions = {
-   checkScore: function(context, lastTurn) {
+   checkScoreKMeans: function(context, lastTurn) {
       console.log("checkScore",context.display)
       context.removeHighlight();
       context.success = false;
@@ -1595,6 +1637,47 @@ var endConditions = {
          throw(window.languageStrings.messages.success);
       }
 
+   },
+   checkScoreKNN: function(context, lastTurn) {
+      console.log("checkScore",context.display)
+      context.removeHighlight();
+      context.success = false;
+      var { nbPoints, nbClusters, k, nbItemsToPredict, nbKnownItems, pointData } = context;
+
+      for(var ip = nbKnownItems; ip < nbPoints; ip++){
+         var dat = pointData[ip]
+         if(!dat.class){
+            context.highlightPoint(ip,true);
+            throw(window.languageStrings.messages.failureMissingItem);
+         }
+      }
+
+      for(var ip = nbKnownItems; ip < nbPoints; ip++){
+         var pDat = pointData[ip];
+         var neighbors = context.findNeighbors(ip,k)
+         var count = Beav.Array.make(nbClusters + 1,0);
+         for(var nei of neighbors){
+            var nDat = pointData[nei.ip];
+            var cla = nDat.class;
+            count[cla]++;
+         }
+         var max = 0;
+         var itemClass = 0;
+         for(var ic = 0; ic <= nbClusters; ic++){
+            var co = count[ic];
+            if(co > max){
+               max = co;
+               itemClass = ic;
+            }
+         }
+         if(itemClass != pDat.class){
+            context.highlightPoint(ip,true);
+            throw(window.languageStrings.messages.failureWrongClass);
+         }
+
+      }
+      context.success = true;
+      throw(window.languageStrings.messages.success);
    }
 };
 
@@ -1729,7 +1812,7 @@ var contextParams = {
                r: 3
             }
          },
-         checkEndCondition: endConditions.checkScore
+         checkEndCondition: endConditions.checkScoreKMeans
       },
       knn: {
          xRange: [0,1000],
@@ -1751,6 +1834,10 @@ var contextParams = {
          pointHighlightAttr: {
             stroke: colors.black,
             "stroke-width": 2
+         },
+         errorAttr: {
+            stroke: "red",
+            "stroke-width": 3
          },
          coordinateHighlightAttr: {
             stroke: colors.black,
@@ -1788,7 +1875,7 @@ var contextParams = {
                r: 3
             }
          },
-         checkEndCondition: endConditions.checkScore
+         checkEndCondition: endConditions.checkScoreKNN
       },
    };
 
