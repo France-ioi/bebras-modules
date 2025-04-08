@@ -487,7 +487,7 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.invalidId);
          }
          // console.log(idItem,idClass)
-         this.highlightPoint(idItem);
+         this.highlightPoint(idItem,false,true);
          pointData[idItem].class = idClass;
          updatePoint(idItem);
 
@@ -612,6 +612,7 @@ var getContext = function(display, infos, curLevel) {
    var centroids = [];
    var points = [];
    var pointHighlight;
+   var keepPointHighlight;
    var coordinateHighlight;
    var centroidHighlight;
    var distanceObj;
@@ -1306,7 +1307,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    // function highlightPoint(id,err) {
-   context.highlightPoint = function(id,err) {
+   context.highlightPoint = function(id,err,keep) {
       if(!context.display)
          return
       if(pointHighlight){
@@ -1323,7 +1324,14 @@ var getContext = function(display, infos, curLevel) {
 
       var a = (err) ? errorAttr : pointHighlightAttr;
 
-      pointHighlight = paper.circle(x,y,r).attr(a);
+      var obj = paper.circle(x,y,r).attr(a);
+      if(!keep){
+         pointHighlight = paper.circle(x,y,r).attr(a);
+      }else{
+         if(!keepPointHighlight)
+            keepPointHighlight = paper.set();
+         keepPointHighlight.push(obj);
+      }
    };
 
    function highlightCoordinate(id,ax) {
