@@ -199,6 +199,23 @@ var getContext = function(display, infos, curLevel) {
             }
          },
       },
+      "gradient": {
+         fr: {
+            label: {
+
+            },
+            code: {
+               move: "move",
+               getAltitude: "getAltitude"
+            },
+            description: {
+               move: "@(x,y)",
+               getAltitude: "@(x1,y1)",
+            },
+            messages: {
+            }
+         },
+      },
    };
    
    var iconSrc = $("img[src$='icon.png']").attr("src");
@@ -638,10 +655,19 @@ var getContext = function(display, infos, curLevel) {
       }
 
       var { paperW, paperH, marginX, marginY } = infos;
-      var x = marginX;
-      var y = marginY;
-      var w = paperW - 2*marginX;
-      var h = paperH - 2*marginY;
+      if(infos.nbCol && infos.pixelSize){
+         var { nbRows, nbCol, pixelSize } = infos;
+         var w = nbCol * pixelSize;
+         var h = nbRows * pixelSize;
+         var x = (paperW - w)/2;
+         var y = marginY;
+         infos.paperH = h + 2*marginY;
+      }else{
+         var x = marginX;
+         var y = marginY;
+         var w = paperW - 2*marginX;
+         var h = paperH - 2*marginY;
+      }
       infos.xPointArea = x;
       infos.yPointArea = y;
       infos.pointAreaW = w;
@@ -712,6 +738,14 @@ var getContext = function(display, infos, curLevel) {
          }
 
          break;
+      case "gradient":
+         var { nbRows, nbCol } = infos;
+         context.grid = Beav.Matrix.make(nbRows,nbCol,0);
+         context.nodes = gridInfos.nodes;
+         var startCol = rng.nextInt(0,nbCol - 1);
+         var startRow = rng.nextInt(0,nbRows - 1);
+         context.path = [{ row: startRow, col: startCol }];
+         initGrid();
       }
 
       
@@ -768,56 +802,13 @@ var getContext = function(display, infos, curLevel) {
          initBack();
          initPoints();
          updatePoints();
-         break;   
+         break;  
+      case "gradient":
+         initCanvas();
+         initMap();
+         break; 
       }
    };
-
-   // context.redrawDisplay = function() {
-   //    console.log("redrawDisplay")
-   //    if(context.display) {
-   //       this.raphaelFactory.destroyAll();
-   //       if(paper !== undefined)
-   //          paper.remove();
-   //       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-   //       // resetBoard();
-   //       redisplayAllItems();
-   //       context.updateScale();
-   //       $("#nbMoves").html(context.nbMoves);
-   //    }
-   // }
-
-   // context.getInnerState = function() {
-   //    console.log("getInnerState")
-   //    var removeItemElement = function (item) {
-   //       var modifiedItem = Object.assign({}, item);
-   //       delete modifiedItem.element;
-   //       return modifiedItem;
-   //    };
-   //    innerState.items = context.items.map(removeItemElement);
-   //    innerState.multicell_items = context.multicell_items.map(removeItemElement);
-   //    innerState.last_connect = context.last_connect;
-   //    innerState.wires = context.wires.map(removeItemElement);
-   //    innerState.nbMoves = context.nbMoves;
-   //    innerState.time = context.time;
-   //    innerState.bag = context.bag.map(removeItemElement);
-
-   //    return innerState;
-   // };
-
-   // context.implementsInnerState = function () {
-   //    return true;
-   // }
-
-   // context.reloadInnerState = function(data) {
-   //    innerState = data;
-   //    context.items = data.items;
-   //    context.multicell_items = data.multicell_items;
-   //    context.last_connect = data.last_connect;
-   //    context.wires = data.wires;
-   //    context.nbMoves = data.nbMoves;
-   //    context.time = data.time;
-   //    context.bag = data.bag;
-   // };
 
    context.unload = function() {
       if(context.display && paper != null) {
@@ -927,6 +918,161 @@ var getContext = function(display, infos, curLevel) {
       };
    };
 
+   function initGrid() {
+      var { grid, nodes } = context;
+      var { nbRows, nbCol } = infos;
+
+      let perlin = {
+         // https://joeiddon.github.io/projects/javascript/perlin.html
+          rand_vect: function(){
+              let theta = rng.nextReal() * 2 * Math.PI;
+              return {x: Math.cos(theta), y: Math.sin(theta)};
+          },
+          dot_prod_grid: function(x, y, vx, vy){
+              let g_vect;
+              let d_vect = {x: x - vx, y: y - vy};
+              if (this.gradients[[vx,vy]]){
+                  g_vect = this.gradients[[vx,vy]];
+              } else {
+                  g_vect = this.rand_vect();
+                  this.gradients[[vx, vy]] = g_vect;
+              }
+              return d_vect.x * g_vect.x + d_vect.y * g_vect.y;
+          },
+          smootherstep: function(x){
+              return 6*x**5 - 15*x**4 + 10*x**3;
+          },
+          interp: function(x, a, b){
+              return a + this.smootherstep(x) * (b-a);
+          },
+          seed: function(){
+              this.gradients = {};
+              this.memory = {};
+          },
+          get: function(x, y) {
+              if (this.memory.hasOwnProperty([x,y]))
+                  return this.memory[[x,y]];
+              let xf = Math.floor(x);
+              let yf = Math.floor(y);
+              //interpolate
+              let tl = this.dot_prod_grid(x, y, xf,   yf);
+              let tr = this.dot_prod_grid(x, y, xf+1, yf);
+              let bl = this.dot_prod_grid(x, y, xf,   yf+1);
+              let br = this.dot_prod_grid(x, y, xf+1, yf+1);
+              let xt = this.interp(x-xf, tl, tr);
+              let xb = this.interp(x-xf, bl, br);
+              let v = this.interp(y-yf, xt, xb);
+              this.memory[[x,y]] = v;
+              return v;
+          }
+      };
+      perlin.seed();
+
+
+      const COLOR_SCALE = 100;
+
+      var refCol = context.path[0].col;
+      var refRow = context.path[0].row;
+
+      var max = -Infinity;
+      var min = Infinity;
+      for (let row = 0; row < nbRows; row ++){
+         for (let col = 0; col < nbCol; col++){
+            var xVal = nodes*col/nbCol;
+            var yVal = nodes*row/nbRows;
+            let v = perlin.get(xVal, yVal) * COLOR_SCALE;
+            var d = Beav.Geometry.distance(row,col,refRow,refCol);
+            v += d*0.1;
+            v = Math.round(v)
+            if(v > max){
+               max = v;
+            }
+            if(v < min){
+               min = v;
+            }
+            grid[row][col] = v;
+         }
+      }
+
+      for (let row = 0; row < nbRows; row ++){
+         for (let col = 0; col < nbCol; col++){
+            var v = grid[row][col];
+            v = Math.round(COLOR_SCALE*(v - min)/(max - min)); 
+            grid[row][col] = v;
+         }
+      }
+      // console.log(min, max)
+
+      
+   };
+
+   function initMap() {
+      if(!context.display)
+         return
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
+      var { nbRows, nbCol } = infos;
+      var w = Math.round(pointAreaW*scale);
+      var h = Math.round(pointAreaH*scale);
+      var x0 = Math.round(xPointArea*scale);
+      var y0 = Math.round(yPointArea*scale);
+
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+
+      const COLOR_SCALE = 100;
+
+      var pixelS = pixelSize*scale;
+      // console.log(pixelS)
+
+      var max = -Infinity;
+      var min = Infinity;
+
+      for (let row = 0; row < nbRows; row ++){
+         for (let col = 0; col < nbCol; col++){
+            var v = context.grid[row][col];
+
+            var x = col*pixelS;
+            var y = row*pixelS;
+
+            var color = getColor(v,COLOR_SCALE);
+
+            ctx.fillStyle = color;
+            ctx.fillRect(
+               x,
+               y,
+               Math.ceil(pixelS),
+               Math.ceil(pixelS)
+            );
+         }
+      }
+      // console.log(min, max)
+
+      function getColor(v,COLOR_SCALE) {
+         var { colorScale } = infos;
+         var min = 0;
+         var max = COLOR_SCALE;
+         v = Math.max(min,v);
+         v = Math.min(max,v);
+         var step = (max - min)/(colorScale.length - 1);
+
+         var index = Math.floor((v - min)/step);
+         var perc = (v - min - index*step)/step;
+         // console.log(perc)
+         var rgb1 = colorScale[index];
+         if(index == colorScale.length - 1){
+            var r = rgb1[0];
+            var g = rgb1[1];
+            var b = rgb1[2];
+         }else{
+            var rgb2 = colorScale[index + 1];
+            var r = Math.floor(rgb1[0] + (rgb2[0] - rgb1[0])*perc);
+            var g = Math.floor(rgb1[1] + (rgb2[1] - rgb1[1])*perc);
+            var b = Math.floor(rgb1[2] + (rgb2[2] - rgb1[2])*perc);
+         } 
+         return "rgb("+r+","+g+","+b+")"
+      };
+   };
+
    function initCanvas() {
       // console.log("initCanvas")
       $("#canvas").remove();
@@ -1010,16 +1156,12 @@ var getContext = function(display, infos, curLevel) {
       var h = Math.round(pointAreaH*scale);
       var x0 = Math.round(xPointArea*scale);
       var y0 = Math.round(yPointArea*scale);
-      // var w = pointAreaW;
-      // var h = pointAreaH;
-      // var x0 = xPointArea;
-      // var y0 = yPointArea;
-      // console.log("updateCanvas",x0,y0,w,h)
+
       var tmpCanvas = document.getElementById('canvas');
       var ctx = tmpCanvas.getContext('2d');
       var imgData = ctx.createImageData(w,h);
       var dat = imgData.data;
-   //    // console.log(answer.params)
+
       var rgbKeys = ["r","g","b"];
       for(var i = 0; i < dat.length; i += 4) {
          var x = x0 + Math.floor((i/4)%w);
@@ -1027,11 +1169,9 @@ var getContext = function(display, infos, curLevel) {
          var pos = getPosFromCoordinates({x,y},true)
          var { id } = findClosestCentroid(pos);
          var col = classColor[id];
-         // if(i == 0)
-         //    console.log(id,col,dat[i])
+
          var op = 0.3;
          for(var j = 0; j < 3; j++){
-            // dat[i + j] = colorRGB[col][j];
             dat[i + j] = Raphael.getRGB(colors[col])[rgbKeys[j]];
          }
          dat[i + 3] = Math.round(255*op); 
@@ -1437,183 +1577,6 @@ var getContext = function(display, infos, curLevel) {
    return context;
 };
 
-// var getResources = function(subTask) {
-//    var res = [];
-//    var type = subTask.gridInfos.contextType;
-//    var typeData = contextParams[type];
-//    if(typeData.itemTypes){
-//       for(var key in typeData.itemTypes){
-//          var params = typeData.itemTypes[key];
-//          if(params.img){
-//             res.push({ type: 'image', url: params.img });
-//          }
-//       }
-//    }
-//    return res
-// };
-
-// var robotEndConditions = {
-//    checkReachExit: function(context, lastTurn) {
-//       var robot = context.getRobot();
-//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successReachExit);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureReachExit);
-//       }
-//    },
-//    checkPickedAllWithdrawables: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-//                solved = false;
-//             }
-//          }
-//       }
-      
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successPickedAllWithdrawables);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-//       }
-//    },
-//    checkPlugsWired: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
-//                solved = false;
-//             }
-//          }
-//       }
-      
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successPlugsWired);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failurePlugsWired);
-//       }
-//    },
-//    checkContainersFilled: function(context, lastTurn) {
-//       var solved = true;
-      
-//       var messages = [
-//          window.languageStrings.messages.failureContainersFilled,
-//          window.languageStrings.messages.failureContainersFilledLess,
-//          window.languageStrings.messages.failureContainersFilledBag
-//       ];
-//       var message = 2;
-//       if (context.infos.maxMoves != undefined) {
-//          if (context.nbMoves > context.infos.maxMoves) {
-//             context.success = false;
-//             throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
-//          }
-//       }
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-//             if(containers.length != 0) {
-//                var container = containers[0];
-//                if(container.containerSize == undefined && container.containerFilter == undefined) {
-//                   container.containerSize = 1;
-//                }
-//                var filter;
-//                if(container.containerFilter == undefined)
-//                   filter = function(obj) { return obj.isWithdrawable === true; };
-//                else
-//                   filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
-               
-//                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
-//                   solved = false;
-//                   message = Math.min(message, 1);
-//                }
-//                else if(context.getItemsOn(row, col, filter).length == 0) {
-//                   solved = false;
-//                   message = Math.min(message, 0);
-//                }
-               
-//                if(container.containerFilter != undefined) {
-//                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
-//                      solved = false;
-//                      message = Math.min(message, 0);
-//                   }
-//                   for(var item in context.bag) {
-//                      if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
-//                         solved = false;
-//                         message = Math.min(message, 2);
-//                      }
-//                   }
-//                }
-//             }
-//             else {
-//                if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
-//                   solved = false;
-//                   message = Math.min(message, 0);
-//                }
-//             }
-//          }
-//       }
-      
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successContainersFilled);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(messages[message]);
-//       }
-//    },
-//    checkBothReachAndCollect: function(context, lastTurn) {
-//       var robot = context.getRobot();
-//       if(context.isOn(function(obj) { return obj.isExit === true; })) {
-//          var solved = true;
-//          for(var row = 0;row < context.nbRows;row++) {
-//             for(var col = 0;col < context.nbCols;col++) {
-//                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-//                   solved = false;
-//                   throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-//                }
-//             }
-//          }
-         
-//          if(solved) {
-//             context.success = true;
-//             throw(window.languageStrings.messages.successPickedAllWithdrawables);
-//          }
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureReachExit);
-//       }
-//    },
-//    checkLights: function(context, lastTurn) {
-//       var solved = true;
-//       for(var row = 0;row < context.nbRows;row++) {
-//          for(var col = 0;col < context.nbCols;col++) {
-//             if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
-//                solved = false;
-//             }
-//          }
-//       }
-      
-//       if(solved) {
-//          context.success = true;
-//          throw(window.languageStrings.messages.successLights);
-//       }
-//       if(lastTurn) {
-//          context.success = false;
-//          throw(window.languageStrings.messages.failureLights);
-//       }
-//    }
-// };
 
 var endConditions = {
    checkScoreKMeans: function(context, lastTurn) {
@@ -1688,71 +1651,6 @@ var endConditions = {
       throw(window.languageStrings.messages.success);
    }
 };
-
-
-// var robotEndFunctionGenerator = {
-//    allFilteredPicked: function(filter) {
-//       return function(context, lastTurn) {
-//          var solved = true;
-//          for(var row = 0;row < context.nbRows;row++) {
-//             for(var col = 0;col < context.nbCols;col++) {
-//                var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
-//                if(filtered.length != 0) {
-//                   solved = false;
-//                }
-//             }
-//          }
-         
-//          for(var item in context.bag) {
-//             if(!filter(context.bag[item])) {
-//                context.success = false;
-//                throw(window.languageStrings.messages.failureUnfilteredObject);
-//             }
-//          }
-         
-//          if(solved) {
-//             context.success = true;
-//             throw(window.languageStrings.messages.successPickedAllWithdrawables);
-//          }
-//          if(lastTurn) {
-//             context.success = false;
-//             throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-//          }
-//       };
-//    },
-//    allNumbersWritten: function(numbers) {
-//       return function(context, lastTurn) {
-//          var solved = true;
-//          for(var iNumber in numbers) {
-//             var number = numbers[iNumber];
-//             var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
-//             if(items.length == 0)
-//                throw("Error: no number here");
-            
-//             var expected;
-//             if(typeof number.value === "number") {
-//                expected = number.value;
-//             } else {
-//                expected = number.value.bind(context)();
-//             }
-            
-//             if(expected != items[0].value) {
-//                solved = false;
-//             }
-//          }
-         
-//          if(solved) {
-//             context.success = true;
-//             throw(window.languageStrings.messages.successNumbersWritten);
-//          }
-         
-//          if(lastTurn) {
-//             context.success = false;
-//             throw(window.languageStrings.messages.failureNumbersWritten);
-//          }
-//       };
-//    }
-// };
 
 var contextParams = {
       none: {
@@ -1885,6 +1783,24 @@ var contextParams = {
          },
          checkEndCondition: endConditions.checkScoreKNN
       },
+      gradient: {
+         nbRows: 300,
+         nbCol: 350,
+         pixelSize: 2,
+         colorScale: [
+            [0,0,0],
+            [17,0,57],
+            [43,0,100],
+            [80,0,100],
+            [116,0,100],
+            [139,42,53],
+            [158,85,5],
+            [190,137,0],
+            [228,197,0],
+            [241,223,99],
+            [254,248,209],
+        ],
+      }
    };
 
 if(window.quickAlgoLibraries) {
