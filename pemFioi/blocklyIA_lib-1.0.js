@@ -770,12 +770,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(window.quickAlgoResponsive) {
-         var areaWidth = Math.max(200, $('.gridArea').width());
-         $(".gridArea").css({
-            display: "flex",
-            "flex-direction": "column",
-            "align-items": "center"
-         });
+         var areaWidth = Math.max(200, $('#grid').width() - 10);
          $('#grid').css("width","auto");
       } else {
          var areaWidth = 400;
