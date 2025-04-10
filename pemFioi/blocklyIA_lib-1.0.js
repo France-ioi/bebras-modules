@@ -206,13 +206,23 @@ var getContext = function(display, infos, curLevel) {
             },
             code: {
                move: "move",
-               getAltitude: "getAltitude"
+               getAltitude: "getAltitude",
+               getCol: "getCol",
+               getRow: "getRow",
             },
             description: {
                move: "@(x,y)",
                getAltitude: "@(x1,y1)",
+               getCol: "@() return current col",
+               getRow: "@() return current row",
             },
             messages: {
+               wrongFormat: function(type,min,max) {
+                  var str = "La coordonnée ";
+                  str += (type == 1) ? "y" : "x";
+                  str += " doit être un nombre entier compris entre "+min+" et "+max;
+                  return str
+               }
             }
          },
       },
@@ -397,6 +407,59 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "getCol",
+      type: "sensors",
+      block: { 
+         name: "getCol", 
+         // params: [null],
+         yieldsValue: 'int'
+      },
+      func: function(callback) {
+         var { path } = context;
+         var last = path[path.length - 1]
+
+         this.callCallback(callback, last.col);
+      }
+   });
+
+    infos.newBlocks.push({
+      name: "getRow",
+      type: "sensors",
+      block: { 
+         name: "getRow", 
+         // params: [null],
+         yieldsValue: 'int'
+      },
+      func: function(callback) {
+         var { path } = context;
+         var last = path[path.length - 1]
+
+         this.callCallback(callback, last.row);
+      }
+   });
+
+    infos.newBlocks.push({
+      name: "getAltitude",
+      type: "sensors",
+      block: { 
+         name: "getAltitude", 
+         params: [null,null],
+         yieldsValue: 'int'
+      },
+      func: function(row,col,callback) {
+         var { nbRows, nbCol, grid } = context;
+         if(!Number.isInteger(row) || row < 0 || row >= nbRows){
+            throw(window.languageStrings.messages.wrongFormat(1,0,nbRows - 1));
+         }
+         if(!Number.isInteger(col) || col < 0 || col >= nbCol){
+            throw(window.languageStrings.messages.wrongFormat(0,0,nbCol - 1));
+         }
+
+         this.callCallback(callback, grid[row][col]);
+      }
+   });
+
+   infos.newBlocks.push({
       name: "showCentroid",
       type: "actions",
       block: { 
@@ -565,6 +628,33 @@ var getContext = function(display, infos, curLevel) {
    });
 
    infos.newBlocks.push({
+      name: "move",
+      type: "actions",
+      block: { 
+         name: "move", 
+         params: [null,null],
+      },
+      func: function(r,c,callback) {
+         var { nbRows, nbCol } = context;
+         if(!Number.isInteger(r) || r < 0 || r >= nbRows){
+            throw(window.languageStrings.messages.wrongFormat(1,0,nbRows - 1));
+         }
+         if(!Number.isInteger(c) || c < 0 || c >= nbCol){
+            throw(window.languageStrings.messages.wrongFormat(0,0,nbCol - 1));
+         }
+         var { path } = context;
+         var last = path[path.length - 1];
+         if(last.row != r || last.col != c){
+            path.push({ row: r, col: c });
+            updateLocations();
+            updateZoom();
+         }
+
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
       name: "distance",
       type: "actions",
       block: { 
@@ -634,13 +724,14 @@ var getContext = function(display, infos, curLevel) {
    var centroidHighlight;
    var distanceObj;
    var nearestObj;
+   var locationObj = [];
+   var zoomObj;
 
    var rng = new RandomGenerator(0);
    
    initVisualParameters();
 
    function initVisualParameters() {
-      // console.log("initVisualParameters")
       if(infos.marginX === undefined) {
          infos.marginX = 20;
       }
@@ -655,18 +746,23 @@ var getContext = function(display, infos, curLevel) {
       }
 
       var { paperW, paperH, marginX, marginY } = infos;
-      if(infos.nbCol && infos.pixelSize){
-         var { nbRows, nbCol, pixelSize } = infos;
-         var w = nbCol * pixelSize;
-         var h = nbRows * pixelSize;
-         var x = (paperW - w)/2;
-         var y = marginY;
-         infos.paperH = h + 2*marginY;
-      }else{
-         var x = marginX;
-         var y = marginY;
-         var w = paperW - 2*marginX;
-         var h = paperH - 2*marginY;
+      var x = marginX;
+      var y = marginY;
+      var w = paperW - 2*marginX;
+      var h = paperH - 2*marginY;
+      // console.log(infos)
+      if(infos.contextType == "gradient"){
+         var { nbRows, nbCol, 
+         nbRowsZoom, nbColZoom, pixelSizeZoom, } = infos;
+         infos.pixelSize = w/nbCol;
+         var h = nbRows * infos.pixelSize;
+
+         var zoomH = nbRowsZoom*pixelSizeZoom;
+         var zoomW = nbColZoom*pixelSizeZoom;
+         infos.xZoom = (paperW - zoomW)/2;
+         infos.yZoom = y + h + marginY;
+
+         infos.paperH = infos.yZoom + zoomH + marginY;
       }
       infos.xPointArea = x;
       infos.yPointArea = y;
@@ -701,9 +797,10 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.reset = function(gridInfos) {
-      // console.log("reset",scale);
+      console.log("reset",scale);
       // console.log(gridInfos,infos);
       var { contextType } = infos;
+      rng.reset(0);
 
       switch(contextType){
       case "k-means":
@@ -739,15 +836,20 @@ var getContext = function(display, infos, curLevel) {
 
          break;
       case "gradient":
-         var { nbRows, nbCol } = infos;
-         context.grid = Beav.Matrix.make(nbRows,nbCol,0);
-         context.nodes = gridInfos.nodes;
-         var startCol = rng.nextInt(0,nbCol - 1);
-         var startRow = rng.nextInt(0,nbRows - 1);
-         context.path = [{ row: startRow, col: startCol }];
-         initGrid();
+         if(gridInfos) {
+            context.nodes = gridInfos.nodes;
+            context.steepnessFactor = gridInfos.steepnessFactor;
+            infos.nbRows = gridInfos.nbRows;
+            infos.nbCol = gridInfos.nbCol;
+            var { nbRows, nbCol } = infos;
+            initVisualParameters();
+            context.grid = Beav.Matrix.make(nbRows,nbCol,0);
+            var startCol = rng.nextInt(0,nbCol - 1);
+            var startRow = rng.nextInt(0,nbRows - 1);
+            context.path = [{ row: startRow, col: startCol }];
+            initGrid();
+         }
       }
-
       
       if(context.display) {
          this.delayFactory.destroyAll();
@@ -755,13 +857,14 @@ var getContext = function(display, infos, curLevel) {
          if(paper !== undefined)
             paper.remove();
          paper = this.raphaelFactory.create("paperMain", "grid", infos.paperW, infos.paperH);
+         frame = paper.rect(0,0,0,0);
          context.updateScale();
       }
       
    };
 
    context.updateScale = function() {
-      // console.log("updateScale")
+      console.log("updateScale")
       if(!context.display) {
          return;
       }
@@ -770,25 +873,33 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(window.quickAlgoResponsive) {
-         var areaWidth = Math.max(200, $('#grid').width() - 10);
+         var areaWidth = Math.max(200, $('#grid').width());
          $('#grid').css("width","auto");
       } else {
          var areaWidth = 400;
          var areaHeight = 600;
       }
       var { paperW, paperH, contextType } = infos;
-      // var paperRatio = paperW/paperH;
       scale = areaWidth/paperW;
+      console.log(scale)
 
       var paperWidth = paperW * scale;
       var paperHeight = paperH * scale;
       paper.setSize(paperWidth, paperHeight);
+      if(frame){
+         var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+         frame.attr({
+            x: xPointArea*scale,
+            y: yPointArea*scale,
+            width: pointAreaW*scale,
+            height: pointAreaH*scale,
+         })
+      }
 
       switch(contextType){
       case "k-means":
          initCentroids();
          initPoints();
-         
          initCanvas();
          updateCanvas();
          updatePoints();
@@ -801,6 +912,8 @@ var getContext = function(display, infos, curLevel) {
       case "gradient":
          initCanvas();
          initMap();
+         updateLocations();
+         updateZoom();
          break; 
       }
    };
@@ -914,7 +1027,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function initGrid() {
-      var { grid, nodes } = context;
+      var { grid, nodes, steepnessFactor, path } = context;
       var { nbRows, nbCol } = infos;
 
       let perlin = {
@@ -966,8 +1079,15 @@ var getContext = function(display, infos, curLevel) {
 
       const COLOR_SCALE = 100;
 
-      var refCol = context.path[0].col;
-      var refRow = context.path[0].row;
+      var refCol = path[0].col;
+      var refRow = path[0].row;
+      // do{
+      //    var refCol = rng.nextInt(0,nbCol - 1);
+      //    var refRow = rng.nextInt(0,nbRows - 1);
+      //    var d = Beav.Geometry.distance(refRow,refCol,startRow,startCol);
+      // }while(d < Math.max(nbRows,nbCol)/2);
+      // console.log(startRow,startCol,refRow,refCol)
+      
 
       var max = -Infinity;
       var min = Infinity;
@@ -977,7 +1097,7 @@ var getContext = function(display, infos, curLevel) {
             var yVal = nodes*row/nbRows;
             let v = perlin.get(xVal, yVal) * COLOR_SCALE;
             var d = Beav.Geometry.distance(row,col,refRow,refCol);
-            v += d*0.1;
+            v -= d*steepnessFactor;
             v = Math.round(v)
             if(v > max){
                max = v;
@@ -1014,22 +1134,17 @@ var getContext = function(display, infos, curLevel) {
       var canvas = document.getElementById('canvas');
       var ctx = canvas.getContext('2d');
 
-      const COLOR_SCALE = 100;
-
       var pixelS = pixelSize*scale;
-      // console.log(pixelS)
 
       var max = -Infinity;
       var min = Infinity;
 
       for (let row = 0; row < nbRows; row ++){
          for (let col = 0; col < nbCol; col++){
-            var v = context.grid[row][col];
-
             var x = col*pixelS;
             var y = row*pixelS;
 
-            var color = getColor(v,COLOR_SCALE);
+            var color = getPixelColor(row,col);
 
             ctx.fillStyle = color;
             ctx.fillRect(
@@ -1040,32 +1155,35 @@ var getContext = function(display, infos, curLevel) {
             );
          }
       }
-      // console.log(min, max)
+   };
 
-      function getColor(v,COLOR_SCALE) {
-         var { colorScale } = infos;
-         var min = 0;
-         var max = COLOR_SCALE;
-         v = Math.max(min,v);
-         v = Math.min(max,v);
-         var step = (max - min)/(colorScale.length - 1);
+   function getPixelColor(row,col) {
+      var { colorScale, nbRows, nbCol } = infos;
+      if(row < 0 || row >= nbRows || col < 0 || col >= nbCol)
+         return colors.black
+      var v = context.grid[row][col];
+      const COLOR_SCALE = 100;
+      var min = 0;
+      var max = COLOR_SCALE;
+      v = Math.max(min,v);
+      v = Math.min(max,v);
+      var step = (max - min)/(colorScale.length - 1);
 
-         var index = Math.floor((v - min)/step);
-         var perc = (v - min - index*step)/step;
-         // console.log(perc)
-         var rgb1 = colorScale[index];
-         if(index == colorScale.length - 1){
-            var r = rgb1[0];
-            var g = rgb1[1];
-            var b = rgb1[2];
-         }else{
-            var rgb2 = colorScale[index + 1];
-            var r = Math.floor(rgb1[0] + (rgb2[0] - rgb1[0])*perc);
-            var g = Math.floor(rgb1[1] + (rgb2[1] - rgb1[1])*perc);
-            var b = Math.floor(rgb1[2] + (rgb2[2] - rgb1[2])*perc);
-         } 
-         return "rgb("+r+","+g+","+b+")"
-      };
+      var index = Math.floor((v - min)/step);
+      var perc = (v - min - index*step)/step;
+      // console.log(perc)
+      var rgb1 = colorScale[index];
+      if(index == colorScale.length - 1){
+         var r = rgb1[0];
+         var g = rgb1[1];
+         var b = rgb1[2];
+      }else{
+         var rgb2 = colorScale[index + 1];
+         var r = Math.floor(rgb1[0] + (rgb2[0] - rgb1[0])*perc);
+         var g = Math.floor(rgb1[1] + (rgb2[1] - rgb1[1])*perc);
+         var b = Math.floor(rgb1[2] + (rgb2[2] - rgb1[2])*perc);
+      } 
+      return "rgb("+r+","+g+","+b+")"
    };
 
    function initCanvas() {
@@ -1206,6 +1324,52 @@ var getContext = function(display, infos, curLevel) {
          }
          obj.attr("clip-rect",[x,y,w,h]);
       }
+   };
+
+   function updateLocations() {
+      if(!context.display)
+         return
+      var { path } = context;
+      
+      for(var il = 0; il < path.length; il++){
+         if(locationObj[il]){
+            locationObj[il].remove();
+         }
+         locationObj[il] = drawLocation(il)
+      }
+   };
+
+   function updateZoom() {
+      if(!context.display)
+         return
+      var { xZoom, yZoom, pixelSizeZoom, nbColZoom, nbRowsZoom,
+      zoomPixelAttr, locationAttr } = infos;
+      var { path } = context;
+
+      var pos = path[path.length - 1];
+      
+      var x0 = xZoom*scale;
+      var y0 = yZoom*scale;
+      var s = pixelSizeZoom*scale;
+      var cx = x0 + nbColZoom*s/2;
+      var cy = y0 + nbRowsZoom*s/2;
+
+      if(zoomObj)
+         zoomObj.remove();
+
+      paper.setStart();
+      for(var row = 0; row < nbRowsZoom; row++){
+         var y = y0 + row*s;
+         var gridRow = pos.row - 1 + row;
+         for(var col = 0; col < nbColZoom; col++){
+            var x = x0 + col*s;
+            var gridCol = pos.col - 1 + col;
+            var c = getPixelColor(gridRow,gridCol);
+            paper.rect(x,y,s,s).attr(zoomPixelAttr).attr("fill",c);
+         }
+      }
+      paper.circle(cx,cy,s/3).attr(locationAttr.current);
+      zoomObj = paper.setFinish();
    };
 
    context.updateScore = function(centPos) {
@@ -1441,6 +1605,23 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
+   function drawLocation(id) {
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH,
+      locationR, locationAttr, pixelSize } = infos;
+      var x0 = xPointArea*scale;
+      var y0 = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+      var { path } = context;
+
+      var pos = path[id];
+      var x = x0 + (pos.col + 0.5)*pixelSize*scale;
+      var y = y0 + (pos.row + 0.5)*pixelSize*scale;
+      var a = (id == path.length - 1) ? locationAttr.current : locationAttr.previous;
+
+      return paper.circle(x,y,locationR).attr(a);
+   };
+
    // function highlightPoint(id,err) {
    context.highlightPoint = function(id,err,keep) {
       if(!context.display)
@@ -1644,6 +1825,11 @@ var endConditions = {
       }
       context.success = true;
       throw(window.languageStrings.messages.success);
+   },
+   checkScoreGradient: function(context, lastTurn) {
+      console.log("checkScore",context.display)
+      context.success = false;
+      
    }
 };
 
@@ -1779,9 +1965,10 @@ var contextParams = {
          checkEndCondition: endConditions.checkScoreKNN
       },
       gradient: {
-         nbRows: 300,
-         nbCol: 350,
-         pixelSize: 2,
+         nbRowsZoom: 3,
+         nbColZoom: 3,
+         pixelSizeZoom: 50,
+         locationR: 10,
          colorScale: [
             [0,0,0],
             [17,0,57],
@@ -1794,7 +1981,23 @@ var contextParams = {
             [228,197,0],
             [241,223,99],
             [254,248,209],
-        ],
+         ],
+         locationAttr: {
+            current: {
+               stroke: colors.blue,
+               "stroke-width": 2,
+               fill: "white"
+            },
+            previous: {
+               stroke: "none",
+               fill: colors.blue
+            }
+         },
+         zoomPixelAttr: {
+            stroke: colors.black,
+            "stroke-width": 1
+         },
+         checkEndCondition: endConditions.checkScoreGradient
       }
    };
 
