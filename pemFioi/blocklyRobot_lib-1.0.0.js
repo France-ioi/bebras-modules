@@ -1071,6 +1071,9 @@ var getContext = function(display, infos, curLevel) {
             code: {
                withdrawObject: "ramasserDomino"
             },
+            description: {
+               withdrawObject: "ramasserDomino() ramasse le domino sur la case du robot"
+            },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
