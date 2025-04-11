@@ -222,6 +222,12 @@ var getContext = function(display, infos, curLevel) {
                   str += (type == 1) ? "y" : "x";
                   str += " doit être un nombre entier compris entre "+min+" et "+max;
                   return str
+               },
+               moveFirst: "Vous devez d'abord vous placer sur la carte",
+               notNeighbor: "Vous ne pouvez appeler cette fonction que sur les cases voisines de votre position actuelle",
+               failureMinimum: "Votre position finale n'est pas la plus basse par rapport à ses plus proches voisins",
+               successAltitude: function(alt) {
+                  return "Vous avez atteint l'altitude de "+alt
                }
             }
          },
@@ -447,12 +453,20 @@ var getContext = function(display, infos, curLevel) {
          yieldsValue: 'int'
       },
       func: function(row,col,callback) {
-         var { nbRows, nbCol, grid } = context;
+         var { nbRows, nbCol, grid, path } = context;
+         if(path.length == 0){
+            throw(window.languageStrings.messages.moveFirst);
+         }
+         var pos = path[path.length - 1];
          if(!Number.isInteger(row) || row < 0 || row >= nbRows){
             throw(window.languageStrings.messages.wrongFormat(1,0,nbRows - 1));
          }
          if(!Number.isInteger(col) || col < 0 || col >= nbCol){
             throw(window.languageStrings.messages.wrongFormat(0,0,nbCol - 1));
+         }
+         if(row < pos.row - 1 || row > pos.row + 1 || 
+            col < pos.col - 1 || col > pos.col + 1){
+            throw(window.languageStrings.messages.notNeighbor);
          }
 
          this.callCallback(callback, grid[row][col]);
@@ -634,21 +648,27 @@ var getContext = function(display, infos, curLevel) {
          name: "move", 
          params: [null,null],
       },
-      func: function(r,c,callback) {
+      func: function(row,col,callback) {
          var { nbRows, nbCol } = context;
-         if(!Number.isInteger(r) || r < 0 || r >= nbRows){
+         if(!Number.isInteger(row) || row < 0 || row >= nbRows){
             throw(window.languageStrings.messages.wrongFormat(1,0,nbRows - 1));
          }
-         if(!Number.isInteger(c) || c < 0 || c >= nbCol){
+         if(!Number.isInteger(col) || col < 0 || col >= nbCol){
             throw(window.languageStrings.messages.wrongFormat(0,0,nbCol - 1));
          }
          var { path } = context;
-         var last = path[path.length - 1];
-         if(last.row != r || last.col != c){
-            path.push({ row: r, col: c });
-            updateLocations();
-            updateZoom();
+         if(path.length == 0){
+            path.push({ row, col });
+            context.showMap = true;
+            initMap();
+         }else{
+            var last = path[path.length - 1];
+            if(last.row != row || last.col != col){
+               path.push({ row, col });
+            }
          }
+         updateLocations();
+         updateZoom();
 
          this.callCallback(callback);
       }
@@ -797,7 +817,7 @@ var getContext = function(display, infos, curLevel) {
    }
    
    context.reset = function(gridInfos) {
-      console.log("reset",scale);
+      // console.log("reset");
       // console.log(gridInfos,infos);
       var { contextType } = infos;
       rng.reset(0);
@@ -836,18 +856,28 @@ var getContext = function(display, infos, curLevel) {
 
          break;
       case "gradient":
+         context.showMap = false;
+         context.allowInfiniteLoop = true;
          if(gridInfos) {
+            if(gridInfos.seed !== undefined){
+               rng.reset(gridInfos.seed);
+               context.seed = gridInfos.seed;
+               // console.log("rng reset",gridInfos.seed)
+            }
             context.nodes = gridInfos.nodes;
-            context.steepnessFactor = gridInfos.steepnessFactor;
             infos.nbRows = gridInfos.nbRows;
             infos.nbCol = gridInfos.nbCol;
             var { nbRows, nbCol } = infos;
+            context.maxAltitude = gridInfos.maxAltitude;
+            context.steepnessFactor = 2*context.maxAltitude/nbRows;
             initVisualParameters();
             context.grid = Beav.Matrix.make(nbRows,nbCol,0);
-            var startCol = rng.nextInt(0,nbCol - 1);
-            var startRow = rng.nextInt(0,nbRows - 1);
-            context.path = [{ row: startRow, col: startCol }];
+            // var startCol = rng.nextInt(0,nbCol - 1);
+            // var startRow = rng.nextInt(0,nbRows - 1);
+            // context.path = [{ row: startRow, col: startCol }];
+            context.path = [];
             initGrid();
+            console.log("reset grid",context.grid[0][0])
          }
       }
       
@@ -864,7 +894,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.updateScale = function() {
-      console.log("updateScale")
+      // console.log("updateScale")
       if(!context.display) {
          return;
       }
@@ -881,7 +911,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var { paperW, paperH, contextType } = infos;
       scale = areaWidth/paperW;
-      console.log(scale)
+      console.log("updateScale",scale)
 
       var paperWidth = paperW * scale;
       var paperHeight = paperH * scale;
@@ -1027,7 +1057,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function initGrid() {
-      var { grid, nodes, steepnessFactor, path } = context;
+      var { grid, nodes, steepnessFactor, path, maxAltitude } = context;
       var { nbRows, nbCol } = infos;
 
       let perlin = {
@@ -1076,17 +1106,8 @@ var getContext = function(display, infos, curLevel) {
       };
       perlin.seed();
 
-
-      const COLOR_SCALE = 100;
-
-      var refCol = path[0].col;
-      var refRow = path[0].row;
-      // do{
-      //    var refCol = rng.nextInt(0,nbCol - 1);
-      //    var refRow = rng.nextInt(0,nbRows - 1);
-      //    var d = Beav.Geometry.distance(refRow,refCol,startRow,startCol);
-      // }while(d < Math.max(nbRows,nbCol)/2);
-      // console.log(startRow,startCol,refRow,refCol)
+      var refCol = rng.nextInt(0,nbCol - 1);
+      var refRow = rng.nextInt(0,nbRows - 1);
       
 
       var max = -Infinity;
@@ -1095,9 +1116,9 @@ var getContext = function(display, infos, curLevel) {
          for (let col = 0; col < nbCol; col++){
             var xVal = nodes*col/nbCol;
             var yVal = nodes*row/nbRows;
-            let v = perlin.get(xVal, yVal) * COLOR_SCALE;
+            let v = perlin.get(xVal, yVal) * maxAltitude;
             var d = Beav.Geometry.distance(row,col,refRow,refCol);
-            v -= d*steepnessFactor;
+            v += d*steepnessFactor;
             v = Math.round(v)
             if(v > max){
                max = v;
@@ -1112,7 +1133,7 @@ var getContext = function(display, infos, curLevel) {
       for (let row = 0; row < nbRows; row ++){
          for (let col = 0; col < nbCol; col++){
             var v = grid[row][col];
-            v = Math.round(COLOR_SCALE*(v - min)/(max - min)); 
+            v = Math.round(maxAltitude*(v - min)/(max - min)); 
             grid[row][col] = v;
          }
       }
@@ -1158,13 +1179,15 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function getPixelColor(row,col) {
+      var { showMap, maxAltitude } = context;
       var { colorScale, nbRows, nbCol } = infos;
+      if(!showMap)
+         return colors.black
       if(row < 0 || row >= nbRows || col < 0 || col >= nbCol)
          return colors.black
       var v = context.grid[row][col];
-      const COLOR_SCALE = 100;
       var min = 0;
-      var max = COLOR_SCALE;
+      var max = maxAltitude;
       v = Math.max(min,v);
       v = Math.min(max,v);
       var step = (max - min)/(colorScale.length - 1);
@@ -1342,9 +1365,13 @@ var getContext = function(display, infos, curLevel) {
    function updateZoom() {
       if(!context.display)
          return
+      if(zoomObj)
+         zoomObj.remove();
+      var { path, showMap } = context;
+      if(path.length == 0)
+         return
       var { xZoom, yZoom, pixelSizeZoom, nbColZoom, nbRowsZoom,
       zoomPixelAttr, locationAttr } = infos;
-      var { path } = context;
 
       var pos = path[path.length - 1];
       
@@ -1353,9 +1380,6 @@ var getContext = function(display, infos, curLevel) {
       var s = pixelSizeZoom*scale;
       var cx = x0 + nbColZoom*s/2;
       var cy = y0 + nbRowsZoom*s/2;
-
-      if(zoomObj)
-         zoomObj.remove();
 
       paper.setStart();
       for(var row = 0; row < nbRowsZoom; row++){
@@ -1368,7 +1392,7 @@ var getContext = function(display, infos, curLevel) {
             paper.rect(x,y,s,s).attr(zoomPixelAttr).attr("fill",c);
          }
       }
-      paper.circle(cx,cy,s/3).attr(locationAttr.current);
+
       zoomObj = paper.setFinish();
    };
 
@@ -1827,9 +1851,30 @@ var endConditions = {
       throw(window.languageStrings.messages.success);
    },
    checkScoreGradient: function(context, lastTurn) {
-      console.log("checkScore",context.display)
+      console.log("checkScore",context.display,lastTurn)
       context.success = false;
-      
+      var { path, grid, nbRows, nbCol } = context;
+      console.log(context.seed);
+
+      var pos = path[path.length - 1];
+      var alt = grid[pos.row][pos.col];
+
+      for(var ir = 0; ir < 3; ir++){
+         var r = pos.row - 1 + ir;
+         if(r < 0 || r >= nbRows)
+            continue;
+         for(var ic = 0; ic < 3; ic++){
+            var c = pos.col - 1 + ic;
+            if(c < 0 || c >= nbCol)
+               continue;
+            var a = grid[r][c];
+            if(a < alt){
+               throw(window.languageStrings.messages.failureMinimum);
+            }
+         }
+      }
+      context.success = true;
+      throw(window.languageStrings.messages.success);
    }
 };
 
