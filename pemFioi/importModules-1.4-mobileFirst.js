@@ -353,7 +353,7 @@
          {name: 'codecast-7.5', included: ['codecast7.5_css', 'codecast7.5_js', 'codecast7.5_loader']},
          {name: 'codecast-html', included: ['codecast_html_css', 'codecast_html_js', 'codecast_html_loader']},
          { name: 'smart-contract', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'codecast-7.4', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0', 'platform-pr', 'beav-1.0', 'installationAPI.01', 'miniPlatform', 'conceptDisplay-1.0', 'conceptViewer-1.0', 'conceptViewer_css-1.0', 'taskStyles-mobileFirst'] },
-         { name: 'server-task', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'codecast-7.4', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0', 'platform-pr', 'beav-1.0', 'installationAPI.01', 'miniPlatform', 'conceptDisplay-1.0', 'conceptViewer-1.0', 'conceptViewer_css-1.0', 'taskStyles-mobileFirst'] },
+         { name: 'server-task', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'codecast-7.5', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0', 'platform-pr', 'beav-1.0', 'installationAPI.01', 'miniPlatform', 'conceptDisplay-1.0', 'conceptViewer-1.0', 'conceptViewer_css-1.0', 'taskStyles-mobileFirst'] },
          {name: 'connected-boards', included: ['connected-boards-js', 'connected-boards-css']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
