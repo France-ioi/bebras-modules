@@ -1,4 +1,14 @@
 $(document).ready(function() {
+  if (window.taskSettings && !window.taskData) {
+    // Convert taskSettings into taskData
+    window.taskData = subTask = taskSettings;
+    window.initBlocklySubTask = function () {
+    };
+    window.taskData.waitInit = function () {
+      window.taskSettings.initTask(window.taskData);
+      delete window.taskSettings.initTask;
+    };
+  }
   if (window.taskData) {
     if (window.taskData.waitInit) {
       window.taskData.waitInit();
