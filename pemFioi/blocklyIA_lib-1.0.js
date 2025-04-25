@@ -1,7 +1,6 @@
 /*blocklyRoboy_lib-1.0.0 by Arthur Léonard*/
 
-var robotCommands = [];
-// var imgPath = modulesPath+"img/algorea/";
+var validationData = {};
 
 var colors = {
    green: "#88BB88",
@@ -226,8 +225,14 @@ var getContext = function(display, infos, curLevel) {
                moveFirst: "Vous devez d'abord vous placer sur la carte",
                notNeighbor: "Vous ne pouvez appeler cette fonction que sur les cases voisines de votre position actuelle",
                failureMinimum: "Votre position finale n'est pas la plus basse par rapport à ses plus proches voisins",
+               failureAltitude: function(av,nbTests,target) {
+                  return "L'altitude moyenne atteinte sur "+nbTests+" tests de "+av+" est supérieure à l'objectif de "+target
+               },
                successAltitude: function(alt) {
                   return "Vous avez atteint l'altitude de "+alt
+               },
+               tooManyMoves: function(max) {
+                  return "Vous ne pouvez pas faire plus de "+max+" déplacements"
                }
             }
          },
@@ -468,6 +473,9 @@ var getContext = function(display, infos, curLevel) {
             col < pos.col - 1 || col > pos.col + 1){
             throw(window.languageStrings.messages.notNeighbor);
          }
+         var zr = row - (pos.row - 1);
+         var zc = col - (pos.col - 1);
+         highlightZoomCell(zr,zc);
 
          this.callCallback(callback, grid[row][col]);
       }
@@ -656,12 +664,15 @@ var getContext = function(display, infos, curLevel) {
          if(!Number.isInteger(col) || col < 0 || col >= nbCol){
             throw(window.languageStrings.messages.wrongFormat(0,0,nbCol - 1));
          }
-         var { path } = context;
+         var { path, maxMove } = context;
          if(path.length == 0){
             path.push({ row, col });
             context.showMap = true;
             initMap();
          }else{
+            if(path.length >= maxMove){
+               throw(window.languageStrings.messages.tooManyMoves(maxMove));
+            }
             var last = path[path.length - 1];
             if(last.row != row || last.col != col){
                path.push({ row, col });
@@ -745,7 +756,8 @@ var getContext = function(display, infos, curLevel) {
    var distanceObj;
    var nearestObj;
    var locationObj = [];
-   var zoomObj;
+   var zoomObj, zoomHighlight;
+   var validationData = {};
 
    var rng = new RandomGenerator(0);
    
@@ -869,6 +881,9 @@ var getContext = function(display, infos, curLevel) {
             infos.nbCol = gridInfos.nbCol;
             var { nbRows, nbCol } = infos;
             context.maxAltitude = gridInfos.maxAltitude;
+            context.target = gridInfos.target;
+            context.nbTests = gridInfos.nbTests;
+            context.maxMove = gridInfos.maxMove;
             context.steepnessFactor = 2*context.maxAltitude/nbRows;
             initVisualParameters();
             context.grid = Beav.Matrix.make(nbRows,nbCol,0);
@@ -877,7 +892,7 @@ var getContext = function(display, infos, curLevel) {
             // context.path = [{ row: startRow, col: startCol }];
             context.path = [];
             initGrid();
-            console.log("reset grid",context.grid[0][0])
+            // console.log("reset grid",context.grid[0][0])
          }
       }
       
@@ -911,7 +926,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var { paperW, paperH, contextType } = infos;
       scale = areaWidth/paperW;
-      console.log("updateScale",scale)
+      // console.log("updateScale",scale)
 
       var paperWidth = paperW * scale;
       var paperHeight = paperH * scale;
@@ -1367,19 +1382,21 @@ var getContext = function(display, infos, curLevel) {
          return
       if(zoomObj)
          zoomObj.remove();
+      if(zoomHighlight)
+         zoomHighlight.hide();
       var { path, showMap } = context;
       if(path.length == 0)
          return
       var { xZoom, yZoom, pixelSizeZoom, nbColZoom, nbRowsZoom,
-      zoomPixelAttr, locationAttr } = infos;
+      zoomPixelAttr } = infos;
 
       var pos = path[path.length - 1];
       
       var x0 = xZoom*scale;
       var y0 = yZoom*scale;
       var s = pixelSizeZoom*scale;
-      var cx = x0 + nbColZoom*s/2;
-      var cy = y0 + nbRowsZoom*s/2;
+      // var cx = x0 + nbColZoom*s/2;
+      // var cy = y0 + nbRowsZoom*s/2;
 
       paper.setStart();
       for(var row = 0; row < nbRowsZoom; row++){
@@ -1394,6 +1411,24 @@ var getContext = function(display, infos, curLevel) {
       }
 
       zoomObj = paper.setFinish();
+   };
+
+   function highlightZoomCell(r,c) {
+      if(!context.display)
+         return
+      var { xZoom, yZoom, pixelSizeZoom, nbColZoom, nbRowsZoom,
+      zoomPixelAttr, zoomHighlightAttr } = infos;
+      var x0 = xZoom*scale;
+      var y0 = yZoom*scale;
+      var s = pixelSizeZoom*scale;
+      
+      var x = x0 + c*s;
+      var y = y0 + r*s;
+
+      if(zoomHighlight)
+         zoomHighlight.remove();
+
+      zoomHighlight = paper.rect(x,y,s,s).attr(zoomHighlightAttr);
    };
 
    context.updateScore = function(centPos) {
@@ -1631,7 +1666,7 @@ var getContext = function(display, infos, curLevel) {
 
    function drawLocation(id) {
       var { xPointArea, yPointArea, pointAreaW, pointAreaH,
-      locationR, locationAttr, pixelSize } = infos;
+      locationR, previousLocationR, locationAttr, pixelSize } = infos;
       var x0 = xPointArea*scale;
       var y0 = yPointArea*scale;
       var w = pointAreaW*scale;
@@ -1642,8 +1677,9 @@ var getContext = function(display, infos, curLevel) {
       var x = x0 + (pos.col + 0.5)*pixelSize*scale;
       var y = y0 + (pos.row + 0.5)*pixelSize*scale;
       var a = (id == path.length - 1) ? locationAttr.current : locationAttr.previous;
+      var r = (id == path.length - 1) ? locationR : previousLocationR;
 
-      return paper.circle(x,y,locationR).attr(a);
+      return paper.circle(x,y,r).attr(a);
    };
 
    // function highlightPoint(id,err) {
@@ -1851,13 +1887,29 @@ var endConditions = {
       throw(window.languageStrings.messages.success);
    },
    checkScoreGradient: function(context, lastTurn) {
-      console.log("checkScore",context.display,lastTurn)
+      // console.log("checkScore",context.display,lastTurn)
       context.success = false;
-      var { path, grid, nbRows, nbCol } = context;
-      console.log(context.seed);
-
+      var { path, grid, nbRows, nbCol, seed, target, nbTests } = context;
+      
       var pos = path[path.length - 1];
       var alt = grid[pos.row][pos.col];
+
+      if(!validationData.seeds){
+         validationData.seeds = [];
+         validationData.scores = [];
+         validationData.count = 0;
+      }
+      if(validationData.seeds.includes(seed) && validationData.count > 0){
+         validationData.seeds = [];
+         validationData.scores = [];
+         validationData.count = 0;
+      }
+      if(!validationData.seeds.includes(seed)){
+         validationData.seeds.push(seed);
+         validationData.scores.push(alt);
+         validationData.count++;
+      }
+      // console.log(validationData);
 
       for(var ir = 0; ir < 3; ir++){
          var r = pos.row - 1 + ir;
@@ -1873,6 +1925,18 @@ var endConditions = {
             }
          }
       }
+
+      if(validationData.count == nbTests){
+         var av = 0;
+         for(var sco of validationData.scores){
+            av += sco;
+         }
+         av = Math.round(av/nbTests);
+         if(av > target){
+            throw(window.languageStrings.messages.failureAltitude(av,nbTests,target));
+         }
+      }
+
       context.success = true;
       throw(window.languageStrings.messages.success);
    }
@@ -2014,6 +2078,7 @@ var contextParams = {
          nbColZoom: 3,
          pixelSizeZoom: 50,
          locationR: 10,
+         previousLocationR: 5,
          colorScale: [
             [0,0,0],
             [17,0,57],
@@ -2041,6 +2106,10 @@ var contextParams = {
          zoomPixelAttr: {
             stroke: colors.black,
             "stroke-width": 1
+         },
+         zoomHighlightAttr: {
+            stroke: colors.blue,
+            "stroke-width": 3
          },
          checkEndCondition: endConditions.checkScoreGradient
       }
