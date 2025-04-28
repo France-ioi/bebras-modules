@@ -757,6 +757,7 @@ var getContext = function(display, infos, curLevel) {
    var nearestObj;
    var locationObj = [];
    var zoomObj, zoomHighlight;
+   var overlay;
    var validationData = {};
 
    var rng = new RandomGenerator(0);
@@ -869,6 +870,7 @@ var getContext = function(display, infos, curLevel) {
          break;
       case "gradient":
          context.showMap = false;
+         // context.showMap = true;
          context.allowInfiniteLoop = true;
          if(gridInfos) {
             if(gridInfos.seed !== undefined){
@@ -887,9 +889,6 @@ var getContext = function(display, infos, curLevel) {
             context.steepnessFactor = 2*context.maxAltitude/nbRows;
             initVisualParameters();
             context.grid = Beav.Matrix.make(nbRows,nbCol,0);
-            // var startCol = rng.nextInt(0,nbCol - 1);
-            // var startRow = rng.nextInt(0,nbRows - 1);
-            // context.path = [{ row: startRow, col: startCol }];
             context.path = [];
             initGrid();
             // console.log("reset grid",context.grid[0][0])
@@ -919,14 +918,14 @@ var getContext = function(display, infos, curLevel) {
       
       if(window.quickAlgoResponsive) {
          var areaWidth = Math.max(200, $('#grid').width());
+         var areaHeight = $('#grid').height();
          $('#grid').css("width","auto");
       } else {
          var areaWidth = 400;
          var areaHeight = 600;
       }
       var { paperW, paperH, contextType } = infos;
-      scale = areaWidth/paperW;
-      // console.log("updateScale",scale)
+      scale = Math.min(areaWidth/paperW,areaHeight/paperH);
 
       var paperWidth = paperW * scale;
       var paperHeight = paperH * scale;
@@ -957,6 +956,7 @@ var getContext = function(display, infos, curLevel) {
       case "gradient":
          initCanvas();
          initMap();
+         initOverlay();
          updateLocations();
          updateZoom();
          break; 
@@ -1227,13 +1227,16 @@ var getContext = function(display, infos, curLevel) {
    function initCanvas() {
       // console.log("initCanvas")
       $("#canvas").remove();
-      $("#grid").prepend("<canvas id=canvas></canvas>");
       
-      var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH, paperW, paperH } = infos;
+      var areaWidth = $('#grid').width();
+      var xShift = (areaWidth - paperW * scale)/2;
+
+      $("#grid").prepend("<canvas id=canvas></canvas>");
       $("#canvas").attr({ width: pointAreaW*scale, height: pointAreaH*scale })
       .css({ 
          position: "absolute",
-         left: xPointArea*scale+"px",
+         left: (xPointArea*scale + xShift)+"px",
          top: yPointArea*scale+"px"
       });
    };
@@ -1248,6 +1251,20 @@ var getContext = function(display, infos, curLevel) {
       var w = pointAreaW*scale;
       var h = pointAreaH*scale;
       backObj = paper.rect(x,y,w,h).attr(backAttr);
+   };
+
+   function initOverlay() {
+      if(overlay)
+         overlay.remove();
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var x = xPointArea*scale;
+      var y = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+      overlay = paper.rect(x,y,w,h).attr(overlayAttr);
+
+      overlay.click(clickMap);
+      overlay.attr("cursor","pointer");
    };
 
    function initPoints() {
@@ -1297,6 +1314,23 @@ var getContext = function(display, infos, curLevel) {
          // console.log(coo)
          drawCentroid(iC + 1,coo.x,coo.y);
       }
+   };
+
+   function clickMap(ev) {
+      var { showMap } = context;
+      if(!showMap)
+         return
+      var { paperW, xPointArea, yPointArea, pointAreaW, pointAreaH,
+      nbRows, nbCol, pixelSize } = infos;
+      
+      var areaWidth = $('#grid').width();
+      var xShift = (areaWidth - paperW * scale)/2;
+      var x = (ev.pageX - $("#grid").offset().left - xShift)/scale ;
+      var y = (ev.pageY - $("#grid").offset().top)/scale;
+      
+      var col = Math.floor((x - xPointArea)/pixelSize);
+      var row = Math.floor((y - yPointArea)/pixelSize);
+      console.log(col,row)
    };
 
    function updateCanvas() {
