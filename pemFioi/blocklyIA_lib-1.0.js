@@ -216,6 +216,7 @@ var getContext = function(display, infos, curLevel) {
                getRow: "@() return current row",
             },
             messages: {
+               altitude: "Altitude",
                wrongFormat: function(type,min,max) {
                   var str = "La coordonnée ";
                   str += (type == 1) ? "y" : "x";
@@ -758,7 +759,8 @@ var getContext = function(display, infos, curLevel) {
    var locationObj = [];
    var zoomObj, zoomHighlight;
    var overlay;
-   var validationData = {};
+   var infoBox;
+   // var validationData = {};
 
    var rng = new RandomGenerator(0);
    
@@ -870,7 +872,7 @@ var getContext = function(display, infos, curLevel) {
          break;
       case "gradient":
          context.showMap = false;
-         // context.showMap = true;
+         context.showMap = true;
          context.allowInfiniteLoop = true;
          if(gridInfos) {
             if(gridInfos.seed !== undefined){
@@ -1330,7 +1332,9 @@ var getContext = function(display, infos, curLevel) {
       
       var col = Math.floor((x - xPointArea)/pixelSize);
       var row = Math.floor((y - yPointArea)/pixelSize);
-      console.log(col,row)
+
+      drawInfoBox(row,col);
+      // console.log(col,row)
    };
 
    function updateCanvas() {
@@ -1409,6 +1413,8 @@ var getContext = function(display, infos, curLevel) {
          }
          locationObj[il] = drawLocation(il)
       }
+      if(overlay)
+         overlay.toFront();
    };
 
    function updateZoom() {
@@ -1714,6 +1720,65 @@ var getContext = function(display, infos, curLevel) {
       var r = (id == path.length - 1) ? locationR : previousLocationR;
 
       return paper.circle(x,y,r).attr(a);
+   };
+
+   function drawInfoBox(row,col) {
+      removeInfoBox();
+
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH,
+      pixelSize, infoBoxAttr, paperW, paperH, marginX } = infos;
+      var { grid } = context;
+      var alt = grid[row][col];
+
+      var x0 = xPointArea*scale;
+      var y0 = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+      var s = pixelSize*scale;
+      var rt = 10*scale;
+      var a = infoBoxAttr;
+
+      var xCell = x0 + col*s;
+      var yCell = y0 + row*s;
+      var cy = yCell + s/2;
+
+      var str = window.languageStrings.messages.altitude+" : "+alt;
+      var text = paper.text(0,0,str).attr(a.text);
+      var bbox = text.getBBox();
+      var padX = 10;
+      var padY = 10;
+      var wb = bbox.width + 2*padX;
+      var hb = bbox.height + 2*padY;
+      
+      var xb = xCell + s + 2*rt;
+      var yb = cy - hb/2;
+      var yb = Math.max(0,yb);
+      
+      var xt = xb - rt*0.7;
+      var yt = cy;
+      var at = -90;
+      if(xb + wb > paperW*scale){
+         xb = xCell - marginX - wb;
+         xt = xb + wb + rt*0.7;
+         at = 90;
+      }
+
+      var rect = paper.rect(xb,yb,wb,hb).attr(a.rect);
+      text.attr({ x: xb + wb/2, y: yb + hb/2 }).toFront();
+      var tr = getShape(paper,"triangle",xt,yt,{radius: rt}).attr(a.triangle);
+      tr.attr("transform",["R",at]);
+
+      infoBox = paper.set(rect,text,tr);
+
+      infoBox.click(removeInfoBox);
+      infoBox.attr("cursor","pointer");
+   };
+
+   function removeInfoBox() {
+      if(infoBox){
+         infoBox.remove();
+         infoBox = null;
+      }
    };
 
    // function highlightPoint(id,err) {
@@ -2144,6 +2209,27 @@ var contextParams = {
          zoomHighlightAttr: {
             stroke: colors.blue,
             "stroke-width": 3
+         },
+         infoBoxAttr: {
+            rect: {
+               stroke: colors.blue,
+               "stroke-width": 2,
+               // stroke: "none",
+               fill: "white",
+               r: 5
+            },
+            triangle: {
+               // stroke: colors.blue,
+               // "stroke-width": 2,
+               stroke: "none",
+               // fill: colors.grey
+               fill: "white",
+            },
+            text:{
+               "font-size": 16,
+               "font-weight": "bold",
+               fill: colors.black
+            }
          },
          checkEndCondition: endConditions.checkScoreGradient
       }
