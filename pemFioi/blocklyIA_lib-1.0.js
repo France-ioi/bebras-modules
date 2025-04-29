@@ -681,6 +681,7 @@ var getContext = function(display, infos, curLevel) {
          }
          updateLocations();
          updateZoom();
+         removeInfoBox();
 
          this.callCallback(callback);
       }
@@ -837,6 +838,7 @@ var getContext = function(display, infos, curLevel) {
       var { contextType } = infos;
       rng.reset(0);
 
+      context.type = contextType;
       switch(contextType){
       case "k-means":
          if(gridInfos) {
@@ -872,7 +874,7 @@ var getContext = function(display, infos, curLevel) {
          break;
       case "gradient":
          context.showMap = false;
-         context.showMap = true;
+         // context.showMap = true;
          context.allowInfiniteLoop = true;
          if(gridInfos) {
             if(gridInfos.seed !== undefined){
@@ -907,6 +909,84 @@ var getContext = function(display, infos, curLevel) {
          context.updateScale();
       }
       
+   };
+
+   context.getInnerState = function() {
+      // console.log("getInnerState")  
+      innerState.type = context.type;
+      switch(context.type){
+      case "k-means":
+         innerState.nbPoints = context.nbPoints;
+         innerState.nbClusters = context.nbClusters;
+         innerState.centroidPos = context.centroidPos;
+         innerState.k = context.k;
+         innerState.classPoints = context.classPoints;
+         innerState.pointData = context.pointData;
+         break;
+      case "knn":
+         innerState.nbPoints = context.nbPoints;
+         innerState.nbClusters = context.nbClusters;
+         innerState.k = context.k;
+         innerState.nbItemsToPredict = context.nbItemsToPredict;
+         innerState.nbKnownItems = context.nbKnownItems;
+         innerState.pointData = context.pointData;
+         break;
+      case "gradient":
+         innerState.showMap = context.showMap;
+         innerState.seed = context.seed;
+         innerState.nodes = context.nodes;
+         innerState.nbRows = context.nbRows;
+         innerState.nbCol = context.nbCol;
+         innerState.maxAltitude = context.maxAltitude;
+         innerState.target = context.target;
+         innerState.nbTests = context.nbTests;
+         innerState.maxMove = context.maxMove;
+         innerState.steepnessFactor = context.steepnessFactor;
+         innerState.grid = context.grid;
+         innerState.path = context.path;
+         break;
+      }
+
+      return innerState;
+   };
+
+   context.reloadInnerState = function(data) {
+      // console.log("reloadInnerState")  
+      innerState = data;
+      context.type = innerState.type;
+
+      switch(context.type){
+      case "k-means":
+         context.nbPoints = innerState.nbPoints;
+         context.nbClusters = innerState.nbClusters;
+         context.centroidPos = innerState.centroidPos;
+         context.k = innerState.k;
+         context.classPoints = innerState.classPoints;
+         context.pointData = innerState.pointData;
+         break;
+      case "knn":
+         context.nbPoints = innerState.nbPoints;
+         context.nbClusters = innerState.nbClusters;
+         context.k = innerState.k;
+         context.nbItemsToPredict = innerState.nbItemsToPredict;
+         context.nbKnownItems = innerState.nbKnownItems;
+         context.pointData = innerState.pointData;
+         break;
+      case "gradient":
+         context.showMap = innerState.showMap;
+         context.seed = innerState.seed;
+         context.nodes = innerState.nodes;
+         context.nbRows = innerState.nbRows;
+         context.nbCol = innerState.nbCol;
+         context.maxAltitude = innerState.maxAltitude;
+         context.target = innerState.target;
+         context.nbTests = innerState.nbTests;
+         context.maxMove = innerState.maxMove;
+         context.steepnessFactor = innerState.steepnessFactor;
+         context.grid = innerState.grid;
+         context.path = innerState.path;
+         break;
+      }
    };
 
    context.updateScale = function() {
@@ -1322,8 +1402,7 @@ var getContext = function(display, infos, curLevel) {
       var { showMap } = context;
       if(!showMap)
          return
-      var { paperW, xPointArea, yPointArea, pointAreaW, pointAreaH,
-      nbRows, nbCol, pixelSize } = infos;
+      var { paperW, xPointArea, yPointArea, pixelSize } = infos;
       
       var areaWidth = $('#grid').width();
       var xShift = (areaWidth - paperW * scale)/2;
@@ -1334,6 +1413,24 @@ var getContext = function(display, infos, curLevel) {
       var row = Math.floor((y - yPointArea)/pixelSize);
 
       drawInfoBox(row,col);
+      // console.log(col,row)
+   };
+
+   function clickZoom(ev) {
+      var { showMap } = context;
+      if(!showMap)
+         return
+      var { xZoom, yZoom, pixelSizeZoom, paperW } = infos;
+      
+      var areaWidth = $('#grid').width();
+      var xShift = (areaWidth - paperW * scale)/2;
+      var x = (ev.pageX - $("#grid").offset().left - xShift)/scale ;
+      var y = (ev.pageY - $("#grid").offset().top)/scale;
+      
+      var col = Math.floor((x - xZoom)/pixelSizeZoom);
+      var row = Math.floor((y - yZoom)/pixelSizeZoom);
+
+      drawInfoBox(row,col,true);
       // console.log(col,row)
    };
 
@@ -1435,8 +1532,6 @@ var getContext = function(display, infos, curLevel) {
       var x0 = xZoom*scale;
       var y0 = yZoom*scale;
       var s = pixelSizeZoom*scale;
-      // var cx = x0 + nbColZoom*s/2;
-      // var cy = y0 + nbRowsZoom*s/2;
 
       paper.setStart();
       for(var row = 0; row < nbRowsZoom; row++){
@@ -1451,6 +1546,9 @@ var getContext = function(display, infos, curLevel) {
       }
 
       zoomObj = paper.setFinish();
+
+      zoomObj.click(clickZoom);
+      zoomObj.attr("cursor","pointer");
    };
 
    function highlightZoomCell(r,c) {
@@ -1722,19 +1820,33 @@ var getContext = function(display, infos, curLevel) {
       return paper.circle(x,y,r).attr(a);
    };
 
-   function drawInfoBox(row,col) {
+   function drawInfoBox(row,col,zoom) {
       removeInfoBox();
 
-      var { xPointArea, yPointArea, pointAreaW, pointAreaH,
-      pixelSize, infoBoxAttr, paperW, paperH, marginX } = infos;
       var { grid } = context;
-      var alt = grid[row][col];
+      if(zoom){
+         var { xZoom, yZoom, pixelSizeZoom, nbColZoom, nbRowsZoom, infoBoxAttr,
+         paperW, paperH, marginX } = infos;
+         var { path } = context;
+         var pos = path[path.length - 1];
+         var gridRow = pos.row - 1 + row;
+         var gridCol = pos.col - 1 + col;
+         var alt = grid[gridRow][gridCol];
 
-      var x0 = xPointArea*scale;
-      var y0 = yPointArea*scale;
-      var w = pointAreaW*scale;
-      var h = pointAreaH*scale;
-      var s = pixelSize*scale;
+         var x0 = xZoom*scale;
+         var y0 = yZoom*scale;
+         var s = pixelSizeZoom*scale;         
+      }else{
+         var { xPointArea, yPointArea, pointAreaW, pointAreaH,
+         pixelSize, infoBoxAttr, paperW, paperH, marginX } = infos;
+         var alt = grid[row][col];
+
+         var x0 = xPointArea*scale;
+         var y0 = yPointArea*scale;
+         // var w = pointAreaW*scale;
+         // var h = pointAreaH*scale;
+         var s = pixelSize*scale;
+      }
       var rt = 10*scale;
       var a = infoBoxAttr;
 
@@ -1775,6 +1887,8 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function removeInfoBox() {
+      if(!context.display)
+         return
       if(infoBox){
          infoBox.remove();
          infoBox = null;
@@ -2215,15 +2329,14 @@ var contextParams = {
                stroke: colors.blue,
                "stroke-width": 2,
                // stroke: "none",
-               fill: "white",
+               fill: colors.grey,
                r: 5
             },
             triangle: {
                // stroke: colors.blue,
                // "stroke-width": 2,
                stroke: "none",
-               // fill: colors.grey
-               fill: "white",
+               fill: colors.grey
             },
             text:{
                "font-size": 16,
