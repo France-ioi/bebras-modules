@@ -82,7 +82,7 @@ var getContext = function(display, infos, curLevel) {
                invalidId: "Identifiant invalide",
                success: "Bravo, vous avez réussi !"
             },
-            // startingBlockName: "Programme du robot"
+            startingBlockName: "Programme du robot"
          },
          en: {
             label: {
@@ -95,7 +95,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                
             },
-            // startingBlockName: "Program of the robot"
+            startingBlockName: "Program of the robot"
          },
          
          es: {
@@ -105,7 +105,7 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
             },
-            // startingBlockName: "Programa del robot"
+            startingBlockName: "Programa del robot"
          },
          de: {
             label: {
@@ -114,7 +114,7 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
             },
-            // startingBlockName: "Roboter-Programm"
+            startingBlockName: "Roboter-Programm"
          },
          it: {
             label: {
@@ -123,7 +123,7 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
             },
-            // startingBlockName: "Programme du robot"
+            startingBlockName: "Programme du robot"
          },
       },
       "k-means": {
