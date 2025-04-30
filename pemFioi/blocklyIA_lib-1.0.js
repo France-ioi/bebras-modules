@@ -69,13 +69,6 @@ var getContext = function(display, infos, curLevel) {
    var contextStrings = {
       none: {
          fr: {
-            // label: {
-            //    getNbItems: "nombre de points",
-            //    getNbClusters: "nombre de clusters",
-            //    getX: "coordonnée x du point %1",
-            //    getY: "coordonnée y du point %1",
-            //    log: "log %1"
-            // },
             code: {
                log: "log",
                distance: "distance",
@@ -135,9 +128,6 @@ var getContext = function(display, infos, curLevel) {
       },
       "k-means": {
          fr: {
-            label: {
-
-            },
             code: {
                getNbItems: "getNbItems",
                getNbClusters: "getNbClusters",
@@ -172,9 +162,6 @@ var getContext = function(display, infos, curLevel) {
       },
       "knn": {
          fr: {
-            label: {
-
-            },
             code: {
                getNbKnownItems: "getNbKnownItems",
                getNbItemsToPredict: "getNbItemsToPredict",
@@ -200,9 +187,6 @@ var getContext = function(display, infos, curLevel) {
       },
       "gradient": {
          fr: {
-            label: {
-
-            },
             code: {
                move: "move",
                getAltitude: "getAltitude",
@@ -235,6 +219,27 @@ var getContext = function(display, infos, curLevel) {
                tooManyMoves: function(max) {
                   return "Vous ne pouvez pas faire plus de "+max+" déplacements"
                }
+            }
+         },
+      },
+      "decisionTree": {
+         fr: {
+            code: {
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getX: "getX",
+               getY: "getY",
+               setClass: "setClass",
+            },
+            description: {
+               getNbItemsToPredict: "@()",
+               getX: "@(idItem)",
+               getY: "@(idItem)",
+               setClass: "@(idItem,idClass)",
+            },
+            messages: {
+               invalidThreshold: function(thr) {
+                  return "Invalid threshold value : "+thr
+               },
             }
          },
       },
@@ -345,6 +350,7 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(id, callback) {
          var { pointData } = context;
+         var { contextType } = infos;
          var pos = pointData[id];
          if(!pos) {
             this.callCallback(callback, false);
@@ -352,7 +358,8 @@ var getContext = function(display, infos, curLevel) {
          }
          var x = getPosFromCoordinate(pos.x,0);
          this.highlightPoint(id);
-         highlightCoordinate(id,0);
+         if(contextType != "decisionTree")
+            highlightCoordinate(id,0);
          this.callCallback(callback, Math.round(x));
       }
    });
@@ -367,6 +374,7 @@ var getContext = function(display, infos, curLevel) {
       },
       func: function(id, callback) {
          var { pointData } = context;
+         var { contextType } = infos;
          var pos = pointData[id]
          if(!pos) {
             this.callCallback(callback, false);
@@ -374,7 +382,8 @@ var getContext = function(display, infos, curLevel) {
          }
          var y = getPosFromCoordinate(pos.y,1);
          this.highlightPoint(id);
-         highlightCoordinate(id,1);
+         if(contextType != "decisionTree")
+            highlightCoordinate(id,1);
          this.callCallback(callback, Math.round(y));
       }
    });
@@ -761,6 +770,7 @@ var getContext = function(display, infos, curLevel) {
    var zoomObj, zoomHighlight;
    var overlay;
    var infoBox;
+   var zoneLineObj = {};
    // var validationData = {};
 
    var rng = new RandomGenerator(0);
@@ -799,6 +809,13 @@ var getContext = function(display, infos, curLevel) {
          infos.yZoom = y + h + marginY;
 
          infos.paperH = infos.yZoom + zoomH + marginY;
+      }else
+      if(infos.contextType == "decisionTree"){
+         w = infos.graphW;
+         h = infos.graphH;
+         paperH = h + 4*marginY;
+         x = (paperW - w)/2;
+         y = 2*marginY;
       }
       infos.xPointArea = x;
       infos.yPointArea = y;
@@ -896,6 +913,18 @@ var getContext = function(display, infos, curLevel) {
             context.path = [];
             initGrid();
             // console.log("reset grid",context.grid[0][0])
+         }
+         break;
+      case "decisionTree":
+         if(gridInfos) {
+            context.tree = new Graph.fromJSON(JSON.stringify(gridInfos.decisionTree));
+            context.zones = getZonesFromGraph(context.tree);
+            context.nbItemsToPredict = gridInfos.nbItemsToPredict;
+            context.nbClass = gridInfos.nbClass;
+            if(!context.pointData){
+               context.pointData = initPointData();
+            }
+            // console.log(context.zones)
          }
       }
       
@@ -1042,6 +1071,10 @@ var getContext = function(display, infos, curLevel) {
          updateLocations();
          updateZoom();
          break; 
+      case "decisionTree":
+         initGraph();
+         initPoints();
+         updatePoints();
       }
    };
 
@@ -1106,6 +1139,13 @@ var getContext = function(display, infos, curLevel) {
             pointData[iP] = pos;
          }
          // console.log(centerIDs)
+      }else
+      if(contextType == "decisionTree"){
+         var { nbItemsToPredict } = context;
+         for(var n = 0; n < nbItemsToPredict; n++){
+            var pos = getRandomPos();
+            pointData.push(pos);
+         }
       }
 
       return pointData
@@ -1351,15 +1391,20 @@ var getContext = function(display, infos, curLevel) {
 
    function initPoints() {
       // console.log("initPoints")
-      var { nbPoints, pointData, nbClusters } = context;
-      var { pointR, classShape, classColor, pointAttr, crossAttr,
-         xPointArea, yPointArea, pointAreaW, pointAreaH, contextType } = infos;
+      var { pointR, classShapes, classColors, pointAttr, crossAttr,
+      xPointArea, yPointArea, pointAreaW, pointAreaH, contextType } = infos;
 
-      // if(frame)
-      //    frame.remove();
-      // frame = paper.rect(xPointArea*scale,yPointArea*scale,pointAreaW*scale,pointAreaH*scale);
-      
-      var nbClass = nbClusters + 1;
+      if(contextType == "k-means" || contextType == "knn"){
+         var { nbPoints, pointData, nbClusters } = context;
+
+         var nbShapes = nbClusters + 1;
+      }else
+      if(contextType == "decisionTree"){
+         var { nbItemsToPredict, pointData, nbClass } = context;
+         var nbPoints = nbItemsToPredict;
+         var nbShapes = nbClass + 1;
+      }
+
       for(var iP = 0; iP < nbPoints; iP++){
          if(!points[iP])
             points[iP] = [];
@@ -1367,16 +1412,16 @@ var getContext = function(display, infos, curLevel) {
          var x = pos.x*scale;
          var y = pos.y*scale;
 
-         for(var iC = 0; iC < nbClass; iC++){
+         for(var iC = 0; iC < nbShapes; iC++){
             if(points[iP][iC]){
                points[iP][iC].remove();
             }
-            var shape = infos.classShape[iC];
+            var shape = infos.classShapes[iC];
             var po = drawShape(shape,x,y,pointR);
             if(shape !== "cross"){
-               po.attr(pointAttr).attr("fill",colors[classColor[iC]]);
+               po.attr(pointAttr).attr("fill",colors[classColors[iC]]);
             }else{
-               po.attr(crossAttr).attr("stroke",colors[classColor[iC]]);
+               po.attr(crossAttr).attr("stroke",colors[classColors[iC]]);
             }
             // po.attr("clip-rect",[xPointArea,yPointArea,pointAreaW,pointAreaH]);
             points[iP][iC] = po;
@@ -1397,6 +1442,129 @@ var getContext = function(display, infos, curLevel) {
          drawCentroid(iC + 1,coo.x,coo.y);
       }
    };
+
+   function initGraph() {
+      if(!context.display)
+         return
+      if(frame)
+         frame.remove();
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH,
+      frameAttr } = infos;
+      var x = xPointArea*scale;
+      var y = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+
+      frame = paper.rect(x,y,w,h).attr(frameAttr);
+
+      updateZoneLines();
+   };
+
+   /* tree decision */
+
+   function getZonesFromGraph(g) {
+      var { xRange, yRange } = infos;
+      var vertices = g.getAllVertices();
+      var root;
+      for(var vert of vertices){
+         var info = g.getVertexInfo(vert);
+         if(info.root){
+            root = vert;
+            break;
+         }
+      }
+      // console.log(vertices,root)
+      var z = { leaves: {}, branches: {} };
+      var rootRanges = [xRange,yRange];
+
+      findZones(root,rootRanges);
+      // console.log(z)
+      return z
+
+      function findZones(v,ranges) {
+         var info = g.getVertexInfo(v);
+         if(info.class != undefined){
+            var zone = { name: v, ranges, class: info.class };
+            // z.push(zone);
+            z.leaves[v] = zone;
+            return
+         }
+         if(info.feat == undefined){
+            var zone = { name: v, ranges };
+            z.leaves[v] = zone;
+            // z.push(zone);
+            return
+         }
+         z.branches[v] = { name: v, ranges };
+         var { thresh, feat } = info;
+
+         var splitRange = getSplitRanges(thresh,feat,ranges);
+         
+         var children = g.getChildren(v);
+         for(var child of children){
+            var cInfo = g.getVertexInfo(child);
+            var side = cInfo.side;
+            var cRange = splitRange[side];
+            var childRanges = Beav.Object.clone(ranges);
+            childRanges[feat] = cRange;
+            findZones(child,childRanges);
+         }
+      };
+   };
+
+   function getSplitRanges(thresh,feat,ranges) {
+      // var { thresh, feat } = info;
+      var featRange = ranges[feat];
+      var min = featRange[0];
+      var max = featRange[1];
+      if(thresh < min || thresh > max){
+         throw(window.languageStrings.messages.invalidThreshold(thresh));
+      }
+      var splitRange = [
+         [min,thresh],
+         [thresh,max]
+      ];
+
+      return splitRange
+   };
+
+   function initMap() {
+      if(!context.display)
+         return
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
+      var { nbRows, nbCol } = infos;
+      var w = Math.round(pointAreaW*scale);
+      var h = Math.round(pointAreaH*scale);
+      var x0 = Math.round(xPointArea*scale);
+      var y0 = Math.round(yPointArea*scale);
+
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+
+      var pixelS = pixelSize*scale;
+
+      var max = -Infinity;
+      var min = Infinity;
+
+      for (let row = 0; row < nbRows; row ++){
+         for (let col = 0; col < nbCol; col++){
+            var x = col*pixelS;
+            var y = row*pixelS;
+
+            var color = getPixelColor(row,col);
+
+            ctx.fillStyle = color;
+            ctx.fillRect(
+               x,
+               y,
+               Math.ceil(pixelS),
+               Math.ceil(pixelS)
+            );
+         }
+      }
+   };
+
+   /* events */
 
    function clickMap(ev) {
       var { showMap } = context;
@@ -1437,7 +1605,7 @@ var getContext = function(display, infos, curLevel) {
    function updateCanvas() {
       if(!context.display)
          return
-      var { classColor, xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      var { classColors, xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
       var w = Math.round(pointAreaW*scale);
       var h = Math.round(pointAreaH*scale);
       var x0 = Math.round(xPointArea*scale);
@@ -1454,7 +1622,7 @@ var getContext = function(display, infos, curLevel) {
          var y = y0 + Math.floor(i/(4*w));
          var pos = getPosFromCoordinates({x,y},true)
          var { id } = findClosestCentroid(pos);
-         var col = classColor[id];
+         var col = classColors[id];
 
          var op = 0.3;
          for(var j = 0; j < 3; j++){
@@ -1466,7 +1634,13 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function updatePoints() {
-      var { nbPoints } = context;
+      var { contextType } = infos;
+      if(contextType != "decisionTree"){
+         var { nbPoints } = context;
+      }else{
+         var { nbItemsToPredict } = context;
+         var nbPoints = nbItemsToPredict;
+      }
       for(var iP = 0; iP < nbPoints; iP++){
          updatePoint(iP);
       }
@@ -1480,15 +1654,19 @@ var getContext = function(display, infos, curLevel) {
       var y = yPointArea*scale;
       var w = pointAreaW*scale;
       var h = pointAreaH*scale;
-      var { classPoints, nbClusters, pointData } = context;
+      var { classPoints, nbClusters, pointData, nbClass } = context;
       if(contextType == "k-means"){
          var cla = classPoints[iP] || 0;
       }else{
-         var cla = pointData[iP].class;
+         var cla = pointData[iP].class || 0;
       }
-      var nbClass = nbClusters + 1;
+      if(contextType != "decisionTree"){
+         var nbShapes = nbClusters + 1;
+      }else{
+         var nbShapes = nbClass + 1;
+      }
       // console.log("updatePoint",iP,cla)
-      for(var iC = 0; iC < nbClass; iC++){
+      for(var iC = 0; iC < nbShapes; iC++){
          var obj = points[iP][iC];
          if(iC == cla){
             obj.show();
@@ -1549,6 +1727,130 @@ var getContext = function(display, infos, curLevel) {
 
       zoomObj.click(clickZoom);
       zoomObj.attr("cursor","pointer");
+   };
+
+   function updateZoneLines() {
+      // console.log("updateZoneLines")
+      if(zoneLineObj.all){
+         zoneLineObj.all.remove();
+         zoneLineObj = {};
+      }
+      var { xRange, yRange, xPointArea, yPointArea, pointAreaW, pointAreaH ,
+      zoneLineAttr, classShapes, zoneShapeR, zoneClassAttr, thresholdAttr,
+      marginX, marginY } = infos;
+
+      var x0 = xPointArea*scale;
+      var y0 = yPointArea*scale;
+      var w = pointAreaW*scale;
+      var h = pointAreaH*scale;
+
+      var { zones } = context;
+      var g = context.tree;
+      var vertices = g.getAllVertices();
+      var root;
+      for(var vert of vertices){
+         var info = g.getVertexInfo(vert);
+         if(info.root){
+            root = vert;
+            break;
+         }
+      }
+      var rootRanges = [xRange,yRange];
+
+      paper.setStart();
+      addZoneLine(root,rootRanges);
+      zoneLineObj.all = paper.setFinish();
+
+      function addZoneLine(v,ranges) {
+         var info = g.getVertexInfo(v);
+         if(info.feat != undefined && info.thresh != undefined){
+
+            var { thresh, feat } = info;
+            var splitRange = getSplitRanges(thresh,feat,ranges);
+            var splitValue = splitRange[0][1];
+
+            for(var ax = 0; ax < 2; ax ++){
+               if(ax == feat){
+                  var ax2 = 1 - ax;
+                  var coo1 = getCoordinateFromValue(ax,splitValue);
+                  var coo21 = getCoordinateFromValue(ax2,ranges[ax2][0]);
+                  var coo22 = getCoordinateFromValue(ax2,ranges[ax2][1]);
+                  if(ax == 0){
+                     var p = ["M",coo1,coo21,"V",coo22];                     
+                  }else{
+                     var p = ["M",coo21,coo1,"H",coo22];                     
+                  }
+                  zoneLineObj[v] = paper.path(p).attr(zoneLineAttr.unselected);
+               }
+            }
+
+            var children = g.getChildren(v);
+            for(var child of children){
+               var cInfo = g.getVertexInfo(child);
+               var side = cInfo.side;
+               var cRange = splitRange[side];
+               var childRanges = Beav.Object.clone(ranges);
+               childRanges[feat] = cRange;
+               addZoneLine(child,childRanges);
+            }
+         }
+         // console.log(zones)
+         if(zones.leaves.hasOwnProperty(v)){
+            zoneLineObj[v] = drawZoneClass(v,true);
+         }
+         if(zones.branches.hasOwnProperty(v)){
+            var vInfo = g.getVertexInfo(v);
+
+            var { thresh, feat } = vInfo;
+            var zDat = zones.branches[v];
+            var ran = zDat.ranges[1 - feat];
+            var axRan = (feat == 0) ? yRange : xRange;
+
+            var side = (ran[0] == axRan[0]) ? 0 : 1;
+
+            if(feat == 0){
+               var x = getCoordinateFromValue(0,thresh);
+               var y = (side == 0) ? y0 - marginY/2 : y0 + h + marginY/2;
+            }else{
+               var y = getCoordinateFromValue(1,thresh);
+               var x = (side == 0) ? x0 - marginX : x0 + w + marginX;
+            }
+            paper.text(x,y,thresh).attr(thresholdAttr);
+         }
+
+         function drawZoneClass(v,leaf) {
+            var zDat = (leaf) ? zones.leaves[v] : zones.branches[v];
+            var pos = [];
+            for(var ax = 0; ax < 2; ax++){
+               var val = (zDat.ranges[ax][0] + zDat.ranges[ax][1])/2;
+               pos.push(val);
+            }
+            var coo = getCoordinatesFromPos(pos);
+            var cID = zDat.class + 1;
+            var sID = classShapes[cID];
+            // console.log(v,cID)
+            var sha = drawShape(sID,coo.x,coo.y,zoneShapeR).attr(zoneClassAttr);
+            // var circ = paper.circle(coo.x,coo.y).attr(zoneLetterAttr.unselected.circle);
+            // var text = paper.text(coo.x,coo.y,v).attr(zoneLetterAttr.unselected.text);
+            // var obj = paper.set(circ,text);
+            return sha
+         };
+
+         function getCoordinateFromValue(aID,val) {
+            var ran = (aID == 0) ? xRange : yRange;
+            var coo0 = (aID == 0) ? x0 : y0;
+            var le = (aID == 0) ? w : h;
+            var coo = coo0 + le*(val - ran[0])/(ran[1] - ran[0]);
+            return coo 
+         };
+
+         function getCoordinatesFromPos(pos) {
+            var x = getCoordinateFromValue(0,pos[0]);
+            var y = getCoordinateFromValue(1,pos[1]);
+            return { x, y }
+         };
+
+      };
    };
 
    function highlightZoomCell(r,c) {
@@ -1763,12 +2065,12 @@ var getContext = function(display, infos, curLevel) {
          barycenters[id].remove();
       }
       var a = (!bar) ? infos.centroidAttr : barycenterAttr;
-      var col = colors[infos.classColor[id]];
+      var col = colors[infos.classColors[id]];
       paper.setStart();
       // if(dim == 1){
       //    var line = paper.path(["M",cx,cy,"V",yPointArea]).attr(a.line);
       // }
-      var shape = (!bar) ? infos.classShape[id] : "cross"; 
+      var shape = (!bar) ? infos.classShapes[id] : "cross"; 
       var sha = drawShape(shape,cx,cy,infos.centroidShapeR);
       sha.attr(a.shape);
       if(!bar){
@@ -1899,6 +2201,7 @@ var getContext = function(display, infos, curLevel) {
    context.highlightPoint = function(id,err,keep) {
       if(!context.display)
          return
+      console.log("highlightPoint",id,err,keep)
       if(pointHighlight){
          pointHighlight.remove();
          pointHighlight = null;
@@ -1915,7 +2218,7 @@ var getContext = function(display, infos, curLevel) {
 
       var obj = paper.circle(x,y,r).attr(a);
       if(!keep){
-         pointHighlight = paper.circle(x,y,r).attr(a);
+         pointHighlight = obj;
       }else{
          if(!keepPointHighlight)
             keepPointHighlight = paper.set();
@@ -2170,8 +2473,8 @@ var contextParams = {
          pointR: 5,
          centroidR: 15,
          centroidShapeR: 10,
-         classColor: [ "black", "blue", "yellow", "green", "purple", "pink" ],
-         classShape: [ "cross", "circle", "square", "diamond", "triangle"],
+         classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
+         classShapes: [ "cross", "circle", "square", "diamond", "triangle"],
          pointAttr: {
             stroke: "none",
          },
@@ -2227,8 +2530,8 @@ var contextParams = {
          xRange: [0,1000],
          yRange: [0,1000],
          pointR: 5,
-         classColor: [ "black", "blue", "yellow", "green", "purple", "pink" ],
-         classShape: [ "cross", "circle", "square", "diamond", "triangle"],
+         classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
+         classShapes: [ "cross", "circle", "square", "diamond", "triangle"],
          pointAttr: {
             stroke: "none",
          },
@@ -2345,6 +2648,46 @@ var contextParams = {
             }
          },
          checkEndCondition: endConditions.checkScoreGradient
+      },
+      decisionTree: {
+         graphW: 500,
+         graphH: 500,
+         xRange: [0,100],
+         yRange: [0,100],
+         classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
+         classShapes: ["cross","circle","triangle","square"],
+         zoneShapeR: 10,
+         pointR: 5,
+         pointAttr: {
+            stroke: "none",
+         },
+         crossAttr: {
+            "stroke-width": 3,
+            "stroke-linecap": "round"
+         },
+         frameAttr: {
+            stroke: colors.black,
+            "stroke-width": 3,
+            fill: "none"
+         },
+         zoneLineAttr: {
+            stroke: colors.black,
+            "stroke-width": 2
+         },
+         zoneClassAttr: {
+            stroke: colors.black,
+            "stroke-width": 1,
+            fill: "none"
+         },
+         thresholdAttr: {
+            "font-size": 16,
+            "font-weight": "bold",
+            fill: colors.black
+         },
+         pointHighlightAttr: {
+            stroke: colors.blue,
+            "stroke-width": 2
+         },
       }
    };
 
