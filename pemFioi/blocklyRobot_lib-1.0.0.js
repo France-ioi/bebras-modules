@@ -2362,7 +2362,7 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
-                  this.callCallback(callback, this.isOn(function(obj) {return obj.isWithdrawable===true;}));
+                  this.callCallback(callback, this.isOn(function(obj) {return obj.isPaint===true;}));
                }
             }
          ],
