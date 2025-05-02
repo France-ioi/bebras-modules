@@ -240,6 +240,8 @@ var getContext = function(display, infos, curLevel) {
                invalidThreshold: function(thr) {
                   return "Invalid threshold value : "+thr
                },
+               errorNoClass: "Le point en rouge n'a pas de classe",
+               errorWrongClass: "Le point en rouge n'a pas la bonne classe",
             }
          },
       },
@@ -401,8 +403,8 @@ var getContext = function(display, infos, curLevel) {
          var coo1 = pointData[id1]
          var coo2 = pointData[id2]
 
-         var pos1 = getPosFromCoordinates(coo1);
-         var pos2 = getPosFromCoordinates(coo2);
+         var pos1 = this.getPosFromCoordinates(coo1);
+         var pos2 = this.getPosFromCoordinates(coo2);
          var d = Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y)
 
          showDist({coo1,coo2 });
@@ -601,6 +603,35 @@ var getContext = function(display, infos, curLevel) {
          // console.log(idItem,idClass)
          this.highlightPoint(idItem,false,true);
          pointData[idItem].class = idClass;
+         updatePoint(idItem);
+
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "setClass",
+      type: "actions",
+      block: { 
+         name: "setClass", 
+         params: [null,null],
+         // yieldsValue: 'int'
+      },
+      func: function(idItem,idClass,callback) {
+         var { nbClass, nbItemsToPredict, pointData } = context;
+         if(!Number.isInteger(idItem) || !Number.isInteger(idClass)){
+            throw(window.languageStrings.messages.noIntegerId);
+         }
+         if(idItem >= nbItemsToPredict || idItem < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         if(idClass > nbClass || idClass < 0){
+            throw(window.languageStrings.messages.invalidId);
+         }
+         // console.log(idItem,idClass)
+         // this.highlightPoint(idItem,false,true);
+         this.removeHighlight();
+         pointData[idItem].class = idClass + 1;
          updatePoint(idItem);
 
          this.callCallback(callback);
@@ -924,6 +955,9 @@ var getContext = function(display, infos, curLevel) {
             if(!context.pointData){
                context.pointData = initPointData();
             }
+            for(var iP = 0; iP < context.nbItemsToPredict; iP++){
+               context.pointData[iP].class = 0;
+            }
             // console.log(context.zones)
          }
       }
@@ -1141,30 +1175,57 @@ var getContext = function(display, infos, curLevel) {
          // console.log(centerIDs)
       }else
       if(contextType == "decisionTree"){
-         var { nbItemsToPredict } = context;
-         for(var n = 0; n < nbItemsToPredict; n++){
+         var { nbItemsToPredict, zones } = context;
+
+         var count = 0;
+         // console.log(infos.yPointArea,infos.pointAreaH)
+         for(var zID in zones.leaves){
+            var ranges = zones.leaves[zID].ranges;
+            // console.log(zID,ranges)
+            var x1 = getCoordinateFromPos(ranges[0][0],0);
+            var x2 = getCoordinateFromPos(ranges[0][1],0);
+            var y1 = getCoordinateFromPos(ranges[1][0],1);
+            var y2 = getCoordinateFromPos(ranges[1][1],1);
+            var pos = getRandomPos({ xMin: x1, xMax: x2, yMin: y1, yMax: y2 });
+            // console.log(pos)
+            pointData.push(pos);
+            count++;
+            if(count >= nbItemsToPredict)
+               break;
+         }
+
+         for(var n = count; n < nbItemsToPredict; n++){
             var pos = getRandomPos();
             pointData.push(pos);
          }
       }
+      // console.log(pointData)
 
       return pointData
 
-      function getRandomPos() {
-         var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+      function getRandomPos(params) {
+         // console.log("getRandomPos",params)
          var pos;
-         var x0 = xPointArea;
-         var y0 = yPointArea;
-         var w = pointAreaW;
-         var h = pointAreaH;
-         // var x1 = x0 + w;
-         // var y1 = y0 + h;
+         if(params){
+            var { xMin, xMax, yMin, yMax } = params;
+            var x0 = xMin;
+            var y0 = yMin;
+            var w = xMax - xMin;
+            var h = yMax - yMin;
+         }else{
+            var { xPointArea, yPointArea, pointAreaW, pointAreaH } = infos;
+            var x0 = xPointArea;
+            var y0 = yPointArea;
+            var w = pointAreaW;
+            var h = pointAreaH;
+         }
+
          var count = 0;
          var dim = 2;
             
          var ran;
          do{
-            var pos = {};
+            pos = {};
             for(var ax = 0; ax < dim; ax++){
                var ran = (ax == 0) ? w : h;
                var min = (ax == 0) ? x0 : y0;
@@ -1528,6 +1589,26 @@ var getContext = function(display, infos, curLevel) {
       return splitRange
    };
 
+   context.getZoneFromPos = function(pos,zones) {
+      for(var zID in zones){
+         var { ranges } = zones[zID];
+         var inZone = true;
+         for(var ax = 0; ax < 2; ax++){
+            var key = (ax == 0) ? "x" : "y";
+            var ran = ranges[ax];
+            if(pos[key] < ran[0] || pos[key] > ran[1]){
+               inZone = false;
+               break;
+            }
+         }
+         if(inZone){
+            return zID
+         }
+      }
+      console.error("can't find zone");
+      return false
+   };
+
    function initMap() {
       if(!context.display)
          return
@@ -1620,7 +1701,7 @@ var getContext = function(display, infos, curLevel) {
       for(var i = 0; i < dat.length; i += 4) {
          var x = x0 + Math.floor((i/4)%w);
          var y = y0 + Math.floor(i/(4*w));
-         var pos = getPosFromCoordinates({x,y},true)
+         var pos = context.getPosFromCoordinates({x,y},true)
          var { id } = findClosestCentroid(pos);
          var col = classColors[id];
 
@@ -1890,7 +1971,7 @@ var getContext = function(display, infos, curLevel) {
          // var coo = {};
          // coo.x = orPos.x*scale;
          // coo.y = orPos.y*scale;
-         var pos = getPosFromCoordinates(orPos);
+         var pos = this.getPosFromCoordinates(orPos);
          var { id, d } = findClosestCentroid(pos,centPos);
          // console.log(id,d)
          id--;
@@ -1927,13 +2008,13 @@ var getContext = function(display, infos, curLevel) {
 
    function getClosestPoint(id,pool,pointData) {
       var coo1 = pointData[id];
-      var pos1 = getPosFromCoordinates(coo1);
+      var pos1 = context.getPosFromCoordinates(coo1);
       var minD = Infinity;
       var closest;
       for(var ip = 0; ip < pool.length; ip++){
          var id2 = pool[ip];
          var coo2 = pointData[id2];
-         var pos2 = getPosFromCoordinates(coo2);
+         var pos2 = context.getPosFromCoordinates(coo2);
          var d = Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y);
          // console.log(d,pos1,pos2)
          if(d < minD){
@@ -1990,7 +2071,7 @@ var getContext = function(display, infos, curLevel) {
          var prevSco = score;
          for(var iC = 0; iC < nbClusters; iC++){
             var {x,y} = findBarycenterCoo(iC,classPoints);
-            centPos[iC] = getPosFromCoordinates({ x, y });
+            centPos[iC] = this.getPosFromCoordinates({ x, y });
          }
          var {score} = context.updateScore(centPos);
          var newSco = score;
@@ -2017,21 +2098,44 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function getCoordinatesFromPos(pos) {
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
+      // var x0 = xPointArea;
+      // var y0 = yPointArea;
+      // var w = pointAreaW;
+      // var h = pointAreaH;
+      // // console.log(x0,y0,w,h)
+
+      // var x = x0 + w*(pos.x - xRange[0])/(xRange[1] - xRange[0]);
+      // var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
+      // x = Math.round(x);
+      // y = Math.round(y);
+      x = Math.round(getCoordinateFromPos(pos.x,0));
+      y = Math.round(getCoordinateFromPos(pos.y,1));
+      return { x, y }
+   };
+
+   function getCoordinateFromPos(val,ax) {
       var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
       var x0 = xPointArea;
       var y0 = yPointArea;
       var w = pointAreaW;
       var h = pointAreaH;
-      // console.log(x0,y0,w,h)
 
-      var x = x0 + w*(pos.x - xRange[0])/(xRange[1] - xRange[0]);
-      var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
-      x = Math.round(x);
-      y = Math.round(y);
-      return { x, y }
+      if(ax == 0){
+         ran = xRange;
+         le = w;
+         min = x0;
+      }else{
+         ran = yRange;
+         le = h;
+         min = y0;
+      }
+
+      var res = min + le*(val - ran[0])/(ran[1] - ran[0]);
+      return res
    };
 
-   function getPosFromCoordinates(coo,can) {
+   context.getPosFromCoordinates = function(coo,can) {
       var x = Math.round(getPosFromCoordinate(coo.x,0,can));
       var y = Math.round(getPosFromCoordinate(coo.y,1,can));
       return { x, y }
@@ -2201,7 +2305,6 @@ var getContext = function(display, infos, curLevel) {
    context.highlightPoint = function(id,err,keep) {
       if(!context.display)
          return
-      console.log("highlightPoint",id,err,keep)
       if(pointHighlight){
          pointHighlight.remove();
          pointHighlight = null;
@@ -2280,8 +2383,8 @@ var getContext = function(display, infos, curLevel) {
 
       var obj;
       if(showText){
-         var pos1 = getPosFromCoordinates(coo1);
-         var pos2 = getPosFromCoordinates(coo2);
+         var pos1 = context.getPosFromCoordinates(coo1);
+         var pos2 = context.getPosFromCoordinates(coo2);
          // console.log(pos1,pos2)
          var d = Math.round(Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y));
          var xt = (x1 + x2)/2;
@@ -2455,7 +2558,29 @@ var endConditions = {
 
       context.success = true;
       throw(window.languageStrings.messages.success);
-   }
+   },
+   checkScoreDecisionTree: function(context, lastTurn) {
+      // console.log("checkScore",context.display,lastTurn)
+      context.success = false;
+      var { zones, nbItemsToPredict, pointData } = context;
+
+      for(var ip = 0; ip < nbItemsToPredict; ip++){
+         var pDat = pointData[ip];
+         if(pDat.class === undefined){
+            context.highlightPoint(ip,true);
+            throw(window.languageStrings.messages.errorNoClass);
+         }
+         var pos = context.getPosFromCoordinates(pDat);
+         var zID = context.getZoneFromPos(pos,zones.leaves);
+         if(pDat.class - 1 != zones.leaves[zID].class){
+            context.highlightPoint(ip,true);
+            throw(window.languageStrings.messages.errorWrongClass);
+         }
+      }
+
+      context.success = true;
+      throw(window.languageStrings.messages.success);
+   },
 };
 
 var contextParams = {
@@ -2688,6 +2813,11 @@ var contextParams = {
             stroke: colors.blue,
             "stroke-width": 2
          },
+         errorAttr: {
+            stroke: "red",
+            "stroke-width": 3
+         },
+         checkEndCondition: endConditions.checkScoreDecisionTree
       }
    };
 
