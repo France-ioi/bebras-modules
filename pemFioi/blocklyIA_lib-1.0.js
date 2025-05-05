@@ -842,7 +842,7 @@ var getContext = function(display, infos, curLevel) {
          infos.xZoom = (paperW - zoomW)/2;
          infos.yZoom = y + h + marginY;
 
-         infos.paperH = infos.yZoom + zoomH + marginY;
+         infos.paperH = infos.yZoom + zoomH + 3*marginY;
       }else
       if(infos.contextType == "decisionTree"){
          w = infos.graphW;
@@ -1057,7 +1057,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.updateScale = function() {
-      // console.log("updateScale")
       if(!context.display) {
          return;
       }
@@ -1365,45 +1364,54 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       // console.log(min, max)
-
-      
    };
 
-   function initMap() {
-      if(!context.display)
-         return
-      var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
-      var { nbRows, nbCol } = infos;
-      var w = Math.round(pointAreaW*scale);
-      var h = Math.round(pointAreaH*scale);
-      var x0 = Math.round(xPointArea*scale);
-      var y0 = Math.round(yPointArea*scale);
+   // function initMap() {
+   //    console.log("initMap")
+   //    if(!context.display)
+   //       return
+   //    var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize, yZoom,
+   //       pixelSizeZoom, nbRowsZoom, nbRows, nbCol, marginY, coordinateTextAttr } = infos;
+   //    var w = Math.round(pointAreaW*scale);
+   //    var h = Math.round(pointAreaH*scale);
+   //    var x0 = Math.round(xPointArea*scale);
+   //    var y0 = Math.round(yPointArea*scale);
 
-      var canvas = document.getElementById('canvas');
-      var ctx = canvas.getContext('2d');
+   //    var canvas = document.getElementById('canvas');
+   //    var ctx = canvas.getContext('2d');
 
-      var pixelS = pixelSize*scale;
+   //    var pixelS = pixelSize*scale;
 
-      var max = -Infinity;
-      var min = Infinity;
+   //    var max = -Infinity;
+   //    var min = Infinity;
 
-      for (let row = 0; row < nbRows; row ++){
-         for (let col = 0; col < nbCol; col++){
-            var x = col*pixelS;
-            var y = row*pixelS;
+   //    for (let row = 0; row < nbRows; row ++){
+   //       for (let col = 0; col < nbCol; col++){
+   //          var x = col*pixelS;
+   //          var y = row*pixelS;
 
-            var color = getPixelColor(row,col);
+   //          var color = getPixelColor(row,col);
 
-            ctx.fillStyle = color;
-            ctx.fillRect(
-               x,
-               y,
-               Math.ceil(pixelS),
-               Math.ceil(pixelS)
-            );
-         }
-      }
-   };
+   //          ctx.fillStyle = color;
+   //          ctx.fillRect(
+   //             x,
+   //             y,
+   //             Math.ceil(pixelS),
+   //             Math.ceil(pixelS)
+   //          );
+   //       }
+   //    }
+
+   //    if(coordinateText){
+   //       coordinateText.remove();
+   //    }
+   //    var my = marginY*scale;
+   //    var zS = pixelSizeZoom*scale;
+   //    var yCoo = yZoom*scale + nbRowsZoom*zS + 2*my;
+   //    var xCoo = x0 + w/2;
+   //    console.log(xCoo,yCoo)
+   //    coordinateText = paper.text(xCoo,yCoo,"test").attr(coordinateTextAttr);
+   // };
 
    function getPixelColor(row,col) {
       var { showMap, maxAltitude } = context;
@@ -1659,8 +1667,10 @@ var getContext = function(display, infos, curLevel) {
    function initMap() {
       if(!context.display)
          return
-      var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
-      var { nbRows, nbCol } = infos;
+      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
+      // var { nbRows, nbCol } = infos;
+      var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize, yZoom,
+         pixelSizeZoom, nbRowsZoom, nbRows, nbCol, marginY, coordinateTextAttr } = infos;
       var w = Math.round(pointAreaW*scale);
       var h = Math.round(pointAreaH*scale);
       var x0 = Math.round(xPointArea*scale);
@@ -1690,6 +1700,15 @@ var getContext = function(display, infos, curLevel) {
             );
          }
       }
+
+      if(coordinateText){
+         coordinateText.remove();
+      }
+      var my = marginY*scale;
+      var zS = pixelSizeZoom*scale;
+      var yCoo = yZoom*scale + nbRowsZoom*zS + 2*my;
+      var xCoo = x0 + w/2;
+      coordinateText = paper.text(xCoo,yCoo,"").attr(coordinateTextAttr);
    };
 
    /* events */
@@ -1855,6 +1874,10 @@ var getContext = function(display, infos, curLevel) {
 
       zoomObj.click(clickZoom);
       zoomObj.attr("cursor","pointer");
+
+      var alt = context.grid[pos.row][pos.col];
+      var str = window.languageStrings.messages.altitude+" : "+alt;
+      coordinateText.attr("text",str);
    };
 
    function updateZoneLines() {
@@ -2823,6 +2846,11 @@ var contextParams = {
          zoomHighlightAttr: {
             stroke: colors.blue,
             "stroke-width": 3
+         },
+         coordinateTextAttr: {
+            "font-size": 16,
+            "font-weight": "bold",
+            fill: colors.black
          },
          infoBoxAttr: {
             rect: {
