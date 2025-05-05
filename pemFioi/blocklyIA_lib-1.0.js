@@ -359,10 +359,11 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          var x = getPosFromCoordinate(pos.x,0);
+         x = Math.round(x);
          this.highlightPoint(id);
-         if(contextType != "decisionTree")
-            highlightCoordinate(id,0);
-         this.callCallback(callback, Math.round(x));
+         highlightCoordinate(id,0);
+         displayCoordinate(x,0);
+         this.callCallback(callback, x);
       }
    });
 
@@ -383,10 +384,11 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          var y = getPosFromCoordinate(pos.y,1);
+         y= Math.round(y);
          this.highlightPoint(id);
-         if(contextType != "decisionTree")
-            highlightCoordinate(id,1);
-         this.callCallback(callback, Math.round(y));
+         highlightCoordinate(id,1);
+         displayCoordinate(y,1);
+         this.callCallback(callback, y);
       }
    });
 
@@ -633,7 +635,7 @@ var getContext = function(display, infos, curLevel) {
          this.removeHighlight();
          pointData[idItem].class = idClass + 1;
          updatePoint(idItem);
-
+         displayCoordinate(false);
          this.callCallback(callback);
       }
    });
@@ -794,6 +796,7 @@ var getContext = function(display, infos, curLevel) {
    var pointHighlight;
    var keepPointHighlight;
    var coordinateHighlight;
+   var coordinateText;
    var centroidHighlight;
    var distanceObj;
    var nearestObj;
@@ -844,7 +847,7 @@ var getContext = function(display, infos, curLevel) {
       if(infos.contextType == "decisionTree"){
          w = infos.graphW;
          h = infos.graphH;
-         paperH = h + 4*marginY;
+         infos.paperH = h + 6*marginY;
          x = (paperW - w)/2;
          y = 2*marginY;
       }
@@ -951,6 +954,7 @@ var getContext = function(display, infos, curLevel) {
             context.tree = new Graph.fromJSON(JSON.stringify(gridInfos.decisionTree));
             context.zones = getZonesFromGraph(context.tree);
             context.nbItemsToPredict = gridInfos.nbItemsToPredict;
+            // context.minNbItemsPerZone = gridInfos.minNbItemsPerZone;
             context.nbClass = gridInfos.nbClass;
             if(!context.pointData){
                context.pointData = initPointData();
@@ -1122,7 +1126,7 @@ var getContext = function(display, infos, curLevel) {
       // console.log("initPointData")
       var pointData = [];
 
-      var { contextType } = infos;
+      var { contextType, xRange, yRange, pointR } = infos;
       if(contextType == "k-means"){
          var { nbPoints } = context;
          for(var n = 0; n < nbPoints; n++){
@@ -1175,7 +1179,7 @@ var getContext = function(display, infos, curLevel) {
          // console.log(centerIDs)
       }else
       if(contextType == "decisionTree"){
-         var { nbItemsToPredict, zones } = context;
+         var { nbItemsToPredict, minNbItemsPerZone, zones } = context;
 
          var count = 0;
          // console.log(infos.yPointArea,infos.pointAreaH)
@@ -1186,9 +1190,35 @@ var getContext = function(display, infos, curLevel) {
             var x2 = getCoordinateFromPos(ranges[0][1],0);
             var y1 = getCoordinateFromPos(ranges[1][0],1);
             var y2 = getCoordinateFromPos(ranges[1][1],1);
-            var pos = getRandomPos({ xMin: x1, xMax: x2, yMin: y1, yMax: y2 });
-            // console.log(pos)
-            pointData.push(pos);
+            for(var side = 0; side < 4; side++){
+               if(side == 0 && ranges[1][0] == yRange[0] ||
+                  side == 1 && ranges[0][1] == xRange[1] ||
+                  side == 2 && ranges[1][1] == yRange[1] ||
+                  side == 3 && ranges[0][0] == xRange[0]){
+                  continue;
+               }
+               var xMin = x1;
+               var xMax = x2;
+               var yMin = y1;
+               var yMax = y2;
+               switch(side){
+               case 0:
+                  yMax = yMin + pointR;
+                  break;
+               case 1:
+                  xMin = xMax - pointR;
+                  break;
+               case 2:
+                  yMin = yMax - pointR;
+                  break;
+               case 3:
+                  xMax = xMin + pointR;
+                  break;
+               }
+               var pos = getRandomPos({ xMin, xMax, yMin, yMax },side);
+               // console.log(pos)
+               pointData.push(pos);
+            }
             count++;
             if(count >= nbItemsToPredict)
                break;
@@ -1238,10 +1268,9 @@ var getContext = function(display, infos, curLevel) {
             var tooClose = false;
             for(var iP = 0; iP < pointData.length; iP++){
                var pPos = pointData[iP];
-               var d = (dim == 2) ? 
-                  Beav.Geometry.distance(pos.x,pos.y,pPos.x,pPos.y) : 
-                  Math.abs(pos.x - pPos.x);
-               if(d < infos.pointR){
+               var d = Beav.Geometry.distance(pos.x,pos.y,pPos.x,pPos.y);
+               if(d < 2*infos.pointR){
+                  // console.log(pos,pPos,d,"tooClose")
                   tooClose = true;
                   break;
                }
@@ -1510,13 +1539,31 @@ var getContext = function(display, infos, curLevel) {
       if(frame)
          frame.remove();
       var { xPointArea, yPointArea, pointAreaW, pointAreaH,
-      frameAttr } = infos;
+      frameAttr, axisLabelAttr, coordinateTextAttr, marginY, marginX } = infos;
       var x = xPointArea*scale;
       var y = yPointArea*scale;
       var w = pointAreaW*scale;
       var h = pointAreaH*scale;
+      var mx = marginX*scale;
+      var my = marginY*scale;
 
-      frame = paper.rect(x,y,w,h).attr(frameAttr);
+      var rect = paper.rect(x,y,w,h).attr(frameAttr);
+
+      var xX = x + w/2;
+      var yX = y + h + 2*my;
+      var xLabel = paper.text(xX,yX,"X").attr(axisLabelAttr);
+
+      var xY = x - 3*mx;
+      var yY = y + h/2;
+      var yLabel = paper.text(xY,yY,"Y").attr(axisLabelAttr);
+
+      frame = paper.set(rect,xLabel,yLabel);
+
+      if(coordinateText){
+         coordinateText.remove();
+      }
+      var yCoo = yX + my;
+      coordinateText = paper.text(x,yCoo,"").attr(coordinateTextAttr);
 
       updateZoneLines();
    };
@@ -1817,8 +1864,8 @@ var getContext = function(display, infos, curLevel) {
          zoneLineObj = {};
       }
       var { xRange, yRange, xPointArea, yPointArea, pointAreaW, pointAreaH ,
-      zoneLineAttr, classShapes, zoneShapeR, zoneClassAttr, thresholdAttr,
-      marginX, marginY } = infos;
+      zoneLineAttr, classShapes, classColors, zoneShapeR, zoneClassAttr, 
+      thresholdAttr, zoneAttr ,marginX, marginY } = infos;
 
       var x0 = xPointArea*scale;
       var y0 = yPointArea*scale;
@@ -1902,19 +1949,31 @@ var getContext = function(display, infos, curLevel) {
          function drawZoneClass(v,leaf) {
             var zDat = (leaf) ? zones.leaves[v] : zones.branches[v];
             var pos = [];
+            var rectCoo = {};
             for(var ax = 0; ax < 2; ax++){
-               var val = (zDat.ranges[ax][0] + zDat.ranges[ax][1])/2;
+               var min = zDat.ranges[ax][0];
+               var max = zDat.ranges[ax][1];
+               var val = (min + max)/2;
                pos.push(val);
+               if(ax == 0){
+                  rectCoo.x = getCoordinateFromValue(0,min);
+                  rectCoo.width = getCoordinateFromValue(0,max) - rectCoo.x;
+               }else{
+                  rectCoo.y = getCoordinateFromValue(1,min);
+                  rectCoo.height = getCoordinateFromValue(1,max) - rectCoo.y;
+               }
             }
             var coo = getCoordinatesFromPos(pos);
             var cID = zDat.class + 1;
             var sID = classShapes[cID];
             // console.log(v,cID)
             var sha = drawShape(sID,coo.x,coo.y,zoneShapeR).attr(zoneClassAttr);
-            // var circ = paper.circle(coo.x,coo.y).attr(zoneLetterAttr.unselected.circle);
-            // var text = paper.text(coo.x,coo.y,v).attr(zoneLetterAttr.unselected.text);
-            // var obj = paper.set(circ,text);
-            return sha
+            
+            var rectCol = colors[classColors[cID]];
+            var rect = paper.rect(0,0,0,0).attr(rectCoo).attr(zoneAttr)
+            .attr("fill",rectCol).toBack();
+
+            return paper.set(sha,rect)
          };
 
          function getCoordinateFromValue(aID,val) {
@@ -2357,6 +2416,18 @@ var getContext = function(display, infos, curLevel) {
       coordinateHighlight = paper.path(p).attr(coordinateHighlightAttr);
    };
 
+   function displayCoordinate(val,ax) {
+      if(!context.display)
+         return
+      if(val === false){
+         coordinateText.attr("text","");
+         return
+      }
+      var str = (ax == 0) ? "x" : "y";
+      str += " : "+val;
+      coordinateText.attr("text",str);
+   };
+
    function showDist(params) {
       // console.log("showDist",context.display)
       if(!context.display)
@@ -2572,7 +2643,8 @@ var endConditions = {
          }
          var pos = context.getPosFromCoordinates(pDat);
          var zID = context.getZoneFromPos(pos,zones.leaves);
-         if(pDat.class - 1 != zones.leaves[zID].class){
+         var zDat = zones.leaves[zID]
+         if(pDat.class - 1 != zDat.class){
             context.highlightPoint(ip,true);
             throw(window.languageStrings.messages.errorWrongClass);
          }
@@ -2782,7 +2854,12 @@ var contextParams = {
          classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
          classShapes: ["cross","circle","triangle","square"],
          zoneShapeR: 10,
-         pointR: 5,
+         pointR: 6,
+         axisLabelAttr: {
+            "font-size": 20,
+            "font-weight": "bold",
+            fill: colors.black
+         },
          pointAttr: {
             stroke: "none",
          },
@@ -2794,6 +2871,10 @@ var contextParams = {
             stroke: colors.black,
             "stroke-width": 3,
             fill: "none"
+         },
+         zoneAttr: {
+            stroke: "none",
+            opacity: 0.4
          },
          zoneLineAttr: {
             stroke: colors.black,
@@ -2810,8 +2891,19 @@ var contextParams = {
             fill: colors.black
          },
          pointHighlightAttr: {
-            stroke: colors.blue,
+            stroke: colors.black,
             "stroke-width": 2
+         },
+         coordinateHighlightAttr: {
+            stroke: colors.black,
+            "stroke-width": 1,
+            "stroke-dasharray": ["-"]
+         },
+         coordinateTextAttr: {
+            "font-size": 16,
+            "font-weight": "bold",
+            fill: colors.black,
+            "text-anchor": "start"
          },
          errorAttr: {
             stroke: "red",
