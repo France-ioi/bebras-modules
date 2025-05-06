@@ -70,16 +70,22 @@ var getContext = function(display, infos, curLevel) {
       none: {
          fr: {
             code: {
+               getX: "getX",
+               getY: "getY",
                log: "log",
                distance: "distance",
             },
             description: {
+               getX: "@(idItem) retourne l'abscisse du point",
+               getY: "@(idItem) retourne l'ordonnée du point",
                log: "@(msg)",
                distance: "@(x1,y1,x2,y2)",
             },
             messages: {
                noIntegerId: "L'identifiant doit être un entier",
-               invalidId: "Identifiant invalide",
+               invalidId: function(id) {
+                  return "Identifiant invalide : "+id
+               },
                success: "Bravo, vous avez réussi !"
             },
             startingBlockName: "Programme du robot"
@@ -131,15 +137,12 @@ var getContext = function(display, infos, curLevel) {
             code: {
                getNbItems: "getNbItems",
                getNbClusters: "getNbClusters",
-               getX: "getX",
-               getY: "getY",
+               
                showCentroid: "showCentroid",
                showDistance: "showDistance",
                setCluster: "setCluster"
             },
             description: {
-               getX: "@(idItem) retourne l'abscisse du point",
-               getY: "@(idItem) retourne l'ordonnée du point",
                showCentroid: "@(idCluster,x,y)",
                showDistance: "@(idItem,idCluster)",
                setCluster: "@(idItem,idCluster)"
@@ -226,22 +229,36 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             code: {
                getNbItemsToPredict: "getNbItemsToPredict",
-               getX: "getX",
-               getY: "getY",
+               getNbKnownItems: "getNbKnownItems",
+               getClass: "getClass",
                setClass: "setClass",
+               setZoneClass: "setZoneClass",
+               splitHorizontally: "splitHorizontally",
+               splitVertically: "splitVertically",
+
             },
             description: {
                getNbItemsToPredict: "@()",
-               getX: "@(idItem)",
-               getY: "@(idItem)",
+               getNbKnownItems: "@()",
                setClass: "@(idItem,idClass)",
+               getClass: "@(idItem)",
+               setZoneClass: "@(idZone,idClass)",
+               splitHorizontally: "@(idParentZone, y, idTopZone, idBottomZone)",
+               splitVertically: "@(idParentZone, x, idLeftZone, idRightZone)",
             },
             messages: {
                invalidThreshold: function(thr) {
                   return "Invalid threshold value : "+thr
                },
                errorNoClass: "Le point en rouge n'a pas de classe",
+               errorNoClassZone: "Au moins une zone n'a pas de classe",
                errorWrongClass: "Le point en rouge n'a pas la bonne classe",
+               idAlreadyExists: function(id) {
+                  return "L'identifiant "+id+" existe déjà"
+               },
+               invalidCoordinate: function(ax) {
+                  return "La valeur de "+((ax == 0) ? "x" : "y")+" est invalide"
+               },
             }
          },
       },
@@ -424,10 +441,14 @@ var getContext = function(display, infos, curLevel) {
          yieldsValue: 'int'
       },
       func: function(id, callback) {
-         var { pointData } = context;
-         var dat = pointData[id]
-
-         this.callCallback(callback, dat.class);
+         var { pointData, type } = context;
+         var dat = pointData[id];
+         var cla = dat.class;
+         if(type == "decisionTree"){
+            cla--;
+         }
+         this.removeHighlight();
+         this.callCallback(callback, cla);
       }
    });
 
@@ -544,10 +565,10 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbPoints || idItem < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idItem));
          }
          if(idCluster >= k || idCluster < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idCluster));
          }
          var coo1 = pointData[idItem];
          var pos2 = centroidPos[idCluster];
@@ -571,10 +592,10 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbPoints || idItem < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idItem));
          }
          if(idCluster >= k || idCluster < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idCluster));
          }
          context.classPoints[idItem] = idCluster + 1;
          updatePoint(idItem);
@@ -597,10 +618,10 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbPoints || idItem < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idItem));
          }
          if(idClass > nbClusters || idClass < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idClass));
          }
          // console.log(idItem,idClass)
          this.highlightPoint(idItem,false,true);
@@ -625,10 +646,10 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbItemsToPredict || idItem < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idItem));
          }
          if(idClass > nbClass || idClass < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idClass));
          }
          // console.log(idItem,idClass)
          // this.highlightPoint(idItem,false,true);
@@ -654,7 +675,7 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.noIntegerId);
          }
          if(idItem >= nbPoints || idItem < 0){
-            throw(window.languageStrings.messages.invalidId);
+            throw(window.languageStrings.messages.invalidId(idItem));
          }
          if(nearestObj){
             nearestObj.remove();
@@ -679,8 +700,11 @@ var getContext = function(display, infos, curLevel) {
          if(!Number.isInteger(id1) || !Number.isInteger(id2)){
             throw(window.languageStrings.messages.noIntegerId);
          }
-         if(id1 >= nbPoints || id1 < 0 || id2 >= nbPoints || id2 < 0){
-            throw(window.languageStrings.messages.invalidId);
+         if(id1 >= nbPoints || id1 < 0){
+            throw(window.languageStrings.messages.invalidId(id1));
+         }
+         if(id2 >= nbPoints || id2 < 0){
+            throw(window.languageStrings.messages.invalidId(id2));
          }
          var coo1 = pointData[id1]
          var coo2 = pointData[id2]
@@ -740,6 +764,106 @@ var getContext = function(display, infos, curLevel) {
       func: function(x1,y1,x2,y2, callback) {
          var d = Beav.Geometry.distance(x1,y1,x2,y2);
          this.callCallback(callback, Math.round(d));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "splitHorizontally",
+      type: "actions",
+      block: { 
+         name: "splitHorizontally", 
+         params: [null,null,null,null],
+      },
+      func: function(idParent,y,idTop,idBottom, callback) {
+         var { currentTree, currentZones } = context;
+         var { yRange } = infos;
+
+         var vertices = currentTree.getAllVertices();
+         if(!vertices.includes(idParent)){
+            throw(window.languageStrings.messages.invalidId(idParent));
+         }
+         if(vertices.includes(idTop)){
+            throw(window.languageStrings.messages.idAlreadyExists(idTop));
+         }
+         if(vertices.includes(idBottom)){
+            throw(window.languageStrings.messages.idAlreadyExists(idBottom));
+         }
+         if(!currentZones.leaves.hasOwnProperty(idParent)){
+            throw(window.languageStrings.messages.invalidId(idParent));
+         }
+         var pDat = currentZones.leaves[idParent];
+         if(y < pDat.ranges[1][0] || y > pDat.ranges[1][1]){
+            throw(window.languageStrings.messages.invalidCoordinate(1));
+         }
+         this.removeHighlight();
+
+         splitZone(idParent,1,y,idTop,idBottom);
+
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "splitVertically",
+      type: "actions",
+      block: { 
+         name: "splitVertically", 
+         params: [null,null,null,null],
+      },
+      func: function(idParent,x,idLeft,idRight, callback) {
+         var { currentTree, currentZones } = context;
+         var { yRange } = infos;
+
+         var vertices = currentTree.getAllVertices();
+         if(!vertices.includes(idParent)){
+            throw(window.languageStrings.messages.invalidId(idParent));
+         }
+         if(vertices.includes(idLeft)){
+            throw(window.languageStrings.messages.idAlreadyExists(idLeft));
+         }
+         if(vertices.includes(idRight)){
+            throw(window.languageStrings.messages.idAlreadyExists(idRight));
+         }
+         if(!currentZones.leaves.hasOwnProperty(idParent)){
+            throw(window.languageStrings.messages.invalidId(idParent));
+         }
+         var pDat = currentZones.leaves[idParent];
+         if(x < pDat.ranges[0][0] || x > pDat.ranges[0][1]){
+            throw(window.languageStrings.messages.invalidCoordinate(0));
+         }
+         this.removeHighlight();
+         
+         splitZone(idParent,0,x,idLeft,idRight);
+         
+         this.callCallback(callback);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "setZoneClass",
+      type: "actions",
+      block: { 
+         name: "setZoneClass", 
+         params: [null,null],
+      },
+      func: function(idZone, idClass, callback) {
+         var { currentTree, currentZones, nbClass } = context;
+         var { yRange } = infos;
+
+         if(!currentZones.leaves.hasOwnProperty(idZone)){
+            throw(window.languageStrings.messages.invalidId(idZone));
+         }
+         if(idClass < 0 || idClass >= nbClass){
+            throw(window.languageStrings.messages.invalidId(idClass));
+         }
+         var info = currentTree.getVertexInfo(idZone);
+         info.class = idClass;
+         currentZones.leaves[idZone].class = idClass;
+         this.removeHighlight();
+         
+         updateZoneLines();
+
+         this.callCallback(callback);
       }
    });
 
@@ -954,15 +1078,31 @@ var getContext = function(display, infos, curLevel) {
             context.tree = new Graph.fromJSON(JSON.stringify(gridInfos.decisionTree));
             context.zones = getZonesFromGraph(context.tree);
             context.nbItemsToPredict = gridInfos.nbItemsToPredict;
-            // context.minNbItemsPerZone = gridInfos.minNbItemsPerZone;
+            context.nbKnownItems = gridInfos.nbKnownItems;
             context.nbClass = gridInfos.nbClass;
+            context.createTree = gridInfos.createTree;
             if(!context.pointData){
                context.pointData = initPointData();
             }
+            
             for(var iP = 0; iP < context.nbItemsToPredict; iP++){
                context.pointData[iP].class = 0;
             }
-            // console.log(context.zones)
+
+            if(context.createTree){
+               var currentTreeJSON = {
+                  "vertexInfo": { 
+                     "A": { root: true, label: "A" },
+                  },
+                  "edgeInfo":{
+                  },
+                  "edgeVertices":{
+                  },
+                  "directed":true
+               };
+               context.currentTree = new Graph.fromJSON(JSON.stringify(currentTreeJSON));
+               context.currentZones = getZonesFromGraph(context.currentTree);
+            }
          }
       }
       
@@ -1012,6 +1152,18 @@ var getContext = function(display, infos, curLevel) {
          innerState.grid = context.grid;
          innerState.path = context.path;
          break;
+      case "decisionTree":
+         innerState.tree = context.tree;
+         innerState.zones = context.zones;
+         innerState.currentTree = context.currentTree;
+         innerState.currentZones = context.currentZones;
+         innerState.nbItemsToPredict = context.nbItemsToPredict;
+         innerState.nbKnownItems = context.nbKnownItems;
+         innerState.nbClass = context.nbClass;
+         innerState.createTree = context.createTree;
+         innerState.pointData = context.pointData;
+         break;
+            
       }
 
       return innerState;
@@ -1052,6 +1204,17 @@ var getContext = function(display, infos, curLevel) {
          context.steepnessFactor = innerState.steepnessFactor;
          context.grid = innerState.grid;
          context.path = innerState.path;
+         break;
+      case "decisionTree":
+         context.tree = innerState.tree;
+         context.zones = innerState.zones;
+         context.currentTree = innerState.currentTree;
+         context.currentZones = innerState.currentZones;
+         context.nbItemsToPredict = innerState.nbItemsToPredict;
+         context.nbKnownItems = innerState.nbKnownItems;
+         context.nbClass = innerState.nbClass;
+         context.createTree = innerState.createTree;
+         context.pointData = innerState.pointData;
          break;
       }
    };
@@ -1178,59 +1341,83 @@ var getContext = function(display, infos, curLevel) {
          // console.log(centerIDs)
       }else
       if(contextType == "decisionTree"){
-         var { nbItemsToPredict, minNbItemsPerZone, zones } = context;
-
+         var { nbItemsToPredict, nbKnownItems, minNbItemsPerZone, 
+         zones, createTree } = context;
+         var nbItems = (createTree) ? nbKnownItems : nbItemsToPredict;
          var count = 0;
          // console.log(infos.yPointArea,infos.pointAreaH)
          for(var zID in zones.leaves){
             var ranges = zones.leaves[zID].ranges;
             // console.log(zID,ranges)
-            var x1 = getCoordinateFromPos(ranges[0][0],0);
-            var x2 = getCoordinateFromPos(ranges[0][1],0);
-            var y1 = getCoordinateFromPos(ranges[1][0],1);
-            var y2 = getCoordinateFromPos(ranges[1][1],1);
-            for(var side = 0; side < 4; side++){
-               if(side == 0 && ranges[1][0] == yRange[0] ||
-                  side == 1 && ranges[0][1] == xRange[1] ||
-                  side == 2 && ranges[1][1] == yRange[1] ||
-                  side == 3 && ranges[0][0] == xRange[0]){
-                  continue;
-               }
-               var xMin = x1;
-               var xMax = x2;
-               var yMin = y1;
-               var yMax = y2;
-               switch(side){
-               case 0:
-                  yMax = yMin + pointR;
-                  break;
-               case 1:
-                  xMin = xMax - pointR;
-                  break;
-               case 2:
-                  yMin = yMax - pointR;
-                  break;
-               case 3:
-                  xMax = xMin + pointR;
-                  break;
-               }
-               var pos = getRandomPos({ xMin, xMax, yMin, yMax },side);
-               // console.log(pos)
+            var xMin = getCoordinateFromPos(ranges[0][0],0);
+            var xMax = getCoordinateFromPos(ranges[0][1],0);
+            var yMin = getCoordinateFromPos(ranges[1][0],1);
+            var yMax = getCoordinateFromPos(ranges[1][1],1);
+            if(!createTree){
+               var allPos = getRandomPosNextToSides(xMin,xMax,yMin,yMax);
+               pointData = pointData.concat(allPos);                         
+               count += allPos.length;
+            }else{
+               var pos = getRandomPos({ xMin, xMax, yMin, yMax });
                pointData.push(pos);
+               count++;
             }
-            count++;
-            if(count >= nbItemsToPredict)
+            if(count >= nbItems)
                break;
          }
 
-         for(var n = count; n < nbItemsToPredict; n++){
+         for(var n = count; n < nbItems; n++){
             var pos = getRandomPos();
             pointData.push(pos);
+         }
+
+         if(createTree){
+            for(var n = 0; n < nbItems; n++){
+               var coo = pointData[n];
+               var pos = context.getPosFromCoordinates(coo);
+               var zID = context.getZoneFromPos(pos,zones.leaves);
+               var zDat = zones.leaves[zID];
+               coo.class = zDat.class + 1;
+            }
          }
       }
       // console.log(pointData)
 
       return pointData
+
+      function getRandomPosNextToSides(x1,x2,y1,y2) {
+         var allPos = []; 
+         for(var side = 0; side < 4; side++){   
+            if(side == 0 && ranges[1][0] == yRange[0] ||
+               side == 1 && ranges[0][1] == xRange[1] ||
+               side == 2 && ranges[1][1] == yRange[1] ||
+               side == 3 && ranges[0][0] == xRange[0]){
+               continue;
+            }
+            var xMin = x1;
+            var xMax = x2;
+            var yMin = y1;
+            var yMax = y2;
+            switch(side){
+            case 0:
+               yMax = yMin + pointR;
+               break;
+            case 1:
+               xMin = xMax - pointR;
+               break;
+            case 2:
+               yMin = yMax - pointR;
+               break;
+            case 3:
+               xMax = xMin + pointR;
+               break;
+            }
+            var pos = getRandomPos({ xMin, xMax, yMin, yMax },side);
+            // console.log(pos)
+            allPos.push(pos);
+         } 
+         return allPos
+      };
 
       function getRandomPos(params) {
          // console.log("getRandomPos",params)
@@ -1366,53 +1553,6 @@ var getContext = function(display, infos, curLevel) {
       // console.log(min, max)
    };
 
-   // function initMap() {
-   //    console.log("initMap")
-   //    if(!context.display)
-   //       return
-   //    var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize, yZoom,
-   //       pixelSizeZoom, nbRowsZoom, nbRows, nbCol, marginY, coordinateTextAttr } = infos;
-   //    var w = Math.round(pointAreaW*scale);
-   //    var h = Math.round(pointAreaH*scale);
-   //    var x0 = Math.round(xPointArea*scale);
-   //    var y0 = Math.round(yPointArea*scale);
-
-   //    var canvas = document.getElementById('canvas');
-   //    var ctx = canvas.getContext('2d');
-
-   //    var pixelS = pixelSize*scale;
-
-   //    var max = -Infinity;
-   //    var min = Infinity;
-
-   //    for (let row = 0; row < nbRows; row ++){
-   //       for (let col = 0; col < nbCol; col++){
-   //          var x = col*pixelS;
-   //          var y = row*pixelS;
-
-   //          var color = getPixelColor(row,col);
-
-   //          ctx.fillStyle = color;
-   //          ctx.fillRect(
-   //             x,
-   //             y,
-   //             Math.ceil(pixelS),
-   //             Math.ceil(pixelS)
-   //          );
-   //       }
-   //    }
-
-   //    if(coordinateText){
-   //       coordinateText.remove();
-   //    }
-   //    var my = marginY*scale;
-   //    var zS = pixelSizeZoom*scale;
-   //    var yCoo = yZoom*scale + nbRowsZoom*zS + 2*my;
-   //    var xCoo = x0 + w/2;
-   //    console.log(xCoo,yCoo)
-   //    coordinateText = paper.text(xCoo,yCoo,"test").attr(coordinateTextAttr);
-   // };
-
    function getPixelColor(row,col) {
       var { showMap, maxAltitude } = context;
       var { colorScale, nbRows, nbCol } = infos;
@@ -1498,8 +1638,8 @@ var getContext = function(display, infos, curLevel) {
          var nbShapes = nbClusters + 1;
       }else
       if(contextType == "decisionTree"){
-         var { nbItemsToPredict, pointData, nbClass } = context;
-         var nbPoints = nbItemsToPredict;
+         var { nbItemsToPredict, pointData, nbClass, nbKnownItems, createTree } = context;
+         var nbPoints = (createTree) ? nbKnownItems : nbItemsToPredict;
          var nbShapes = nbClass + 1;
       }
 
@@ -1572,7 +1712,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var yCoo = yX + my;
       coordinateText = paper.text(x,yCoo,"").attr(coordinateTextAttr);
-
+      
       updateZoneLines();
    };
 
@@ -1645,6 +1785,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.getZoneFromPos = function(pos,zones) {
+      // console.log(zones)
       for(var zID in zones){
          var { ranges } = zones[zID];
          var inZone = true;
@@ -1749,6 +1890,23 @@ var getContext = function(display, infos, curLevel) {
       // console.log(col,row)
    };
 
+   function splitZone(id0,ax,thresh,id1,id2) {
+      var { currentTree } = context;
+      var g = currentTree;
+      var info = g.getVertexInfo(id0);
+      info.feat = ax;
+      info.thresh = thresh;
+      for(var ic = 0; ic < 2; ic++){
+         var id = (ic == 0) ? id1 : id2;
+         g.addVertex(id, { label: id, side: ic });
+         var eID = id0+"_"+id;
+         g.addEdge(eID, id0, id);
+      }
+      context.currentZones = getZonesFromGraph(currentTree);
+      // console.log(context.currentZones)
+      updateZoneLines();
+   };
+
    function updateCanvas() {
       if(!context.display)
          return
@@ -1785,8 +1943,8 @@ var getContext = function(display, infos, curLevel) {
       if(contextType != "decisionTree"){
          var { nbPoints } = context;
       }else{
-         var { nbItemsToPredict } = context;
-         var nbPoints = nbItemsToPredict;
+         var { nbItemsToPredict, nbKnownItems, createTree } = context;
+         var nbPoints = (createTree) ? nbKnownItems : nbItemsToPredict;
       }
       for(var iP = 0; iP < nbPoints; iP++){
          updatePoint(iP);
@@ -1882,12 +2040,14 @@ var getContext = function(display, infos, curLevel) {
 
    function updateZoneLines() {
       // console.log("updateZoneLines")
+      if(!context.display)
+         return
       if(zoneLineObj.all){
          zoneLineObj.all.remove();
          zoneLineObj = {};
       }
       var { xRange, yRange, xPointArea, yPointArea, pointAreaW, pointAreaH ,
-      zoneLineAttr, classShapes, classColors, zoneShapeR, zoneClassAttr, 
+      zoneLineAttr, classShapes, classColors, zoneShapeR, zoneClassAttr,  zoneNameAttr,
       thresholdAttr, zoneAttr ,marginX, marginY } = infos;
 
       var x0 = xPointArea*scale;
@@ -1895,8 +2055,9 @@ var getContext = function(display, infos, curLevel) {
       var w = pointAreaW*scale;
       var h = pointAreaH*scale;
 
-      var { zones } = context;
-      var g = context.tree;
+      var { zones, tree, currentTree, currentZones, createTree } = context;
+      var g = (createTree) ? currentTree : tree;
+      zones = (createTree) ? currentZones : zones;
       var vertices = g.getAllVertices();
       var root;
       for(var vert of vertices){
@@ -1915,7 +2076,6 @@ var getContext = function(display, infos, curLevel) {
       function addZoneLine(v,ranges) {
          var info = g.getVertexInfo(v);
          if(info.feat != undefined && info.thresh != undefined){
-
             var { thresh, feat } = info;
             var splitRange = getSplitRanges(thresh,feat,ranges);
             var splitValue = splitRange[0][1];
@@ -1987,12 +2147,20 @@ var getContext = function(display, infos, curLevel) {
                }
             }
             var coo = getCoordinatesFromPos(pos);
-            var cID = zDat.class + 1;
-            var sID = classShapes[cID];
+            if(zDat.class !== undefined){
+               var cID = zDat.class + 1;
+               var sID = classShapes[cID];
+            }
             // console.log(v,cID)
-            var sha = drawShape(sID,coo.x,coo.y,zoneShapeR).attr(zoneClassAttr);
+            if(!createTree){
+               var sha = drawShape(sID,coo.x,coo.y,zoneShapeR).attr(zoneClassAttr);
+            }else{
+               var cir = paper.circle(coo.x,coo.y,2*zoneShapeR).attr(zoneNameAttr.circle);
+               var tex = paper.text(coo.x,coo.y,v).attr(zoneNameAttr.text);
+               var sha = paper.set(cir,tex);
+            }
             
-            var rectCol = colors[classColors[cID]];
+            var rectCol = (zDat.class !== undefined) ? colors[classColors[cID]] : "none";
             var rect = paper.rect(0,0,0,0).attr(rectCoo).attr(zoneAttr)
             .attr("fill",rectCol).toBack();
 
@@ -2180,17 +2348,6 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function getCoordinatesFromPos(pos) {
-      // var { xPointArea, yPointArea, pointAreaW, pointAreaH, xRange, yRange } = infos;
-      // var x0 = xPointArea;
-      // var y0 = yPointArea;
-      // var w = pointAreaW;
-      // var h = pointAreaH;
-      // // console.log(x0,y0,w,h)
-
-      // var x = x0 + w*(pos.x - xRange[0])/(xRange[1] - xRange[0]);
-      // var y = y0 + h*(pos.y - yRange[0])/(yRange[1] - yRange[0]);
-      // x = Math.round(x);
-      // y = Math.round(y);
       x = Math.round(getCoordinateFromPos(pos.x,0));
       y = Math.round(getCoordinateFromPos(pos.y,1));
       return { x, y }
@@ -2253,9 +2410,7 @@ var getContext = function(display, infos, curLevel) {
       var a = (!bar) ? infos.centroidAttr : barycenterAttr;
       var col = colors[infos.classColors[id]];
       paper.setStart();
-      // if(dim == 1){
-      //    var line = paper.path(["M",cx,cy,"V",yPointArea]).attr(a.line);
-      // }
+
       var shape = (!bar) ? infos.classShapes[id] : "cross"; 
       var sha = drawShape(shape,cx,cy,infos.centroidShapeR);
       sha.attr(a.shape);
@@ -2656,20 +2811,40 @@ var endConditions = {
    checkScoreDecisionTree: function(context, lastTurn) {
       // console.log("checkScore",context.display,lastTurn)
       context.success = false;
-      var { zones, nbItemsToPredict, pointData } = context;
+      var { zones, nbItemsToPredict, nbKnownItems, pointData, createTree,
+      currentTree, currentZones } = context;
 
-      for(var ip = 0; ip < nbItemsToPredict; ip++){
-         var pDat = pointData[ip];
-         if(pDat.class === undefined){
-            context.highlightPoint(ip,true);
-            throw(window.languageStrings.messages.errorNoClass);
+      if(!createTree){
+         for(var ip = 0; ip < nbItemsToPredict; ip++){
+            var pDat = pointData[ip];
+            if(pDat.class === undefined){
+               context.highlightPoint(ip,true);
+               throw(window.languageStrings.messages.errorNoClass);
+            }
+            var pos = context.getPosFromCoordinates(pDat);
+            var zID = context.getZoneFromPos(pos,zones.leaves);
+            var zDat = zones.leaves[zID];
+            if(pDat.class - 1 != zDat.class){
+               context.highlightPoint(ip,true);
+               throw(window.languageStrings.messages.errorWrongClass);
+            }
          }
-         var pos = context.getPosFromCoordinates(pDat);
-         var zID = context.getZoneFromPos(pos,zones.leaves);
-         var zDat = zones.leaves[zID]
-         if(pDat.class - 1 != zDat.class){
-            context.highlightPoint(ip,true);
-            throw(window.languageStrings.messages.errorWrongClass);
+      }else{
+         for(var zID in currentZones.leaves){
+            var zDat = currentZones.leaves[zID];
+            if(zDat.class === undefined){
+               throw(window.languageStrings.messages.errorNoClassZone);
+            }
+         }
+         for(var ip = 0; ip < nbKnownItems; ip++){
+            var pDat = pointData[ip];
+            var pos = context.getPosFromCoordinates(pDat);
+            var zID = context.getZoneFromPos(pos,currentZones.leaves);
+            var zDat = currentZones.leaves[zID];
+            if(pDat.class - 1 != zDat.class){
+               context.highlightPoint(ip,true);
+               throw(window.languageStrings.messages.errorWrongClass);
+            }
          }
       }
 
@@ -2686,15 +2861,8 @@ var contextParams = {
          checkEndEveryTurn: false,
          paperW: 770,
          paperH: 600,
-      },
-      "k-means": {
-         xRange: [0,1000],
-         yRange: [0,1000],
-         pointR: 5,
-         centroidR: 15,
-         centroidShapeR: 10,
          classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
-         classShapes: [ "cross", "circle", "square", "diamond", "triangle"],
+         classShapes: [ "cross", "circle", "triangle", "square", "diamond" ],
          pointAttr: {
             stroke: "none",
          },
@@ -2702,6 +2870,17 @@ var contextParams = {
             "stroke-width": 3,
             "stroke-linecap": "round"
          },
+         errorAttr: {
+            stroke: "red",
+            "stroke-width": 3
+         },
+      },
+      "k-means": {
+         xRange: [0,1000],
+         yRange: [0,1000],
+         pointR: 5,
+         centroidR: 15,
+         centroidShapeR: 10,
          centroidAttr: {
             shape: {
                "stroke": "none",
@@ -2750,15 +2929,6 @@ var contextParams = {
          xRange: [0,1000],
          yRange: [0,1000],
          pointR: 5,
-         classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
-         classShapes: [ "cross", "circle", "square", "diamond", "triangle"],
-         pointAttr: {
-            stroke: "none",
-         },
-         crossAttr: {
-            "stroke-width": 3,
-            "stroke-linecap": "round"
-         },
          backAttr: {
             "stroke": "none",
             fill: colors.grey
@@ -2766,10 +2936,6 @@ var contextParams = {
          pointHighlightAttr: {
             stroke: colors.black,
             "stroke-width": 2
-         },
-         errorAttr: {
-            stroke: "red",
-            "stroke-width": 3
          },
          coordinateHighlightAttr: {
             stroke: colors.black,
@@ -2879,21 +3045,12 @@ var contextParams = {
          graphH: 500,
          xRange: [0,100],
          yRange: [0,100],
-         classColors: [ "black", "blue", "yellow", "green", "purple", "pink" ],
-         classShapes: ["cross","circle","triangle","square"],
          zoneShapeR: 10,
          pointR: 6,
          axisLabelAttr: {
             "font-size": 20,
             "font-weight": "bold",
             fill: colors.black
-         },
-         pointAttr: {
-            stroke: "none",
-         },
-         crossAttr: {
-            "stroke-width": 3,
-            "stroke-linecap": "round"
          },
          frameAttr: {
             stroke: colors.black,
@@ -2912,6 +3069,20 @@ var contextParams = {
             stroke: colors.black,
             "stroke-width": 1,
             fill: "none"
+         },
+         zoneNameAttr: {
+            circle: {
+               stroke: colors.black,
+               "stroke-width": 2,
+               fill: "none",
+               opacity: 0.3
+            },
+            text: {
+               "font-size": 30,
+               // "font-weight": "bold",
+               fill: colors.black,
+               opacity: 0.3
+            }
          },
          thresholdAttr: {
             "font-size": 16,
@@ -2932,10 +3103,6 @@ var contextParams = {
             "font-weight": "bold",
             fill: colors.black,
             "text-anchor": "start"
-         },
-         errorAttr: {
-            stroke: "red",
-            "stroke-width": 3
          },
          checkEndCondition: endConditions.checkScoreDecisionTree
       }
