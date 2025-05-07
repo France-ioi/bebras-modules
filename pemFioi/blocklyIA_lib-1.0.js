@@ -447,7 +447,7 @@ var getContext = function(display, infos, curLevel) {
          if(type == "decisionTree"){
             cla--;
          }
-         this.removeHighlight();
+         // this.removeHighlight();
          this.callCallback(callback, cla);
       }
    });
@@ -799,6 +799,7 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.invalidCoordinate(1));
          }
          this.removeHighlight();
+         displayCoordinate(false);
 
          splitZone(idParent,1,y,idTop,idBottom);
 
@@ -838,6 +839,7 @@ var getContext = function(display, infos, curLevel) {
             throw(window.languageStrings.messages.invalidCoordinate(0));
          }
          this.removeHighlight();
+         displayCoordinate(false);
          
          splitZone(idParent,0,x,idLeft,idRight);
          
@@ -867,6 +869,7 @@ var getContext = function(display, infos, curLevel) {
          info.class = idClass;
          currentZones.leaves[idZone].class = idClass;
          this.removeHighlight();
+         displayCoordinate(false);
          
          updateZoneLines();
 
