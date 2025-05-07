@@ -778,6 +778,9 @@ var getContext = function(display, infos, curLevel) {
          var { currentTree, currentZones } = context;
          var { yRange } = infos;
 
+         idParent = String(idParent);
+         idTop = String(idTop);
+         idBottom = String(idBottom);
          var vertices = currentTree.getAllVertices();
          if(!vertices.includes(idParent)){
             throw(window.languageStrings.messages.invalidId(idParent));
@@ -814,6 +817,9 @@ var getContext = function(display, infos, curLevel) {
          var { currentTree, currentZones } = context;
          var { yRange } = infos;
 
+         idParent = String(idParent);
+         idLeft = String(idLeft);
+         idRight = String(idRight);
          var vertices = currentTree.getAllVertices();
          if(!vertices.includes(idParent)){
             throw(window.languageStrings.messages.invalidId(idParent));
@@ -850,6 +856,7 @@ var getContext = function(display, infos, curLevel) {
          var { currentTree, currentZones, nbClass } = context;
          var { yRange } = infos;
 
+         idZone = String(idZone);
          if(!currentZones.leaves.hasOwnProperty(idZone)){
             throw(window.languageStrings.messages.invalidId(idZone));
          }
