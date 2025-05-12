@@ -2143,8 +2143,8 @@ window.displayHelper = {
                fullMessage += this.strings.tryNextTask;
             } else if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
                actionNext = nextLevel;
-               if(gradedLevel == "easy") { fullMessage += this.strings.tryMediumLevel; }
-               if(gradedLevel == "medium") { fullMessage += this.strings.tryHardLevel; }
+               if(nextLevel == "medium") { fullMessage += this.strings.tryMediumLevel; }
+               if(nextLevel == "hard") { fullMessage += this.strings.tryHardLevel; }
             } else {
                actionNext = "nextTask";
                fullMessage += this.strings.tryNextTask;
