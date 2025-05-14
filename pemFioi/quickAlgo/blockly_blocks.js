@@ -565,21 +565,21 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       createBlock: function(block) {
-         if (typeof block.blocklyInit == "undefined") {
+         if (typeof block.fullBlock != "undefined") {
+            Blockly.Blocks[block.name] = block.fullBlock;
+         } else if (typeof block.blocklyInit == "undefined") {
             var blocklyjson = block.blocklyJson;
             Blockly.Blocks[block.name] = {
                init: function() {
                   this.jsonInit(blocklyjson);
                }
             };
-         }
-         else if (typeof block.blocklyInit == "function") {
+         } else if (typeof block.blocklyInit == "function") {
             Blockly.Blocks[block.name] = {
                init: block.blocklyInit()
             };
-         }
-         else {
-            console.err(block.name + ".blocklyInit is defined but not a function");
+         } else {
+            console.error(block.name + ".blocklyInit is defined but not a function");
          }
       },
 
