@@ -1,14 +1,4 @@
 $(document).ready(function() {
-  if (window.taskSettings && !window.taskData) {
-    // Convert taskSettings into taskData
-    window.taskData = subTask = taskSettings;
-    window.initBlocklySubTask = function () {
-    };
-    window.taskData.waitInit = function () {
-      window.taskSettings.initTask(window.taskData);
-      delete window.taskSettings.initTask;
-    };
-  }
   if (window.taskData) {
     if (window.taskData.waitInit) {
       window.taskData.waitInit();
@@ -39,13 +29,6 @@ $(document).ready(function() {
     }
     if (!additionalOptions.language && window.stringsLanguage) {
       additionalOptions.language = window.stringsLanguage;
-    }
-
-    // Merge metadata into task data
-    if (window.PEMTaskMetaData && window.taskData) {
-      if (window.PEMTaskMetaData.supportedLanguages) {
-        window.taskData.supportedLanguages = window.PEMTaskMetaData.supportedLanguages.join(',');
-      }
     }
 
     var codecastParameters = $.extend(true, {
