@@ -361,8 +361,11 @@ Quiz.sidecontent = {
         $('#task').appendTo('#sidecontent-container');
         $('#sidecontent-iframe').attr('src', params.sideurl);
 
-        this.updateHalves();
-        this.updateSeparator();
+        var that = this;
+        setTimeout(function () {
+            that.updateHalves();
+            that.updateSeparator();
+        }, 10);
     },
 
     updateHalves: function () {
