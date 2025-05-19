@@ -1,6 +1,6 @@
 $(document).ready(function() {
-  if (window.taskData) {
-    if (window.taskData.waitInit) {
+  if (window.taskData || window.taskSettings) {
+    if (window.taskData && window.taskData.waitInit) {
       window.taskData.waitInit();
     }
 
@@ -23,7 +23,7 @@ $(document).ready(function() {
       };
     });
 
-    var additionalOptions = window.taskData.codecastParameters ? window.taskData.codecastParameters : {};
+    var additionalOptions = window.taskData && window.taskData.codecastParameters ? window.taskData.codecastParameters : {};
     if (window.codecastPreload) {
       additionalOptions.preload = true;
     }
