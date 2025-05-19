@@ -350,8 +350,8 @@ Quiz.sidecontent = {
 
         $('body').addClass('sidecontent');
         $(`<div id="sidecontent-buttons">
-            <div id="sidecontent-left" onclick="Quiz.separator.moveLeft()"><span class="fas fa-chevron-left"></span></div>
-            <div id="sidecontent-right" onclick="Quiz.separator.moveRight()"><span class="fas fa-chevron-right"></span></div>
+            <div id="sidecontent-left" onclick="Quiz.sidecontent.moveLeft()"><span class="fas fa-chevron-left"></span></div>
+            <div id="sidecontent-right" onclick="Quiz.sidecontent.moveRight()"><span class="fas fa-chevron-right"></span></div>
         </div>
         <div id="sidecontent-separator"></div>
         <div id="sidecontent-container">
