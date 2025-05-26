@@ -342,13 +342,18 @@ Quiz.UI = function(params) {
 
 Quiz.sidecontent = {
     current: 1,
+    isSmall: false,
 
     init: function (params) {
         if (!params.sideurl) {
             return;
         }
 
+        var that = this;
+
         $('body').addClass('sidecontent');
+        $(window).on('resize', this.onResize.bind(this));
+
         $(`<div id="sidecontent-buttons">
             <div id="sidecontent-left" onclick="Quiz.sidecontent.moveLeft()"><span class="fas fa-chevron-left"></span></div>
             <div id="sidecontent-right" onclick="Quiz.sidecontent.moveRight()"><span class="fas fa-chevron-right"></span></div>
@@ -361,37 +366,9 @@ Quiz.sidecontent = {
         $('#task').appendTo('#sidecontent-container');
         $('#sidecontent-iframe').attr('src', params.sideurl);
 
-        var that = this;
         setTimeout(function () {
-            that.updateHalves();
-            that.updateSeparator();
+            that.onResize();
         }, 10);
-    },
-
-    updateHalves: function () {
-        var widthAvailable = $('body').width() - 32;
-        $('#sidecontent').show();
-        $('#task').show();
-        if (this.current == 1) {
-            $('#sidecontent').css('width', widthAvailable * this.current / 2);
-            $('#task').css('width', widthAvailable * (2 - this.current) / 2);
-            $('#sidecontent-container').css('justify-content', 'space-between');
-        } else if (this.current == 0) {
-            $('#sidecontent').hide();
-            $('#task').css('width', widthAvailable);
-            $('#sidecontent-container').css('justify-content', 'flex-end');
-        } else if (this.current == 2) {
-            $('#sidecontent').css('width', widthAvailable);
-            $('#task').hide();
-            $('#sidecontent-container').css('justify-content', 'flex-start');
-        }
-    },
-
-    updateSeparator: function () {
-        var widthAvailable = $('body').width() - 32;
-        var separatorPos = (widthAvailable * this.current / 2) + 8;
-        $('#sidecontent-separator').css('left', separatorPos);
-        $('#sidecontent-buttons').css('left', separatorPos - 16);
     },
 
     onResize: function () {
@@ -399,9 +376,46 @@ Quiz.sidecontent = {
         this.updateSeparator();
     },
 
+    updateHalves: function () {
+        var widthAvailable = $('body').width() - 32;
+        $('#sidecontent').show();
+        $('#task').show();
+        if (this.current == 1 && !this.isSmall) {
+            $('#sidecontent').css('width', widthAvailable * this.current / 2);
+            $('#task').css('width', widthAvailable * (2 - this.current) / 2);
+            $('#sidecontent-container').css('justify-content', 'space-between');
+        } else if (this.current == 0) {
+            $('#sidecontent').hide();
+            $('#task').css('width', widthAvailable);
+            $('#sidecontent-container').css('justify-content', 'flex-end');
+        } else {
+            $('#sidecontent').css('width', widthAvailable);
+            $('#task').hide();
+            $('#sidecontent-container').css('justify-content', 'flex-start');
+        }
+    },
+
+    updateSeparator: function () {
+        var current = this.current;
+        if (current == 1 && this.isSmall) { current = 2; }
+        var widthAvailable = $('body').width() - 32;
+        var separatorPos = (widthAvailable * current / 2) + 8;
+        $('#sidecontent-separator').css('left', separatorPos);
+        $('#sidecontent-buttons').css('left', separatorPos - 16);
+    },
+
+    onResize: function () {
+        this.isSmall = $('body').width() < 700;
+        this.updateHalves();
+        this.updateSeparator();
+    },
+
     moveLeft: function () {
         if (this.current > 0) {
             this.current--;
+            if (this.isSmall) {
+                this.current = 0;
+            }
             this.updateHalves();
             this.updateSeparator();
         }
@@ -410,6 +424,9 @@ Quiz.sidecontent = {
     moveRight: function () {
         if (this.current < 2) {
             this.current++;
+            if (this.isSmall) {
+                this.current = 2;
+            }
             this.updateHalves();
             this.updateSeparator();
         }
