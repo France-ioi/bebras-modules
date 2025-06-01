@@ -267,9 +267,13 @@
             var grader = getAnswerGrader(answer_grader_data, score_settings, idx);
             var grader_result = grader(answer[idx]);
             calculator.addAnswer(grader_result.score);
+            grader_result.feedback.score = grader_result.score;
             res.feedback.push(grader_result.feedback);
         });
         res.score = calculator.getScore();
+        if (window.Quiz.grader.feedback) {
+            res.overall_feedback = window.Quiz.grader.feedback(res.score / score_settings.maxScore * 100);
+        }
         //console.log(res)
         return res;
     };

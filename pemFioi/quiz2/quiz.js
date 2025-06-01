@@ -112,6 +112,7 @@ Quiz.questionTypes = {
 
 
 Quiz.UI = function(params) {
+    Quiz.submittingSingle = null;
 
     var questions_order = [];
 
@@ -148,6 +149,9 @@ Quiz.UI = function(params) {
     // init versions
     Quiz.versions.init(params);
 
+    Quiz.sidecontent.init(params);
+
+
 
     // questions types
     function initAnswers(parent) {
@@ -166,6 +170,18 @@ Quiz.UI = function(params) {
         questions[i] = Quiz.questionTypes.create(type, el, i, params);
     });
     questions_order = Quiz.common.shuffleElements(els, params.shuffle_questions);
+    if (params.submit_single) {
+        $('question').each(function (i, el) {
+            el = $(el);
+            el.append('<p style="text-align: center;"><button class="btn btn-success submit-single" type="button">Check this question</button></p>');
+            el.find('.submit-single').click(function () {
+                Quiz.submittingSingle = i;
+                task.getAnswer(function (answer) {
+                    task.gradeAnswer(answer, null, function () { });
+                });
+            });
+        });
+    }
 
 
     // toggle questions numeration
@@ -269,15 +285,34 @@ Quiz.UI = function(params) {
 
         displayFeedback: function(feedback) {
             for(var i=0; i<feedback.length; i++) {
+                if (Quiz.submittingSingle !== null && Quiz.submittingSingle !== i) {
+                    continue;
+                }
                 if(!questions[i].checkAnswered(lang.translate('wrong_answer_msg_not_answered'))) {
                     continue;
                 }
                 questions[i].displayFeedback(feedback[i]);
-            }
-            if(feedback.partial) {
-
+                if (Quiz.submittingSingle !== null) {
+                    var questionEl = $($('question')[i]);
+                    questionEl.find('.error-message, .success-message').remove();
+                    if (feedback[i].score == 1) {
+                        Quiz.common.toggleAlertMessage(questionEl, "Correct answer!", 'success');
+                    } else {
+                        Quiz.common.toggleAlertMessage(questionEl, "Wrong answer.", 'error');
+                    }
+                }
             }
             this.toggleFeedback(true);
+            Quiz.submittingSingle = null;
+        },
+
+        displayOverallFeedback: function (feedback) {
+            if (!feedback) { return; }
+            $('.taskContent').append('<div class="alert-message feedback-message"><i class="fas fa-clipboard-list icon"></i> ' + feedback + '</div>');
+        },
+
+        getSubmittingSingle: function () {
+            return Quiz.submittingSingle;
         },
 
         reset: function(from_scratch) {
@@ -300,5 +335,100 @@ Quiz.UI = function(params) {
             return res;
         }
 
+    }
+}
+
+
+// manage the side content and its separator
+Quiz.sidecontent = {
+    current: 1,
+    isSmall: false,
+
+    init: function (params) {
+        if (!params.sideurl) {
+            return;
+        }
+
+        var that = this;
+
+        $('body').addClass('sidecontent');
+        $(window).on('resize', this.onResize.bind(this));
+
+        $(`<div id="sidecontent-buttons">
+            <div id="sidecontent-left" onclick="Quiz.sidecontent.moveLeft()"><span class="fas fa-chevron-left"></span></div>
+            <div id="sidecontent-right" onclick="Quiz.sidecontent.moveRight()"><span class="fas fa-chevron-right"></span></div>
+        </div>
+        <div id="sidecontent-separator"></div>
+        <div id="sidecontent-container">
+        <div id="sidecontent">
+            <iframe id="sidecontent-iframe" width="100%" height="100%" src="" frameborder="0" scrolling="yes"></iframe>
+        </div></div>`).appendTo('body');
+        $('#task').appendTo('#sidecontent-container');
+        $('#sidecontent-iframe').attr('src', params.sideurl);
+
+        setTimeout(function () {
+            that.onResize();
+        }, 10);
+    },
+
+    onResize: function () {
+        this.updateHalves();
+        this.updateSeparator();
+    },
+
+    updateHalves: function () {
+        var widthAvailable = $('body').width() - 32;
+        $('#sidecontent').show();
+        $('#task').show();
+        if (this.current == 1 && !this.isSmall) {
+            $('#sidecontent').css('width', widthAvailable * this.current / 2);
+            $('#task').css('width', widthAvailable * (2 - this.current) / 2);
+            $('#sidecontent-container').css('justify-content', 'space-between');
+        } else if (this.current == 0) {
+            $('#sidecontent').hide();
+            $('#task').css('width', widthAvailable);
+            $('#sidecontent-container').css('justify-content', 'flex-end');
+        } else {
+            $('#sidecontent').css('width', widthAvailable);
+            $('#task').hide();
+            $('#sidecontent-container').css('justify-content', 'flex-start');
+        }
+    },
+
+    updateSeparator: function () {
+        var current = this.current;
+        if (current == 1 && this.isSmall) { current = 2; }
+        var widthAvailable = $('body').width() - 32;
+        var separatorPos = (widthAvailable * current / 2) + 8;
+        $('#sidecontent-separator').css('left', separatorPos);
+        $('#sidecontent-buttons').css('left', separatorPos - 16);
+    },
+
+    onResize: function () {
+        this.isSmall = $('body').width() < 700;
+        this.updateHalves();
+        this.updateSeparator();
+    },
+
+    moveLeft: function () {
+        if (this.current > 0) {
+            this.current--;
+            if (this.isSmall) {
+                this.current = 0;
+            }
+            this.updateHalves();
+            this.updateSeparator();
+        }
+    },
+
+    moveRight: function () {
+        if (this.current < 2) {
+            this.current++;
+            if (this.isSmall) {
+                this.current = 2;
+            }
+            this.updateHalves();
+            this.updateSeparator();
+        }
     }
 }

@@ -32,7 +32,9 @@
                 'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.',
                 'feedback_score_binary_correct': 'Congratulations, everything is correct.',
                 'feedback_score_binary_mistake': 'There is at least one mistake.',
-                'feedback_answer_saved': 'Your answer has been saved.'
+                'feedback_answer_saved': 'Your answer has been saved.',
+                'prompt_single': 'Select one answer',
+                'prompt_multiple': 'Select 0 to %% answers'
             },
             fr: {
                 'score': 'Score',
@@ -60,7 +62,9 @@
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.',
                 'feedback_score_binary_correct': 'Félicitations, tout est correct.',
                 'feedback_score_binary_mistake': 'Il y a au moins une erreur.',
-                'feedback_answer_saved': 'Votre réponse a été enregistrée.'
+                'feedback_answer_saved': 'Votre réponse a été enregistrée.',
+                'prompt_single': 'Sélectionnez une réponse',
+                'prompt_multiple': 'Sélectionnez de 0 à %% réponses',
             },
         },
 
@@ -125,6 +129,7 @@
             this.setValidated(false);
             this.popup.hide();
             this.unfreezeTask();
+            this.clearFeedback();
             window.quiz_ui.toggleFeedback(false);
             task.showViews({"task": true, "solution": false}, function(){});
             window.quiz_ui.reset(from_scratch);
@@ -170,6 +175,11 @@
         },
 
 
+        clearFeedback: function () {
+            $('.error-message, .success-message, .feedback-message').remove();
+        },
+
+
         setValidated: function(validated) {
             this.validated = !!validated;
             if(validated) {
@@ -207,6 +217,7 @@
             this.addButton(this.holder, 'validate', function () {
                 self.freezeTask();
                 self.setValidated(true);
+                self.clearFeedback();
                 var cb = null;
                 if(Quiz.params.feedback_score == 'saved') {
                     cb = function() {
@@ -390,6 +401,8 @@
         task_token.init()
 
         platform.getTaskParams(null, null, function(taskParams) {
+            taskParams.maxScore = 100;
+            taskParams.minScore = 0;
             var params = Object.assign(quiz_settings, {
                 random: parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100), //0
                 parent: $('#task')
@@ -420,6 +433,7 @@
             task.getAnswerObject = function() {
                 var answerObj = {
                     data: q.getAnswer(),
+                    submittingSingle: q.getSubmittingSingle(),
                     versions: Quiz.versions.get(),
                     validated: task_toolbar.validated
                 }
@@ -474,7 +488,10 @@
                     if(Quiz.params.save_only_mode) {
                         result.score = taskParams.maxScore;
                     }
-                    displayScore(result.score, taskParams.maxScore);
+                    if (answer.submittingSingle === null) {
+                        displayScore(result.score, taskParams.maxScore);
+                        q.displayOverallFeedback(result.overall_feedback);
+                    }
                     //displayMessages(result.messages);
                     callback(result.score, lang.translate('grader_msg') + result.score, null);
                 }
@@ -540,30 +557,4 @@
             callback(res);
         }
     };
-
-
-
-
-// dev code for quiz2 testing, remove it later
-/*
-    $(document).ready(function() {
-
-        var answer = '[[1],[1,2],["test"],["ipsum","amet"]]';
-        task.reloadAnswer(answer, function() {
-            task.gradeAnswer(answer, '', function(res) {
-                //alert(res)
-            })
-        })
-
-        var btn = $('<button class="btn btn-success">test</button>')
-        btn.click(function() {
-            task.getAnswer(function(res) {
-                alert(res)
-            })
-        })
-        $(document.body).prepend(btn);
-    })
-*/
-
-
 })();
