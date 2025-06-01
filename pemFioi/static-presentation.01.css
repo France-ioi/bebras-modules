@@ -29,10 +29,10 @@ body.static-task li {
    font-size: 16px;
    margin: 10px;
 }
-div.return-button {
+div.bottom-button {
    text-align: center;
 }
-.bouton, div.return-button button {
+.bouton, div.bottom-button button {
    background-color: #af2765;
    height: 50px;
    padding-left: 5px;
@@ -44,7 +44,7 @@ div.return-button {
    display: inline-block;
 
 }
-.bouton:hover, div.return-button button:hover {
+.bouton:hover, div.bottom-button button:hover {
    background-color: #aeaeae;
    border: 3px solid #aeaeae;
 }

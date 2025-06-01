@@ -224,17 +224,19 @@ document.addEventListener('DOMContentLoaded', function() {
       btnHtml += '</button>';
       var div = document.createElement('div');
       div.innerHTML = btnHtml;
-      div.classList.add('return-button');
+      div.classList.add('return-button')
+      div.classList.add('bottom-button');
       document.body.appendChild(div);
    }
    if (sto.addNextButton && !document.querySelector('div.next-button')) {
       // Add a next button
       var btnHtml = '<button onclick="platform.validate(\'next\');">';
-      btnHtml += typeof sto.addNextButton == 'string' ? sto.addNextButton : 'Passer';
+      btnHtml += typeof sto.addNextButton == 'string' ? sto.addNextButton : 'Passer à la suite';
       btnHtml += '</button>';
       var div = document.createElement('div');
       div.innerHTML = btnHtml;
       div.classList.add('next-button');
+      div.classList.add('bottom-button');
       document.body.appendChild(div);
    }
    if(sto.checkHideTitle) {
