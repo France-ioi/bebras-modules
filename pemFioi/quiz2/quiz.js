@@ -338,8 +338,8 @@ Quiz.UI = function(params) {
     }
 }
 
-// manage the separator
 
+// manage the side content and its separator
 Quiz.sidecontent = {
     current: 1,
     isSmall: false,
@@ -432,5 +432,3 @@ Quiz.sidecontent = {
         }
     }
 }
-$(function () {
-});

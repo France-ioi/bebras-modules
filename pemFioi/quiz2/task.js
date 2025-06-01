@@ -32,7 +32,9 @@
                 'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.',
                 'feedback_score_binary_correct': 'Congratulations, everything is correct.',
                 'feedback_score_binary_mistake': 'There is at least one mistake.',
-                'feedback_answer_saved': 'Your answer has been saved.'
+                'feedback_answer_saved': 'Your answer has been saved.',
+                'prompt_single': 'Select one answer',
+                'prompt_multiple': 'Select 0 to %% answers'
             },
             fr: {
                 'score': 'Score',
@@ -60,7 +62,9 @@
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.',
                 'feedback_score_binary_correct': 'Félicitations, tout est correct.',
                 'feedback_score_binary_mistake': 'Il y a au moins une erreur.',
-                'feedback_answer_saved': 'Votre réponse a été enregistrée.'
+                'feedback_answer_saved': 'Votre réponse a été enregistrée.',
+                'prompt_single': 'Sélectionnez une réponse',
+                'prompt_multiple': 'Sélectionnez de 0 à %% réponses',
             },
         },
 

@@ -33,6 +33,9 @@
             answer.html(html)
         });
         answers.wrapAll('<div class="answers"></div>');
+        var prompt = $('<p class="prompt"></p>');
+        prompt.html(lang.translate("prompt_" + question.attr("type"), answers.length));
+        prompt.insertBefore(question.find('.answers'));
     }
 
 
