@@ -507,7 +507,7 @@
                 };
 
                 var token = task_token.get()
-                if(token) {
+                if(token && !window.Quiz.grader.data) {
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,

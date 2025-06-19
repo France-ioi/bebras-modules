@@ -364,7 +364,13 @@ Quiz.sidecontent = {
             <iframe id="sidecontent-iframe" width="100%" height="100%" src="" frameborder="0" scrolling="yes"></iframe>
         </div></div>`).appendTo('body');
         $('#task').appendTo('#sidecontent-container');
-        $('#sidecontent-iframe').attr('src', params.sideurl);
+        var sideUrl = params.sideurl;
+        // add a ranhom parameter to the URL to prevent caching
+        if (sideUrl.indexOf('?') === -1) {
+            sideUrl += '?';
+        }
+        sideUrl += 'random=' + (new Date()).getTime();
+        $('#sidecontent-iframe').attr('src', sideUrl);
 
         setTimeout(function () {
             that.onResize();
