@@ -369,7 +369,7 @@ Quiz.sidecontent = {
         if (sideUrl.indexOf('?') === -1) {
             sideUrl += '?';
         }
-        sideUrl += 'random=' + (new Date()).getTime();
+        sideUrl += '&random=' + (new Date()).getTime();
         $('#sidecontent-iframe').attr('src', sideUrl);
 
         setTimeout(function () {
