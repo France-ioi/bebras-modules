@@ -190,6 +190,8 @@
          'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
          'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
 
+         'dual-1.0': {src: modulesPath+"/pemFioi/dual-1.0.js", id: "dual-1.0"},
+
          // Barcode
          'barcode_context': {src: modulesPath+"/pemFioi/barcode/context.js", id: "barcode_context"},
          'barcode_display': {src: modulesPath+"/pemFioi/barcode/display.js", id: "barcode_display"},

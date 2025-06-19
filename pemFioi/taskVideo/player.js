@@ -348,6 +348,7 @@
             var refreshLayout = this.getRefreshLayoutFunc(config);
             $(window).scroll(refreshLayout);
             $(window).resize(refreshLayout);
+            if (window.Dual) { Dual.addResizeFunction(refreshLayout); }
             refreshLayout();
         },
 
