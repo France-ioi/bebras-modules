@@ -372,7 +372,7 @@
 
         getRefreshLayoutFunc: function(config) {
             var elements = this.elements,
-                win = $(window),
+                win = $('#task'),
                 doc = $(window.document),
                 is_wide_mode_old = null;
 
