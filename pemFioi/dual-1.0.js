@@ -5,8 +5,10 @@ window.Dual = {
     resizeFunctions: [],
 
     init: function () {
+        console.log('Dual init');
         var params = this.params;
         if (!params.sideurl) {
+            console.log('No sideurl provided for Dual.');
             return;
         }
 
