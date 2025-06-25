@@ -15,6 +15,7 @@
                 'wrong_answer_msg_partial_feedback': 'You have at least one mistake. Here is a hint:',
                 'wrong_answer_msg_not_answered': 'You didn\'t answer this question',
                 'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
+                'wrong_partial': 'You didn\'t answer this question completely.',
                 'validate': 'Submit',
                 'solution': 'Show answer',
                 'restart': 'Restart',
