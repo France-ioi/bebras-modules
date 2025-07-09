@@ -302,6 +302,10 @@ var miniPlatformValidate = function(task) { return function(mode, success, error
     task.getAnswer(function (answer) {
       task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
         success();
+      }, function (message) {
+        if (error) {
+          error(message);
+        }
       })
     });
   }
