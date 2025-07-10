@@ -137,12 +137,17 @@ var getContext = function(display, infos, curLevel) {
             code: {
                getNbItems: "getNbItems",
                getNbClusters: "getNbClusters",
+               getNbCentroids: "getNbCentroids",
+               getXCentroid: "getXCentroid",
+               getYCentroid: "getYCentroid",
                
                showCentroid: "showCentroid",
                showDistance: "showDistance",
                setCluster: "setCluster"
             },
             description: {
+               getXCentroid: "@(idCentroid)",
+               getYCentroid: "@(idCentroid)",
                showCentroid: "@(idCluster,x,y)",
                showDistance: "@(idItem,idCluster)",
                setCluster: "@(idItem,idCluster)"
@@ -158,7 +163,9 @@ var getContext = function(display, infos, curLevel) {
                   return "La valeur de "+name+" doit être comprise entre "+min+" et "+max
                },
                failureNbCentroids: "Le nombre de centroïdes est incorrect",
+               failureCentroidPos: "Le centroïde n'est pas au barycentre de tous les points",
                failureMissingItem: "Un des points n'a pas de classe",
+               failureWrongClass: "Un des points n'a pas la bonne classe",
                failureScore: "La position des centroïdes n'est pas optimisée",
             }
          },
@@ -353,9 +360,18 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "getNbClusters",
       type: "sensors",
-      block: { name: "getNbItems", yieldsValue: 'int' },
+      block: { name: "getNbClusters", yieldsValue: 'int' },
       func: function(callback) {
          this.callCallback(callback, context.nbClusters);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "getNbCentroids",
+      type: "sensors",
+      block: { name: "getNbCentroids", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, context.k);
       }
    });
 
@@ -401,11 +417,49 @@ var getContext = function(display, infos, curLevel) {
             return
          }
          var y = getPosFromCoordinate(pos.y,1);
-         y= Math.round(y);
+         y = Math.round(y);
          this.highlightPoint(id);
          highlightCoordinate(id,1);
          displayCoordinate(y,1);
          this.callCallback(callback, y);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "getXCentroid",
+      type: "sensors",
+      block: { 
+         name: "getXCentroid", 
+         params: [null],
+         yieldsValue: 'int'
+      },
+      func: function(id, callback) {
+         var { centroidPos } = context;
+         var pos = centroidPos[id];
+         if(!pos) {
+            this.callCallback(callback, false);
+            return
+         }
+         this.callCallback(callback, pos.x);
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "getYCentroid",
+      type: "sensors",
+      block: { 
+         name: "getYCentroid", 
+         params: [null],
+         yieldsValue: 'int'
+      },
+      func: function(id, callback) {
+         var { centroidPos } = context;
+         var pos = centroidPos[id];
+         if(!pos) {
+            this.callCallback(callback, false);
+            return
+         }
+         this.callCallback(callback, pos.y);
       }
    });
 
@@ -1028,10 +1082,16 @@ var getContext = function(display, infos, curLevel) {
       case "k-means":
          if(gridInfos) {
             context.nbPoints = gridInfos.nbPoints;
-            context.nbClusters = gridInfos.nbClusters;
+            context.mode = gridInfos.mode;
+            context.centroidPos = gridInfos.centroidPos;
+            context.nbClusters = gridInfos.nbClusters || gridInfos.centroidPos.length;
          }
-         context.centroidPos  = [];
-         context.k = 0;
+         if(!context.centroidPos){
+            context.centroidPos  = [];
+            context.k = 0;
+         }else{
+            context.k = context.centroidPos.length;
+         }
          context.classPoints = [];
          context.allowInfiniteLoop = true;
          if(!context.pointData){
@@ -1139,6 +1199,7 @@ var getContext = function(display, infos, curLevel) {
          innerState.k = context.k;
          innerState.classPoints = context.classPoints;
          innerState.pointData = context.pointData;
+         innerState.mode = context.mode;
          break;
       case "knn":
          innerState.nbPoints = context.nbPoints;
@@ -1192,6 +1253,7 @@ var getContext = function(display, infos, curLevel) {
          context.k = innerState.k;
          context.classPoints = innerState.classPoints;
          context.pointData = innerState.pointData;
+         context.mode = innerState.mode;
          break;
       case "knn":
          context.nbPoints = innerState.nbPoints;
@@ -2267,14 +2329,14 @@ var getContext = function(display, infos, curLevel) {
    };
 
    function getClosestPoint(id,pool,pointData) {
-      var coo1 = pointData[id];
-      var pos1 = context.getPosFromCoordinates(coo1);
+      var pos1 = pointData[id];
+      // var pos1 = context.getPosFromCoordinates(coo1);
       var minD = Infinity;
       var closest;
       for(var ip = 0; ip < pool.length; ip++){
          var id2 = pool[ip];
-         var coo2 = pointData[id2];
-         var pos2 = context.getPosFromCoordinates(coo2);
+         var pos2 = pointData[id2];
+         // var pos2 = context.getPosFromCoordinates(coo2);
          var d = Beav.Geometry.distance(pos1.x,pos1.y,pos2.x,pos2.y);
          // console.log(d,pos1,pos2)
          if(d < minD){
@@ -2607,6 +2669,8 @@ var getContext = function(display, infos, curLevel) {
    function displayCoordinate(val,ax) {
       if(!context.display)
          return
+      if(!coordinateText)
+         return
       if(val === false){
          coordinateText.attr("text","");
          return
@@ -2697,29 +2761,76 @@ var endConditions = {
       console.log("checkScore",context.display)
       context.removeHighlight();
       context.success = false;
-      var { nbPoints, centroidPos, nbClusters, classPoints } = context;
+      var { nbPoints, centroidPos, nbClusters, classPoints, mode, pointData } = context;
 
       if(nbClusters != centroidPos.length){
          throw(window.languageStrings.messages.failureNbCentroids);
       }
 
-      for(var ip = 0; ip < nbPoints; ip++){
-         if(!classPoints[ip]){
-            throw(window.languageStrings.messages.failureMissingItem);
+      if(mode == 0){
+         var xb = 0; 
+         var yb = 0; 
+         for(var ip = 0; ip < nbPoints; ip++){
+            var pos = pointData[ip];
+            var { x, y } = context.getPosFromCoordinates(pos);
+            xb += x;
+            yb += y;
          }
-      }
+         xb = Math.round(xb/nbPoints);
+         yb = Math.round(yb/nbPoints);
+         var d = Beav.Geometry.distance(xb,yb,centroidPos[0].x,centroidPos[0].y);   
+         if(d > 0){
+            throw(window.languageStrings.messages.failureCentroidPos);
+         }else{
+            context.success = true;
+            throw(window.languageStrings.messages.success);
+         }
 
-      var { score } = context.updateScore();
-      var bestScore  = context.findBestScore();
-      var validMargin = 10;
-      var scoreAlt = score/nbPoints;
-      var bestScoreAlt = bestScore/nbPoints;
-      console.log(scoreAlt,bestScoreAlt);
-      if(Math.abs(scoreAlt - bestScoreAlt) > validMargin){
-         throw(window.languageStrings.messages.failureScore);
-      }else{
+      }else
+      if(mode == 1){
+         for(var ip = 0; ip < nbPoints; ip++){
+            if(!classPoints[ip]){
+               throw(window.languageStrings.messages.failureMissingItem);
+            }
+            var pos = pointData[ip];
+            var { x, y } = context.getPosFromCoordinates(pos);
+            var minD = Infinity;
+            var cla = 0;
+            for(var ic = 0; ic < centroidPos.length; ic++){
+               var cPos = centroidPos[ic];
+               var d = Beav.Geometry.distance(x,y,cPos.x,cPos.y);
+               if(d < minD){
+                  minD = d;
+                  cla = ic + 1;
+               }
+            }
+            if(cla != classPoints[ip]){
+               context.highlightPoint(ip,true);
+               throw(window.languageStrings.messages.failureWrongClass);
+            }
+         }
          context.success = true;
          throw(window.languageStrings.messages.success);
+      }else
+      if(mode == 2){
+         for(var ip = 0; ip < nbPoints; ip++){
+            if(!classPoints[ip]){
+               throw(window.languageStrings.messages.failureMissingItem);
+            }
+         }
+
+         var { score } = context.updateScore();
+         var bestScore  = context.findBestScore();
+         var validMargin = 10;
+         var scoreAlt = score/nbPoints;
+         var bestScoreAlt = bestScore/nbPoints;
+         console.log(scoreAlt,bestScoreAlt);
+         if(Math.abs(scoreAlt - bestScoreAlt) > validMargin){
+            throw(window.languageStrings.messages.failureScore);
+         }else{
+            context.success = true;
+            throw(window.languageStrings.messages.success);
+         }
       }
 
    },
