@@ -809,7 +809,7 @@ var getContext = function(display, infos, curLevel) {
 
    infos.newBlocks.push({
       name: "distance",
-      type: "actions",
+      type: "sensors",
       block: { 
          name: "distance", 
          params: [null,null,null,null],
