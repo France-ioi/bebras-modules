@@ -213,6 +213,7 @@ function getLanguageString(key) {
             for(var key in newData) {
                 this.data[key] = newData[key];
             }
+            this.get(callback);
         }
 
         this.getToken = function(data, callback) {
