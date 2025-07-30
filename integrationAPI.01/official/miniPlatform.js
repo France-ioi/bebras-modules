@@ -151,9 +151,38 @@ function getLanguageString(key) {
     if(typeof window.jwt == 'undefined') {
         window.jwt = {
             isDummy: true,
-            sign: function() { return null; },
-            decode: function(token) { return token; }
-            };
+            sign: function(data) {
+                var header = {alg: "HS256", typ: "JWT"};
+                // Dummy signature because it would require
+                // installing a crypto library to calculate the real one
+                var signature = 'bcM4TMh3PG77_0P7DwqeUAR07XKIvgNce58uJEEP_6A';
+                var claim = Object.assign(data, {"sub": 1234567890});
+
+                return window.jwt.encode64(JSON.stringify(header)) + '.' +
+                    window.jwt.encode64(JSON.stringify(claim)) + '.' +
+                    (signature || '');
+            },
+            decode: function(token) {
+                var parts = token.split('.');
+
+                return {
+                    header: JSON.parse(window.jwt.decode64(parts[0])),
+                    claim: JSON.parse(window.jwt.decode64(parts[1])),
+                    signature: (parts[2] || '')
+                };
+            },
+            encode64: function (value) {
+                var encoded = btoa(unescape(encodeURIComponent(value)));
+
+                return encoded
+                    .replace(/\//, '_')
+                    .replace(/\+/, '-')
+                    .replace(/=+$/, '');
+            },
+            decode64: function (value) {
+                return decodeURIComponent(escape(atob(value)));
+            }
+        };
     }
 
     function TaskToken(data, key) {
@@ -301,7 +330,13 @@ var miniPlatformValidate = function(task) { return function(mode, success, error
     // Try to validate
     task.getAnswer(function (answer) {
       task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
-        success();
+        task_token.update({bAccessSolutions: true}, function(token) {
+          task.updateToken(token, function() {
+            if (success) {
+              success();
+            }
+          });
+        });
       }, function (message) {
         if (error) {
           error(message);
@@ -528,41 +563,40 @@ $(document).ready(function() {
             loadedViews.grader = true;
          }
 
-         task.load(
-             loadedViews,
-             function() {
-                platform.trigger('load', [loadedViews]);
-                task.getViews(function(views, showViews) {
+          task_token.get(function(token) {
+            task.updateToken(token, function () {
+              task.load(
+                loadedViews,
+                function () {
+                  platform.trigger('load', [loadedViews]);
+                  task.getViews(function (views, showViews) {
                     chooseView.init(views, showViews);
 
-                    task.showViews(shownViews, function() {
-                        chooseView.update(shownViews);
-                        platform.trigger('showViews', [shownViews]);
+                    task.showViews(shownViews, function () {
+                      chooseView.update(shownViews);
+                      platform.trigger('showViews', [shownViews]);
                     });
-                });
-                if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
-                }
-
-                // add branded header to platformless task depending on avatarType
-                // defaults to beaver platform branding
-                if(window.displayHelper) {
-                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                  } else {
-                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                  });
+                  if ($("#solution").length) {
+                    $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
                   }
+
+                  // add branded header to platformless task depending on avatarType
+                  // defaults to beaver platform branding
+                  if (window.displayHelper) {
+                    if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                      $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                    } else {
+                      $('body').prepend(miniPlatformWrapping[beaver].header);
+                    }
+                  }
+                },
+                function (error) {
+                  console.error(error)
                 }
-             },
-             function(error) {
-                 console.error(error)
-             }
-        );
-
-
-        task_token.get(function(token) {
-            task.updateToken(token, function() {})
-        })
+              );
+            });
+          });
 
 
          /* For the 'resize' event listener below, we use a cross-browser
