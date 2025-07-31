@@ -23,6 +23,7 @@ var importableModules = function () {
       'simulation-2.0': {src: modulesPath+"/pemFioi/simulation-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-2.0.js"},
       'simulation-3.0': {src: modulesPath+"/pemFioi/simulation-3.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-3.0.js"},
       'raphaelButton-1.0': {src: modulesPath+"/pemFioi/raphaelButton-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-1.0.js"},
+      'raphaelButton-2.0': {src: modulesPath+"/pemFioi/raphaelButton-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-2.0.js"},
       'graph-1.0': {src: modulesPath+"/pemFioi/graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-1.0.js"},
       'visual-graph-1.0': {src: modulesPath+"/pemFioi/visual-graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.0.js"},
       'visual-graph-1.1': {src: modulesPath+"/pemFioi/visual-graph-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.1.js"},
