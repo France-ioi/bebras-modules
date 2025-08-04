@@ -395,7 +395,7 @@ var getContext = function(display, infos, curLevel) {
          x = Math.round(x);
          this.highlightPoint(id);
          highlightCoordinate(id,0);
-         displayCoordinate(x,0);
+         displayCoordinate(x,0,id);
          this.callCallback(callback, x);
       }
    });
@@ -420,7 +420,7 @@ var getContext = function(display, infos, curLevel) {
          y = Math.round(y);
          this.highlightPoint(id);
          highlightCoordinate(id,1);
-         displayCoordinate(y,1);
+         displayCoordinate(y,1,id);
          this.callCallback(callback, y);
       }
    });
@@ -1420,11 +1420,11 @@ var getContext = function(display, infos, curLevel) {
          // console.log(infos.yPointArea,infos.pointAreaH)
          for(var zID in zones.leaves){
             var ranges = zones.leaves[zID].ranges;
-            // console.log(zID,ranges)
             var xMin = getCoordinateFromPos(ranges[0][0],0);
             var xMax = getCoordinateFromPos(ranges[0][1],0);
             var yMin = getCoordinateFromPos(ranges[1][0],1);
             var yMax = getCoordinateFromPos(ranges[1][1],1);
+            // console.log(zID,ranges,xMin,xMax)
             if(!createTree){
                var allPos = getRandomPosNextToSides(xMin,xMax,yMin,yMax);
                pointData = pointData.concat(allPos);                         
@@ -1759,7 +1759,8 @@ var getContext = function(display, infos, curLevel) {
       if(frame)
          frame.remove();
       var { xPointArea, yPointArea, pointAreaW, pointAreaH,
-      frameAttr, axisLabelAttr, coordinateTextAttr, marginY, marginX } = infos;
+      frameAttr, axisLabelAttr, coordinateTextAttr, coordinateTextBackAttr,
+      marginY, marginX } = infos;
       var x = xPointArea*scale;
       var y = yPointArea*scale;
       var w = pointAreaW*scale;
@@ -1783,7 +1784,10 @@ var getContext = function(display, infos, curLevel) {
          coordinateText.remove();
       }
       var yCoo = yX + my;
-      coordinateText = paper.text(x,yCoo,"").attr(coordinateTextAttr);
+      var text = paper.text(x,yCoo,"").attr(coordinateTextAttr);
+      var back = paper.rect(x,yCoo,0,0).attr(coordinateTextBackAttr);
+      text.toFront();
+      coordinateText = paper.set(text,back);
       
       updateZoneLines();
    };
@@ -2107,7 +2111,7 @@ var getContext = function(display, infos, curLevel) {
 
       var alt = context.grid[pos.row][pos.col];
       var str = window.languageStrings.messages.altitude+" : "+alt;
-      coordinateText.attr("text",str);
+      coordinateText[0].attr("text",str);
    };
 
    function updateZoneLines() {
@@ -2650,34 +2654,64 @@ var getContext = function(display, infos, curLevel) {
          distanceObj = null;
       }
       var { pointData } = context;
-      var { coordinateHighlightAttr, xPointArea, yPointArea } = infos;
+      var { coordinateHighlightAttr, xPointArea, yPointArea, pointAreaH } = infos;
       
       var pos = pointData[id];
       var x = pos.x*scale;
       var y = pos.y*scale;
-      if(ax == 0){
+      if(ax == 1){
          var x0 = xPointArea*scale;
          var p = ["M",x0,y,"H",x];
       }else{
-         var y0 = yPointArea*scale;
+         var y0 = (yPointArea + pointAreaH)*scale;
          var p = ["M",x,y0,"V",y];
       }
 
       coordinateHighlight = paper.path(p).attr(coordinateHighlightAttr);
    };
 
-   function displayCoordinate(val,ax) {
+   function displayCoordinate(val,ax,id) {
       if(!context.display)
          return
       if(!coordinateText)
          return
       if(val === false){
-         coordinateText.attr("text","");
+         coordinateText.hide();
          return
       }
+      var { pointData } = context;
+      var { xPointArea, yPointArea, pointAreaH, pointAreaW, marginX, marginY } = infos;
+
       var str = (ax == 0) ? "x" : "y";
       str += " : "+val;
-      coordinateText.attr("text",str);
+      coordinateText.attr("transform","");
+      coordinateText[0].attr("text",str);
+      var bbox = coordinateText[0].getBBox();
+      var padding = 5;
+      var xb = bbox.x - padding;
+      var yb = bbox.y - padding;
+      var wb = bbox.width + 2*padding;
+      var hb = bbox.height + 2*padding;
+      coordinateText[1].attr({
+         x: xb, y: yb, width: wb, height: hb
+      });
+
+      var pos = pointData[id];
+      if(ax == 1){
+         var x = (xPointArea - 2*marginX)*scale;
+         var y = pos.y*scale;
+      }else{
+         var y = (yPointArea + pointAreaH + marginY)*scale;
+         var x = pos.x*scale;
+      }
+      var x0 = coordinateText[0].attr("x");
+      var y0 = coordinateText[0].attr("y");
+      var tx = x - x0;
+      var ty = y - y0;
+      
+      coordinateText.show().attr("transform",["T",tx,ty]);
+      coordinateText[1].toFront();
+      coordinateText[0].toFront();
    };
 
    function showDist(params) {
@@ -3139,6 +3173,10 @@ var contextParams = {
             "font-weight": "bold",
             fill: colors.black
          },
+         coordinateTextBackAttr: {
+            stroke: "none",
+            fill: "white"
+         },
          infoBoxAttr: {
             rect: {
                stroke: colors.blue,
@@ -3223,7 +3261,12 @@ var contextParams = {
             "font-size": 16,
             "font-weight": "bold",
             fill: colors.black,
-            "text-anchor": "start"
+            // "text-anchor": "start"
+         },
+         coordinateTextBackAttr: {
+            stroke: "none",
+            fill: "white",
+            r: 5
          },
          checkEndCondition: endConditions.checkScoreDecisionTree
       }
