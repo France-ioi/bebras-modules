@@ -1472,15 +1472,19 @@ var getContext = function(display, infos, curLevel) {
             var yMax = y2;
             switch(side){
             case 0:
+               yMin += pointR
                yMax = yMin + pointR;
                break;
             case 1:
+               xMax -= pointR;
                xMin = xMax - pointR;
                break;
             case 2:
+               yMax -= pointR;
                yMin = yMax - pointR;
                break;
             case 3:
+               xMin += pointR;
                xMax = xMin + pointR;
                break;
             }
