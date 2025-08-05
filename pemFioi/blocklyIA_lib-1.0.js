@@ -260,7 +260,9 @@ var getContext = function(display, infos, curLevel) {
                errorNoClass: "Le point en rouge n'a pas de classe",
                errorNoClassZone: "Au moins une zone n'a pas de classe",
                errorWrongClass: "Le point en rouge n'a pas la bonne classe",
-               errorTooManyVertices: "Vous avez créé trop de noeuds",
+               errorTooManyVertices: function(nb,max) {
+                  return "Vous avez créé "+nb+" noeuds alors qu'il ne fallait pas en créer plus de "+max
+               },
                idAlreadyExists: function(id) {
                   return "L'identifiant "+id+" existe déjà"
                },
@@ -1152,6 +1154,7 @@ var getContext = function(display, infos, curLevel) {
             context.nbKnownItems = gridInfos.nbKnownItems;
             context.nbClass = gridInfos.nbClass;
             context.createTree = gridInfos.createTree;
+            context.maxNbVertex = gridInfos.maxNbVertex;
             if(!context.pointData){
                context.pointData = initPointData();
             }
@@ -1234,6 +1237,7 @@ var getContext = function(display, infos, curLevel) {
          innerState.nbClass = context.nbClass;
          innerState.createTree = context.createTree;
          innerState.pointData = context.pointData;
+         innerState.maxNbVertex = context.maxNbVertex;
          break;
             
       }
@@ -1288,6 +1292,7 @@ var getContext = function(display, infos, curLevel) {
          context.nbClass = innerState.nbClass;
          context.createTree = innerState.createTree;
          context.pointData = innerState.pointData;
+         context.maxNbVertex = innerState.maxNbVertex;
          break;
       }
    };
@@ -2794,6 +2799,15 @@ var getContext = function(display, infos, curLevel) {
    return context;
 };
 
+// var computeGrade = function (context, message) {
+//    // Return the grade
+//    console.log("computeGrade",context.successRate)
+//    return {
+//       successRate: context.successRate,
+//       message: message
+//    };
+// };
+
 
 var endConditions = {
    checkScoreKMeans: function(context, lastTurn) {
@@ -2972,7 +2986,7 @@ var endConditions = {
       // console.log("checkScore",context.display,lastTurn)
       context.success = false;
       var { zones, nbItemsToPredict, nbKnownItems, pointData, createTree,
-      currentTree, currentZones, tree } = context;
+      currentTree, currentZones, tree, maxNbVertex } = context;
 
       if(!createTree){
          for(var ip = 0; ip < nbItemsToPredict; ip++){
@@ -3011,12 +3025,12 @@ var endConditions = {
          var nbVerTar = tree.getVerticesCount();
          var nbVer = currentTree.getVerticesCount();
          // console.log(nbVerTar,nbVer)
-         if(nbVer >= nbVerTar + 5){
-            throw(window.languageStrings.messages.errorTooManyVertices);
+         if(nbVer > maxNbVertex){
+            throw(window.languageStrings.messages.errorTooManyVertices(nbVer,maxNbVertex));
          }
-         if(nbVer > nbVerTar){
-            context.successRate = 1 - 0.2*(nbVer - nbVerTar); // unsure if this works
-         }
+         // if(nbVer > nbVerTar){
+         //    context.successRate = 1 - 0.2*(nbVer - nbVerTar); // unsure if this works
+         // }
       }
 
       context.success = true;
