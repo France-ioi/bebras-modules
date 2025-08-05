@@ -260,6 +260,7 @@ var getContext = function(display, infos, curLevel) {
                errorNoClass: "Le point en rouge n'a pas de classe",
                errorNoClassZone: "Au moins une zone n'a pas de classe",
                errorWrongClass: "Le point en rouge n'a pas la bonne classe",
+               errorTooManyVertices: "Vous avez créé trop de noeuds",
                idAlreadyExists: function(id) {
                   return "L'identifiant "+id+" existe déjà"
                },
@@ -2971,7 +2972,7 @@ var endConditions = {
       // console.log("checkScore",context.display,lastTurn)
       context.success = false;
       var { zones, nbItemsToPredict, nbKnownItems, pointData, createTree,
-      currentTree, currentZones } = context;
+      currentTree, currentZones, tree } = context;
 
       if(!createTree){
          for(var ip = 0; ip < nbItemsToPredict; ip++){
@@ -2989,6 +2990,7 @@ var endConditions = {
             }
          }
       }else{
+         // console.log(currentTree,tree)
          for(var zID in currentZones.leaves){
             var zDat = currentZones.leaves[zID];
             if(zDat.class === undefined){
@@ -3004,6 +3006,16 @@ var endConditions = {
                context.highlightPoint(ip,true);
                throw(window.languageStrings.messages.errorWrongClass);
             }
+         }
+
+         var nbVerTar = tree.getVerticesCount();
+         var nbVer = currentTree.getVerticesCount();
+         // console.log(nbVerTar,nbVer)
+         if(nbVer >= nbVerTar + 5){
+            throw(window.languageStrings.messages.errorTooManyVertices);
+         }
+         if(nbVer > nbVerTar){
+            context.successRate = 1 - 0.2*(nbVer - nbVerTar); // unsure if this works
          }
       }
 
