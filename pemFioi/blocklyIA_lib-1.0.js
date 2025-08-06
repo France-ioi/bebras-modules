@@ -1192,6 +1192,38 @@ var getContext = function(display, infos, curLevel) {
       
    };
 
+   context.redrawDisplay = function() {
+      // console.log("redrawDisplay",context.tree.vertexInfo)
+      switch(context.type){
+      case "k-means":
+      case "knn":
+         context.pointData = initPointData();
+         for(var iP = context.nbKnownItems; iP < context.nbPoints; iP++){
+            context.pointData[iP].class = 0;
+         }
+         break;
+      case "gradient":
+         // initGrid();
+         break;
+      case "decisionTree":
+         context.pointData = initPointData();
+         for(var iP = 0; iP < context.nbItemsToPredict; iP++){
+            context.pointData[iP].class = 0;
+         }
+         break;
+
+      }
+      if(context.display) {
+         this.delayFactory.destroyAll();
+         this.raphaelFactory.destroyAll();
+         if(paper !== undefined)
+            paper.remove();
+         paper = this.raphaelFactory.create("paperMain", "grid", infos.paperW, infos.paperH);
+         frame = paper.rect(0,0,0,0);
+         context.updateScale();
+      }
+   }
+
    context.getInnerState = function() {
       // console.log("getInnerState")  
       innerState.type = context.type;
