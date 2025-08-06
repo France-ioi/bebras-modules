@@ -1897,7 +1897,8 @@ var getContext = function(display, infos, curLevel) {
       // var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize } = infos;
       // var { nbRows, nbCol } = infos;
       var { xPointArea, yPointArea, pointAreaW, pointAreaH, pixelSize, yZoom,
-         pixelSizeZoom, nbRowsZoom, nbRows, nbCol, marginY, coordinateTextAttr } = infos;
+         pixelSizeZoom, nbRowsZoom, nbRows, nbCol, marginY, coordinateTextAttr,
+         coordinateTextBackAttr } = infos;
       var w = Math.round(pointAreaW*scale);
       var h = Math.round(pointAreaH*scale);
       var x0 = Math.round(xPointArea*scale);
@@ -1935,7 +1936,10 @@ var getContext = function(display, infos, curLevel) {
       var zS = pixelSizeZoom*scale;
       var yCoo = yZoom*scale + nbRowsZoom*zS + 2*my;
       var xCoo = x0 + w/2;
-      coordinateText = paper.text(xCoo,yCoo,"").attr(coordinateTextAttr);
+      var text = paper.text(xCoo,yCoo,"").attr(coordinateTextAttr);
+      var back = paper.rect(xCoo,yCoo,0,0).attr(coordinateTextBackAttr);
+      text.toFront();
+      coordinateText = paper.set(text,back);
    };
 
    /* events */
