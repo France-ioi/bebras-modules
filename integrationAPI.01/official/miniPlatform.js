@@ -175,9 +175,9 @@ function getLanguageString(key) {
                 var encoded = btoa(unescape(encodeURIComponent(value)));
 
                 return encoded
-                    .replace(/\//, '_')
-                    .replace(/\+/, '-')
-                    .replace(/=+$/, '');
+                    .replace(/\//g, '_')
+                    .replace(/\+/g, '-')
+                    .replace(/=+$/g, '');
             },
             decode64: function (value) {
                 return decodeURIComponent(escape(atob(value)));
