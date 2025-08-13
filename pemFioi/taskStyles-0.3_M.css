@@ -300,6 +300,11 @@ h1 .stars {
    margin: 0;
    padding: 13px;
 }
+.consigne p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+}
 [alkindi] .consigne h3 {
    background: #88BB88;
 }
