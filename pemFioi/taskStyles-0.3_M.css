@@ -820,7 +820,8 @@ h1 .stars {
    min-width: 366px;
 }
 .layout_3 #zone_3 > div,
-.layout_4 #zone_3 > div {
+.layout_4 #zone_3 > div,
+.layout_5 #zone_3 > div {
    display: block;
 }
 .layout_3 #zone_3 #showExercice,
@@ -828,6 +829,7 @@ h1 .stars {
    display: none;
 }
 .layout_3 [id^=resp_sw],
+.layout_5 [id^=resp_sw],
 .layout_3 #showSolution {
    background: #eeeeee;
    color: #4a90e2;
@@ -842,7 +844,8 @@ h1 .stars {
 [alkindi].layout_4 #showSolution {
    color: #6d6d6d;
 }
-.layout_3 div.selected {
+.layout_3 div.selected,
+.layout_5 div.selected {
    background: #4a90e2;
    color: white;
 }
@@ -881,6 +884,7 @@ h1 .stars {
 }
 
 .layout_3 [id^=resp_sw],
+.layout_5 [id^=resp_sw],
 .layout_3 #showSolution {
    width: auto;
    font-size: 14px;
@@ -888,11 +892,13 @@ h1 .stars {
    font-weight: bold;
 }
 .layout_3 [id^=resp_sw] i,
+.layout_5 [id^=resp_sw] i,
 .layout_3 #showSolution i {
    margin: 0 10px 0 0;
    transform: none;
 }
 .layout_3 [id^=resp_sw] span,
+.layout_5 [id^=resp_sw] span,
 .layout_3 #showSolution span {
    display: inline;
    position: relative;
@@ -902,6 +908,7 @@ h1 .stars {
 }
 
 .layout_3 .hideButtons [id^=resp_sw],
+.layout_5 .hideButtons [id^=resp_sw],
 .layout_3 .hideButtons #showSolution {
    width: auto;
    font-size: 14px;
@@ -909,11 +916,13 @@ h1 .stars {
    font-weight: bold;
 }
 .layout_3 .hideButtons [id^=resp_sw] i,
+.layout_5 .hideButtons [id^=resp_sw] i,
 .layout_3 .hideButtons #showSolution i {
    margin: 0 10px 0 0;
    transform: none;
 }
 .layout_3 .hideButtons [id^=resp_sw] span,
+.layout_5 .hideButtons [id^=resp_sw] span,
 .layout_3 .hideButtons #showSolution span {
    display: inline;
    position: relative;
@@ -1141,7 +1150,19 @@ h1 .stars {
    margin: 0;
 }
 
-/**************************************************************/
+/***************************************************************/
+/* LAYOUT 5 (full page mission, with instructions in other tab */
+/***************************************************************/
+
+.layout_5 #zone_1, .layout_5 #zone_2 {
+    width: 100%;
+}
+
+/***************************************************************/
+
+#zone_3 {
+    z-index: 10;
+}
 
 #displayHelperAnswering {
 	/*padding: 10px;*/

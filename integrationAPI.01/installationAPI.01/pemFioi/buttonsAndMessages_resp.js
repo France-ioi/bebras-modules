@@ -40,6 +40,7 @@ window.displayHelper = {
    timeoutMinutes: 5,
    avatarType: "beaver",
    bUseFullWidth: false,
+   taskFullPage: false,
    responsive: false,
    mobileMode: false, 
    toggle_task: false,
@@ -1254,9 +1255,9 @@ window.displayHelper = {
             $('#zone_0 h1').after($('#tabsContainer'));
          }
          if(w >= layout1Breakpoint) {
-            this.mobileMode = false;
-            this.layout = 1;
-            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.mobileMode = !!this.taskFullPage;
+            this.layout = this.taskFullPage ? 5 : 1;
+            this.availableH = h - headerH - this.versionHeaderH[0] - this.footerH;
             this.availableW = Math.floor(w*0.7);
             $('#zone_1').height(this.availableH);
             $('#zone_12').css("overflow-x","initial");
@@ -1264,8 +1265,8 @@ window.displayHelper = {
                $('#side_zone').addClass('show');
             }
          }else if(w >= 800){
-            this.mobileMode = false;
-            this.layout = 2;
+            this.mobileMode = !!this.taskFullPage;
+            this.layout = this.taskFullPage ? 5 : 2;
             this.availableW = w;
             $('#zone_1').height('auto');
          }else if(w/h < 1){
@@ -1309,7 +1310,9 @@ window.displayHelper = {
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
          }
 
-         this.updateTaskDimensions();
+         if (!this.taskFullPage) {
+             this.updateTaskDimensions();
+         }
          this.toggleTask();
       }
       setTimeout(function() {
@@ -1572,13 +1575,16 @@ window.displayHelper = {
       }
    },
 
-   useFullWidth: function() {
+   useFullWidth: function(options = {}) {
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
       $('body').css('width', '100%');
+      if (options.taskFullPage) {
+          this.taskFullPage = true;
+      }
       // This try is probably not needed but avoid breaking just in case
       try {
          $(document).ready(function () {
