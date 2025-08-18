@@ -945,8 +945,9 @@ h1 .stars {
    border-radius: 0;
 }
 .layout_3 .hideButtons #displayHelperAnswering,
-.layout_4 .hideButtons #displayHelperAnswering {
-   display: none;
+.layout_4 .hideButtons #displayHelperAnswering,
+.layout_5 .hideButtons #displayHelperAnswering {
+    display: none;
 }
 
 .layout_3 .compact #displayHelper_cancel > div {
