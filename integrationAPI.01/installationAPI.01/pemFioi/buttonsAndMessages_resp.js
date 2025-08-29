@@ -45,8 +45,8 @@ window.displayHelper = {
    mobileMode: false, 
    toggle_task: false,
    headerH: 71,   // in resp mode
-   versionHeaderH: [93,93,85,48],  // in resp mode
-   altVersionHeaderH: [60,60,51,49],  // in resp mode when nbLevels = 1
+   versionHeaderH: [93,93,85,48,93],  // in resp mode
+   altVersionHeaderH: [60,60,51,49,60],  // in resp mode when nbLevels = 1
    footerH: 50,  // in resp mode
    availableH: null, // height for zone_2 in responsive mode
    availableW: null, // width for zone_2 in responsive mode
