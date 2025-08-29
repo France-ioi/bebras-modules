@@ -583,6 +583,7 @@ h1 .stars {
 #zone_012 {
    /*overflow: auto;*/
    width: 100%;
+   height: calc(100% - 50px);
 }
 #task [id^=scroll_arr_] {
    display: none;
@@ -646,13 +647,15 @@ h1 .stars {
 #main_header.layout_1 td,
 #main_header.layout_2 td,
 #main_header.layout_3 td,
-#main_header.layout_4 td {
+#main_header.layout_4 td,
+#main_header.layout_5 td {
    text-align: center;
 }
 .layout_1 h1,
 .layout_2 h1,
 .layout_3 h1,
-.layout_4 h1 {
+.layout_4 h1,
+.layout_5 h1 {
    padding-left: 1em;
 }
 .layout_1 #tabsContainer #tabsMenu .resp_tabs, 
@@ -667,15 +670,18 @@ h1 .stars {
 #task.layout_1,
 #task.layout_2,
 #task.layout_3,
-#task.layout_4 {
+#task.layout_4,
+#task.layout_5 {
    width: 100%;
 }
 [class^=layout_] #taskCont {
    margin: auto;
-} 
+   position: relative;
+   min-height: 100%;
+}
 #zone_12 {
    border: none;
-   margin-bottom: 50px;
+   /*margin-bottom: 50px;*/
 }
 .layout_1 #zone_1 {
    width: 30%;
@@ -770,7 +776,7 @@ h1 .stars {
 }
 .layout_3 h1,
 .layout_4 h1 {
-   font-size: 25px;
+   font-size: 25px !important;
 }
 .layout_3 #tabsMenu .li {
    width: 160px;
@@ -1011,9 +1017,18 @@ h1 .stars {
    bottom: 10px;
 }
 
+.layout_4 #zone_012 {
+   height: 100%;
+}
+
 .layout_4 #zone_12 {
-   margin-right: 50px;
+   /*margin-right: 50px;*/
    margin-bottom: 0;
+   width: calc(100% - 50px);
+}
+
+.layout_4 #zone_2 {
+   width: 100%;
 }
 
 .layout_4 #zone_3 {

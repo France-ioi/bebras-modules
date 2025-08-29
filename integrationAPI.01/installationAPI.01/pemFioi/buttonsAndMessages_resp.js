@@ -1182,8 +1182,8 @@ window.displayHelper = {
       }else{
          $('#resp_switch_2').addClass('selected');
          $('#resp_switch_1').removeClass('selected');
-         $('#zone_2').css("overflow","visible");
-         $('#zone_2').css("height","auto");
+         $('#zone_2').css("overflow-y","auto");
+         $('#zone_2').css("height","100%");
          $('#zone_2').css("min-height",this.availableH+'px');
          $('#zone_1').css("overflow","hidden");
          $('#zone_1').css("height",0);
@@ -1245,12 +1245,13 @@ window.displayHelper = {
          $('#task, #main_header').removeClass();
          $('#task').css("height",(h - headerH)+'px');
          $('#task').css("margin-top",headerH+'px');
-         $('#task').css("overflow", "auto");
+         $('#task').css("overflow", "hidden");
          $('#zone_1').css("overflow","visible");
          $('#zone_2').css("overflow","visible");
          $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
          $('#zone_12').css("overflow-x", "");
          $('#zone_12').css("overflow-y", "");
+         $('#zone_12').css("height", "calc(100% - " + this.versionHeaderH[this.layout - 1] + "px)");
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }
