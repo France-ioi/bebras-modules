@@ -1251,7 +1251,6 @@ window.displayHelper = {
          $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
          $('#zone_12').css("overflow-x", "");
          $('#zone_12').css("overflow-y", "");
-         $('#zone_12').css("height", "calc(100% - " + $('#zone_0').height() + "px)");
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }
@@ -1310,6 +1309,7 @@ window.displayHelper = {
             var zone1H = $('#zone_1').height();
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
          }
+         $('#zone_12').css("height", "calc(100% - " + $('#zone_0').height() + "px)");
 
          if (!this.taskFullPage) {
              this.updateTaskDimensions();
