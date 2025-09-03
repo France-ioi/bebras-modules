@@ -1267,6 +1267,7 @@ window.displayHelper = {
          }else if(w >= 800){
             this.mobileMode = !!this.taskFullPage;
             this.layout = this.taskFullPage ? 5 : 2;
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
             this.availableW = w;
             $('#zone_1').height('auto');
          }else if(w/h < 1){
