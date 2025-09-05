@@ -5,6 +5,7 @@ $(document).ready(function() {
     }
 
     var taskInstructionsHtml = $('#taskIntro').html();
+    var taskSolution = $('#solution').html();
 
     var hints = $('#taskHints > div').toArray().map(elm => {
       return {
@@ -52,6 +53,7 @@ $(document).ready(function() {
       task: window.taskData,
       taskInstructions: taskInstructionsHtml,
       taskHints: hints,
+      taskSolution: taskSolution,
       taskSuccessMessage: $('#taskSuccessMessage').length ? $('#taskSuccessMessage').html() : null,
     }, additionalOptions, window.codecastPreload ? window.codecastPreload : {});
 
