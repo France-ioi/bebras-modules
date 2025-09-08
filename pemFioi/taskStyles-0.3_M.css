@@ -512,6 +512,7 @@ h1 .stars {
    max-width: 100%;
    font-size: 1.2em;
    cursor: pointer;
+   z-index: 10;
 }
 #error i:first-of-type {
    margin-right: 10px;
