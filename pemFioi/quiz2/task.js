@@ -513,8 +513,8 @@
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,
-                        answer_token,
                         new_format ? answer.data : answer,
+                        answer_token,
                         new_format ? answer.versions : Quiz.versions.get(),
                         scoreSettings,
                         onGrade,
