@@ -366,11 +366,12 @@
     }
 
 
-    function useGraderUrl(url, task_token, answer, versions, score_settings, callback, errorcb) {
+    function useGraderUrl(url, task_token, answer, answer_token, versions, score_settings, callback, errorcb) {
         var data = {
             action: 'grade2', //
             task: task_token,
             answer: answer,
+            answer_token: answer_token,
             versions: versions,
             score_settings: score_settings
         }
@@ -512,6 +513,7 @@
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,
+                        answer_token,
                         new_format ? answer.data : answer,
                         new_format ? answer.versions : Quiz.versions.get(),
                         scoreSettings,
