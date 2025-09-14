@@ -393,7 +393,7 @@
                     q.showResult(result);
                     displayScore(result.score, taskParams.maxScore);
                     displayMessages(result.messages);
-                    callback(result.score, lang.translate('grader_msg') + result.score, null);
+                    callback(result.score, lang.translate('grader_msg') + result.score, result.token || null);
                 }
                 function onError(result) {
                     task_toolbar.displayError(lang.translate('error_grading'));
