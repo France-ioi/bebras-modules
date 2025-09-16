@@ -850,16 +850,20 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.getDistanceFromVertex = function(id, xPos, yPos) {
-      // console.log("getDistanceFromVertex",id,xPos,yPos)
       var vertexPos = this.getVertexPosition(id);
       var tableMode = this.visualGraph.getVertexVisualInfo(id).tableMode;
-
+      // console.log("getDistanceFromVertex",id,xPos,yPos,vertexPos,tableMode)
+      // this.paper.circle(xPos,yPos,10)
+      // this.paper.circle(vertexPos.x,vertexPos.y,10)
       if (window.displayHelper) {
          var scale = window.displayHelper.scaleFactor || 1;
       }else{
          var scale = 1;
       }
-      var distanceFromCenter = Beav.Geometry.distance(vertexPos.x*scale,vertexPos.y*scale,xPos,yPos);
+      // console.log(scale,displayHelper.scaleFactor)
+      // var distanceFromCenter = Beav.Geometry.distance(vertexPos.x*scale,vertexPos.y*scale,xPos,yPos);
+      var distanceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,xPos,yPos);
+      // console.log(id,distanceFromCenter,distanceFromCenterAlt)
       if(!tableMode){
          if(distanceFromCenter <= this.circleAttr.r) {
             return 0;
@@ -882,11 +886,12 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.getDistanceFromEdge = function(id, xPos, yPos) {
-      if (window.displayHelper) {
-         var scale = window.displayHelper.scaleFactor || 1;
-      }else{
-         var scale = 1;
-      }
+      // if (window.displayHelper) {
+      //    var scale = window.displayHelper.scaleFactor || 1;
+      // }else{
+      //    var scale = 1;
+      // }
+      scale = 1;
       // console.log(scale)
       var vInfo = this.visualGraph.getEdgeVisualInfo(id);
       if(vInfo["radius-ratio"]){    // if curved edge
