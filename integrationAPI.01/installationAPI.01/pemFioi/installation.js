@@ -251,7 +251,7 @@ function fillImages(text, images, res) {
    var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4", "zip", "mp3", "pdf", "csv", "py"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
-      var regexp = new RegExp("[\'\"]([^;\"\']*." + ext + ")[\'\"]", "g");
+      var regexp = new RegExp("[\'\"]([^;\"\']*\\." + ext + ")[\'\"]", "g");
       while (true) {
          var match = regexp.exec(text);
          if (!match) {
