@@ -50,7 +50,9 @@ var getContext = function(display, infos, curLevel) {
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
 
    var robotImagesPrefix = imgPrefix;
-   if ('modulesPath' in window && infos) {
+   if (infos && undefined !== infos.robotImagesPrefix) {
+      robotImagesPrefix = infos.robotImagesPrefix;
+   } else if ('modulesPath' in window && infos) {
       robotImagesPrefix = window.modulesPath.replace(/\/$/, '') + '/pemFioi/robot/images/' + infos.contextType + '/';
    }
 
