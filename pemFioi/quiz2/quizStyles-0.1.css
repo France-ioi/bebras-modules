@@ -4,15 +4,20 @@
 *
 */
 
+body {
+  margin: 0;
+}
+
 #task {
   position: relative;
-  overflow-x: hidden;
   font-family: 'Titillium Web', Arial, Helvetica, sans-serif;
   color: #333;
   padding-top: 2em;
   counter-reset: questions-counter;
   max-width: 1200px;
   margin: auto;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #task * {
@@ -44,9 +49,9 @@ question {
   display: block;
 }
 
-question>* {
-  padding: 0 60px;
-}
+/*question>* {*/
+/*  padding: 0 60px;*/
+/*}*/
 
 /* Old alternating colors
 question:nth-child(odd) {
@@ -61,7 +66,7 @@ question .error-message, .quiz-toolbar .error-message {
   padding: 7px 8px 7px 40px;
   position: relative;
   /*font-size: 14px;*/
-  margin: 10px 60px;
+  margin: 10px;
 }
 
 question .error-message .icon,
@@ -83,7 +88,7 @@ question .success-message, .quiz-toolbar .success-message {
   padding: 7px 8px 7px 40px;
   position: relative;
   /*font-size: 14px;*/
-  margin: 10px 60px;
+  margin: 10px;
 }
 
 question .success-message .icon,
@@ -103,7 +108,7 @@ question .success-message .icon,
   border-radius: 50px;
   padding: 7px 8px 7px 40px;
   position: relative;
-  margin: 10px 60px;
+  margin: 10px;
   font-weight: bold;
 }
 
@@ -127,9 +132,8 @@ question::after {
   content: '';
   position: relative;
   display: block;
-  width: 90vw;
+  width: 100%;
   height: 1px;
-  left: 5vw;
   background-color: #4a90e2;
   margin: 24px 0px;
   clear: both;
@@ -675,7 +679,7 @@ button,
 }
 
 .quiz-popup-inner .content .btn {
-  margin: 0 10px;
+  margin: 5px 10px;
 }
 
 
@@ -704,10 +708,23 @@ button,
 }
 
 .fill-gaps-toolbar {
-  margin: 0px 60px;
+  /*margin: 0px 60px;*/
   padding: 12px;
   background-color: #AAA;
   border-radius: 5px;
+  position: sticky;
+  top: 10px;
+  z-index: 1;
+}
+.fill-gaps-toolbar:before {
+  content: '';
+  background: white;
+  height: 10px;
+  display: block;
+  top: -10px;
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 
 .fill-gaps-toolbar .word {
@@ -728,12 +745,9 @@ button,
 }
 
 .fill-gaps-text .word {
-  border: 1px solid #4a90e2;
-  border-radius: 5px;
-  background-color: white;
   text-align: center;
   cursor: move;
-  padding: 4px 20px;
+  padding: 0px 20px;
 }
 
 .fill-gaps-text .placeholder {
@@ -741,27 +755,35 @@ button,
   border-radius: 5px;
   background: #AAA;
   min-width: 60px;
-  padding: 5px 0px;
+  padding: 4px 0px;
+  margin: 2px 0;
   color: #4a90e2;
   font-weight: bold;
-}
-
-.fill-gaps-text .placeholder-hover {
-  border: 1px solid #4a90e2;
-  background: #FFF;
-  padding: 4px 0px;
 }
 
 .fill-gaps-text .placeholder:empty:before {
   content: "\00a0";
 }
 
+.fill-gaps-text .placeholder:not(:empty) {
+  border: 1px solid #4a90e2;
+  background: white;
+}
+
+.fill-gaps-text .placeholder:empty {
+  border: 1px solid transparent;
+}
+
+.fill-gaps-text .placeholder-hover {
+  background: white;
+  border: 1px solid #4a90e2 !important;
+}
 
 .fill-gaps-text .correct span {
   color: #00aa1f;
-  ;
+;
   border-color: #00aa1f;
-  ;
+;
 }
 
 .fill-gaps-text .mistake span {
