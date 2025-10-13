@@ -182,6 +182,17 @@
          'quiz2_questions_sort_items': {src: modulesPath+"/pemFioi/quiz2/questions/sort_items.js", id: "quiz_questions_sort_items"},
          'sortable': {src: modulesPath+"/ext/Sortable-master/Sortable.js", id: "sortable"},
 
+         // Quiz task v3
+         'quiz3_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz3/quizStyles-0.1.css", id: "quiz_styles"},
+         'quiz3': {src: modulesPath+"/pemFioi/quiz3/quiz.js", id: "quiz"},
+         'quiz3_task': {src: modulesPath+"/pemFioi/quiz3/task.js", id: "quiz_task"},
+         'quiz3_grader': {src: modulesPath+"/pemFioi/quiz3/grader.js", id: "quiz_grader"},
+         'quiz3_questions_choice': {src: modulesPath+"/pemFioi/quiz3/questions/choice.js", id: "quiz_questions_choice"},
+         'quiz3_questions_fill_gaps': {src: modulesPath+"/pemFioi/quiz3/questions/fill_gaps.js", id: "quiz_questions_fill_gaps"},
+         'quiz3_questions_input': {src: modulesPath+"/pemFioi/quiz3/questions/input.js", id: "quiz_questions_input"},
+         'quiz3_questions_sort_list': {src: modulesPath+"/pemFioi/quiz3/questions/sort_list.js", id: "quiz_questions_sort_list"},
+         'quiz3_questions_sort_items': {src: modulesPath+"/pemFioi/quiz3/questions/sort_items.js", id: "quiz_questions_sort_items"},
+
          // Video task
          'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
          'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
@@ -247,6 +258,8 @@
          'ai-tasks-tools-css': { type: "stylesheet", src: modulesPath + "/../../modules/pemFioi/ai-tasks-tools/index.css", id: "ai_tasks_tools_css" },
          'traceroute-context': { src: modulesPath + "/pemFioi/network/traceroute/context.js", id: "traceroute-context" },
          'scanip-context': { src: modulesPath + "/pemFioi/network/scanip/context.js", id: "scanip-context" },
+
+         'interactjs': {src: modulesPath+"/ext/interactjs/interact.min.js", id: "interactjs"}
       }
    }
 

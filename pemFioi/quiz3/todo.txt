@@ -1,0 +1,21 @@
++ feedback_score: none / binary / exact
+    Indicates what we display about the score at the very bottom:
+    - none: we display a message "Your answers will be graded later".
+    - binary: if score is 100%, display "Congratulations, everything is correct", otherwise "There is at least one mistake"
+    - exact: we display the exact score
+* feedback_on_wrong_choices: none / first_under_question / first_under_choice / selected_only / all
+    Display in red the feedback sent for some choices by the server (if there is some), under these choices:
+    - first_under_question:  for multiple choice questions and fill in the gaps, the first incorrect answer. Display it not under the choice, but under the whole question
+    - first_under_choice:  same as above, but for multiple choice questions, it's displayed under the incorrect choice
+    - selected_only: for multiple choice questions : each incorrect choice that is selected by the user. For fill in the gaps: each incorrect answer.
+    - all: every incorrect choice
+* feedback_on_correct_choices: none / selected_only / all
+    Display in green, the feedback sent for some choices by the server, if there is some, under these choices:
+    - selected_only: for multiple choice questions: each correct choice that is selected by the user. For fill in the gaps: each correct filled gap.
+    - all: each correct choice or correct filled gap
++ show_solutions: none / correct_only / all
+    Display the solution under each question in these cases:
+    - correct_only: only if the answer was correct
+    - all: under all questions
++ alert_if_no_answer: false / true
+    Display an alert under every question for which the user didn't provide any answer
