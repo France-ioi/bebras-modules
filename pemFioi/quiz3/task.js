@@ -309,7 +309,8 @@
             disablePlatformProgress: true,
             minWidth: 'auto',
             nbHints: 0,
-            usesTokens: true
+            usesTokens: true,
+            autoHeight: true
         };
         if (typeof json !== 'undefined') {
             Object.assign(metadata, json);
