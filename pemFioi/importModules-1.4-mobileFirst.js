@@ -197,7 +197,10 @@
          'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
          'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
          'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
-         
+         'taskVideo2': {src: modulesPath+"/pemFioi/taskVideo2/taskVideo.js", id: "taskVideo2"},
+         'taskVideo2Player': {src: modulesPath+"/pemFioi/taskVideo2/player.js", id: "taskVideoPlayer2"},
+         'taskVideo2_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo2/player.css", id: "taskVideo2_css"},
+
          'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
          'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
 

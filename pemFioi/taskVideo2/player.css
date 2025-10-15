@@ -1,0 +1,118 @@
+.task-video .introduction {
+    margin: 20px 0;
+}
+
+.task-video .task-video-content {
+    overflow: hidden;
+    position: relative;
+    zoom: 1;
+    background: transparent;
+    transition: box-shadow 0.2s ease-in-out, background 0.2s ease-in-out;
+}
+
+.task-video .sections {
+    overflow-y: scroll;
+}
+
+.task-video .sections .section {
+    margin-bottom: 5px;
+}
+
+.task-video .section .title {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.task-video .section .title .duration {
+    float: right;
+}
+
+.task-video .section .title:hover,
+.task-video .sections .active .title {
+    background: #DEF;
+}
+
+.task-video .section .description {
+    padding: 5px;
+    color: #999;
+}
+
+.task-video .section .description.hasImage {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.task-video .section .description.hasImage div.image {
+    width: 200px;
+    height: 100%;
+    margin: 0px 8px;
+    white-space: nowrap;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.task-video .section .description.hasImage div.image img {
+    width: 200px;
+}
+
+.task-video .time-link {
+    color: #36F;
+    cursor: pointer;
+}
+
+.task-video .time-link:hover {
+    text-decoration: underline;
+}
+
+.task-video .sections .viewed .title:after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    border: solid #060;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    margin-left: 10px;
+}
+
+.task-video .conclusion {
+    margin: 20px 0;
+}
+
+
+.task-video-narrow-mode .fixed-content .player,
+.task-video-wide-mode .fixed-content {
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.66);
+    -moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.66);
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.66);
+}
+
+
+.task-video-wide-mode .player {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.task-video-wide-mode .sections {
+    position: absolute;
+    height: 100%;
+    right: 0;
+    top: 0;
+}
+
+.task-video-narrow-mode .player {
+    width: 100%;
+}
+
+.task-video-narrow-mode .sections {
+    width: 100%;
+}
