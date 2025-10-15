@@ -49,13 +49,6 @@ var getContext = function(display, infos, curLevel) {
    var iconSrc = $("img[src$='icon.png']").attr("src");
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
 
-   var robotImagesPrefix = imgPrefix;
-   if (infos && undefined !== infos.robotImagesPrefix) {
-      robotImagesPrefix = infos.robotImagesPrefix;
-   } else if ('modulesPath' in window && infos) {
-      robotImagesPrefix = window.modulesPath.replace(/\/$/, '') + '/pemFioi/robot/images/' + infos.contextType + '/';
-   }
-
    function imgUrlWithPrefix(url) {
       return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
    }
@@ -2433,7 +2426,7 @@ var getContext = function(display, infos, curLevel) {
                         this.leave(window.languageStrings.messages.failureLineBreak);
                      }
 
-                     this.dropObject({type: "paint", color: names[cur_color], img: robotImagesPrefix + names[cur_color] + '.png', imgalt: translations["fr"][cur_color]});
+                     this.dropObject({type: "paint", color: names[cur_color], img: names[cur_color] + '.png', imgalt: translations["fr"][cur_color]});
                      if (robot.col == context.nbCols - 1) {
                         robot.row = (robot.row + 1) % context.nbRows;
                         robot.col = 0;
@@ -2482,7 +2475,7 @@ var getContext = function(display, infos, curLevel) {
          ignoreBag: true,
          blockingFilter: false,
          itemTypes: {
-            green_robot: { img: robotImagesPrefix + "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
+            green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
             marker_red: { num: 2, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "red";} },
             marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "blue";} },
             marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 1, containerFilter: function(item) {return item.color === "yellow";} },
