@@ -200,6 +200,7 @@
          'taskVideo2': {src: modulesPath+"/pemFioi/taskVideo2/taskVideo.js", id: "taskVideo2"},
          'taskVideo2Player': {src: modulesPath+"/pemFioi/taskVideo2/player.js", id: "taskVideoPlayer2"},
          'taskVideo2_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo2/player.css", id: "taskVideo2_css"},
+         'peeertube_api': {src: modulesPath+"/ext/peertube/player.min.js", id: "peertube_api"},
 
          'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
          'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
