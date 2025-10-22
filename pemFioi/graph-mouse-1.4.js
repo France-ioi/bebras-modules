@@ -298,9 +298,11 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
          // $("#" + paperElementID).unbind(jqEvent, this.clickHandler);
          $("#" + paperElementID).off(jqEvent);
       }
+      // console.log("paperMouse",enabled)
    };
 
    this.clickHandler = function(event) {
+      // console.log("clickHandler")
       // var offset = $(self.paper.canvas).offset();
       var offset = $("#"+paperElementID).offset();
       
@@ -672,7 +674,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       // Check if vertex was clicked
       // console.log("fuzzyClick "+id)
       var vertex = self.getFuzzyVertex(xPos, yPos);
-      // console.log(vertex)
+      // console.log("fuzzy vertex",vertex,forVertices)
       if(vertex !== null) {
          if(forVertices) {
             self.callback("vertex", vertex, xPos, yPos, event);
@@ -704,6 +706,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
       // console.log(id+" forBackground:"+forBackground);
       // Background was clicked.
+      // console.log("fuzzy back")
       if(forBackground) {
          self.callback(null, null, xPos, yPos, event);
       }
@@ -716,10 +719,10 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var minDistance = Infinity;
       this.graph.forEachVertex(function(id) {
          var distance = visualGraph.graphDrawer.getDistanceFromVertex(id, xPos, yPos);
+         // console.log("distance",id,distance,vertexThreshold)
          if(distance <= vertexThreshold && distance < minDistance) {
             vertex = id;
             minDistance = distance;
-            // console.log(id);
          }
       });
       return vertex;
@@ -888,7 +891,7 @@ function VertexDragAndConnect(settings) {
       this.fuzzyClicker = new FuzzyClicker(self.id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
    }
-   
+
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -945,7 +948,7 @@ function VertexDragAndConnect(settings) {
       // console.log("onFuzzyClick",elementType,id)
       if(elementType === "edge") {
          if(self.selectionParent !== null) {
-            // console.log("vertexSelect")
+            // console.log("fuzzy vertexSelect")
             self.onVertexSelect(self.selectionParent, false);
          }
          self.selectionParent = null;
@@ -965,7 +968,7 @@ function VertexDragAndConnect(settings) {
    }
 
    this.startHandler = function(x, y, event) { 
-      // console.log("startHandler")
+      // console.log("startDrag")
       if(self.unselectAllEdges){
          self.unselectAllEdges();
       }
@@ -998,6 +1001,7 @@ function VertexDragAndConnect(settings) {
          // self.isDragging = false;
          return;
       }
+      // console.log("endDrag")
       self.clickHandler(self.elementID,event.pageX,event.pageY);  // because drag event interferes with click event on chrome
    };
 
@@ -1794,6 +1798,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
+      // console.log("onVertexSelect",vertexId,selected)
       var attr;
       var info = graph.getVertexInfo(vertexId);
       // console.log(vertexId+" select "+selected);
@@ -1882,6 +1887,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnEdgeSelect = function(edgeID,selected) {
+      // console.log("onEdgeSelect",edgeID,selected)
       var edge = visualGraph.getRaphaelsFromID(edgeID);
       var info = graph.getEdgeInfo(edgeID);
       if(info.edgeType != undefined){
@@ -1945,6 +1951,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultCreateVertex = function(x,y) {
+      // console.log(x,y)
       var vertexGuid = 0;
       while(graph.isVertex("v_" + vertexGuid)) {
          vertexGuid++;
@@ -2050,7 +2057,7 @@ function GraphEditor(settings) {
             }
             for(var iEdge = 0; iEdge < edges.length; iEdge++){
                if(edges[iEdge] !== edgeID){
-                  var isFrom = edgesFrom.includes(edges[iEdge]);
+                  var isFrom = Beav.Array.has(edgesFrom,edges[iEdge]);
                   var vInfo = visualGraph.getEdgeVisualInfo(edges[iEdge]);
                   if(!vInfo["radius-ratio"]){
                      vInfo["radius-ratio"] = 0;
