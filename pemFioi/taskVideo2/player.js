@@ -27,7 +27,7 @@
         format: function(value) {
             var v = parseInt(value, 10),
                 h = Math.floor(v / 3600);
-                m = Math.floor((v - (h * 3600)) / 60),
+            m = Math.floor((v - (h * 3600)) / 60),
                 s = v - (h * 3600) - (m * 60);
 
             function zero(v) {
@@ -63,7 +63,6 @@
 
 
         load: function(callback) {
-            console.log('test', this);
             if(this.loaded) {
                 return callback();
             }
@@ -190,7 +189,7 @@
             }
             var el = $(
                 '<div class="title">' + ('number' in section ? section.number + '. ' : '') + section.title +
-                    '<div class="duration">' + time_string.format(section.start) + '</div>' +
+                '<div class="duration">' + time_string.format(section.start) + '</div>' +
                 '</div>'
             );
             el.click(makeClickCallback(idx));
@@ -213,7 +212,7 @@
 
                 return '<span class="time-link" data-time="' + time + '">' + title + '</span>';
             });
-            if(section.image) { 
+            if(section.image) {
                 // section.image is either an URL to an image, or a #id
                 // identifier for an image tag to fetch the URL from
                 var html = '<div class="description hasImage">';
@@ -527,11 +526,8 @@
 
         var currentTime = null;
         var playbackStatus = null;
-        var seekedTime = null;
 
         function onPlaybackStatusChange(newStatus) {
-            console.log('status change', {playbackStatus, newStatus, seekedTime});
-
             playbackStatus = newStatus;
             if(newStatus === 'ended' && events.onPlaybackEnd) {
                 events.onPlaybackEnd();
@@ -539,16 +535,8 @@
         }
 
         function onPlaybackStatusUpdate(data) {
-            console.log('status update', data);
             currentTime = data['position'];
             playbackStatus = data['playbackState'];
-            console.log('status update', playbackStatus);
-
-            if (seekedTime && playbackStatus && 'unstarted' !== playbackStatus) {
-                player.seek(seekedTime);
-                seekedTime = null;
-            }
-
             if ('playing' === playbackStatus) {
                 sections.track(data['position']);
             }
@@ -572,13 +560,9 @@
         };
 
         player.seekTo = function (time) {
-            if (!playbackStatus || playbackStatus === 'unstarted') {
-                seekedTime = time;
-                // Some buffering is needed before the player can seek to specified time.
+            player.seek(time).then(() => {
                 player.play();
-            } else {
-                player.seek(time);
-            }
+            })
         };
 
         player.playVideo = function () {
