@@ -678,6 +678,8 @@ h1 .stars {
 [class^=layout_] #taskCont {
    margin: auto;
    position: relative;
+}
+.layout_5 #taskCont {
    min-height: 100%;
 }
 #zone_12 {
