@@ -175,9 +175,8 @@ function addTaskParamsCb(cb) {
 function displayLanguageParts(currentLanguage) {
    for (var element of document.querySelectorAll(`[data-lang]`)) {
       if ('none' === element.style.display) {
-         element.style.display = element.previousStyle;
+         element.style.display = '';
       }
-      element.previousStyle = element.style.display ? element.style.display : 'block';
    }
    for (var element of document.querySelectorAll(`[data-lang]:not([data-lang~="${currentLanguage}"]):not([data-lang~="pseudo"])`)) {
       element.style.display = 'none';
