@@ -14,6 +14,13 @@
 
 
 var task = {};
+var languageNames = {
+   python: 'Python',
+   c: 'C',
+   cpp: 'C++',
+   pascal: 'Pascal',
+   java: 'Java'
+};
 
 task.showViews = function (views, success, error) {
    success();
@@ -124,7 +131,7 @@ function staticTaskPreprocess() {
    if(!document.getElementById('task')) {
       document.body.id = 'task';
    }
-};
+}
 
 if (!window.preprocessingFunctions) {
    window.preprocessingFunctions = [];
@@ -162,6 +169,56 @@ function addTaskParamsCb(cb) {
       cb(task.taskParams);
    } else {
       taskParamsCbs.push(cb);
+   }
+}
+
+function displayLanguageParts(currentLanguage) {
+   for (var element of document.querySelectorAll(`[data-lang]`)) {
+      if ('none' === element.style.display) {
+         element.style.display = element.previousStyle;
+      }
+      element.previousStyle = element.style.display ? element.style.display : 'block';
+   }
+   for (var element of document.querySelectorAll(`[data-lang]:not([data-lang~="${currentLanguage}"]):not([data-lang~="pseudo"])`)) {
+      element.style.display = 'none';
+   }
+}
+
+function loadAceEditor(element, lang, source) {
+   var aceEditor = ace.edit(element);
+
+   var modeMatching = {
+      python: 'python',
+      c: 'c_cpp',
+      cpp: 'c_cpp',
+      java: 'java',
+      pascal: 'pascal',
+      jvs: 'plain_text',
+   };
+
+   aceEditor.setOptions({
+      readOnly: true,
+      maxLines: Infinity,
+   });
+   aceEditor.$blockScrolling = Infinity;
+   aceEditor.getSession().setMode("ace/mode/" + modeMatching[lang]);
+   aceEditor.setFontSize(18);
+   aceEditor.setValue(source);
+   aceEditor.renderer.setShowGutter(false);
+   aceEditor.renderer.$cursorLayer.element.style.display = 'none';
+   aceEditor.setShowPrintMargin(false);
+   aceEditor.setHighlightActiveLine(false);
+   aceEditor.selection.clearSelection();
+}
+
+
+function displayCodeSnippets() {
+   var elements = document.querySelectorAll('[data-show-source]');
+   for (var element of elements) {
+      var lang = element.getAttribute('data-lang') || element.getAttribute('data-always-show-lang');
+      var source = element.getAttribute('data-code');
+      element.innerHTML = '<div class="code-block code" style="margin-bottom: 20px;"><div class="code-header">' + languageNames[lang] + '</div><div class="editor"><div class="inside-editor"></div></div></div>';
+      loadAceEditor(element.querySelector('.inside-editor'), lang, source);
    }
 }
 
@@ -245,6 +302,26 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('h1').style.display = 'none';
          }
       });
+   }
+
+   if (document.querySelector('[select-lang-selector]') && sto.supportedLanguages && sto.supportedLanguages.length) {
+      var langSelector = document.querySelector('[select-lang-selector]');
+      var options = [];
+      for (var i = 0; i < sto.supportedLanguages.length; i++) {
+         options.push('<option value="' + sto.supportedLanguages[i] + '">' + languageNames[sto.supportedLanguages[i]] + '</option>');
+      }
+      langSelector.innerHTML = '<select id="language-selector">' + options.join('') + '</select>';
+
+      displayLanguageParts('python');
+
+      document.querySelector('#language-selector').addEventListener('change', function (event) {
+         var newValue = event.target.value;
+         displayLanguageParts(newValue);
+      });
+   }
+
+   if (document.querySelector('[data-show-source]')) {
+      displayCodeSnippets();
    }
 });
 
