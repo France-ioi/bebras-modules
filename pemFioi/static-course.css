@@ -9,6 +9,9 @@ body {
 
 .course {
     max-width: 1200px;
+    padding-top: 10px;
+    padding-bottom: 40px;
+    color: #7c7c7c;
 }
 
 h1 {

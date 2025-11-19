@@ -194,7 +194,12 @@ function loadAceEditor(element, lang, source) {
       java: 'java',
       pascal: 'pascal',
       jvs: 'plain_text',
+      ocaml: 'ocaml',
    };
+
+   if (!(lang in modeMatching)) {
+      return;
+   }
 
    aceEditor.setOptions({
       readOnly: true,
