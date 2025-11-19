@@ -3,6 +3,10 @@ html {
     font-family: "Open Sans", sans-serif;
 }
 
+body {
+    margin: 0;
+}
+
 h1 {
     font-size: 1.5em !important;
     color: #30242b;
@@ -41,10 +45,6 @@ h3 {
     color: #30242b;
     font-weight: normal;
     margin-bottom: 1rem;
-}
-
-.course {
-    padding: 15px;
 }
 
 .morceau_cours,
