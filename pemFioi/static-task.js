@@ -215,6 +215,16 @@ function loadAceEditor(element, lang, source) {
    aceEditor.selection.clearSelection();
 }
 
+function isLocalStorageEnabled() {
+   var test = '__testvariable__';
+   try {
+      localStorage.setItem(test, test);
+      localStorage.removeItem(test);
+      return true;
+   } catch (e) {
+      return false;
+   }
+}
 
 function displayCodeSnippets() {
    var elements = document.querySelectorAll('[data-show-source]');
@@ -316,10 +326,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       langSelector.innerHTML = '<select id="language-selector">' + options.join('') + '</select>';
 
-      displayLanguageParts('python');
+      var currentLanguage = isLocalStorageEnabled() && localStorage.getItem('platform') ? localStorage.getItem('platform') : 'python';
+      displayLanguageParts(currentLanguage);
+      document.querySelector('#language-selector').value = currentLanguage;
 
       document.querySelector('#language-selector').addEventListener('change', function (event) {
          var newValue = event.target.value;
+         if (isLocalStorageEnabled()) {
+            localStorage.setItem('platform', newValue);
+         }
          displayLanguageParts(newValue);
       });
    }
