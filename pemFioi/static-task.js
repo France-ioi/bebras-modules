@@ -181,6 +181,10 @@ function displayLanguageParts(currentLanguage) {
    for (var element of document.querySelectorAll(`[data-lang]:not([data-lang~="${currentLanguage}"]):not([data-lang~="pseudo"])`)) {
       element.style.display = 'none';
    }
+
+   for (var element of document.querySelectorAll(`[current-lang]`)) {
+      element.innerHTML = languageNames[currentLanguage];
+   }
 }
 
 function loadAceEditor(element, lang, source) {
