@@ -3176,7 +3176,7 @@ var boardProgramming = (function (exports) {
       };
   }
 
-  function asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, key, arg) {
+  function asyncGeneratorStep$5(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
           var value = info.value;
@@ -3190,16 +3190,16 @@ var boardProgramming = (function (exports) {
           Promise.resolve(value).then(_next, _throw);
       }
   }
-  function _async_to_generator$4(fn) {
+  function _async_to_generator$5(fn) {
       return function() {
           var self = this, args = arguments;
           return new Promise(function(resolve, reject) {
               var gen = fn.apply(self, args);
               function _next(value) {
-                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "next", value);
+                  asyncGeneratorStep$5(gen, resolve, reject, _next, _throw, "next", value);
               }
               function _throw(err) {
-                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "throw", err);
+                  asyncGeneratorStep$5(gen, resolve, reject, _next, _throw, "throw", err);
               }
               _next(undefined);
           });
@@ -3236,7 +3236,7 @@ var boardProgramming = (function (exports) {
           return _makeRequest.apply(this, arguments);
       }
       function _makeRequest() {
-          _makeRequest = _async_to_generator$4(function*(sensor, fetchParameters, callback) {
+          _makeRequest = _async_to_generator$5(function*(sensor, fetchParameters, callback) {
               const fetchUrl = fetchParameters.url;
               const fetchArguments = _extends$3({
                   method: fetchParameters.method,
@@ -3963,7 +3963,7 @@ def delete(url, **kw):
     return request("DELETE", url, **kw)
 `;
 
-  function asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, key, arg) {
+  function asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
           var value = info.value;
@@ -3977,16 +3977,16 @@ def delete(url, **kw):
           Promise.resolve(value).then(_next, _throw);
       }
   }
-  function _async_to_generator$3(fn) {
+  function _async_to_generator$4(fn) {
       return function() {
           var self = this, args = arguments;
           return new Promise(function(resolve, reject) {
               var gen = fn.apply(self, args);
               function _next(value) {
-                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "next", value);
+                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "next", value);
               }
               function _throw(err) {
-                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "throw", err);
+                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "throw", err);
               }
               _next(undefined);
           });
@@ -3996,7 +3996,7 @@ def delete(url, **kw):
       return _getSerial$1.apply(this, arguments);
   }
   function _getSerial$1() {
-      _getSerial$1 = _async_to_generator$3(function*(filters) {
+      _getSerial$1 = _async_to_generator$4(function*(filters) {
           const allPorts = yield navigator.serial.getPorts();
           const savedBoard = getSessionStorage('galaxia_board');
           let port;
@@ -4021,7 +4021,7 @@ def delete(url, **kw):
       return _serialWrite$1.apply(this, arguments);
   }
   function _serialWrite$1() {
-      _serialWrite$1 = _async_to_generator$3(function*(port, data) {
+      _serialWrite$1 = _async_to_generator$4(function*(port, data) {
           const writer = port.writable.getWriter();
           const encoder = new TextEncoder();
           yield writer.write(encoder.encode(data));
@@ -4077,7 +4077,7 @@ def delete(url, **kw):
       }
       connect(url) {
           var _this = this;
-          return _async_to_generator$3(function*() {
+          return _async_to_generator$4(function*() {
               _this.resetProperties();
               _this.connecting = true;
               try {
@@ -4105,7 +4105,7 @@ def delete(url, **kw):
       }
       serialStartRead(port) {
           var _this = this;
-          return _async_to_generator$3(function*() {
+          return _async_to_generator$4(function*() {
               _this.reader = port.readable.getReader();
               while(true){
                   const { value, done } = yield _this.reader.read();
@@ -4119,7 +4119,7 @@ def delete(url, **kw):
       }
       transferPythonLib() {
           var _this = this;
-          return _async_to_generator$3(function*() {
+          return _async_to_generator$4(function*() {
               yield _this.transferModule('fioilib.py', galaxiaPythonLib);
               yield _this.transferModule('requests.py', galaxiaRequestsModule);
               yield new Promise((resolve)=>_this.executeSerial("f = open(\"main.py\", \"w\")\r\nf.write(" + JSON.stringify(mainLib$1).replace(/\n/g, "\r\n") + ")\r\nf.close()\r\n", resolve));
@@ -4127,7 +4127,7 @@ def delete(url, **kw):
       }
       transferModule(moduleFile, moduleContent) {
           var _this = this;
-          return _async_to_generator$3(function*() {
+          return _async_to_generator$4(function*() {
               const size = 1200; // Max 1kb size
               const numChunks = Math.ceil(moduleContent.length / size);
               yield new Promise((resolve)=>_this.executeSerial(`f = open("${moduleFile}", "w")\r\n`, resolve));
@@ -4168,7 +4168,7 @@ def delete(url, **kw):
           }
           this.releasing = true;
           var _this = this;
-          const endRelease = /*#__PURE__*/ _async_to_generator$3(function*() {
+          const endRelease = /*#__PURE__*/ _async_to_generator$4(function*() {
               if (!_this.releaseTimeout) {
                   return;
               }
@@ -4397,7 +4397,7 @@ elif program_exists:
       return boardCustomBlocks;
   }
 
-  function asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, key, arg) {
+  function asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
           var value = info.value;
@@ -4411,16 +4411,16 @@ elif program_exists:
           Promise.resolve(value).then(_next, _throw);
       }
   }
-  function _async_to_generator$2(fn) {
+  function _async_to_generator$3(fn) {
       return function() {
           var self = this, args = arguments;
           return new Promise(function(resolve, reject) {
               var gen = fn.apply(self, args);
               function _next(value) {
-                  asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, "next", value);
+                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "next", value);
               }
               function _throw(err) {
-                  asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, "throw", err);
+                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "throw", err);
               }
               _next(undefined);
           });
@@ -4435,7 +4435,7 @@ elif program_exists:
           return this.updateState.bind(this);
       }
       fetchGalaxiaCard() {
-          return _async_to_generator$2(function*() {
+          return _async_to_generator$3(function*() {
               // Cache results
               if (!galaxiaSvgInline) {
                   galaxiaSvgInline = decodeURIComponent(img$1.substring(img$1.indexOf(',') + 1));
@@ -4445,7 +4445,7 @@ elif program_exists:
       }
       importGalaxia(selector) {
           var _this = this;
-          return _async_to_generator$2(function*() {
+          return _async_to_generator$3(function*() {
               const svgData = yield _this.fetchGalaxiaCard();
               $(selector).html(svgData).css('user-select', 'none');
               _this.galaxiaSvg = $(selector + ' svg');
@@ -4933,7 +4933,8 @@ elif program_exists:
           dumps: "dumps(content) sérialise un objet en une chaîne formatée en JSON",
           get: "get(url) envoie une requête HTTP GET",
           post: "post(url, data, headers) envoie une requête HTTP POST",
-          sleep_us: "sleep_us(microseconds) met en pause l'exécution pendant une durée en microsecondes"
+          sleep_us: "sleep_us(microseconds) met en pause l'exécution pendant une durée en microsecondes",
+          "image.__constructor": "Image(leds) crée une image qui peut être affichée sur la grille de leds"
       },
       constant: {},
       startingBlockName: "Programme",
@@ -15148,7 +15149,7 @@ def turnBuzzerOff(pin=12):
     setBuzzerState("buzzer1", 0)
 `;
 
-  function asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, key, arg) {
+  function asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
           var value = info.value;
@@ -15162,16 +15163,16 @@ def turnBuzzerOff(pin=12):
           Promise.resolve(value).then(_next, _throw);
       }
   }
-  function _async_to_generator$1(fn) {
+  function _async_to_generator$2(fn) {
       return function() {
           var self = this, args = arguments;
           return new Promise(function(resolve, reject) {
               var gen = fn.apply(self, args);
               function _next(value) {
-                  asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, "next", value);
+                  asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, "next", value);
               }
               function _throw(err) {
-                  asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, "throw", err);
+                  asyncGeneratorStep$2(gen, resolve, reject, _next, _throw, "throw", err);
               }
               _next(undefined);
           });
@@ -15181,7 +15182,7 @@ def turnBuzzerOff(pin=12):
       return _getSerial.apply(this, arguments);
   }
   function _getSerial() {
-      _getSerial = _async_to_generator$1(function*(filters) {
+      _getSerial = _async_to_generator$2(function*(filters) {
           const allPorts = yield navigator.serial.getPorts();
           const savedBoard = getSessionStorage('microbit_board');
           let port;
@@ -15211,7 +15212,7 @@ def turnBuzzerOff(pin=12):
       return _serialWrite.apply(this, arguments);
   }
   function _serialWrite() {
-      _serialWrite = _async_to_generator$1(function*(port, data) {
+      _serialWrite = _async_to_generator$2(function*(port, data) {
           const writer = port.writable.getWriter();
           const encoder = new TextEncoder();
           yield writer.write(encoder.encode(data));
@@ -15267,7 +15268,7 @@ def turnBuzzerOff(pin=12):
       }
       connect(url) {
           var _this = this;
-          return _async_to_generator$1(function*() {
+          return _async_to_generator$2(function*() {
               _this.resetProperties();
               _this.connecting = true;
               try {
@@ -15295,7 +15296,7 @@ def turnBuzzerOff(pin=12):
       }
       serialStartRead(port) {
           var _this = this;
-          return _async_to_generator$1(function*() {
+          return _async_to_generator$2(function*() {
               _this.reader = port.readable.getReader();
               while(true){
                   const { value, done } = yield _this.reader.read();
@@ -15309,7 +15310,7 @@ def turnBuzzerOff(pin=12):
       }
       transferPythonLib() {
           var _this = this;
-          return _async_to_generator$1(function*() {
+          return _async_to_generator$2(function*() {
               console.log('start transfer');
               yield serialWrite(_this.serial, "\x03");
               yield _this.transferModule('fioilib.py', microbitPythonLib);
@@ -15320,7 +15321,7 @@ def turnBuzzerOff(pin=12):
       }
       transferModule(moduleFile, moduleContent) {
           var _this = this;
-          return _async_to_generator$1(function*() {
+          return _async_to_generator$2(function*() {
               const size = 1200; // Max 1kb size
               const numChunks = Math.ceil(moduleContent.length / size);
               yield new Promise((resolve)=>_this.executeSerial(`f = open("${moduleFile}", "w")\r\n`, resolve));
@@ -15361,7 +15362,7 @@ def turnBuzzerOff(pin=12):
           }
           this.releasing = true;
           var _this = this;
-          const endRelease = /*#__PURE__*/ _async_to_generator$1(function*() {
+          const endRelease = /*#__PURE__*/ _async_to_generator$2(function*() {
               if (!_this.releaseTimeout) {
                   return;
               }
@@ -15495,11 +15496,708 @@ elif program_exists:
   """)
   f.close()*/ ;
 
+  const displayAlphabet = {
+      'A': [
+          '09900',
+          '90090',
+          '99990',
+          '90090',
+          '90090'
+      ],
+      'B': [
+          '99900',
+          '90090',
+          '99900',
+          '90090',
+          '99900'
+      ],
+      'C': [
+          '09990',
+          '90000',
+          '90000',
+          '90000',
+          '09990'
+      ],
+      'D': [
+          '99900',
+          '90090',
+          '90090',
+          '90090',
+          '99900'
+      ],
+      'E': [
+          '99990',
+          '90000',
+          '99900',
+          '90000',
+          '99990'
+      ],
+      'F': [
+          '99990',
+          '90000',
+          '99900',
+          '90000',
+          '90000'
+      ],
+      'G': [
+          '09990',
+          '90000',
+          '90099',
+          '90009',
+          '09990'
+      ],
+      'H': [
+          '90090',
+          '90090',
+          '99990',
+          '90090',
+          '90090'
+      ],
+      'I': [
+          '99900',
+          '09000',
+          '09000',
+          '09000',
+          '99900'
+      ],
+      'J': [
+          '99999',
+          '00090',
+          '00090',
+          '90090',
+          '09900'
+      ],
+      'K': [
+          '90090',
+          '90900',
+          '99000',
+          '90900',
+          '90090'
+      ],
+      'L': [
+          '90000',
+          '90000',
+          '90000',
+          '90000',
+          '99990'
+      ],
+      'M': [
+          '90009',
+          '90909',
+          '90009',
+          '90009',
+          '90009'
+      ],
+      'N': [
+          '90009',
+          '99009',
+          '90909',
+          '90099',
+          '90009'
+      ],
+      'O': [
+          '09900',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'P': [
+          '99900',
+          '90090',
+          '99900',
+          '90000',
+          '90000'
+      ],
+      'Q': [
+          '09900',
+          '90090',
+          '90090',
+          '09900',
+          '00990'
+      ],
+      'R': [
+          '99900',
+          '90090',
+          '99900',
+          '90090',
+          '90009'
+      ],
+      'S': [
+          '09990',
+          '90000',
+          '09900',
+          '00090',
+          '99900'
+      ],
+      'T': [
+          '99999',
+          '00900',
+          '00900',
+          '00900',
+          '00900'
+      ],
+      'U': [
+          '90090',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'V': [
+          '90009',
+          '90009',
+          '90009',
+          '09090',
+          '00900'
+      ],
+      'W': [
+          '90009',
+          '90009',
+          '90909',
+          '99099',
+          '90009'
+      ],
+      'X': [
+          '90090',
+          '90090',
+          '09900',
+          '90090',
+          '90090'
+      ],
+      'Y': [
+          '90009',
+          '09090',
+          '00900',
+          '00900',
+          '00900'
+      ],
+      'Z': [
+          '99990',
+          '00900',
+          '09000',
+          '90000',
+          '99990'
+      ],
+      'a': [
+          '00000',
+          '09990',
+          '90090',
+          '90090',
+          '09999'
+      ],
+      'b': [
+          '90000',
+          '90000',
+          '99900',
+          '90090',
+          '99900'
+      ],
+      'c': [
+          '00000',
+          '09990',
+          '90000',
+          '90000',
+          '09990'
+      ],
+      'd': [
+          '00090',
+          '00090',
+          '09990',
+          '90090',
+          '09990'
+      ],
+      'e': [
+          '09900',
+          '90090',
+          '99900',
+          '90000',
+          '09990'
+      ],
+      'f': [
+          '00990',
+          '09000',
+          '99900',
+          '09000',
+          '09000'
+      ],
+      'g': [
+          '09990',
+          '90090',
+          '09990',
+          '00090',
+          '09900'
+      ],
+      'h': [
+          '90000',
+          '90000',
+          '99900',
+          '90090',
+          '90090'
+      ],
+      'i': [
+          '09000',
+          '00000',
+          '09000',
+          '09000',
+          '09000'
+      ],
+      'j': [
+          '00090',
+          '00000',
+          '00090',
+          '00090',
+          '09900'
+      ],
+      'k': [
+          '90000',
+          '90900',
+          '99000',
+          '90900',
+          '90090'
+      ],
+      'l': [
+          '09000',
+          '09000',
+          '09000',
+          '09000',
+          '00990'
+      ],
+      'm': [
+          '00000',
+          '99099',
+          '90909',
+          '90009',
+          '90009'
+      ],
+      'n': [
+          '00000',
+          '99900',
+          '90090',
+          '90090',
+          '90090'
+      ],
+      'o': [
+          '00000',
+          '09900',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'p': [
+          '00000',
+          '99900',
+          '90090',
+          '99900',
+          '90000'
+      ],
+      'q': [
+          '00000',
+          '09990',
+          '90090',
+          '09990',
+          '00090'
+      ],
+      'r': [
+          '00000',
+          '09990',
+          '90000',
+          '90000',
+          '90000'
+      ],
+      's': [
+          '00000',
+          '00990',
+          '09000',
+          '00900',
+          '99000'
+      ],
+      't': [
+          '09000',
+          '09990',
+          '09000',
+          '09000',
+          '00999'
+      ],
+      'u': [
+          '00000',
+          '90090',
+          '90090',
+          '90090',
+          '09999'
+      ],
+      'v': [
+          '00000',
+          '90009',
+          '90009',
+          '09090',
+          '00900'
+      ],
+      'w': [
+          '00000',
+          '90009',
+          '90009',
+          '90909',
+          '99099'
+      ],
+      'x': [
+          '00000',
+          '90090',
+          '09900',
+          '09900',
+          '90090'
+      ],
+      'y': [
+          '00000',
+          '90009',
+          '09090',
+          '00900',
+          '99000'
+      ],
+      'z': [
+          '00000',
+          '99990',
+          '00900',
+          '09000',
+          '99990'
+      ],
+      '0': [
+          '09900',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      '1': [
+          '00900',
+          '09900',
+          '00900',
+          '00900',
+          '09990'
+      ],
+      '2': [
+          '99900',
+          '00090',
+          '09900',
+          '90000',
+          '99990'
+      ],
+      '3': [
+          '99990',
+          '00090',
+          '00900',
+          '90090',
+          '09900'
+      ],
+      '4': [
+          '00090',
+          '00990',
+          '09090',
+          '99999',
+          '00090'
+      ],
+      '5': [
+          '99999',
+          '90000',
+          '99990',
+          '00009',
+          '99990'
+      ],
+      '6': [
+          '00090',
+          '00900',
+          '09990',
+          '90009',
+          '09990'
+      ],
+      '7': [
+          '99999',
+          '00090',
+          '00900',
+          '09000',
+          '90000'
+      ],
+      '8': [
+          '09990',
+          '90009',
+          '09990',
+          '90009',
+          '09990'
+      ],
+      '9': [
+          '09990',
+          '90009',
+          '09990',
+          '00900',
+          '09000'
+      ],
+      '!': [
+          '09000',
+          '09000',
+          '09000',
+          '00000',
+          '09000'
+      ],
+      '"': [
+          '09090',
+          '09090',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '$': [
+          '09990',
+          '99009',
+          '09990',
+          '90099',
+          '09990'
+      ],
+      '%': [
+          '99009',
+          '90090',
+          '00900',
+          '09009',
+          '90099'
+      ],
+      '^': [
+          '00900',
+          '09090',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '&': [
+          '09900',
+          '90090',
+          '09900',
+          '90090',
+          '09909'
+      ],
+      '*': [
+          '00000',
+          '09090',
+          '00900',
+          '09090',
+          '00000'
+      ],
+      '(': [
+          '00900',
+          '09000',
+          '09000',
+          '09000',
+          '00900'
+      ],
+      ')': [
+          '09000',
+          '00900',
+          '00900',
+          '00900',
+          '09000'
+      ],
+      '[': [
+          '09990',
+          '09000',
+          '09000',
+          '09000',
+          '09990'
+      ],
+      ']': [
+          '09990',
+          '00090',
+          '00090',
+          '00090',
+          '09990'
+      ],
+      '{': [
+          '00990',
+          '00900',
+          '09900',
+          '00900',
+          '00990'
+      ],
+      '}': [
+          '99000',
+          '09000',
+          '09900',
+          '09000',
+          '99000'
+      ],
+      '@': [
+          '09990',
+          '90009',
+          '90909',
+          '90099',
+          '09900'
+      ],
+      "'": [
+          '09000',
+          '09000',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '~': [
+          '00000',
+          '00000',
+          '09900',
+          '00099',
+          '00000'
+      ],
+      ':': [
+          '00000',
+          '09000',
+          '00000',
+          '09000',
+          '00000'
+      ],
+      '#': [
+          '09090',
+          '99999',
+          '09090',
+          '99999',
+          '09090'
+      ],
+      '/': [
+          '00009',
+          '00090',
+          '00900',
+          '09000',
+          '90000'
+      ],
+      '\\': [
+          '90000',
+          '09000',
+          '00900',
+          '00090',
+          '00009'
+      ],
+      '?': [
+          '09990',
+          '90009',
+          '00990',
+          '00000',
+          '00900'
+      ],
+      '.': [
+          '00000',
+          '00000',
+          '00000',
+          '09000',
+          '00000'
+      ],
+      ',': [
+          '00000',
+          '00000',
+          '00000',
+          '00900',
+          '09000'
+      ],
+      '<': [
+          '00090',
+          '00900',
+          '09000',
+          '00900',
+          '00090'
+      ],
+      '>': [
+          '09000',
+          '00900',
+          '00090',
+          '00900',
+          '09000'
+      ],
+      ' ': [
+          '00000',
+          '00000',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '-': [
+          '00000',
+          '00000',
+          '09990',
+          '00000',
+          '00000'
+      ],
+      '+': [
+          '00000',
+          '00900',
+          '09990',
+          '00900',
+          '00000'
+      ],
+      '_': [
+          '00000',
+          '00000',
+          '00000',
+          '00000',
+          '99999'
+      ],
+      '=': [
+          '00000',
+          '09990',
+          '00000',
+          '09990',
+          '00000'
+      ]
+  };
+
+  function asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, key, arg) {
+      try {
+          var info = gen[key](arg);
+          var value = info.value;
+      } catch (error) {
+          reject(error);
+          return;
+      }
+      if (info.done) {
+          resolve(value);
+      } else {
+          Promise.resolve(value).then(_next, _throw);
+      }
+  }
+  function _async_to_generator$1(fn) {
+      return function() {
+          var self = this, args = arguments;
+          return new Promise(function(resolve, reject) {
+              var gen = fn.apply(self, args);
+              function _next(value) {
+                  asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, "next", value);
+              }
+              function _throw(err) {
+                  asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, "throw", err);
+              }
+              _next(undefined);
+          });
+      };
+  }
   function convertImageFromString(str) {
       return str.split(':').map((e)=>e.split('').map(Number)).slice(0, 5);
   }
+  const DISPLAY_INTERVAL = 625;
   function displayModuleDefinition(context, strings) {
       const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
+      function displayLedStates(sensor, states, command, callback) {
+          return _displayLedStates.apply(this, arguments);
+      }
+      function _displayLedStates() {
+          _displayLedStates = _async_to_generator$1(function*(sensor, states, command, callback) {
+              const live = !(!context.display || context.autoGrading || context.offLineMode);
+              if (live) {
+                  let cb = context.runner.waitCallback(callback);
+                  context.quickPiConnection.sendCommand(command, cb);
+              }
+              for (let state of states){
+                  context.registerQuickPiEvent(sensor.name, state);
+                  yield new Promise((resolve)=>setTimeout(resolve, DISPLAY_INTERVAL));
+              }
+              if (!live) {
+                  context.waitDelay(callback);
+              }
+          });
+          return _displayLedStates.apply(this, arguments);
+      }
       return {
           classDefinitions: {
               actuator: {
@@ -15545,12 +16243,252 @@ elif program_exists:
                               value: "09090:99999:99999:09990:00900:"
                           },
                           {
+                              name: "HEART_SMALL",
+                              value: "00000:09090:09990:00900:00000:"
+                          },
+                          {
+                              name: "HAPPY",
+                              value: "00000:09090:00000:90009:09990:"
+                          },
+                          {
                               name: "SMILE",
                               value: "00000:00000:00000:90009:09990:"
                           },
                           {
                               name: "SAD",
                               value: "00000:09090:00000:09990:90009:"
+                          },
+                          {
+                              name: "CONFUSED",
+                              value: "00000:09090:00000:09090:90909:"
+                          },
+                          {
+                              name: "ANGRY",
+                              value: "90009:09090:00000:99999:90909:"
+                          },
+                          {
+                              name: "ASLEEP",
+                              value: "00000:99099:00000:09990:00000:"
+                          },
+                          {
+                              name: "SURPRISED",
+                              value: "09090:00000:00900:09090:00900:"
+                          },
+                          {
+                              name: "SILLY",
+                              value: "90009:00000:99999:00909:00999:"
+                          },
+                          {
+                              name: "FABULOUS",
+                              value: "99999:99099:00000:09090:09990:"
+                          },
+                          {
+                              name: "MEH",
+                              value: "09090:00000:00090:00900:09000:"
+                          },
+                          {
+                              name: "YES",
+                              value: "00000:00009:00090:90900:09000:"
+                          },
+                          {
+                              name: "NO",
+                              value: "90009:09090:00900:09090:90009:"
+                          },
+                          {
+                              name: "CLOCK12",
+                              value: "00900:00900:00900:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK1",
+                              value: "00090:00090:00900:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK2",
+                              value: "00000:00099:00900:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK3",
+                              value: "00000:00000:00999:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK4",
+                              value: "00000:00000:00900:00099:00000:"
+                          },
+                          {
+                              name: "CLOCK5",
+                              value: "00000:00000:00900:00090:00090:"
+                          },
+                          {
+                              name: "CLOCK6",
+                              value: "00000:00000:00900:00900:00900:"
+                          },
+                          {
+                              name: "CLOCK7",
+                              value: "00000:00000:00900:09000:09000:"
+                          },
+                          {
+                              name: "CLOCK8",
+                              value: "00000:00000:00900:99000:00000:"
+                          },
+                          {
+                              name: "CLOCK9",
+                              value: "00000:00000:99900:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK10",
+                              value: "00000:99000:00900:00000:00000:"
+                          },
+                          {
+                              name: "CLOCK11",
+                              value: "09000:09000:00900:00000:00000:"
+                          },
+                          {
+                              name: "ARROW_N",
+                              value: "00900:09990:90909:00900:00900:"
+                          },
+                          {
+                              name: "ARROW_NE",
+                              value: "00999:00099:00909:09000:90000:"
+                          },
+                          {
+                              name: "ARROW_E",
+                              value: "00900:00090:99999:00090:00900:"
+                          },
+                          {
+                              name: "ARROW_SE",
+                              value: "90000:09000:00909:00099:00999:"
+                          },
+                          {
+                              name: "ARROW_S",
+                              value: "00900:00900:90909:09990:00900:"
+                          },
+                          {
+                              name: "ARROW_SW",
+                              value: "00009:00090:90900:99000:99900:"
+                          },
+                          {
+                              name: "ARROW_W",
+                              value: "00900:09000:99999:09000:00900:"
+                          },
+                          {
+                              name: "ARROW_NW",
+                              value: "99900:99000:90900:00090:00009:"
+                          },
+                          {
+                              name: "TRIANGLE",
+                              value: "00000:00900:09090:99999:00000:"
+                          },
+                          {
+                              name: "TRIANGLE_LEFT",
+                              value: "90000:99000:90900:90090:99999:"
+                          },
+                          {
+                              name: "CHESSBOARD",
+                              value: "09090:90909:09090:90909:09090:"
+                          },
+                          {
+                              name: "DIAMOND",
+                              value: "00900:09090:90009:09090:00900:"
+                          },
+                          {
+                              name: "DIAMOND_SMALL",
+                              value: "00000:00900:09090:00900:00000:"
+                          },
+                          {
+                              name: "SQUARE",
+                              value: "99999:90009:90009:90009:99999:"
+                          },
+                          {
+                              name: "SQUARE_SMALL",
+                              value: "00000:09990:09090:09990:00000:"
+                          },
+                          {
+                              name: "RABBIT",
+                              value: "90900:90900:99990:99090:99990:"
+                          },
+                          {
+                              name: "COW",
+                              value: "90009:90009:99999:09990:00900:"
+                          },
+                          {
+                              name: "MUSIC_CROTCHET",
+                              value: "00900:00900:00900:99900:99900:"
+                          },
+                          {
+                              name: "MUSIC_QUAVER",
+                              value: "00900:00990:00909:99900:99900:"
+                          },
+                          {
+                              name: "MUSIC_QUAVERS",
+                              value: "09999:09009:09009:99099:99099:"
+                          },
+                          {
+                              name: "PITCHFORK",
+                              value: "90909:90909:99999:00900:00900:"
+                          },
+                          {
+                              name: "XMAS",
+                              value: "00900:09990:00900:09990:99999:"
+                          },
+                          {
+                              name: "PACMAN",
+                              value: "09999:99090:99900:99990:09999:"
+                          },
+                          {
+                              name: "TARGET",
+                              value: "00900:09990:99099:09990:00900:"
+                          },
+                          {
+                              name: "TSHIRT",
+                              value: "99099:99999:09990:09990:09990:"
+                          },
+                          {
+                              name: "ROLLERSKATE",
+                              value: "00099:00099:99999:99999:09090:"
+                          },
+                          {
+                              name: "DUCK",
+                              value: "09900:99900:09999:09990:00000:"
+                          },
+                          {
+                              name: "HOUSE",
+                              value: "00900:09990:99999:09990:09090:"
+                          },
+                          {
+                              name: "TORTOISE",
+                              value: "00000:09990:99999:09090:00000:"
+                          },
+                          {
+                              name: "BUTTERFLY",
+                              value: "99099:99999:00900:99999:99099:"
+                          },
+                          {
+                              name: "STICKFIGURE",
+                              value: "00900:99999:00900:09090:90009:"
+                          },
+                          {
+                              name: "GHOST",
+                              value: "99999:90909:99999:99999:90909:"
+                          },
+                          {
+                              name: "SWORD",
+                              value: "00900:00900:00900:09990:00900:"
+                          },
+                          {
+                              name: "GIRAFFE",
+                              value: "99000:09000:09000:09990:09090:"
+                          },
+                          {
+                              name: "SKULL",
+                              value: "09990:90909:99999:09990:09990:"
+                          },
+                          {
+                              name: "UMBRELLA",
+                              value: "09990:99999:00900:90900:09900:"
+                          },
+                          {
+                              name: "SNAKE",
+                              value: "99000:99099:09090:09990:00000:"
                           }
                       ]
                   }
@@ -15575,24 +16513,29 @@ elif program_exists:
                           throw `There is no LED matrix.`;
                       }
                       let command;
-                      let newState;
+                      let statesToDisplay;
                       if (image.image) {
                           command = `ledMatrixShowImage("${sensor.name}", Image("${image.image}"))`;
-                          newState = convertImageFromString(image.image);
-                      } else if (image.match(/[0-9:]/)) {
+                          statesToDisplay = [
+                              convertImageFromString(image.image)
+                          ];
+                      } else if (String(image).match(/[0-9]{5}:[0-9]{5}:[0-9]{5}:[0-9]{5}:[0-9]{5}:?/)) {
                           command = `ledMatrixShowImage("${sensor.name}", Image("${image}"))`;
-                          newState = convertImageFromString(image);
+                          statesToDisplay = [
+                              convertImageFromString(image)
+                          ];
                       } else {
                           command = `ledMatrixShowImage("${sensor.name}", "${image}")`;
-                          newState = convertImageFromString(image);
+                          statesToDisplay = [];
+                          for (let char of String(image).split('')){
+                              if (char in displayAlphabet) {
+                                  statesToDisplay.push(displayAlphabet[char]);
+                              } else {
+                                  statesToDisplay.push(displayAlphabet['?']);
+                              }
+                          }
                       }
-                      context.registerQuickPiEvent(sensor.name, newState);
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
+                      return displayLedStates(sensor, statesToDisplay, command, callback);
                   },
                   clear: function(self, callback) {
                       const sensor = context.sensorHandler.findSensorByType('ledmatrix');
