@@ -17823,7 +17823,7 @@ elif program_exists:
               context.recreateDisplay = false;
           }
           context.paper.setSize($('#virtualSensors').width() * context.quickPiZoom, $('#virtualSensors').height());
-          if (context.infos.quickPiBoard) {
+          if (context.infos.quickPiBoard && 'microbit' !== context.infos.quickPiBoard) {
               $('#virtualBoard').height($('#virtualSensors').height());
           }
           var area = context.paper.width * context.paper.height;
