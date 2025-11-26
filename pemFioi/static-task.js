@@ -19,7 +19,9 @@ var languageNames = {
    c: 'C',
    cpp: 'C++',
    pascal: 'Pascal',
-   java: 'Java'
+   java: 'Java',
+   ocaml: 'OCaml',
+   jvs: 'JavaScool'
 };
 
 task.showViews = function (views, success, error) {
@@ -196,7 +198,7 @@ function loadAceEditor(element, lang, source) {
       cpp: 'c_cpp',
       java: 'java',
       pascal: 'pascal',
-      jvs: 'plain_text',
+      jvs: 'java',
       ocaml: 'ocaml',
    };
 
@@ -331,6 +333,9 @@ document.addEventListener('DOMContentLoaded', function() {
       langSelector.innerHTML = '<select id="language-selector">' + options.join('') + '</select>';
 
       var currentLanguage = isLocalStorageEnabled() && localStorage.getItem('platform') ? localStorage.getItem('platform') : 'python';
+      if (!sto.supportedLanguages.includes(currentLanguage)) {
+         currentLanguage = sto.supportedLanguages[0];
+      }
       displayLanguageParts(currentLanguage);
       document.querySelector('#language-selector').value = currentLanguage;
 
