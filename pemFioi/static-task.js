@@ -353,6 +353,14 @@ document.addEventListener('DOMContentLoaded', function() {
    if (document.querySelector('[data-show-source]')) {
       displayCodeSnippets();
    }
+
+    if (window.MathJax) {
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+
+        MathJax.Hub.Queue(markdown);
+    }
 });
 
 
