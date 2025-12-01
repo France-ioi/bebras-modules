@@ -21,7 +21,8 @@ var languageNames = {
    pascal: 'Pascal',
    java: 'Java',
    ocaml: 'OCaml',
-   jvs: 'JavaScool'
+   jvs: 'JavaScool',
+   pseudo: 'Pseudo-code'
 };
 
 task.showViews = function (views, success, error) {
@@ -200,6 +201,7 @@ function loadAceEditor(element, lang, source) {
       pascal: 'pascal',
       jvs: 'java',
       ocaml: 'ocaml',
+      pseudo: 'plain_text',
    };
 
    if (!(lang in modeMatching)) {
