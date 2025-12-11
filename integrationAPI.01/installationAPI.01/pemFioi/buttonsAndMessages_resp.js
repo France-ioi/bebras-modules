@@ -945,6 +945,11 @@ window.displayHelper = {
       return true;
    },
 
+   isRtl: function () {
+      // needs to be checked each time as direction is generally changed by task.js
+      return $('body').css('direction') == 'rtl';
+   },
+
    showSolution: function(show) {
       if(show){
          $('#solution').show();
@@ -1483,6 +1488,8 @@ window.displayHelper = {
    },
 
    updateTaskCSS: function(scaleFactor,limitingFactor) {
+      var rtl = this.isRtl();
+      var marginSide = rtl ? 'margin-right' : 'margin-left';
       $('#taskCont').width(this.taskW);
       // $('#taskCont').height(newTaskH);
       var fixingOffset = 0; // unnecessary?
@@ -1498,13 +1505,13 @@ window.displayHelper = {
             }
          }
          if(limitingFactor == 'W'){
-            $('#taskCont').css('margin-left','auto');
+            $('#taskCont').css(marginSide, 'auto');
          }else{
             if(this.verticalScroll){
-               $('#taskCont').css('margin-left','auto');
+               $('#taskCont').css(marginSide, 'auto');
             }else{
                // $('#taskCont').css('margin-left',(this.availableW - this.taskW)*scaleFactor/2);
-               $('#taskCont').css('margin-left','auto'); // cf. alkindi 2017 01
+               $('#taskCont').css(marginSide, 'auto'); // cf. alkindi 2017 01
             }
          }
       }else{
@@ -1528,13 +1535,13 @@ window.displayHelper = {
          if(this.availableW < this.taskW){
             // console.log("check",limitingFactor)*scaleFactor
             if(limitingFactor == "W"){
-               $('#taskCont').css('margin-left',-this.taskW*(1 - scaleFactor)/2 );
+               $('#taskCont').css(marginSide, -this.taskW * (1 - scaleFactor) / 2);
             }else{
                var marginLeft = (this.availableW - this.taskW)/2;
-               $('#taskCont').css('margin-left',marginLeft);
+               $('#taskCont').css(marginSide, marginLeft);
             }
          }else{
-            $('#taskCont').css('margin-left','auto');
+            $('#taskCont').css(marginSide, 'auto');
          }
       }
       $('#zone_2').height(Math.max(this.availableH,this.verticalScroll ? this.newTaskH + 60 : this.newTaskH));
@@ -1552,7 +1559,7 @@ window.displayHelper = {
                zone2Perc = 60;
                zone1Perc = 40;
             }
-            $('#taskCont').css('margin-left','auto');
+            $('#taskCont').css(marginSide, 'auto');
          }else{
             var zone2Perc = 70;
             var zone1Perc = 30;
