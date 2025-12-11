@@ -93,6 +93,9 @@ window.displayHelper = {
          levelName_easy: "Facile",
          levelName_medium: "Moyen",
          levelName_hard: "Difficile",
+         switch_statement: "Énoncé",
+         switch_task: "Exercice",
+         switch_solution: "Solution",
          warningTimeout: "<p>Attention, cela fait plus de {0} minutes que vous êtes sur cette question.</p><p>Vous devriez sans doute changer de sujet, en cliquant sur le bouton tout en haut à droite.</p>",
          alright: "D'accord",
          moveOn: "Passer à la suite",
@@ -164,6 +167,9 @@ window.displayHelper = {
          levelName_easy: "Easy",
          levelName_medium: "Medium",
          levelName_hard: "Hard",
+         switch_statement: "Statement",
+         switch_task: "Task",
+         switch_solution: "Solution",
          warningTimeout: "<p>Warning, it has been more than {0} minutes since you started working on this task.</p><p>You should probably switch to a diffrent task, by clicking on the button on the top-right.</p>",
          alright: "Alright",
          moveOn: "Move on",
@@ -235,6 +241,9 @@ window.displayHelper = {
          levelName_easy: "Lätt",
          levelName_medium: "Medelsvår",
          levelName_hard: "Svår",
+         switch_statement: "Uppgift",
+         switch_task: "Övning",
+         switch_solution: "Lösning",
          warningTimeout: "<p>Varning: det har gått mer än {0} minuter sedan du började med den här uppgiften. </p><p>Du borde kanske byta till en annan uppgift, genom att klicka på knappen uppe till höger.</p>",
          alright: "Okej",
          moveOn: "Gå vidare",
@@ -306,6 +315,9 @@ window.displayHelper = {
          levelName_easy: "Helppo",
          levelName_medium: "Hieman vaikeampi",
          levelName_hard: "Vaikea",
+         switch_statement: "Tehtävä",
+         switch_task: "Harjoitus",
+         switch_solution: "Ratkaisu",
          warningTimeout: "<p>Huomio: on kulunut jo yli {0} minuuttia siitä, kun aloit tekemään tätä tehtävää.</p><p>Sinun mahdollisesti kannattaisi siirtyä yrittämään jotain toista tehtävää klikkaamalla oikean yläkulman nappia.</p>",
          alright: "Ok",
          moveOn: "Siirry eteenpäin",
@@ -377,6 +389,9 @@ window.displayHelper = {
          levelName_easy: "Leicht",
          levelName_medium: "Mittel",
          levelName_hard: "Schwer",
+         switch_statement: "Aufgabenstellung",
+         switch_task: "Aufgabe",
+         switch_solution: "Lösung",
          warningTimeout: "<p>Achtung, du bist schon seit {0} Minuten bei dieser Frage.</p><p>Du solltest jetzt zu einer anderen Aufgabe wechseln.</p>",
          alright: "OK",
          moveOn: "Fortfahren",
@@ -448,6 +463,9 @@ window.displayHelper = {
          levelName_easy: "سهل",
          levelName_medium: "متوسط",
          levelName_hard: "صعب",
+         switch_statement: "البيان",
+         switch_task: "التمرين",
+         switch_solution: "الحل",
          warningTimeout: "<p>لقد مر وقت طويل منذ أن بدأت في هذه المسألة, من الأفضل أن تبدأ في مسألة أخرى حتى لا يضيع الوقت</p>",
          alright: "حسناً",
          moveOn: "استمر",
@@ -519,6 +537,9 @@ window.displayHelper = {
          levelName_easy: "Fácil",
          levelName_medium: "Moderado",
          levelName_hard: "Difícil",
+         switch_statement: "Enunciado",
+         switch_task: "Ejercicio",
+         switch_solution: "Solución",
          warningTimeout: "<p>Atención, ya llevas {0} minutos en esta pregunta.</p><p>Te recomendamos cambiar de tema haciendo click sobre el botón de arriba a la derecha.</p>",
          alright: "De acuerdo",
          moveOn: "Pasar a la siguiente",
@@ -590,6 +611,9 @@ window.displayHelper = {
          levelName_easy: "Facile",
          levelName_medium: "Medio",
          levelName_hard: "Difficile",
+         switch_statement: "Enunciato",
+         switch_task: "Esercizio",
+         switch_solution: "Soluzione",
          warningTimeout: "<p>Attenzione, sono più di {0} minuti che sei su questa domanda.</p><p>Dovresti cambiare argomento, cliccando sul pulsante in alto a destra.</p>",
          alright: "Va bene",
          moveOn: "Vai avanti",
@@ -661,6 +685,9 @@ window.displayHelper = {
          levelName_easy: "Enostavno",
          levelName_medium: "Srednje",
          levelName_hard: "Težko",
+         switch_statement: "Naloga",
+         switch_task: "Vaja",
+         switch_solution: "Rešitev",
          warningTimeout: "<p>Opozorilo: Odkar rešuješ to nalogo, je minilo že več kot {0} minut.</p><p>Najbolje, da izbereš drugo nalogo, tako da klikneš gumb v zgornjem desnem kotu.</p>",
          alright: "V redu",
          moveOn: "Nadaljuj",
@@ -797,9 +824,9 @@ window.displayHelper = {
 
       if(this.responsive){
          $('#displayHelperAnswering').appendTo($('#zone_3'));
-         $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i><span>ÉNONCÉ</span></div><div id="resp_switch_2"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
-         $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>EXERCICE</span></div>'));
-         $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>SOLUTION</span></div>'));
+         $('#zone_3').prepend($('<div id="resp_switch_1"><i class="far fa-file-alt"></i><span>' + this.strings.switch_statement.toUpperCase() + '</span></div><div id="resp_switch_2"><i class="fas fa-pen"></i><span>' + this.strings.switch_task.toUpperCase() + '</span></div>'));
+         $('#zone_3').append($('<div id="showExercice" class="selected"><i class="fas fa-pen"></i><span>' + this.strings.switch_task.toUpperCase() + '</span></div>'));
+         $('#zone_3').append($('<div id="showSolution"><i class="fas fa-file-signature"></i><span>' + this.strings.switch_solution.toUpperCase() + '</span></div>'));
 
          $('#zone_012').append($('<div id="scroll_arr_up"><i class="fas fa-chevron-up"></i></div>'));
          $('#zone_012').append($('<div id="scroll_arr_down"><i class="fas fa-chevron-down"></i></div>'));

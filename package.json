@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "loaders": "cd loaders && node makeloader.js"
+  },
+  "dependencies": {
+    "gulp": "^5.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-uglify": "^3.0.2"
+  }
+}
