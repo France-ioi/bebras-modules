@@ -761,7 +761,7 @@ h1 .stars {
 .layout_3 h1,
 .layout_4 h1,
 .layout_5 h1 {
-   padding-left: 1em;
+   padding-inline-start: 1em;
 }
 
 .layout_1 #tabsContainer #tabsMenu .resp_tabs,
