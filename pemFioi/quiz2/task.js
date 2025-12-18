@@ -394,6 +394,14 @@
     }
 
 
+    function lazyLoadImgs() {
+        var lazyElements = document.querySelectorAll('[lazysrc]');
+        for (var i = 0; i < lazyElements.length; i++) {
+            const lazyElement = lazyElements[i];
+            lazyElement.src = lazyElement.getAttribute('lazysrc');
+            lazyElement.removeAttribute('lazysrc');
+        }
+    }
 
 
 
@@ -401,6 +409,7 @@
         var lastViews = views;
         var lastReloadedAnswer = null;
         task_token.init()
+        lazyLoadImgs();
 
         platform.getTaskParams(null, null, function(taskParams) {
             taskParams.maxScore = 100;
