@@ -1487,6 +1487,64 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      seashells: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le coquillage",
+               dropObject: "déposer les coquillages",
+               withdrawNum_noShadow: "prendre %1 coquillages",
+               dropNum_noShadow: "déposer %1 coquillages",
+               nbWithdrawables: "nombre de coquillages sur la case",
+               containerSize: "taille du panier",
+               onObject: "sur un coquillage",
+               onContainer: "sur un panier",
+               obstacleNorth: "rocher au nord",
+               obstacleSouth: "rocher au sud",
+               obstacleEast: "rocher à l'est",
+               obstacleWest: "rocher à l'ouest"
+            },
+            code: {
+               withdrawObject: "ramasserCoquillage",
+               dropObject: "deposerCoquillages",
+               onObject: "surCoquillage",
+               onContainer: "surPanier",
+               nbWithdrawables: "nbCoquillages",
+               containerSize: "taillePanier",
+               withdrawNum: "ramasser",
+               withdrawNum_noShadow: "ramasser",
+               obstacleNorth: "rocherNord",
+               obstacleSouth: "rocherSud",
+               obstacleEast: "rocherEst",
+               obstacleWest: "rocherOuest"
+            },
+            description: {
+               withdrawObject: "ramasserCoquillage() ramasse le coquillage qui se trouve sur la case",
+               dropObject: "deposerCoquillages() dépose tous les coquillages transportés",
+               onObject: "surCoquillage() indique s'il y a un ou des coquillages sur la case",
+               onContainer: "surPanier() indique s'il y a un panier sur la case",
+               nbWithdrawables: "nbCoquillages() indique combien de coquillages sont sur la case",
+               containerSize: "taillePanier() indique combien le panier doit contenir de coquillages",
+               dropNum: "deposer(nbCoquillages) dépose nbCoquillages coquillagess sur la case",
+               withdrawNum: "ramasser(nbCoquillages) ramasse nbCoquillages coquillages sur la case",
+               obstacleNorth: "rocherNord() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleSouth: "rocherSud() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleEast: "rocherEst() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleWest: "rocherOuest() teste s'il y a un rocher sur la case au nord du robot"
+            },
+            messages: {
+               emptyBag: "Le robot ne porte pas de coquillage !",
+               successContainersFilled: "Bravo, votre robot a collecté tous les coquillages !",
+               failureContainersFilledLess: "Il reste encore au moins un coquillage à ramasser.",
+               failureContainersFilledBag: "Il faut apporter les coquillages dans le panier !",
+               failureDropObject: "Ce panier a déjà assez de coquillages.",
+               nothingToPickUp: "Pas de coquillage ici !",
+               failureContainersFilledBag: "Votre robot a ramassé trop de coquillages.",
+               failureDropObject: "Votre robot essaie de déposer trop de coquillages dans ce panier.",
+               obstacle: "Le robot essaie de foncer dans un rocher.",
+               failureReachExit: "Le robot n'a pas déposé les coquillages dans le panier."
+            }
+         },
+      },
       sokoban: {
          fr: {
             label: {
@@ -2508,6 +2566,39 @@ var getContext = function(display, infos, curLevel) {
             number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
+      },
+      seashells: {
+         backgroundColor: "#f3e4bf",
+         borderColor: "#ddb03c",
+         bagSize: 200,
+         itemTypes: {
+            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 4, customDisplay: function(obj) {
+            	if(context.bag.length != 0)
+            		obj.img = "red_robot_shell.png";
+            	else
+            		obj.img = "red_robot.png";
+            } },
+            basket: { num: 2, img: "basket.png", side: 75, isExit: true, isContainer: true, offsetX: -7, offsetY: 7, zOrder: 1},
+            shell: { num: 3, img: "shell.png", side: 60, isWithdrawable: true, offsetY: 2, zOrder: 2 },
+            shell: { num: 4, img: "shell.png", side: 60, isWithdrawable: true, offsetY: 0, offsetX: 0, zOrder: 2, canBeOutside: true, customDisplay: function(obj) {
+            	if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; }))
+            		obj.offsetX = 0;
+            } },
+            count_shells: { num: 5, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isWithdrawable === true;
+               }).length;
+            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -14, offsetY: -14},
+            count_needs: { num: 6, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isContainer === true;
+               })[0].containerSize;
+            }, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -15, offsetY: -14},
+            obstacle: { num: 7, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
+            board: { num: 8, side: 60, isWritable: true, fontColor: "#ffffff", fontBold: true, zOrder: 3, offsetX: -14, offsetY: -14 },
+            mask: {num: 12, img: "mask.png", side: 60, isMask: true, zOrder: 3 },
+         },
+         checkEndCondition: robotEndConditions.checkBothReachAndCollect
       },
       sokoban: {
          backgroundColor: "#c2c6f2",
