@@ -412,8 +412,12 @@
         lazyLoadImgs();
 
         platform.getTaskParams(null, null, function(taskParams) {
-            taskParams.maxScore = 100;
-            taskParams.minScore = 0;
+            if (typeof taskParams.minScore === 'undefined') {
+                taskParams.minScore = 0;
+            }
+            if (typeof taskParams.maxScore === 'undefined') {
+                taskParams.maxScore = 100;
+            }
             var params = Object.assign(quiz_settings, {
                 random: parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100), //0
                 parent: $('#task')
