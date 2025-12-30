@@ -87,6 +87,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "déposer l'objet",
                onObject: "sur un objet",
                onContainer: "sur un conteneur",
+               onExit: "sur une sortie",
                onNumber: "sur un nombre",
                onWritable: "sur un tableau",
                onLauncher: "sur un lanceur laser",
@@ -143,6 +144,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "deposerObjet",
                onObject: "surObjet",
                onContainer: "surConteneur",
+               onExit: "sur Sortie",
                onNumber: "surNombre",
                onWritable: "surTableau",
                onLauncher: "surLanceur",
@@ -182,11 +184,13 @@ var getContext = function(display, infos, curLevel) {
                shoot: "tirerLaser(direction) fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
                readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
+               writeNumber: "ecrireNombre(nombre) écrit le nombre en paramètre sur la case où se trouve le robot",
                withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot",
                dropObject: "deposerObjet() dépose l'objet sur la case du robot",
                platformInFront: "plateformeDevant() teste s'il y a une plateforme devant le robot",
                platformAbove: "plateformeDessus() teste s'il y a une plateforme au-dessus du robot",
-               dropPlatformInFront: "construirePlateformeDevant() construit une plateforme sur la case devant le robot"
+               dropPlatformInFront: "construirePlateformeDevant() construit une plateforme sur la case devant le robot",
+               jump: "sauter() fait sauter le robot sur la plateforme juste au-dessus de lui"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -214,6 +218,7 @@ var getContext = function(display, infos, curLevel) {
                failureReadHere: "Il n'y a pas de nombre écrit ici !",
                successNumbersWritten: "Bravo, votre robot a écrit les bons nombres !",
                failureNumbersWritten: "Votre robot n'a pas écrit les bons nombres !",
+               failureMissingNumber: "Le robot n'a pas écrit tous les nombres.",
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser d'objet ici",
@@ -1467,6 +1472,10 @@ var getContext = function(display, infos, curLevel) {
             label: {
                obstacleRight: "asteroïde à droite",
                obstacleInFront: "asteroïde devant",
+               onExit: "sur une fusée"
+            },
+            code: {
+               onExit: "surFusee"
             },
             messages: {
                successReachExit: "Bravo, le robot a rejoint la fusée !",
@@ -2972,6 +2981,15 @@ var getContext = function(display, infos, curLevel) {
          var robot = this.getRobot();
          this.destroyMask(robot.row, robot.col);
          this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
+      }
+   });
+
+   infos.newBlocks.push({
+      name: "onExit",
+      type: "sensors",
+      block: { name: "onExit", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isExit === true;}));
       }
    });
    
@@ -4856,7 +4874,7 @@ var robotEndFunctionGenerator = {
             var number = numbers[iNumber];
             var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
             if(items.length == 0)
-               context.leave("Error: no number here");
+               context.leave(window.languageStrings.messages.failureMissingNumber);
             
             var expected;
             if(typeof number.value === "number") {
