@@ -66,7 +66,7 @@ var algoreaInstructionsStrings = {
       biscuits: function(imgs, nbTypes) {
          var text = "Programmez le robot pour qu'il ramasse les biscuits ";
          if (nbTypes > 1) {
-            text += "de ces types : ";
+            text += "<br/>de ces types : ";
          } else {
             text += "de ce type : ";            
          }
