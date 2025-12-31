@@ -4929,6 +4929,43 @@ var robotEndConditions = {
          context.leave(messages[message]);
       }
    },
+   checkSpecificCollection: function(context, lastTurn) {
+      // Look for a custom filter in the task infos, otherwise accept everything (legacy behavior)
+      var filter = context.infos.checkFilter || function(obj) { return true; };
+      
+      var solved = true;
+
+      // 1. Check if there are valid items left on the grid (Failure if yes)
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            // We look for items that are withdrawable AND match the criteria
+            var remainingTargets = context.getItemsOn(row, col, function(obj) { 
+               return obj.isWithdrawable === true && filter(obj); 
+            });
+            if(remainingTargets.length > 0) {
+               solved = false;
+            }
+         }
+      }
+      
+      // 2. Check if the robot picked up something it shouldn't have
+      for(var i = 0; i < context.bag.length; i++) {
+         var item = context.bag[i];
+         if(!filter(item)) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureUnfilteredObject); 
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+      }
+   },
    checkBothReachAndCollect: function(context, lastTurn) {
       var robot = context.getRobot();
       if(context.isOn(function(obj) { return obj.isExit === true; })) {
