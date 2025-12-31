@@ -58,6 +58,9 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
             case "dominoes":
                totalHTML += createDominoesInstructions();
                break
+            case "biscuits":
+               totalHTML += createBiscuitsInstructions();
+               break
             case "fishing":
                totalHTML += createFishingInstructions();
                break
@@ -267,24 +270,85 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       return html
    };
 
-   function createFishingInstructions() {
-      var nbIslands = countItem(6);
-
-      var html = "<p>";
-      html += strings.fishing(nbIslands);
-      html += "</p>";
-
-      if(gridInfos.intro.howTo == true){
-         html += "<p>";
-         html += strings.fishingHowTo;
-         html += "</p>";
+   function createBiscuitsInstructions() {
+      if(gridInfos.intro && gridInfos.intro.text){
+         return "<p>"+gridInfos.intro.text+"</p>"
       }
 
-      if(gridInfos.intro.exactNumber == true){
-         html += "<p>";
-         html += strings.fishingExactNumber;
-         html += "</p>";
+      var imgPath = (typeof window.modulesPath !== 'undefined') ? window.modulesPath + "img/algorea/" : "";
+      var imagesHtml = "";
+      
+      // Resolve filter function based on level or global
+      var filterSource = subTask.gridInfos.checkFilter;
+      var filterFunc = null;
+
+      if (typeof filterSource === 'function') {
+         filterFunc = filterSource;
+      } else if (typeof filterSource === 'object' && filterSource !== null) {
+         filterFunc = filterSource[level];
       }
+
+      if (filterFunc && window.getContext) {
+         try {
+            //window.getContext(null,{}).getInfo["itemTypes"]
+            var ctx = window.getContext(null, gridInfos);
+            var itemTypes = ctx.infos.itemTypes;
+            var validImages = [];
+            
+            // Get grid data for the first test of the current level to check presence
+            var levelData = data[level][0];
+            var tiles = levelData.tiles;
+            var initItems = levelData.initItems || [];
+
+            for (var key in itemTypes) {
+               var item = itemTypes[key];
+               
+               // 1. Logic check: Is it withdrawable and matches filter?
+               if (item.isWithdrawable && filterFunc(item)) {
+                  var isPresent = false;
+                  
+                  // 2. Presence check in tiles
+                  if (item.num !== undefined) {
+                      for (var r = 0; r < tiles.length; r++) {
+                          for (var c = 0; c < tiles[r].length; c++) {
+                              if (tiles[r][c] == item.num) {
+                                  isPresent = true;
+                                  break;
+                              }
+                          }
+                          if (isPresent) break;
+                      }
+                  }
+                  
+                  // 3. Presence check in initItems
+                  if (!isPresent) {
+                      for (var i = 0; i < initItems.length; i++) {
+                          if (initItems[i].type === key) {
+                              isPresent = true;
+                              break;
+                          }
+                      }
+                  }
+                  
+                  // 4. Add image if present
+                  if (isPresent && item.img && validImages.indexOf(item.img) === -1) {
+                     validImages.push(item.img);
+                  }
+               }
+            }
+
+            if (validImages.length > 0) {
+               for (var i = 0; i < validImages.length; i++) {
+                  imagesHtml += "<img src='" + imgPath + validImages[i] + "' style='vertical-align: middle; width: 40px; margin: 0 3px;' />";
+               }
+            }
+         } catch(e) {
+            console.error("Error generating biscuit instructions:", e);
+         }
+      }
+
+      var html = "<p>"+strings.biscuits(imagesHtml, validImages.length)+"</p>";
+
       return html
    };
 
