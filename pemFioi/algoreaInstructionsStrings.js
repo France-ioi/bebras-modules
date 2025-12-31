@@ -64,13 +64,14 @@ var algoreaInstructionsStrings = {
       },
       rollOver: "Le robot peut passer sur les dominos qu'il ne ramasse pas.",
       biscuits: function(imgs, nbTypes) {
-         var text = "Programmez le robot pour qu'il ramasse les biscuits ";
+         var text = "<p>Programmez le robot pour qu'il ramasse les biscuits ";
          if (nbTypes > 1) {
             text += "<br/>de ces types : ";
          } else {
             text += "de ce type : ";            
          }
-         text += imgs;
+         text += imgs + "</p>";
+         text += "<p>Le robot ne doit ramasser aucun des autres biscuits.</p>";
          return text
       },
       fishing: function(nbIslands) {
