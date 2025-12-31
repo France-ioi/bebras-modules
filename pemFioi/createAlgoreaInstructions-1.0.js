@@ -352,6 +352,27 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       return html
    };
 
+   function createFishingInstructions() {
+      var nbIslands = countItem(6);
+
+      var html = "<p>";
+      html += strings.fishing(nbIslands);
+      html += "</p>";
+
+      if(gridInfos.intro.howTo == true){
+         html += "<p>";
+         html += strings.fishingHowTo;
+         html += "</p>";
+      }
+
+      if(gridInfos.intro.exactNumber == true){
+         html += "<p>";
+         html += strings.fishingExactNumber;
+         html += "</p>";
+      }
+      return html
+   };
+
    function createFlowersInstructions() {
       var nbTarget = countItem(2);
       // var nbFixed = countItem(5);
