@@ -1171,6 +1171,23 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      biscuits: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le biscuit",
+            },
+            code: {
+               withdrawObject: "ramasserBiscuit"
+            },
+            description: {
+               withdrawObject: "ramasserBiscuit() ramasse le biscuit sur la case du robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les biscuits demandés !",
+               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les biscuits demandés."
+            }
+         },
+      },
       fishing: {
          fr: {
             label: {
@@ -3704,6 +3721,43 @@ var robotEndConditions = {
          throw(messages[message]);
       }
    },
+   checkSpecificCollection: function(context, lastTurn) {
+      // Look for a custom filter in the task infos, otherwise accept everything (legacy behavior)
+      var filter = context.infos.checkFilter || function(obj) { return true; };
+      
+      var solved = true;
+
+      // 1. Check if there are valid items left on the grid (Failure if yes)
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            // We look for items that are withdrawable AND match the criteria
+            var remainingTargets = context.getItemsOn(row, col, function(obj) { 
+               return obj.isWithdrawable === true && filter(obj); 
+            });
+            if(remainingTargets.length > 0) {
+               solved = false;
+            }
+         }
+      }
+      
+      // 2. Check if the robot picked up something it shouldn't have
+      for(var i = 0; i < context.bag.length; i++) {
+         var item = context.bag[i];
+         if(!filter(item)) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureUnfilteredObject); 
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+      }
+   },
    checkBothReachAndCollect: function(context, lastTurn) {
       var robot = context.getRobot();
       if(context.isOn(function(obj) { return obj.isExit === true; })) {
@@ -4297,6 +4351,126 @@ var contextParams = {
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 14, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 }
          }
+      },
+      biscuits: {
+         newBlocks: [
+           {
+             name: "onChocolate",
+             strings: {
+               fr: {
+                 label: "sur chocolat",
+                 code: "surChocolat",
+                 description: "surChocolat(): Le robot est-il sur un biscuit au chocolat ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onChocolate",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isChocolate===true;}));
+             }
+           },
+           {
+             name: "onHole",
+             strings: {
+               fr: {
+                 label: "sur trou",
+                 code: "surTrou",
+                 description: "surTrou(): Le robot est-il sur un biscuit troué ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onHole",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isHole===true;}));
+             }
+           },
+           {
+             name: "onCircle",
+             strings: {
+               fr: {
+                 label: "sur rond",
+                 code: "surRond",
+                 description: "surRond(): Le robot est-il sur un biscuit rond ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onCircle",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isCircle===true;}));
+             }
+           },
+           {
+             name: "onTriangle",
+             strings: {
+               fr: {
+                 label: "sur triangle",
+                 code: "surTriangle",
+                 description: "surTriangle(): Le robot est-il sur un biscuit triangle ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onTriangle",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isTriangle===true;}));
+             }
+           },
+           {
+             name: "onSquare",
+             strings: {
+               fr: {
+                 label: "sur carré",
+                 code: "surCarre",
+                 description: "surCarre(): Le robot est-il sur un biscuit carré ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onSquare",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
+             }
+           }
+         ],
+         noBorders: true,
+         backgroundColor: "#F9E6C3",
+         itemTypes: {
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
+            CCF: { num: 3, img: "biscuit_circle_choc.png", side: 60, isWithdrawable: true, isCircle: true, isChocolate: true, Order: 1 },
+            CCH: { num: 4, img: "biscuit_circle_choc_hole.png", side: 60, isWithdrawable: true, isCircle: true, isChocolate: true, isHole: true, zOrder: 1 },
+            CPF: { num: 5, img: "biscuit_circle.png", side: 60, isWithdrawable: true, isCircle: true, zOrder: 1 },
+            CPH: { num: 6, img: "biscuit_circle_hole.png", side: 60, isWithdrawable: true, isCircle: true, isHole: true, zOrder: 1 },
+            SCF: { num: 7, img: "biscuit_square_choc.png", side: 60, isWithdrawable: true, isSquare: true, isChocolate: true, zOrder: 1 },
+            SCH: { num: 8, img: "biscuit_square_choc_hole.png", side: 60, isWithdrawable: true, isSquare: true, isChocolate: true, isHole: true, zOrder: 1 },
+            SPF: { num: 9, img: "biscuit_square.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
+            SPH: { num: 10, img: "biscuit_square_hole.png", side: 60, isWithdrawable: true, isSquare: true, isHole: true, zOrder: 1 },
+            TCF: { num: 11, img: "biscuit_triangle_choc.png", side: 60, isWithdrawable: true, isTriangle: true, isChocolate: true, zOrder: 1 },
+            TCH: { num: 12, img: "biscuit_triangle_choc_hole.png", side: 60, isWithdrawable: true, isTriangle: true, isChocolate: true, isHole: true, zOrder: 1 },
+            TPF: { num: 13, img: "biscuit_triangle.png", side: 60, isWithdrawable: true, isTriangle: true, zOrder: 1 },
+            TPH: { num: 14, img: "biscuit_triangle_hole.png", side: 60, isWithdrawable: true, isTriangle: true, isHole: true, zOrder: 1 },
+            board_background: { num: 15, color: "#ffffff", side: 60, zOrder: 0 },
+            board: {num: 16, side: 60, isWritable: true, zOrder: 1 },
+            obstacle: { num: 17, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
+         },
+         checkEndCondition: robotEndConditions.checkSpecificCollection
       },
       fishing: {
          backgroundColor: "#57b8bf",
