@@ -1502,11 +1502,11 @@ c);this.listeners_.push(Blockly.bindEvent_(this.svgBackground_,"mouseover",this,
 Blockly.Flyout.prototype.clearOldBlocks_=function(){for(var a=this.workspace_.getTopBlocks(!1),b=0,c;c=a[b];b++)c.workspace==this.workspace_&&c.dispose(!1,!1);for(b=0;a=this.backgroundButtons_[b];b++)goog.dom.removeNode(a);for(b=this.backgroundButtons_.length=0;a=this.buttons_[b];b++)a.dispose();this.buttons_.length=0};
 Blockly.Flyout.prototype.addBlockListeners_ = function (a, b, c) {
     this.autoClose ? (this.listeners_.push(Blockly.bindEventWithChecks_(a, "mousedown", null, this.createBlockFunc_(b))), this.listeners_.push(Blockly.bindEventWithChecks_(c, "mousedown", null, this.createBlockFunc_(b)))) : (this.listeners_.push(Blockly.bindEventWithChecks_(a, "mousedown", null, this.blockMouseDown_(b))), this.listeners_.push(Blockly.bindEventWithChecks_(c, "mousedown", null, this.blockMouseDown_(b))));
-    // this.listeners_.push(Blockly.bindEvent_(a,
-    //     "mouseover", b, b.addSelect));
-    // this.listeners_.push(Blockly.bindEvent_(a, "mouseout", b, b.removeSelect));
-    // this.listeners_.push(Blockly.bindEvent_(c, "mouseover", b, b.addSelect));
-    // this.listeners_.push(Blockly.bindEvent_(c, "mouseout", b, b.removeSelect))
+    this.listeners_.push(Blockly.bindEvent_(a,
+        "mouseover", b, b.addSelect));
+    this.listeners_.push(Blockly.bindEvent_(a, "mouseout", b, b.removeSelect));
+    this.listeners_.push(Blockly.bindEvent_(c, "mouseover", b, b.addSelect));
+    this.listeners_.push(Blockly.bindEvent_(c, "mouseout", b, b.removeSelect))
 };
 Blockly.Flyout.blockRightClick_=function(a,b){Blockly.terminateDrag_();Blockly.WidgetDiv.hide(!0);Blockly.DropDownDiv.hideWithoutAnimation();Blockly.hideChaff(!0);b.showContextMenu_(a);Blockly.Touch.clearTouchIdentifier()};
 Blockly.Flyout.prototype.blockMouseDown_=function(a){var b=this;return function(c){Blockly.isRightButton(c)?Blockly.Flyout.blockRightClick_(c,a):(b.dragMode_=Blockly.DRAG_NONE,Blockly.terminateDrag_(),Blockly.WidgetDiv.hide(!0),Blockly.DropDownDiv.hideWithoutAnimation(),Blockly.hideChaff(),b.startDragMouseY_=c.clientY,b.startDragMouseX_=c.clientX,Blockly.Flyout.startDownEvent_=c,Blockly.Flyout.startBlock_=a,Blockly.Flyout.startFlyout_=b,Blockly.Flyout.onMouseUpWrapper_=Blockly.bindEvent_(document,
