@@ -25,7 +25,7 @@ function isCrossDomain() {
       } catch(e){
           res = false;
       }
-      return res;
+      return res && !getUrlParameterByName('xd');
    }
    return isInIframe() && !isSameDomain();
 }
@@ -86,6 +86,9 @@ if (!isCrossDomain()) {
       },
       openUrl: function(url, success, error) {
          return platform.parent_platform.openUrl(url, success, error);
+      },
+      log: function(data, success, error) {
+         return platform.parent_platform.log(data, success, error);
       },
       initCallback: function(callback) {
          this.initCallbackFun = callback;
@@ -256,6 +259,15 @@ if (!isCrossDomain()) {
          success: success
       });
    };
+   platform.log = function(data, success, error) {
+      if (!success) success = function(){};
+      if (!error) error = function() {console.error(arguments);};
+      platform.chan.call({method: "platform.log",
+         params: data,
+         error: error,
+         success: success
+      });
+   };
 }
 
 window.platform = platform;
@@ -293,6 +305,9 @@ window.displayHelper = {
    stoppedShowingResult: false,
    previousMessages: {},
    popupMessageShown: false,
+   alwaysAskLevelChange: false,
+   taskParams: {},
+   taskParamsInitialised: false,
 
    thresholds: {},
    // Legacy settings for old tasks ; new ones are expected to use thresholds
@@ -306,6 +321,7 @@ window.displayHelper = {
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 4,
+   forceNextTaskAfter: -1,
    neverHadHard: false,
    showMultiversionNotice: false,
    taskLevel: '',
@@ -339,7 +355,7 @@ window.displayHelper = {
          no: "Non",
          tryHardLevel: "Nous vous proposons d'essayer la version 4 étoiles.",
          tryMediumLevel: "Nous vous proposons d'essayer la version 3 étoiles.",
-         tryNextTask: "Nous vous proposons de passer au sujet suivant. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
+         tryNextTask: "Nous vous proposons de passer à un autre sujet. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
          yourScoreIsNow: "Votre score est maintenant :",
          worseScoreStays: "C'est moins bien qu'avant ; votre score reste :",
          scoreStays: "Votre score reste le même :",
@@ -363,6 +379,7 @@ window.displayHelper = {
          illKeepThatInMind: "J'y prendrai garde",
          harderLevelAvailable: "Notez que pour cette question, vous pouvez résoudre directement une version plus difficile que celle-ci.",
          lockedLevel: "Cette version est verrouillée. Résolvez la précédente pour l'afficher !",
+         lockedLevelDev: "Cette version est normalement verrouillée, et la précédente doit être résolue avant de pouvoir afficher cette version. Comme vous avez chargé ce sujet en local, vous pouvez néanmoins la voir.",
          gradeThisAnswer: "Évaluer cette réponse",
 
          // The following messages are used for tasks with no feedback
@@ -433,6 +450,7 @@ window.displayHelper = {
          illKeepThatInMind: "I'll consider it.",
          harderLevelAvailable: "Note that for this task, you may try to directly work on a harder version than this one.",
          lockedLevel: "This version is locked. Solve the previous version to display it!",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "Grade this answer",
 
          // The following messages are used for tasks with no feedback
@@ -503,6 +521,7 @@ window.displayHelper = {
          illKeepThatInMind: "Jag ska tänka på det.",
          harderLevelAvailable: "Notera att på den här uppgiften kan du direkt försöka med en svårare version än denna.",
          lockedLevel: "Den här versionen är låst. Lös den föregående nivån för att visa den!",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "Bedöm svaret",
 
          // The following messages are used for tasks with no feedback
@@ -530,7 +549,7 @@ window.displayHelper = {
          enemyWarning: "<strong>Varning:</strong> i den här utmaningen kommer datorn se till att du inte hittar lösningen av en slump."
       },
       fi: {
-         version: "Versio",
+         version: "Versio ",
          levelVersionName_easy: "helppo versio",
          levelVersionName_medium: "hieman vaikeampi versio",
          levelVersionName_hard: "vaikea versio",
@@ -540,7 +559,7 @@ window.displayHelper = {
          levelName_easy: "Helppo",
          levelName_medium: "Hieman vaikeampi",
          levelName_hard: "Vaikea",
-         warningTimeout: "<p>Varoitus: on kulunut jo yli {0} minuuttia siitä, kun aloit tekemään tätä tehtävää.</p><p>Sinun mahdollisesti kannattaisi siirtyä yrittämään jotain toista tehtävää, klikkaamalla oikean yläkulman nappia.</p>",
+         warningTimeout: "<p>Huomio: on kulunut jo yli {0} minuuttia siitä, kun aloit tekemään tätä tehtävää.</p><p>Sinun mahdollisesti kannattaisi siirtyä yrittämään jotain toista tehtävää klikkaamalla oikean yläkulman nappia.</p>",
          alright: "Ok",
          moveOn: "Siirry eteenpäin",
          solvedMoveOn: "Ratkaisit tämän tehtävän kokonaan, siirry nyt seuraavaan tehtävään.",
@@ -556,28 +575,29 @@ window.displayHelper = {
          score: "Pisteet:",
          noPointsForLevel: "Et ole vielä saanut pisteitä tästä versiosta.",
          outOf: " / ",
-         tryToDoBetterOrChangeTask: "Yritä saada vielä paremmat pisteet, tai siirry toiseen tehtävään.",
-         tryToDoBetterOrMoveToNextLevel: "Yritä saada vielä paremmat pisteet, tai siirry saman tehtävän vaikeampaan versioon.",
+         tryToDoBetterOrChangeTask: "Yritä saada vielä paremmat pisteet tai siirry toiseen tehtävään.",
+         tryToDoBetterOrMoveToNextLevel: "Yritä saada vielä paremmat pisteet tai siirry saman tehtävän vaikeampaan versioon.",
          bestPossibleScoreCongrats: "Onnittelut: saavutit tehtävän maksimipistemäärän!",
          forMorePointsMoveToNextLevel: "Siirry tehtävän vaikeampaan versioon saadaksesi enemmän pisteitä.",
          youDidBetterBefore: "Sait aiemmin enemmän pisteitä.",
          scoreStays2: "Pistemääräsi säilyy samana.",
          reloadBestAnswer: "Palauta paras aiempi vastauksesi.",
-         noAnswerSaved: "No answer saved so far for this version.",
+         noAnswerSaved: "Tähän versioon ei ole vielä tallennettu vastausta.",
          validate: "Tarkista vastaus",
          restart: "Aloita alusta",
          harderLevelSolved: "Varoitus: olet jo ratkaissut vaikeamman version tästä tehtävästä. Tämän helpomman version ratkaiseminen ei voi korottaa pistemäärääsi.",
          showLevelAnyway: "Siirry joka tapauksessa.",
          scoreObtained: "Saatu pistemäärä:",
          hardVersionTakesTime: "{0} voi viedä runsaasti aikaa. {1} voi tuottaa pisteitä nopeammin.",
-         illKeepThatInMind: "Huomioin tämän.",
+         illKeepThatInMind: "Ymmärrän tämän.",
          harderLevelAvailable: "Huomaa, että voit myös suoraan koittaa ratkaista vaikeampaa versiota tästä tehtävästä.",
          lockedLevel: "Tämä versio on vielä lukittu: ratkaise ensin helpompi versio!",
-         gradeThisAnswer: "Pisteytä tämä vastaus",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
+         gradeThisAnswer: "Tarkista vastaus",
 
          // The following messages are used for tasks with no feedback
          saveAnswer: "Tallenna vastaus",
-         answerSavedModifyOrCancelIt: "Vastauksesi on tallennettu. Voit muokata sitä, tai {0} ja aloittaa uudelleen alusta.",
+         answerSavedModifyOrCancelIt: "Vastauksesi on tallennettu. Voit muokata sitä tai {0} ja aloittaa uudelleen alusta.",
          cancelIt: "perua sen",
          warningDifferentAnswerSaved: "Varoitus: toisenlainen vastaus on tallennettu jo aiemmin.",
          youMay: "Voit {0}.",
@@ -597,7 +617,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "Kilpailu on jo päättynyt, joten uutta vastaustasi ei enää tallennettu. Voit {0}.",
          reloadSubmittedAnswer: "palauttaa aiemmin lähetetyn vastauksen",
          difficultyWarning: "<strong>Varoitus:</strong> tämän version ratkaiseminen vie aikaa.<br/>Saat luultavasti ratkaistua 2 tai 3 tähden version nopeammin.",
-         enemyWarning: "<strong>Varoitus:</strong> tässä tehtävässä tietokone pyrkii varmistamaan, ettet voi löytää ratkaisua sattumalta."
+         enemyWarning: "<strong>Huomio:</strong> tässä tehtävässä tietokone pyrkii varmistamaan, ettet voi löytää ratkaisua sattumalta."
       },
       de: {
          version: "Version",
@@ -643,6 +663,7 @@ window.displayHelper = {
          illKeepThatInMind: "Ich hab das verstanden",
          harderLevelAvailable: "Beachte, dass du bei dieser Frage direkt zu einer schwereren Version gehen kannst.",
          lockedLevel: "Diese Version ist noch gesperrt. Löse die vorherige um diese freizuschalten.",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "Diese Antwort auswerten",
 
          // The following messages are used for tasks with no feedback
@@ -713,6 +734,7 @@ window.displayHelper = {
          illKeepThatInMind: "I'll consider it.",
          harderLevelAvailable: "تنبيه: يمكنك حل المستوى الأصعب في هذه المسألة مباشرة",
          lockedLevel: "هذا المستوى مغلق. يجب عليك حل المستوى السابق أولا",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "قيم هذه الإجابة",
 
          // The following messages are used for tasks with no feedback
@@ -750,64 +772,136 @@ window.displayHelper = {
          levelName_easy: "Fácil",
          levelName_medium: "Moderado",
          levelName_hard: "Difícil",
-         warningTimeout: "<p>Atención, ya lleva {0} minutos en esta pregunta.</p><p>Le recomendamos cambiar de tema haciendo click sobre el botón de arriba a la derecha.</p>",
+         warningTimeout: "<p>Atención, ya llevas {0} minutos en esta pregunta.</p><p>Te recomendamos cambiar de tema haciendo click sobre el botón de arriba a la derecha.</p>",
          alright: "De acuerdo",
          moveOn: "Pasar a la siguiente",
-         solvedMoveOn: "Ha resuelto completamente esta pregunta. Pase a otra pregunta.",
-         confirmRestart: "¿Está seguro que desea volver a iniciar esta versión?",
+         solvedMoveOn: "Has resuelto completamente esta pregunta. Pasa a otra pregunta.",
+         confirmRestart: "¿Estás seguro que deseas volver a iniciar esta versión?",
          yes: "Sí",
          no: "No",
-         tryHardLevel: "Le recomendamos intentar la versión de 4 estrellas.",
-         tryMediumLevel: "Le recomendamos intentar la versión de 3 estrellas.",
-         tryNextTask: "Nous vous proposons de passer au sujet suivant. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
-         yourScoreIsNow: "Su puntuación es ahora :",
-         worseScoreStays: "Esto no está tan bien como antes; su puntuación se mantiene en :",
-         scoreStays: "Su puntuación se mantiene igual :",
+         tryHardLevel: "Te recomendamos intentar la versión de 4 estrellas.",
+         tryMediumLevel: "Te recomendamos intentar la versión de 3 estrellas.",
+         tryNextTask: "Te recomendamos que pases a la siguiente pregunta. Si tienes tiempo, puedes volver más tarde para probar la siguiente versión",
+         yourScoreIsNow: "Tu puntuación es ahora :",
+         worseScoreStays: "Esto no está tan bien como antes; tu puntuación se mantiene en :",
+         scoreStays: "tu puntuación se mantiene igual :",
          score: "Puntuación :",
-         noPointsForLevel: "Aún no ha recibido puntos en esta versión.",
+         noPointsForLevel: "Aún no has recibido puntos en esta versión.",
          outOf: " de ",
-         tryToDoBetterOrChangeTask: "Intente nuevamente para obtener una mejor puntuación, o pase a la siguiente pregunta.",
-         tryToDoBetterOrMoveToNextLevel: "Intente nuevamente para obtener una mejor puntuación, o pase una versión más difícil.",
+         tryToDoBetterOrChangeTask: "Intenta nuevamente para obtener una mejor puntuación, o pasa a la siguiente pregunta.",
+         tryToDoBetterOrMoveToNextLevel: "Intenta nuevamente para obtener una mejor puntuación, o pasa a una versión más difícil.",
          bestPossibleScoreCongrats: "Esta es la mejor puntuación posible en este problema, ¡felicitaciones!",
-         forMorePointsMoveToNextLevel: "Para obtener más puntos, pase a una versión más difícil.",
-         youDidBetterBefore: "Realizó un mejor trabajo antes.",
-         scoreStays2: "Su puntuación se mantiene igual.",
-         reloadBestAnswer: "Recargar su mejor respuesta.",
+         forMorePointsMoveToNextLevel: "Para obtener más puntos, pasa a una versión más difícil.",
+         youDidBetterBefore: "Realizaste un mejor trabajo antes.",
+         scoreStays2: "Tu puntuación se mantiene igual.",
+         reloadBestAnswer: "Recargar tu mejor respuesta.",
          noAnswerSaved: "Aún no hay respuesta guardada para esta versión.",
          validate: "Validar",
          restart: "Reiniciar",
-         harderLevelSolved: "Atención: ya ha resuelto una versión más difícil. No puede ganar puntos extra con esta versión.",
+         harderLevelSolved: "Atención: ya has resuelto una versión más difícil. No puedes ganar puntos extra con esta versión.",
          showLevelAnyway: "Mostrar el nivel de igual manera",
          scoreObtained: "Puntuación obtenida:",
-         hardVersionTakesTime: "Resolver una {0} puede tomar mucho tiempo; le aconsejamos priorizar resolver las preguntas en {1} para ganar puntos rápidamente.",
+         hardVersionTakesTime: "Resolver una {0} puede tomar mucho tiempo; te aconsejamos priorizar el resolver las preguntas en {1} para ganar puntos más rápidamente.",
          illKeepThatInMind: "Lo tendré en mente",
-         harderLevelAvailable: "Note que para esta pregunta, puede resolver directamente una versión más difícil que esta.",
-         lockedLevel: "Esta versión está bloqueada. Resuelva la version anterior para verla.",
+         harderLevelAvailable: "Nota que para esta pregunta, puedes resolver directamente una versión más difícil que esta.",
+         lockedLevel: "Esta versión está bloqueada. Resuelve la version anterior para verla.",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "Evaluar esta respuesta",
 
          // The following messages are used for tasks with no feedback
-         saveAnswer: "Guardar su respuesta",
-         answerSavedModifyOrCancelIt: "Su respuesta fue guardada. Puede modificarla, o bien {0} y reiniciar.",
+         saveAnswer: "Guardar tu respuesta",
+         answerSavedModifyOrCancelIt: "Tu respuesta fue guardada. Puedes modificarla, o bien {0} y reiniciar.",
          cancelIt: "cancelarla",
          warningDifferentAnswerSaved: "Atención: una respuesta diferente ha sido guardada.",
-         youMay: "Usted puede {0}.",
+         youMay: "Tú puedes {0}.",
          reloadIt: "recargarla",
          saveThisNewAnswer: "Guardar esta nueva respuesta",
 
          gradingInProgress: "Evaluación en curso",
-         scoreIs: "Su puntuación es:",
+         scoreIs: "Tu puntuación es:",
          point: "punto",
          points: "puntos",
          // The following messages are used when viewing tasks after contest is over
-         contestOverScoreStays: "El concurso está terminando, su respuesta no ha sido guardada y su puntuación se mantiene en:",
-         scoreWouldBecome: "Con esta respuesta, su puntuación será :",
+         contestOverScoreStays: "La actividad está terminando, tu respuesta no ha sido guardada y tu puntuación se mantiene en:",
+         scoreWouldBecome: "Con esta respuesta, tu puntuación será :",
          reloadValidAnswer: "Volver a cargar la respuesta válida.",
-         contestOverAnswerNotSaved: "El concurso ha terminado: su respuesta no fue guardada.",
-         scoreWouldStay: "Con esta respuesta, su puntuación será la misma:",
-         answerNotSavedContestOver: "El concurso está terminando y su respuesta no ha sido guardada. Usted puede {0}.",
+         contestOverAnswerNotSaved: "La actividad ha terminado: tu respuesta no fue guardada.",
+         scoreWouldStay: "Con esta respuesta, tu puntuación será la misma:",
+         answerNotSavedContestOver: "La actividad está terminando y tu respuesta no ha sido guardada. Tú puedes {0}.",
          reloadSubmittedAnswer: "recargar la respuesta que ha enviado",
-         difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
-         enemyWarning: "<strong>Advertencia:</strong> en este desafío, la computadora se asegurará que no encuentre la respuesta por casualidad."
+         difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Puedes resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
+         enemyWarning: "<strong>Advertencia:</strong> en este desafío, la computadora se asegurará que no encuentres la respuesta por casualidad."
+      },
+      it: {
+         version: "Versione",
+         levelVersionName_easy: "versione facile",
+         levelVersionName_medium: "versione media",
+         levelVersionName_hard: "versione difficile",
+         levelVersionName_easy_stars: "versione a 2 stelle",
+         levelVersionName_medium_stars: "versione a 3 stelle",
+         levelVersionName_hard_stars: "versione a 4 stelle",
+         levelName_easy: "Facile",
+         levelName_medium: "Medio",
+         levelName_hard: "Difficile",
+         warningTimeout: "<p>Attenzione, sono più di {0} minuti che sei su questa domanda.</p><p>Dovresti cambiare argomento, cliccando sul pulsante in alto a destra.</p>",
+         alright: "Va bene",
+         moveOn: "Vai avanti",
+         solvedMoveOn: "Hai risolto completamente questo quesito, passa a un'altra domanda.",
+         confirmRestart: "Sei sicuro di voler ricominciare questa versione ?",
+         yes: "Sì",
+         no: "No",
+         tryHardLevel: "Ti proponiamo di provare la versione 4 stelle.",
+         tryMediumLevel: "Ti proponiamo di provare la versione 3 stelle.",
+         tryNextTask: "Ti proponiamo di passare all'argomento successivo. Se ti resta del tempo, potrai riprovare più tardi la seguente versione.",
+         yourScoreIsNow: "Adesso il tuo punteggio è :",
+         worseScoreStays: "Non è buono come prima ; il tuo punteggio rimane :",
+         scoreStays: "Il tuo punteggio resta lo stesso :",
+         score: "Score :",
+         noPointsForLevel: "Non hai ancora punti su questa versione.",
+         outOf: " sur ",
+         tryToDoBetterOrChangeTask: "Prova a fare di meglio, o passa ad un'altra domanda.",
+         tryToDoBetterOrMoveToNextLevel: "Prova a fare di meglio, o passa a una versione più difficile.",
+         bestPossibleScoreCongrats: "E' il miglior punteggio possibile su quest'argomento ; congratulazioni !",
+         forMorePointsMoveToNextLevel: "Per ottenere più punti, passa a una versione più difficile.",
+         youDidBetterBefore: "Sei andato meglio prima.",
+         scoreStays2: "Il tuo punteggio resta lo stesso.",
+         reloadBestAnswer: "Ricarica la tua miglior risposta.",
+         noAnswerSaved: "Nessuna risposta salvata per questa versione.",
+         validate: "Convalida",
+         restart: "Ricomincia",
+         harderLevelSolved: "Attenzione : hai già risolto una versione più difficile. Non potrai più ottenere punti supplementari con questa versione.",
+         showLevelAnyway: "Vedi lo stesso",
+         scoreObtained: "Score ottenuto :",
+         hardVersionTakesTime: "Risolvere una {0} ti può prendere molto tempo ; dai priorità alle risposte alle domande in {1} per guadagnare rapidamente punti.",
+         illKeepThatInMind: "Me lo ricorderò",
+         harderLevelAvailable: "Si noti che per questa domanda è possibile risolvere direttamente una versione più difficile di questa.",
+         lockedLevel: "Questa versione è bloccata. Risolvi la precedente per visualizzarla !",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
+         gradeThisAnswer: "Valuta questa risposta",
+
+         // The following messages are used for tasks with no feedback
+         saveAnswer: "Salva la tua risposta",
+         answerSavedModifyOrCancelIt: "La sua risposta è stata registrata. Puoi cambiarla, oppure {0} e ricominciare da capo.",
+         cancelIt: "annullarla",
+         warningDifferentAnswerSaved: "Attenzione : è salvata una risposta diversa.",
+         youMay: "Puoi {0}.",
+         reloadIt: "ricaricala",
+         saveThisNewAnswer: "Salva questa nuova risposta",
+
+         gradingInProgress: "Valutazione in corso",
+         scoreIs: "Il tuo punteggio è di :",
+         point: "punto",
+         points: "punti",
+         // The following messages are used when viewing tasks after contest is over
+         contestOverScoreStays: "Il concorso è terminato, la tua risposta non è stata salvata e il tuo punteggio è di :",
+         scoreWouldBecome: "Con questa risposta, il tuo punteggio sarà :",
+         reloadValidAnswer: "Ricarica la risposta convalidata.",
+         contestOverAnswerNotSaved: "Il concorso è terminato : la tua risposta non è stata salvata.",
+         scoreWouldStay: "Con questa risposta, il tuo punteggio resterà lo stesso :",
+         answerNotSavedContestOver: "Il concorso è terminato, la tua risposta non è stata salvata. Puoi {0}.",
+         reloadSubmittedAnswer: "ricarica la risposta che hai inviato",
+         difficultyWarning: "<strong>Attenzione :</strong> risolvere questa versione richiede del tempo.<br/>Potresti risolvere molto più rapidamente le versioni 2 e 3 stelle di altri argomenti.",
+         enemyWarning: "<strong>Attenzione </strong> in questa sfida, il computer ti impedirà di trovare la soluzione per caso."
       },
       sl: {
          version: "Stopnja",
@@ -853,6 +947,7 @@ window.displayHelper = {
          illKeepThatInMind: "Razmislil(-a) bom.",
          harderLevelAvailable: "Ne pozabi, da lahko to nalogo rešuješ na težji stopnji kot je ta.",
          lockedLevel: "Ta stopnja je zaklenjena! Za pikaz moraš najprej rešiti prejšnjo stopnjo!",
+         lockedLevelDev: "This version is normally locked, and the previous version must be solved before displaying this. As you opened this task locally, you can however display this version for testing purposes.",
          gradeThisAnswer: "Oceni ta odgovor",
 
          // The following messages are used for tasks with no feedback
@@ -880,21 +975,49 @@ window.displayHelper = {
          enemyWarning: "<strong>Opozorilo:</strong> Pri tej nalogi ti bo računalnik preprečil naključno rešitev."
       },
    },
+
+   // themeStrings is like languageStrings, when setTheme is called, it will
+   // overwrite some languageStrings
+   themeStrings: {
+      coursera: {
+         solvedMoveOn: "Votre score a été transmis à Coursera. Vous devez rafraîchir la page dans Coursera pour voir votre note.",
+         moveOn: "Fermer cet exercice",
+         no: "Rester"
+      },
+   },
+
    initLanguage: function() {
       if (window.stringsLanguage == undefined) {
          window.stringsLanguage = 'fr';
       }
       this.strings = this.languageStrings[window.stringsLanguage];
+      if(this.theme) { this.setTheme(this.theme); }
    },
+   setTheme: function(theme) {
+      // Set a "theme", which is just some different strings
+
+      var newStrings = this.themeStrings[theme];
+      if(!newStrings) { return; }
+      this.theme = theme;
+
+      if(!this.strings) { return; }
+      for(var key in newStrings) {
+         this.strings[key] = newStrings[key];
+      }
+   },
+
    /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
+      this.loading = true;
       this.initLanguage();
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      window.platform.getTaskParams(null, null, function(taskParams) {
+
+      function processTaskParams(taskParams) {
          self.taskParams = taskParams;
+         self.taskParamsInitialised = true;
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
@@ -914,6 +1037,7 @@ window.displayHelper = {
          if (!document.getElementById('displayHelperAnswering')) {
             $(self.taskSelector).append(addTaskHTML);
          }
+         self.loading = false;
          self.loaded = true;
          self.timeLoaded = new Date().getTime();
          if (self.popupMessageShown) {
@@ -931,7 +1055,15 @@ window.displayHelper = {
          if (self.timeoutMinutes > 0) {
             self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
          }
-      });
+      };
+
+      if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
+         // Get the taskParams from the task if possible
+         // Avoids an async call in a function which isn't async
+         processTaskParams(window.task.displayedSubTask.taskParams);
+      } else {
+         window.platform.getTaskParams(null, null, processTaskParams);
+      }
    },
    unload: function() {
       if (this.taskDelayWarningTimeout) {
@@ -939,6 +1071,7 @@ window.displayHelper = {
       }
       clearInterval(this.checkAnswerInterval);
       this.checkAnswerInterval = null;
+      this.loading = false;
       this.loaded = false;
       this.prevAnswer = '';
       this.readOnly = false;
@@ -965,13 +1098,19 @@ window.displayHelper = {
 
    initLevelVars: function() {
       var defaultLevelsRanks = { basic: 1, easy: 2, medium: 3, hard: 4 };
+      this.taskLevel = '';
       this.levelsRanks = {};
       this.levelsScores = {};
       this.prevLevelsScores = {};
       for(var i=0; i < this.levels.length; i++) {
          var levelName = this.levels[i];
          if(typeof this.levelsRanks[levelName] == 'undefined') {
-            this.levelsRanks[levelName] = defaultLevelsRanks[levelName];
+            if(i == this.levels.length - 1) {
+               // The highest level always gets the max stars
+               this.levelsRanks[levelName] = this.maxStars;
+            } else {
+               this.levelsRanks[levelName] = defaultLevelsRanks[levelName];
+            }
          }
          this.levelsScores[levelName] = 0;
          this.prevLevelsScores[levelName] = 0;
@@ -997,11 +1136,16 @@ window.displayHelper = {
          }
          self.doSetupLevels(initLevel);
       };
-      if (!this.taskParams) {
-         window.platform.getTaskParams(null, null, function(taskParams) {
-            self.taskParams = taskParams;
+      if (!this.taskParamsInitialised) {
+         if (window.task && window.task.displayedSubTask && window.task.displayedSubTask.taskParams) {
+            self.taskParams = window.task.displayedSubTask.taskParams;
             callSetupLevels();
-         });
+         } else {
+            window.platform.getTaskParams(null, null, function (taskParams) {
+               self.taskParams = taskParams;
+               callSetupLevels();
+            });
+         }
       } else {
          callSetupLevels();
       }
@@ -1069,20 +1213,26 @@ window.displayHelper = {
       }
 
       var tabsStarContainers = [];
-      var tabsHTML = '<div id="tabsMenu">';
       var curLevel;
+      // We only render the tabs if there is more than one level ; but we
+      // keep tabsMenu as some interfaces depend on that
+      var tabsInnerHTML = '';
+      var nbLevels = 0;
       for (curLevel in this.levelsRanks) {
-         tabsHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
+         nbLevels++;
+         tabsInnerHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
-            tabsHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
+            tabsInnerHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
          } else {
-            tabsHTML += this.strings["levelName_" + curLevel] + ' — ' +
+            tabsInnerHTML += this.strings["levelName_" + curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
          }
-         tabsHTML += '</a></span>';
+         tabsInnerHTML += '</a></span>';
       }
-      tabsHTML += '</div>';
+      if(nbLevels < 2) { tabsInnerHTML = ''; }
+      var tabsHTML = '<div id="tabsMenu">' + tabsInnerHTML + '</div>';
       $('#tabsContainer').append(tabsHTML);
+      if(nbLevels >= 4) { $('#tabsMenu').addClass('moreTabs'); }
 
       var self = this;
       setTimeout(function() {
@@ -1120,10 +1270,12 @@ window.displayHelper = {
       $('#valider').appendTo($('#displayHelper_validate'));
       if(window.innerWidth >= 1200) {
           $('#task').addClass('largeScreen');
+          $('#solution').addClass('largeScreen');
           $('#displayHelperAnswering').appendTo($('#zone_1'));
       }
       else {
          $('#task').removeClass('largeScreen');
+         $('#solution').removeClass('largeScreen');
          if ($('#showSolutionButton')) {
             $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
          }
@@ -1139,6 +1291,7 @@ window.displayHelper = {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
+      $('body').css('width', '100%');
       // This try is probably not needed but avoid breaking just in case
       try {
          $(document).ready(function () {displayHelper.updateLayout();});
@@ -1153,9 +1306,13 @@ window.displayHelper = {
       return this.levelsMaxScores;
    },
 
-   displayLevel: function(newLevel) {
+   displayLevel: function (newLevel, calledFromSet, isLocked) {
       // Only displays a level, without requesting a level change to the task
-      if (this.popupMessageShown) {
+      if(!calledFromSet) {
+         this.taskLevel = newLevel;
+      }
+
+      if (this.popupMessageShown && !isLocked) {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
@@ -1181,17 +1338,21 @@ window.displayHelper = {
       $('#tabsMenu .li.current').next().addClass('next');
    },
 
-   setLevel: function(newLevel) {
-      if (this.taskLevel == newLevel) {
+   setLevel: function(newLevel, force) {
+      // Check for locked level
+      var lockedLevel = $('#tab_' + newLevel).hasClass('lockedLevel');
+
+      // Always make sure we're displaying the level
+      this.displayLevel(newLevel, true, lockedLevel);
+
+      // Skip actually changing the level if we're already on this level
+      if (this.taskLevel == newLevel && !force) {
          return;
       }
-
-      this.displayLevel(newLevel);
 
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;
-      this.taskLevel = newLevel;
       var self = this;
 
       var afterReload = function() {
@@ -1200,10 +1361,14 @@ window.displayHelper = {
          self.checkAnswerChanged();
          self.stopShowingResult();
          if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
-            self.showPopupMessage(self.strings.lockedLevel, 'lock');
+            if(window.location.protocol == 'file:') {
+               self.showPopupMessage(self.strings.lockedLevelDev, 'tab', self.strings.alright, reload);
+            } else {
+               self.showPopupMessage(self.strings.lockedLevel, 'lock');
+            }
          } else if (!self.hasSolution) {
             if ($('#tab_' + newLevel).hasClass('uselessLevel') && self.levelsScores[newLevel] < self.levelsMaxScores[newLevel]) {
-               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
+               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, reload, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
                var easyVersionKey = "levelVersionName_easy";
@@ -1215,22 +1380,27 @@ window.displayHelper = {
                'tab',
                   self.strings.illKeepThatInMind, function() {
                      self.neverHadHard = false;
+                     reload();
                   }
                );
             }
          }
       };
 
-      if(self.reloadWithCallbacks) {
-         task.reloadStateObject(state, function() {
-            task.reloadAnswerObject(answer, afterReload);
-         });
-      }
-      else {
-         task.reloadStateObject(state, true);
-         task.reloadAnswerObject(answer);
-         afterReload();
-      }
+      var reload = function(callback) {
+         if(self.reloadWithCallbacks) {
+            task.reloadStateObject(state, function() {
+               task.reloadAnswerObject(answer, callback);
+            });
+         }
+         else {
+            task.reloadStateObject(state, true);
+            task.reloadAnswerObject(answer);
+            if(callback) { callback(); }
+         }
+      };
+
+      reload(afterReload);
    },
 
    getImgPath: function() {
@@ -1262,7 +1432,7 @@ window.displayHelper = {
    },
 
 
-   showPopupDialog: function(message) {
+   showPopupDialog: function(message, callback) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -1278,6 +1448,7 @@ window.displayHelper = {
       $('#popupMessage').html(popupHtml).show();
 
       this.popupMessageShown = true;
+      if (callback) callback();
       try {
          $(parent.document).scrollTop(0);
       } catch (e) {
@@ -1486,6 +1657,10 @@ window.displayHelper = {
          task.reloadAnswer('', function() {
             self.checkAnswerChanged();
          });
+      } else if (mode == 'stay') {
+         // A few tasks erroneously call this validate directly instead of the
+         // platform's validate
+         this.callValidate();
       } else {
          task.getAnswer(function(strAnswer) {
             if (!self.hasSolution) {
@@ -1590,7 +1765,11 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          this.updateStarsAtLevel(gradedLevel);
-         drawStars('titleStars', this.maxStars, 24, this.graderScore / maxScores.hard, 'normal');
+         var maxMaxScore = 0;
+         for(var lvl in maxScores) {
+            maxMaxScore = Math.max(maxScores[lvl], maxMaxScore);
+         }
+         drawStars('titleStars', this.maxStars, 24, this.graderScore / maxMaxScore, 'normal');
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
@@ -1606,6 +1785,10 @@ window.displayHelper = {
             $('#tab_' + curLevel).removeClass('lockedLevel');
             this.unlockedLevels++;
             this.updateStarsAtLevel(curLevel);
+            // Currently displayed level has been unlocked, display it
+            if(curLevel == this.taskLevel) {
+               this.setLevel(this.taskLevel, true);
+            }
          }
       }
       if (scores[gradedLevel] == this.graderScore) {
@@ -1649,10 +1832,14 @@ window.displayHelper = {
                 if(gradedLevel == "medium") { threshold = this.thresholdMedium; }
                 else if(gradedLevel == "easy") { threshold = this.thresholdEasy; }
             }
-            if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
+            if(levelIdx == this.forceNextTaskAfter) {
+               // Move onto next task after a specified difficulty
+               actionNext = "top";
+               fullMessage += this.strings.tryNextTask;
+            } else if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
                actionNext = nextLevel;
-               if(gradedLevel == "easy") { fullMessage += this.strings.tryMediumLevel; }
-               if(gradedLevel == "medium") { fullMessage += this.strings.tryHardLevel; }
+               if(nextLevel == "medium") { fullMessage += this.strings.tryMediumLevel; }
+               if(nextLevel == "hard") { fullMessage += this.strings.tryHardLevel; }
             } else {
                actionNext = "nextTask";
                fullMessage += this.strings.tryNextTask;
@@ -1664,8 +1851,13 @@ window.displayHelper = {
          }
       }
       var self = this;
+
       // Offer an option to stay on the task instead of forcing nextTask
-      var noButtonText = actionNext == "nextTask" ? this.strings.no : null;
+      var noButtonText = null;
+      if (this.alwaysAskLevelChange || actionNext == "nextTask") {
+         noButtonText = this.strings.no;
+      }
+
       this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
             // TODO: replace with something compatible with the API.
@@ -1675,6 +1867,8 @@ window.displayHelper = {
             }
             if (actionNext == "nextTask") {
                platform.validate("nextImmediate");
+            } else if (actionNext == "top") {
+               platform.validate("top");
             } else if(self.levelsIdx[actionNext] !== undefined) {
                self.setLevel(actionNext);
             }
@@ -1719,6 +1913,10 @@ window.displayHelper = {
    // Checks task.getAnswer() against previously recorded result, and calls
    // displayHelper.updateMessages() accordingly.
    checkAnswerChanged: function() {
+      if (this.loading) {
+         // Avoid cancelling the interval while the task is loading
+         return;
+      }
       if (!this.loaded) {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
          return;
@@ -1762,7 +1960,11 @@ window.displayHelper = {
             }
          }
       }
-      scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
+      scoreDiffMsg += " " + this.graderScore;
+      if (this.taskParams && this.taskParams.maxScore) {
+         // taskParams may not always be loaded there
+         scoreDiffMsg += this.strings.outOf + this.taskParams.maxScore + ".";
+      }
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' +  this.strings.reloadValidAnswer + '</a>';
@@ -1835,7 +2037,7 @@ window.displayHelper = {
       switch (taskMode) {
          case 'saved_unchanged':
             var color = 'red';
-            if (this.submittedScore == this.taskParams.maxScore) {
+            if (this.submittedScore == (this.taskParams.maxScore || 0)) {
                color = 'green';
             } else if (this.submittedScore > 0) {
                color = '#ff8c00';
@@ -2017,9 +2219,11 @@ window.displayHelper = {
 
    sendBestScore: function(callback, scores, messages) {
       var bestLevel = 'easy';
+      var bestScore = null;
       for (var curLevel in scores) {
-         if (scores[bestLevel] <= scores[curLevel]) {
+         if (bestScore === null || bestScore <= scores[curLevel]) {
             bestLevel = curLevel;
+            bestScore = scores[curLevel];
          }
       }
       callback(scores[bestLevel], messages[bestLevel] + " (" + this.strings["levelVersionName_" + bestLevel] + ")");
@@ -2130,9 +2334,13 @@ var Beav = new Object();
 Beav.Object = new Object();
 
 Beav.Object.eq = function eq(x, y) {
-   // assumes arguments to be of same type
+   // assumes arguments to be of same type, except if one of the two arguments is null,
+   // in which case the comparison returns true if the other argument is also null.
+   if (x == null || y == null) {
+      return (x == null && y == null);
+   }
    var tx = typeof(x);
-   var ty = typeof(y);
+   var ty = typeof(y); 
    if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
    }
@@ -2174,6 +2382,10 @@ Beav.Object.eq = function eq(x, y) {
       return true;
    }
    throw "Beav.Object.eq unsupported types";
+};
+
+Beav.Object.clone = function(obj) {
+   return JSON.parse(JSON.stringify(obj))
 };
 
 
@@ -2263,6 +2475,32 @@ Beav.Array.shuffle = function(t, randomSeed) {
       t[pos] = tmp;
    }
 };
+
+Beav.Array.pickRandomNTimes = function (t, rng, n, diffN) {
+   // Pick a random index from t, n times, different from at least diffN previous indexes
+   // Useful to have a task which randomly cycles through the elements of t,
+   // without giving the same task instance as the previous diffN ones
+   var previousIndexes = [];
+   var index = 0;
+   if (n < 1) { n += 100; }
+   for (var i = 0; i < n; i++) {
+      index = rng.nextInt(0, Math.max(0, t.length - previousIndexes.length - 1));
+      var sortedPreviousIndexes = previousIndexes.slice();
+      sortedPreviousIndexes.sort();
+      for (var j = 0; j < sortedPreviousIndexes.length; j++) {
+         if (index >= sortedPreviousIndexes[j]) {
+            index++;
+         }
+      }
+      if (index > t.length - 1) {
+         // Happens if we ask for more different indexes than there are items in the list
+         index = t.length - 1;
+      }
+      previousIndexes.push(index);
+      previousIndexes = previousIndexes.slice(-diffN);
+   }
+   return t[index];
+}
 
 
 /**********************************************************************************/
@@ -2443,6 +2681,51 @@ Beav.Navigator.isIE8 = function() {
   return navigator.appVersion.indexOf("MSIE 8.") != -1;
 }
 
+Beav.Navigator.getVersion = function(){
+   var ua= navigator.userAgent, tem, 
+   M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+   if(/trident/i.test(M[1])){
+      tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+      return 'IE '+(tem[1] || '');
+   }
+   if(M[1]=== 'Chrome'){
+      tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+      if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+   }
+   M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+   if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+   return M
+}
+
+Beav.Navigator.isIE = function () {
+   // case for IE11 which has trident
+   var version = Beav.Navigator.getVersion();
+   if (typeof version == 'string' && version.substring(0, 2).toLowerCase() == 'ie') {
+      return true
+   }
+   return version[0].toLowerCase() == 'msie' || version[0].toLowerCase() == 'ie';
+}
+
+Beav.Navigator.isSafari = function () {
+   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+   // console.log(isSafari)
+   return isSafari
+}
+
+Beav.Navigator.supportsResponsive = function() {
+   if(Beav.Navigator.isIE8()){
+      return false
+   }
+   var navVersion = Beav.Navigator.getVersion();
+   if(navVersion[0].toLowerCase() == 'msie'){
+      return false
+   }
+   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 68){
+      return false
+   }
+   return true
+}
+
 
 /**********************************************************************************/
 /* Dom */
@@ -2490,6 +2773,57 @@ Beav.Raphael.lineRelative = function(paper, x1, y1, dx, dy) {
    return Beav.Raphael.line(paper, x1, y1, x1+dx, y1+dy);
 };
 
+Beav.Raphael.loadTextExtensions = function(paper) {
+   paper.text_prebeav = paper.text;
+
+   var valign = function(dir) { // dir = 'center', or 'top', or 'bottom'
+      var b = this.getBBox();
+      var h = b.height;
+      var d = 0;
+      if (dir == 'center') {
+         d = 0;
+      } else if (dir == 'top') {
+         d = h/2;
+      } else if (dir == 'top') {
+         d = - h/2; // TODO: maybe remove one pixel in case h is odd number?
+      }
+      try {
+         // this.translate(0, d); // not supported by IE8
+         // this.attr({'y': b.y + d}); // does not seem to work
+         this.transform("t0," + d); // workaround?
+      } catch(e) {}
+      return this;
+   };
+
+   paper.text = function(x, y, text, fontSize) {
+      if(!window.enableRtl || !text || typeof text == "string" || !text.length) {
+         var txt = paper.text_prebeav(x, y, text);
+         txt.valign = valign;
+         return txt;
+      }
+      var set = paper.set();
+      if(!fontSize) { fontSize = 16; }
+      var lineHeight = fontSize * 1.2; // Raphael's line-height
+      var startY = y - ((text.length - 1) / 2) * lineHeight
+      for(var i = 0; i < text.length; i++) {
+         var txt = paper.text_prebeav(x, startY + i * lineHeight, text[i]);
+         txt.valign = valign;
+         set.push(txt);
+      }
+      return set;
+   }
+
+   var setproto = paper.set().__proto__;
+   try {
+   setproto.valign = function(dir) {
+      this.forEach(function(item) {
+         item.valign(dir);
+      });
+      return this;
+   };
+   } catch(err) {
+   }
+};
 
 /**********************************************************************************/
 /* Random */
@@ -2521,12 +2855,25 @@ Beav.Geometry.distance = function(x1,y1,x2,y2) {
    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
 };
 
+Beav.Geometry.distance3D = function(x1,y1,z1,x2,y2,z2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2) + Math.pow(z2 - z1,2));
+};
+
+Beav.Geometry.distanceND = function(pos1,pos2) {
+   var nbDim = pos1.length;
+   var sum = 0;
+   for(var iD = 0; iD < nbDim; iD++){
+      sum += Math.pow(pos2[iD] - pos1[iD], 2);
+   }
+   return Math.sqrt(sum);
+};
+
 /*
    This is used to handle drag on devices that have both a touch screen and a mouse.
    Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
    To call instead of element.drag(onMove, onStart, onEnd);
 */
-Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
+Beav.dragWithTouch = function (element, onMove, onStart, onEnd) {
    var touchingX = 0;
    var touchingY = 0;
    var disabled = false;
@@ -2555,7 +2902,12 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       var touches = evt.changedTouches;
       var dx = touches[0].pageX - touchingX;
       var dy = touches[0].pageY - touchingY;
-      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      onMove(dx/scale, dy/scale, touches[0].pageX, touches[0].pageY, evt);
    }
    
    function callOnStart(x,y,event) {
@@ -2565,7 +2917,12 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
    
    function callOnMove(dx,dy,x,y,event) {
       disabled = true;
-      onMove(dx,dy,x,y,event);
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      onMove(dx/scale,dy/scale,x,y,event);
    }
    
    function callOnEnd(event) {
@@ -2576,12 +2933,17 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
    // element.undrag();
    element.drag(callOnMove,callOnStart,callOnEnd);
    if (element.touchstart) {
+      element.untouchstart();
+      element.untouchend();
+      element.untouchmove();
+      element.untouchcancel();
       element.touchstart(onTouchStart);
       element.touchend(onTouchEnd);
       element.touchcancel(onTouchEnd);
       element.touchmove(onTouchMove);
    }
 }
+
 (function() {
 
 'use strict';
@@ -2593,6 +2955,20 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
 var res = {};
 
 var taskResourcesLoaded = false;
+
+function getTextContent(node) {
+   if(!node) { return ''; }
+   var text = '';
+   node.childNodes.forEach(function (child) {
+      if (child.nodeType == 3) {
+         text += child.textContent ? ' ' + child.textContent.trim() : '';
+      } else if (child.nodeType == 1) {
+         var childText = getTextContent(child);
+         text += childText ? ' ' + childText : '';
+      }
+   });
+   return text.trim();
+}
 
 window.implementGetResources = function(task) {
    task.getResources = function(callback)
@@ -2622,9 +2998,9 @@ window.implementGetResources = function(task) {
       res.sat_modules = [];
       res.files = [];
       if (!res.title) {
-         res.title = $('title').text();
+         res.title = $('title').text() || $('h1').text();
       }
-      
+
       // Resources
       var curDest = 'task';
       var curType = 'javascript';
@@ -2693,17 +3069,25 @@ window.implementGetResources = function(task) {
 
       // Images
       var images = [];
-      var image = '';
-      $('#task img').each(function() {
-         var src = $(this).attr('src');
-         if (src) {
-            image = src.toString();
-            if ($.inArray(image, images) === -1) {
-               res.task.push({ type: 'image', url: image });
-               images.push(image);
+      function addImageTo(imageList) {
+         return function () {
+            var src = $(this).attr('src');
+            var classes = $(this).attr('class');
+            classes = classes ? classes.split(/\s+/) : null;
+            if (src) {
+               var imageSrc = src.toString();
+               if ($.inArray(imageSrc, images) === -1) {
+                  var imgData = { type: 'image', url: imageSrc };
+                  if (classes && classes.length > 0) {
+                     imgData.classes = classes;
+                  }
+                  imageList.push(imgData);
+                  images.push(imageSrc);
+               }
             }
          }
-      });
+      }
+      $('#task img').each(addImageTo(res.task));
       fillImages($('#task').html(), images, res.task);
       $('script').each(function() {
          if ($(this).hasClass('remove') || $(this).attr('src') || $(this).attr('href')) {
@@ -2711,23 +3095,11 @@ window.implementGetResources = function(task) {
          }
          fillImages($(this).html(), images, res.task);
       });
-      $('#solution img').each(function() {
-         image = $(this).attr('src').toString();
-         if ($.inArray(image, images) === -1) {
-            res.solution.push({ type: 'image', url: image });
-            images.push(image);
-         }
-      });
+      $('#solution img').each(addImageTo(res.solution));
       fillImages($('#solution').html(), images, res.solution);
       $('.hint').each(function() {
          var hintnum = $(this).attr('hint-num');
-         $('[hint-num='+hintnum+'] img').each(function() {
-            image = $(this).attr('src').toString();
-            if ($.inArray(image, images) === -1) {
-               res.hints[hintnum].push({ type: 'image', url: image });
-               images.push(image);
-            }
-         });
+         $('[hint-num=' + hintnum + '] img').each(addImageTo(res.hints[hintnum]));
          fillImages($(this).html(), images, res.hints[hintnum]);
       });
 
@@ -2757,6 +3129,22 @@ window.implementGetResources = function(task) {
         }
       });
 
+      // Text for referencing
+      var content = {};
+      content.title = res.title;
+      content.summary = '';
+      content.level2 = [];
+      content.level3 = [];
+      $('h2').each(function () {
+         content.level2.push($(this).text().trim());
+      });
+      $('h3').each(function () {
+         content.level3.push($(this).text().trim());
+      });
+      content.text = getTextContent($('#task')[0]) || getTextContent($('body')[0]);
+      content.lang = 'default';
+      res.content = [content];
+
       taskResourcesLoaded = true;
 
       if(window.taskGetResourcesPost) {
@@ -2778,7 +3166,7 @@ window.declareTaskResource = declareResource;
 
 var resourcesObjectForRegistration = {};
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
    if (typeof json !== 'undefined') {
       res = json;
    }
@@ -2806,10 +3194,10 @@ $(document).ready(function() {
 
 
 function fillImages(text, images, res) {
-   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4", "zip"];
+   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4", "zip", "mp3", "pdf", "csv", "py"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
-      var regexp = new RegExp("[\'\"]([^;\"\']*." + ext + ")[\'\"]", "g");
+      var regexp = new RegExp("[\'\"]([^;\"\']*\\." + ext + ")[\'\"]", "g");
       while (true) {
          var match = regexp.exec(text);
          if (!match) {
@@ -2846,6 +3234,12 @@ function fillImages(text, images, res) {
    // demo platform key
    var demo_key = 'buddy'
 
+   function getUrlParameterByName(name) {
+     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+       results = regex.exec(location.href);
+     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+   }
 
    var languageStrings = {
       ar: {
@@ -2976,9 +3370,38 @@ function getLanguageString(key) {
     if(typeof window.jwt == 'undefined') {
         window.jwt = {
             isDummy: true,
-            sign: function() { return null; },
-            decode: function(token) { return token; }
-            };
+            sign: function(data) {
+                var header = {alg: "HS256", typ: "JWT"};
+                // Dummy signature because it would require
+                // installing a crypto library to calculate the real one
+                var signature = 'bcM4TMh3PG77_0P7DwqeUAR07XKIvgNce58uJEEP_6A';
+                var claim = Object.assign(data, {"sub": 1234567890});
+
+                return window.jwt.encode64(JSON.stringify(header)) + '.' +
+                    window.jwt.encode64(JSON.stringify(claim)) + '.' +
+                    (signature || '');
+            },
+            decode: function(token) {
+                var parts = token.split('.');
+
+                return {
+                    header: JSON.parse(window.jwt.decode64(parts[0])),
+                    claim: JSON.parse(window.jwt.decode64(parts[1])),
+                    signature: (parts[2] || '')
+                };
+            },
+            encode64: function (value) {
+                var encoded = btoa(unescape(encodeURIComponent(value)));
+
+                return encoded
+                    .replace(/\//g, '_')
+                    .replace(/\+/g, '-')
+                    .replace(/=+$/g, '');
+            },
+            decode64: function (value) {
+                return decodeURIComponent(escape(atob(value)));
+            }
+        };
     }
 
     function TaskToken(data, key) {
@@ -2996,7 +3419,7 @@ function getLanguageString(key) {
             } catch(e) {}
             var hintsReq = JSON.parse(this.data.sHintsRequested);
             var exists = hintsReq.find(function(h) {
-                return h == hint_params;
+               return JSON.stringify(h) == JSON.stringify(hint_params);
             });
             if(!exists) {
                 hintsReq.push(hint_params);
@@ -3009,6 +3432,7 @@ function getLanguageString(key) {
             for(var key in newData) {
                 this.data[key] = newData[key];
             }
+            this.get(callback);
         }
 
         this.getToken = function(data, callback) {
@@ -3112,27 +3536,37 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(task) { return function(mode, success, error) {
-   if (!success) { success = function () { }; }
-   if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
-      return;
-   }
-   if (mode == 'cancel') {
-      alreadyStayed = false;
-   }
-   if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
-      platform.trigger('validate', [mode]);
-      success();
-   } else {
-      // Try to validate
-      task.getAnswer(function (answer) {
-         task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
-            success();
-         })
-      });
-   }
-   if (mode == 'stay') {
-      alreadyStayed = true;
-   }
+  if (!success) { success = function () { }; }
+  if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
+    return;
+  }
+  if (mode == 'cancel') {
+    alreadyStayed = false;
+  }
+  if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
+    platform.trigger('validate', [mode]);
+    success();
+  } else {
+    // Try to validate
+    task.getAnswer(function (answer) {
+      task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
+        task_token.update({bAccessSolutions: true}, function(token) {
+          task.updateToken(token, function() {
+            if (success) {
+              success();
+            }
+          });
+        });
+      }, function (message) {
+        if (error) {
+          error(message);
+        }
+      })
+    });
+  }
+  if (mode == 'stay') {
+    alreadyStayed = true;
+  }
 }};
 
 function getUrlParameter(sParam)
@@ -3170,20 +3604,23 @@ var chooseView = (function () {
       isDouble: false,
       lastShownViews: {},
 
-      init: function(views) {
-         if (! $("#choose-view").length)
-            $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
+      init: function(views, showViews) {
+         if (! $("#choose-view").length) {
+             $(document.body).prepend('<div id="choose-view"></div>');
+         }
          $("#choose-view").html("");
          // Display buttons to select task view or solution view
-         /*
-         for(var viewName in views) {
+
+        if (showViews) {
+          for(var viewName in views) {
             if (!views[viewName].requires) {
-               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
-               $("#choose-view").append(btn);
-               btn.click(this.selectFactory(viewName));
+              var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
+              $("#choose-view").append(btn);
+              btn.click(this.selectFactory(viewName));
             }
-         }
-         */
+          }
+        }
+
          $("#grade").remove();
          var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + getLanguageString('gradeAnswer') + '</button></center>');
          // display grader button only if dev mode by adding URL hash 'dev'
@@ -3203,8 +3640,8 @@ var chooseView = (function () {
          })
       },
 
-      reinit: function(views) {
-         this.init(views);
+      reinit: function(views, showViews) {
+         this.init(views, showViews);
          var newShownViews = {};
          for(var viewName in this.lastShownViews) {
             if(!this.lastShownViews[viewName]) { continue; }
@@ -3254,7 +3691,7 @@ var chooseView = (function () {
 
 window.task_token = new TaskToken({
    itemUrl: window.location.href,
-   randomSeed: Math.floor(Math.random() * 10)
+   randomSeed: getUrlParameterByName('randomSeed') ? Number(getUrlParameterByName('randomSeed')) : Math.floor(Math.random() * 10)
 }, demo_key);
 
 
@@ -3266,8 +3703,8 @@ $(document).ready(function() {
        var testEdge = parent.TaskProxyManager; // generates an exception on edge when in a platform (parent not available)
    } catch(ex) {
        // iframe from files:// url are considered cross-domain by Chrome
-       if(location.protocol !== 'file:') {
-         hasPlatform = true;
+       if(location.protocol !== 'file:' && getUrlParameterByName('iframe') !== 'noApi') {
+           hasPlatform = true;
        }
    }
    if (!hasPlatform) {
@@ -3280,8 +3717,11 @@ $(document).ready(function() {
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
             if(data.views) {
-               chooseView.reinit(data.views);
+               chooseView.reinit(data.views, taskMetaData.showViews);
             }
+            if (success) {success();}
+         };
+         platform.log = function(data, success, error) {
             if (success) {success();}
          };
          var taskOptions = {};
@@ -3298,7 +3738,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions, "supportsTabs": true};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
@@ -3335,46 +3775,48 @@ $(document).ready(function() {
          }
          if (!taskOptions.hideTitle) {
             $("#task h1").show();
+            if ($("#task h1").length)
+                document.title = $("#task h1:first").text();
          }
 
          if (taskMetaData.fullFeedback) {
             loadedViews.grader = true;
          }
 
-         task.load(
-             loadedViews,
-             function() {
-                platform.trigger('load', [loadedViews]);
-                task.getViews(function(views) {
-                    chooseView.init(views);
-                });
-                task.showViews(shownViews, function() {
-                    chooseView.update(shownViews);
-                    platform.trigger('showViews', [{"task": true}]);
-                });
-                if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
-                }
+          task_token.get(function(token) {
+            task.updateToken(token, function () {
+              task.load(
+                loadedViews,
+                function () {
+                  platform.trigger('load', [loadedViews]);
+                  task.getViews(function (views, showViews) {
+                    chooseView.init(views, showViews);
 
-                // add branded header to platformless task depending on avatarType
-                // defaults to beaver platform branding
-                if(window.displayHelper) {
-                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                  } else {
-                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                    task.showViews(shownViews, function () {
+                      chooseView.update(shownViews);
+                      platform.trigger('showViews', [shownViews]);
+                    });
+                  });
+                  if ($("#solution").length) {
+                    $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
                   }
+
+                  // add branded header to platformless task depending on avatarType
+                  // defaults to beaver platform branding
+                  if (window.displayHelper) {
+                    if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                      $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                    } else {
+                      $('body').prepend(miniPlatformWrapping[beaver].header);
+                    }
+                  }
+                },
+                function (error) {
+                  console.error(error)
                 }
-             },
-             function(error) {
-                 console.error(error)
-             }
-        );
-
-
-        task_token.get(function(token) {
-            task.updateToken(token, function() {})
-        })
+              );
+            });
+          });
 
 
          /* For the 'resize' event listener below, we use a cross-browser
@@ -3393,8 +3835,8 @@ $(document).ready(function() {
          }
 
          addEvent('resize', window, function() {
-            task.getViews(function(views) {
-               chooseView.reinit(views);
+            task.getViews(function(views, showViews) {
+               chooseView.reinit(views, showViews);
             });
          });
       };

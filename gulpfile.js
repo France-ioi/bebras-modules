@@ -79,4 +79,4 @@ for(var name in bundles) {
     allBundles.push('bundle-' + name);
 }
 
-gulp.task('bundles', allBundles);
+gulp.task('bundles', gulp.parallel(allBundles));
