@@ -4781,6 +4781,49 @@ elif program_exists:
       }
       return module;
   }
+  function getBlockGeneratorParams(blockInfo, block, language) {
+      let params = "";
+      let args0 = blockInfo.blocklyJson.args0;
+      let blockParams = blockInfo.params;
+      /* There are three kinds of input: value_input, statement_input and dummy_input,
+       We should definitely consider value_input here and not consider dummy_input here.
+
+       I don't know how statement_input is handled best, so I'll ignore it first -- Robert
+     */ let iParam = 0;
+      for(let iArgs0 in args0){
+          if (args0[iArgs0].type == "input_value") {
+              if (iParam) {
+                  params += ", ";
+              }
+              if (blockParams && blockParams[iArgs0] == 'Statement') {
+                  params += "function () {\n  " + window.Blockly.JavaScript.statementToCode(block, 'PARAM_' + iParam) + "}";
+              } else {
+                  params += window.Blockly[language].valueToCode(block, 'PARAM_' + iParam, window.Blockly[language].ORDER_ATOMIC);
+              }
+              iParam += 1;
+          }
+          if (args0[iArgs0].type == "field_number" || args0[iArgs0].type == "field_angle" || args0[iArgs0].type == "field_dropdown" || args0[iArgs0].type == "field_input") {
+              if (iParam) {
+                  params += ", ";
+              }
+              let fieldValue = block.getFieldValue('PARAM_' + iParam);
+              if (blockParams && blockParams[iArgs0] == 'Number') {
+                  params += parseInt(fieldValue);
+              } else {
+                  params += JSON.stringify(fieldValue);
+              }
+              iParam += 1;
+          }
+          if (args0[iArgs0].type == "field_colour") {
+              if (iParam) {
+                  params += ", ";
+              }
+              params += '"' + block.getFieldValue('PARAM_' + iParam) + '"';
+              iParam += 1;
+          }
+      }
+      return params;
+  }
 
   function magnetometerModuleDefinition(context, strings) {
       const sensorHandler = context.sensorHandler;
@@ -16302,6 +16345,9 @@ def readMagneticForce(axis):
         throw("Unknown axis")
     return round(val/100, 1)
 
+def computeCompassHeading():
+    return compass.heading()
+
 def readMagnetometerLSM303C(allowcalibration=True):
     return [readMagneticForce("x"), readMagneticForce("y"), readMagneticForce("z")]
 
@@ -22137,6 +22183,9 @@ elif program_exists:
           var _this = this;
           this.microbitDownloadHex.on('click', /*#__PURE__*/ _async_to_generator(function*(e) {
               const pythonCode = yield _this.context.getPythonCode();
+              console.log({
+                  pythonCode
+              });
               const hexFile = yield convertToHex(pythonCode);
               const a = window.document.createElement('a');
               const blob = new Blob([
@@ -22390,8 +22439,8 @@ elif program_exists:
           const accelerometerModule = accelerometerModuleDefinition(context);
           accelerometerModule.readAcceleration.blocks.forEach((block)=>{
               block.codeGenerators = {
-                  Python: (block)=>{
-                      const axis = block.getFieldValue('PARAM_0');
+                  Python: (blocklyBlock)=>{
+                      const axis = blocklyBlock.getFieldValue('PARAM_0');
                       return [
                           `accelerometer.get_${axis}()`,
                           window.Blockly.Python.ORDER_NONE
@@ -22416,31 +22465,28 @@ elif program_exists:
           const ledMatrixModule = ledMatrixModuleDefinition(context);
           ledMatrixModule.ledMatrixShow.blocks.forEach((block)=>{
               block.codeGenerators = {
-                  Python: ()=>{
-                      return [
-                          `display.show(TODO)`,
-                          window.Blockly.Python.ORDER_NONE
-                      ];
+                  Python: (blocklyBlock)=>{
+                      let blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
+                      if ('ledMatrixShowImage' === block.name) {
+                          blockParams = `Image(${blockParams})`;
+                      }
+                      return `display.show(${blockParams});\n`;
                   }
               };
           });
           ledMatrixModule.ledMatrixClear.blocks.forEach((block)=>{
               block.codeGenerators = {
                   Python: ()=>{
-                      return [
-                          `display.clear()`,
-                          window.Blockly.Python.ORDER_NONE
-                      ];
+                      return `display.clear();\n`;
                   }
               };
           });
           ledMatrixModule.ledMatrixGetPixel.blocks.forEach((block)=>{
               block.codeGenerators = {
-                  Python: (block)=>{
-                      const x = block.getFieldValue('PARAM_0');
-                      const y = block.getFieldValue('PARAM_1');
+                  Python: (blocklyBlock)=>{
+                      const blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
                       return [
-                          `display.get_pixel(${x}, ${y})`,
+                          `display.get_pixel(${blockParams})`,
                           window.Blockly.Python.ORDER_NONE
                       ];
                   }
@@ -22448,14 +22494,9 @@ elif program_exists:
           });
           ledMatrixModule.ledMatrixSetPixel.blocks.forEach((block)=>{
               block.codeGenerators = {
-                  Python: (block)=>{
-                      const x = block.getFieldValue('PARAM_0');
-                      const y = block.getFieldValue('PARAM_1');
-                      const intensity = block.getFieldValue('PARAM_2');
-                      return [
-                          `display.set_pixel(${x}, ${y}, ${intensity})`,
-                          window.Blockly.Python.ORDER_NONE
-                      ];
+                  Python: (blocklyBlock)=>{
+                      const blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
+                      return `display.set_pixel(${blockParams});\n`;
                   }
               };
           });
@@ -22477,6 +22518,16 @@ elif program_exists:
                       const axis = block.getFieldValue('PARAM_0');
                       return [
                           `compass.get_${axis}()`,
+                          window.Blockly.Python.ORDER_NONE
+                      ];
+                  }
+              };
+          });
+          magnetometerModule.computeCompassHeading.blocks.forEach((block)=>{
+              block.codeGenerators = {
+                  Python: ()=>{
+                      return [
+                          `compass.heading()`,
                           window.Blockly.Python.ORDER_NONE
                       ];
                   }
