@@ -4433,14 +4433,14 @@ elif program_exists:
       };
       const wasGesture = function(axis, callback) {
           if (!context.display || context.autoGrading || context.offLineMode) {
-              let sensor = sensorHandler.findSensorByType("accelerometer");
-              let state = context.getSensorState(sensor.name);
-              context.waitDelay(callback, state);
+              sensorHandler.findSensorByType("accelerometer");
+              // let state = context.getSensorState(sensor.name);
+              context.waitDelay(callback, false);
           } else {
               let cb = context.runner.waitCallback(callback);
               let command = "wasGesture(\"" + axis + "\")";
               context.quickPiConnection.sendCommand(command, function(returnVal) {
-                  cb(Number(returnVal));
+                  cb(!!returnVal);
               });
           }
       };
@@ -4534,7 +4534,7 @@ elif program_exists:
                           'accelerometer'
                       ],
                       methods: {
-                          wasGesture: {
+                          was_gesture: {
                               params: [
                                   "String"
                               ],
@@ -5650,6 +5650,7 @@ elif program_exists:
           stroke: "mettre la couleur de tracé à %1",
           noStroke: "ne pas dessiner les contours",
           readAcceleration: "accélération en (m/s²) dans l'axe %1",
+          wasGesture: "geste effectué",
           computeRotation: "calcul de l'angle de rotation (°) sur l'accéléromètre %1",
           readSoundLevel: "volume sonore",
           soundLevel: "volume sonore",
@@ -5801,6 +5802,7 @@ elif program_exists:
           stroke: "stroke(color) dessiner les bords des figures avec la couleur donnée",
           noStroke: "noStroke() ne pas dessiner les bordures des figures",
           readAcceleration: "readAcceleration(axis) lit l'accélération en m/s² sur l'axe (X, Y ou Z)",
+          wasGesture: "wasGesture(gesture) retourne True si le geste indiqué a été effectué",
           computeRotation: "computeRotation(axis) calcule l'angle de rotation en degrés sur l'accéléromètre",
           readSoundLevel: "readSoundLevel(port) retourne le volume ambiant",
           readMagneticForce: "readMagneticForce(axis) retourne le champ magnétique (µT) sur l'axe (X, Y ou Z)",
@@ -5838,6 +5840,7 @@ elif program_exists:
           // Microbit
           "Image.__constructor": "Image(leds) crée une image qui peut être affichée sur la grille de leds",
           "Accel.get_x": "retourne la valeur sur l'axe X de l'accélération en m/s²",
+          "Accel.was_gesture": "retourne True si le geste indiqué a été effectué",
           "Button.is_pressed": "retourne True si le bouton est enfoncé, False sinon"
       },
       constant: {},
@@ -13019,7 +13022,11 @@ def detectBoard():
               getStateString: function(state) {
                   if (state == null) return "0m/s²";
                   if (Array.isArray(state)) {
-                      return "X: " + state[0] + "m/s² Y: " + state[1] + "m/s² Z: " + state[2] + "m/s²";
+                      return [
+                          'X',
+                          'Y',
+                          'Z'
+                      ].map((dir, index)=>`${dir}: ${parseFloat(this.state[index].toFixed(1))} m/s²`).join(" ");
                   } else {
                       return state.toString() + "m/s²";
                   }
@@ -13067,7 +13074,11 @@ def detectBoard():
           }
           if (this.state) {
               try {
-                  let str = "X: " + this.state[0] + " m/s²\nY: " + this.state[1] + " m/s²\nZ: " + this.state[2] + " m/s²";
+                  const str = [
+                      'X',
+                      'Y',
+                      'Z'
+                  ].map((dir, index)=>`${dir}: ${parseFloat(this.state[index].toFixed(1))} m/s²`).join("\n");
                   this.stateText = this.context.paper.text(cx, state1y, str);
               } catch (e) {
               }
@@ -15640,6 +15651,15 @@ def detectBoard():
                   imgh = imgw;
               }
           }
+          let focusRect = {
+              x: imgx,
+              y: imgy,
+              h: imgh,
+              w: imgw
+          };
+          if (sensor.type == "accelerometer" || sensor.type == "gyroscope" || sensor.type == "magnetometer") {
+              focusRect.w = w * 0.75;
+          }
           let portx = state1x;
           let porty = imgy;
           let portsize = sensor.drawInfo.height * 0.11;
@@ -15656,16 +15676,16 @@ def detectBoard():
           let drawPortText = false;
           let drawName = true;
           if (!sensor.focusrect || this.sensorHandler.isElementRemoved(sensor.focusrect)) {
-              sensor.focusrect = this.context.paper.rect(imgx, imgy, imgw, imgh);
+              sensor.focusrect = this.context.paper.rect(focusRect.x, focusRect.y, focusRect.w, focusRect.h);
           }
           sensor.focusrect.attr({
               "fill": "468DDF",
               "fill-opacity": 0,
               "opacity": 0,
-              "x": imgx,
-              "y": imgy,
-              "width": imgw,
-              "height": imgh
+              "x": focusRect.x,
+              "y": focusRect.y,
+              "width": focusRect.w,
+              "height": focusRect.h
           });
           if (this.context.autoGrading) {
               scrolloffset = $('#virtualSensors').scrollLeft();
@@ -16426,6 +16446,10 @@ def turnBuzzerOn(pin=12):
 
 def turnBuzzerOff(pin=12):
     setBuzzerState("buzzer1", 0)
+    
+def wasGesture(gesture):
+    return accelerometer.was_gesture(gesture)
+
 `;
 
   function asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, key, arg) {
@@ -22443,6 +22467,17 @@ elif program_exists:
                       const axis = blocklyBlock.getFieldValue('PARAM_0');
                       return [
                           `accelerometer.get_${axis}()`,
+                          window.Blockly.Python.ORDER_NONE
+                      ];
+                  }
+              };
+          });
+          accelerometerModule.wasGesture.blocks.forEach((block)=>{
+              block.codeGenerators = {
+                  Python: (blocklyBlock)=>{
+                      let blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
+                      return [
+                          `accelerometer.was_gesture(${blockParams})`,
                           window.Blockly.Python.ORDER_NONE
                       ];
                   }
