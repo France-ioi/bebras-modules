@@ -11743,7 +11743,7 @@ def detectBoard():
               ]
           ];
       }
-      draw(sensorHandler, { imgx, imgy, imgw, imgh }) {
+      draw(sensorHandler, { imgx, imgy, imgw, imgh, h }) {
           if (this.stateText) this.stateText.remove();
           if (!this.state || !this.state.length) this.state = [
               [
@@ -11805,18 +11805,20 @@ def detectBoard():
                   }
               }
           }
+          const offsetY = h * 0.08;
+          const squareSize = (imgh - offsetY) / 5;
           for(let y = 0; y < 5; y++){
               for(let x = 0; x < 5; x++){
                   this.ledmatrixOn[y][x].attr({
                       opacity: this.state[y][x] / 10,
-                      x: imgx + imgw / 5 * x,
-                      y: imgy + imgh / 5 * y,
+                      x: imgx + squareSize * x,
+                      y: imgy + offsetY + squareSize * y,
                       width: imgw / 5,
                       height: imgh / 5
                   });
                   this.ledmatrixOff[y][x].attr({
-                      x: imgx + imgw / 5 * x,
-                      y: imgy + imgh / 5 * y,
+                      x: imgx + squareSize * x,
+                      y: imgy + offsetY + squareSize * y,
                       width: imgw / 5,
                       height: imgh / 5
                   });
@@ -15769,13 +15771,14 @@ def detectBoard():
           if (this.context.autoGrading) {
               scrolloffset = $('#virtualSensors').scrollLeft();
               if (scrolloffset > 0) fadeopacity = 0.3;
-              imgw = w * .80;
-              imgh = sensor.drawInfo.height * .80;
-              imgx = sensor.drawInfo.x + imgw * 0.75 + scrolloffset;
-              imgy = sensor.drawInfo.y + sensor.drawInfo.height / 2 - imgh / 2;
+              // imgw = w * .80;
+              // imgh = sensor.drawInfo.height * .80;
+              // imgw = imgh;
+              //
+              // imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2);
               state1x = imgx + imgw * 1.2;
               state1y = imgy + imgh / 2;
-              portx = x;
+              portx = x + 5;
               porty = imgy + imgh / 2;
               portsize = imgh / 3;
               statesize = sensor.drawInfo.height * 0.2;
@@ -23522,11 +23525,13 @@ elif program_exists:
               for (let [iSensor, sensor] of context.sensorsList.all().entries()){
                   let cellsAmount = sensorHandler.findSensorDefinition(sensor).cellsAmount;
                   const sensorWidth = cellsAmount ? cellsAmount(context.paper) : 1;
+                  const ratio = sensorWidth === 1 ? 0.6 : 1;
+                  const maxSize = context.sensorSize * 2.8;
                   sensor.drawInfo = {
                       x: 0,
                       y: 10 + context.timeLineSlotHeight * iSensor,
-                      width: sensorSize * sensorWidth * .90,
-                      height: sensorSize * .90
+                      width: maxSize * ratio,
+                      height: maxSize * ratio / sensorWidth
                   };
                   var rect = context.paper.rect(0, sensor.drawInfo.y, context.paper.width, context.timeLineSlotHeight);
                   rect.attr({
