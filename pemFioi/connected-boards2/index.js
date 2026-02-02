@@ -15854,7 +15854,8 @@ def detectBoard():
           }
           if (drawParameters.drawName) {
               if (sensor.name) {
-                  let sensorId = sensor.name;
+                  var _sensor_label;
+                  let sensorId = (_sensor_label = sensor.label) != null ? _sensor_label : sensor.name;
                   if (this.context.useportforname) sensorId = sensor.port;
                   sensor.nameText = this.context.paper.text(drawParameters.namex, drawParameters.namey, sensorId);
                   // sensor.nameText = this.context.paper.text(namex, namey, sensor.name );
@@ -16298,21 +16299,31 @@ def detectBoard():
       }
       getSensorNames(sensorType) {
           return ()=>{
-              const sensorNames = this.getSensorNamesForType(sensorType);
+              const sensorNames = this.getSensorsForType(sensorType);
               if (0 === sensorNames.length) {
-                  sensorNames.push('none');
+                  sensorNames.push({
+                      name: 'none',
+                      label: 'none'
+                  });
               }
-              return sensorNames.map((name)=>[
-                      name,
-                      name
+              return sensorNames.map((sensor)=>[
+                      sensor.label,
+                      sensor.name
                   ]);
           };
       }
       getSensorNamesForType(sensorType) {
-          let names = [];
+          return this.getSensorsForType(sensorType).map((el)=>el.name);
+      }
+      getSensorsForType(sensorType) {
+          let sensors = [];
           for (let sensor of this.context.sensorsList.all()){
               if (sensor.type == sensorType) {
-                  names.push(sensor.name);
+                  var _sensor_label;
+                  sensors.push({
+                      name: sensor.name,
+                      label: (_sensor_label = sensor.label) != null ? _sensor_label : sensor.name
+                  });
               }
           }
           if (sensorType == "button") {
@@ -16321,12 +16332,15 @@ def detectBoard():
                       let stickDefinition = this.findSensorDefinition(sensor);
                       for(let iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++){
                           let name = sensor.name + "." + stickDefinition.gpiosNames[iStick];
-                          names.push(name);
+                          sensors.push({
+                              name,
+                              label: name
+                          });
                       }
                   }
               }
           }
-          return names;
+          return sensors;
       }
       drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
           this.sensorDrawer.drawSensor(sensor, juststate, donotmovefocusrect);
