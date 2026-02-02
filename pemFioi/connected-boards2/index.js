@@ -14934,7 +14934,8 @@ def detectBoard():
           }
           for (let sensor of context.sensorsList.all()){
               let sensorDefinition = sensorHandler.findSensorDefinition(sensor);
-              addGridElement("sensorGrid", 0, sensor.name, sensor.name, sensorDefinition.selectorImages[0], sensor.port);
+              var _sensor_label;
+              addGridElement("sensorGrid", 0, sensor.name, (_sensor_label = sensor.label) != null ? _sensor_label : sensor.name, sensorDefinition.selectorImages[0], sensor.port);
           }
           updateAddGrid();
           var usedPorts = [];
