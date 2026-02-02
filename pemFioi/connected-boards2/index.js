@@ -347,7 +347,7 @@ var boardProgramming = (function (exports) {
               else ctx.fillStyle = "white";
           }
       }
-      noFill(color) {
+      noFill() {
           this.noFillStatus = true;
       }
       stroke(color) {
@@ -359,7 +359,7 @@ var boardProgramming = (function (exports) {
               else ctx.strokeStyle = "white";
           }
       }
-      noStroke(color) {
+      noStroke() {
           this.noStrokeStatus = true;
       }
       _drawPoint(canvas, scale, x, y) {
@@ -4436,9 +4436,6 @@ elif program_exists:
               let sensor = sensorHandler.findSensorByType("accelerometer");
               let state = context.getSensorState(sensor.name);
               const wasGesture = state[3];
-              state[3] = null;
-              sensor.state = state;
-              context.registerQuickPiEvent(sensor.name, state);
               context.waitDelay(callback, wasGesture === gesture);
           } else {
               let cb = context.runner.waitCallback(callback);
@@ -5844,7 +5841,7 @@ elif program_exists:
           // Microbit
           "Image.__constructor": "Image(leds) crée une image qui peut être affichée sur la grille de leds",
           "Accel.get_x": "retourne la valeur sur l'axe X de l'accélération en m/s²",
-          "Accel.was_gesture": "retourne True si le geste indiqué a été effectué",
+          "Accel.was_gesture": "accelerometer.was_gesture(gesture) retourne True si le geste indiqué a été effectué",
           "Button.is_pressed": "retourne True si le bouton est enfoncé, False sinon"
       },
       constant: {},
@@ -10820,6 +10817,527 @@ def detectBoard():
       };
   }
 
+  function initScreenDrawing(sensor) {
+      if (!sensor.screenDrawing) {
+          sensor.screenDrawing = new screenDrawing(sensor.canvas);
+      }
+  }
+  function screenModuleDefinition(context, strings) {
+      const sensorHandler = context.sensorHandler;
+      const displayText = (line1, arg2, arg3)=>{
+          let line2 = arg2;
+          let callback = arg3;
+          if (typeof arg3 == "undefined") {
+              // Only one argument
+              line2 = null;
+              callback = arg2;
+          }
+          let sensor = sensorHandler.findSensorByType("screen");
+          let command = "displayText(\"" + line1 + "\", \"\")";
+          context.registerQuickPiEvent(sensor.name, {
+              line1: line1,
+              line2: line2
+          });
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, function(retval) {
+                  cb();
+              });
+          }
+      };
+      const drawPoint = (x, y, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.drawPoint(x, y);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "drawPoint(" + x + "," + y + ")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const isPointSet = (x, y, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          let value = sensor.screenDrawing.isPointSet(x, y);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback, value);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "isPointSet(" + x + "," + y + ")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const drawLine = (x0, y0, x1, y1, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.drawLine(x0, y0, x1, y1);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "drawLine(" + x0 + "," + y0 + "," + x1 + "," + y1 + ")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const drawRectangle = (x0, y0, width, height, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.drawRectangle(x0, y0, width, height);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "drawRectangle(" + x0 + "," + y0 + "," + width + "," + height + ")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const drawCircle = (x0, y0, diameter, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.drawCircle(x0, y0, diameter);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "drawCircle(" + x0 + "," + y0 + "," + diameter + ")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const clearScreen = (callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.clearScreen();
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "clearScreen()";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const updateScreen = (callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "updateScreen()";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const autoUpdate = (autoupdate, callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "autoUpdate(\"" + (autoupdate ? "True" : "False") + "\")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const fill = (color, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.fill(color);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "fill(\"" + color + "\")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const noFill = (callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.noFill();
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "NoFill()";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const stroke = (color, callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.stroke(color);
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "stroke(\"" + color + "\")";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      const noStroke = (callback)=>{
+          let sensor = sensorHandler.findSensorByType("screen");
+          initScreenDrawing(sensor);
+          sensor.screenDrawing.noStroke();
+          context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "noStroke()";
+              context.quickPiConnection.sendCommand(command, function() {
+                  cb();
+              });
+          }
+      };
+      return {
+          displayText: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "displayText",
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      variants: [
+                          [
+                              null
+                          ],
+                          [
+                              null,
+                              null
+                          ]
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  "text": ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='displayText'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" + "</block>",
+                      handler: displayText
+                  }
+              ]
+          },
+          displayText2Lines: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "displayText2Lines",
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  "text": ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  "text": ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='displayText2Lines'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: displayText
+                  }
+              ]
+          },
+          drawPoint: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "drawPoint",
+                      params: [
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='drawPoint'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: drawPoint
+                  }
+              ]
+          },
+          isPointSet: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "isPointSet",
+                      yieldsValue: 'bool',
+                      params: [
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='isPointSet'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: isPointSet
+                  }
+              ]
+          },
+          drawLine: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "drawLine",
+                      params: [
+                          "Number",
+                          "Number",
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_2"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_3"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='drawLine'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: drawLine
+                  }
+              ]
+          },
+          drawRectangle: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "drawRectangle",
+                      params: [
+                          "Number",
+                          "Number",
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_2"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_3"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='drawRectangle'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: drawRectangle
+                  }
+              ]
+          },
+          drawCircle: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "drawCircle",
+                      params: [
+                          "Number",
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_2"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='drawCircle'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: drawCircle
+                  }
+              ]
+          },
+          clearScreen: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "clearScreen",
+                      handler: clearScreen
+                  }
+              ]
+          },
+          updateScreen: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "updateScreen",
+                      handler: updateScreen
+                  }
+              ]
+          },
+          autoUpdate: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "autoUpdate",
+                      params: [
+                          "Boolean"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='autoUpdate'>" + "<value name='PARAM_0'><shadow type='logic_boolean'></shadow></value>" + "</block>",
+                      handler: autoUpdate
+                  }
+              ]
+          },
+          fill: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "fill",
+                      params: [
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='fill'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: fill
+                  }
+              ]
+          },
+          noFill: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "noFill",
+                      handler: noFill
+                  }
+              ]
+          },
+          stroke: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "stroke",
+                      params: [
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='stroke'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: stroke
+                  }
+              ]
+          },
+          noStroke: {
+              category: 'display',
+              blocks: [
+                  {
+                      name: "noStroke",
+                      handler: noStroke
+                  }
+              ]
+          }
+      };
+  }
+
   function _extends$4() {
       _extends$4 = Object.assign || function(target) {
           for(var i = 1; i < arguments.length; i++){
@@ -11080,12 +11598,13 @@ def detectBoard():
           delete buzzerModule.stop;
           const lightModule = lightModuleDefinition(context);
           const magnetometerModule = magnetometerModuleDefinition(context);
+          const screenModule = screenModuleDefinition(context, strings);
           const soundModule = soundModuleDefinition(context);
           const temperatureModule = temperatureModuleDefinition(context);
           const timeModule = timeModuleDefinition(context);
           delete timeModule.sleep_sec;
           delete timeModule.sleep_us;
-          const features = _extends$4({}, accelerometerModule, buttonsModule, buzzerModule, lightModule, magnetometerModule, soundModule, temperatureModule, timeModule);
+          const features = _extends$4({}, accelerometerModule, buttonsModule, buzzerModule, lightModule, magnetometerModule, screenModule, soundModule, temperatureModule, timeModule);
           for(let feature in features){
               delete features[feature].classMethods;
           }
@@ -11847,19 +12366,27 @@ def detectBoard():
           }
       }
       drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
-          const drawBubble = ()=>{
-              const table = `<table>
-        ${state.map((line, y)=>`<tr>
-            ${line.map((cell, x)=>`<td style="width: 20px; height: 20px; position: relative; background: lightgrey; border: solid 1px darkgrey">
-                <div style="top: 0; left: 0; right: 0; bottom: 0; position: absolute; background: red; opacity: ${state[y][x] / 10}"></div>
-              </td>`).join('')}
-          </tr>`).join('')}
-        </table>`;
-              const div = document.createElement("div");
-              $(div).html(table);
-              return div;
-          };
-          drawBubbleTimeline(this, sensorHandler, state, expectedState, type, drawParameters, drawBubble);
+          if (!state) {
+              return;
+          }
+          const sensorDef = sensorHandler.findSensorDefinition(this);
+          if (type != "actual" || !this.lastDrawnState || !sensorDef.compareState(this.lastDrawnState, state)) {
+              const drawBubble = ()=>{
+                  const table = `<table>
+          ${state.map((line, y)=>`<tr>
+              ${line.map((cell, x)=>`<td style="width: 20px; height: 20px; position: relative; background: lightgrey; border: solid 1px darkgrey">
+                  <div style="top: 0; left: 0; right: 0; bottom: 0; position: absolute; background: red; opacity: ${state[y][x] / 10}"></div>
+                </td>`).join('')}
+            </tr>`).join('')}
+          </table>`;
+                  const div = document.createElement("div");
+                  $(div).html(table);
+                  return div;
+              };
+              drawBubbleTimeline(this, sensorHandler, state, expectedState, type, drawParameters, drawBubble);
+          } else {
+              drawParameters.deleteLastDrawnElements = false;
+          }
       }
       constructor(...args){
           super(...args);
@@ -12402,13 +12929,12 @@ def detectBoard():
                   this.screenrect.attr({
                       "opacity": 0
                   });
-                  const quickPiModuleDefinition = quickpiModuleDefinition(this.context, this.strings);
-                  quickPiModuleDefinition.blockImplementations.initScreenDrawing(this);
+                  initScreenDrawing(this);
                   //sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
                   screenDrawing.renderToCanvas(this.state, this.canvas, screenScale);
               } else {
                   let statex = drawParameters.imgx + drawParameters.imgw * .05;
-                  let statey = drawParameters.imgy + drawParameters.imgh * .2;
+                  let statey = drawParameters.imgy + drawParameters.imgh * .2 + 5 + (this.state.line2 ? drawParameters.statesize : 0);
                   if (this.state.line1.length > 16) this.state.line1 = this.state.line1.substring(0, 16);
                   if (this.state.line2 && this.state.line2.length > 16) this.state.line2 = this.state.line2.substring(0, 16);
                   if (this.canvasNode) {
@@ -12422,10 +12948,12 @@ def detectBoard():
           }
       }
       drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
+          if (!state) {
+              return;
+          }
           const { startx, ypositionmiddle, color, strokewidth, ypositiontop } = drawParameters;
-          var sensorDef = sensorHandler.findSensorDefinition(this);
-          if (type != "actual" || !this.lastScreenState || !sensorDef.compareState(this.lastScreenState, state)) {
-              this.lastScreenState = state;
+          let sensorDef = sensorHandler.findSensorDefinition(this);
+          if (type != "actual" || !this.lastDrawnState || !sensorDef.compareState(this.lastDrawnState, state)) {
               let stateBubble;
               if (state.isDrawingData) {
                   stateBubble = this.context.paper.text(startx, ypositiontop + 10, '\uf303');
@@ -13390,8 +13918,8 @@ def detectBoard():
       drawTimelineState(sensorHandler, state, expectedState, type, drawParameters) {
           const { startx, ypositionmiddle, color } = drawParameters;
           const sensorDef = sensorHandler.findSensorDefinition(this);
-          if (type != "actual" || !this.lastScreenState || !sensorDef.compareState(this.lastScreenState, state)) {
-              this.lastScreenState = state;
+          if (type != "actual" || !this.lastDrawnState || !sensorDef.compareState(this.lastDrawnState, state)) {
+              this.lastDrawnState = state;
               var stateBubble = this.context.paper.text(startx, ypositionmiddle + 10, '\uf044');
               stateBubble.attr({
                   "font": "Font Awesome 5 Free",
@@ -16243,6 +16771,9 @@ def detectBoard():
           }
           if (sensorDef && !sensorDef.compareState) {
               sensorDef.compareState = function(state1, state2) {
+                  // if ((state1 === undefined || state1 === null) && (state2 === undefined || state2 === null)) {
+                  //   return true;
+                  // }
                   if (Array.isArray(state1) && Array.isArray(state2)) {
                       return JSON.stringify(state1) === JSON.stringify(state2);
                   }
@@ -21834,7 +22365,6 @@ elif program_exists:
   ];
   const DISPLAY_INTERVAL = 625;
   function ledMatrixModuleDefinition(context, strings) {
-      context.sensorHandler;
       const displayLedStates = /*#__PURE__*/ _async_to_generator$1(function*(sensor, states, command, callback) {
           const live = !(!context.display || context.autoGrading || context.offLineMode);
           if (live) {
@@ -23354,7 +23884,7 @@ elif program_exists:
               var sensorDef = sensorHandler.findSensorDefinition(sensor);
               if (sensorDef && !sensorDef.isSensor && sensor.getInitialState) {
                   var initialState = sensor.getInitialState();
-                  if (initialState != null) context.registerQuickPiEvent(sensor.name, initialState, true, true);
+                  if (initialState != null) context.registerQuickPiEvent(sensor.name, initialState, true, false);
               }
           }
           startSensorPollInterval();
@@ -23575,12 +24105,14 @@ elif program_exists:
                       }
                       drawSensorTimeLineState(sensor, lastState, state.time, context.maxTime, "expected", true);
                       if (!context.loopsForever) drawSensorTimeLineState(sensor, lastState, startTime, maxTime, "finnish", false);
+                      sensor.lastDrawnState = lastState;
                       sensor.lastAnalogState = null;
                   }
               }
               for(var iState = 0; iState < context.timeLineStates.length; iState++){
                   var timelinestate = context.timeLineStates[iState];
                   drawSensorTimeLineState(timelinestate.sensor, timelinestate.state, timelinestate.startTime, timelinestate.endTime, timelinestate.type, true);
+                  timelinestate.sensor.lastDrawnState = timelinestate.state;
               }
           } else {
               var nSensors = context.sensorsList.size();
@@ -23609,18 +24141,18 @@ elif program_exists:
               var iSensor = 0;
               for(var row = 0; row < nbRows; row++){
                   var y = geometry.size * row;
-                  if (row > 0) {
-                      var line = context.paper.path([
-                          "M",
-                          x1,
-                          y,
-                          "L",
-                          x2,
-                          y
-                      ]);
-                      context.sensorDivisions.push(line);
-                      line.attr(lineAttr);
-                  }
+                  // if(row > 0){
+                  var line = context.paper.path([
+                      "M",
+                      x1,
+                      y,
+                      "L",
+                      x2,
+                      y
+                  ]);
+                  context.sensorDivisions.push(line);
+                  line.attr(lineAttr);
+                  // }
                   for(var col = 0; col < nbCol; col++){
                       var x = cellW * col;
                       // var y1 = y + geometry.size / 4;
@@ -24158,51 +24690,52 @@ elif program_exists:
           }
           var i = 0;
           var textStart = 0;
-          var timelabel = context.paper.text(textStart, context.timeLineY, strings.messages.timeLabel);
-          timelabel.attr({
+          let bbox = null;
+          const timelabelText = context.paper.text(textStart, context.timeLineY, strings.messages.timeLabel);
+          timelabelText.attr({
               "font-size": "10px",
               'text-anchor': 'start',
               'font-weight': 'bold',
               fill: "gray"
           });
-          context.timelineText.push(timelabel);
-          timelabel.node.style.MozUserSelect = "none";
-          timelabel.node.style.WebkitUserSelect = "none";
-          var bbox = timelabel.getBBox();
+          context.timelineText.push(timelabelText);
+          timelabelText.node.style.MozUserSelect = "none";
+          timelabelText.node.style.WebkitUserSelect = "none";
+          bbox = timelabelText.getBBox();
           textStart = bbox.x + bbox.width + 3;
-          var timelabel = context.paper.text(textStart, context.timeLineY, '\uf00e');
-          timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
-          timelabel.node.style.fontWeight = "bold";
-          timelabel.node.style.MozUserSelect = "none";
-          timelabel.node.style.WebkitUserSelect = "none";
-          timelabel.attr({
+          const timeLabelZoomPlus = context.paper.text(textStart, context.timeLineY, '\uf00e');
+          timeLabelZoomPlus.node.style.fontFamily = '"Font Awesome 5 Free"';
+          timeLabelZoomPlus.node.style.fontWeight = "bold";
+          timeLabelZoomPlus.node.style.MozUserSelect = "none";
+          timeLabelZoomPlus.node.style.WebkitUserSelect = "none";
+          timeLabelZoomPlus.attr({
               "font-size": "20" + "px",
               'text-anchor': 'start',
               'font-weight': 'bold',
               'fill': "#4A90E2"
           });
-          context.timelineText.push(timelabel);
-          timelabel.click(function() {
+          context.timelineText.push(timeLabelZoomPlus);
+          timeLabelZoomPlus.click(function() {
               var originalzoom = context.quickPiZoom;
               context.quickPiZoom += 0.3;
               if (context.quickPiZoom < 1) context.quickPiZoom = 1;
               if (originalzoom != context.quickPiZoom) context.resetDisplay();
           });
-          var bbox = timelabel.getBBox();
+          bbox = timeLabelZoomPlus.getBBox();
           textStart = bbox.x + bbox.width + 3;
-          var timelabel = context.paper.text(textStart, context.timeLineY, '\uf010');
-          timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
-          timelabel.node.style.fontWeight = "bold";
-          timelabel.node.style.MozUserSelect = "none";
-          timelabel.node.style.WebkitUserSelect = "none";
-          timelabel.attr({
+          const timeLabelZoomMinus = context.paper.text(textStart, context.timeLineY, '\uf010');
+          timeLabelZoomMinus.node.style.fontFamily = '"Font Awesome 5 Free"';
+          timeLabelZoomMinus.node.style.fontWeight = "bold";
+          timeLabelZoomMinus.node.style.MozUserSelect = "none";
+          timeLabelZoomMinus.node.style.WebkitUserSelect = "none";
+          timeLabelZoomMinus.attr({
               "font-size": "20" + "px",
               'text-anchor': 'start',
               'font-weight': 'bold',
               'fill': "#4A90E2"
           });
-          context.timelineText.push(timelabel);
-          timelabel.click(function() {
+          context.timelineText.push(timeLabelZoomMinus);
+          timeLabelZoomMinus.click(function() {
               var originalzoom = context.quickPiZoom;
               context.quickPiZoom -= 0.3;
               if (context.quickPiZoom < 1) context.quickPiZoom = 1;
@@ -24212,7 +24745,7 @@ elif program_exists:
               var x = context.timelineStartx + i * context.pixelsPerTime;
               var labelText = (i / 1000).toFixed(2);
               if (step >= 1000) labelText = (i / 1000).toFixed(0);
-              var timelabel = context.paper.text(x, context.timeLineY, labelText);
+              const timelabel = context.paper.text(x, context.timeLineY, labelText);
               timelabel.attr({
                   "font-size": "15px",
                   'text-anchor': 'center',
@@ -24318,7 +24851,7 @@ elif program_exists:
           if (!context.loopsForever) {
               var endx = context.timelineStartx + context.maxTime * context.pixelsPerTime;
               var x = context.timelineStartx + i * context.pixelsPerTime;
-              var timelabel = context.paper.text(x, context.timeLineY, '\uf11e');
+              const timelabel = context.paper.text(x, context.timeLineY, '\uf11e');
               timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
               timelabel.node.style.fontWeight = "bold";
               timelabel.node.style.MozUserSelect = "none";
@@ -24664,9 +25197,9 @@ elif program_exists:
           sensor.lastDrawnTime = context.currentTime;
           if (newState !== null && sensor.lastDrawnState != newState) {
               // Draw the new state change
-              if (sensor.lastDrawnState === null) {
-                  sensor.lastDrawnState = newState;
-              }
+              // if(sensor.lastDrawnState === null) {
+              //     sensor.lastDrawnState = newState;
+              // }
               var type = "actual";
               // Check the new state
               var expectedState = context.getSensorExpectedState(name, context.currentTime);
@@ -24813,7 +25346,7 @@ elif program_exists:
           }
           drawNewStateChangesSensor(sensor.name, sensor.state);
           context.increaseTime(sensor);
-          return state;
+          return JSON.parse(JSON.stringify(state));
       };
       // This will advance grading time to the next button release for waitForButton
       // will return false if the next event wasn't a button press
