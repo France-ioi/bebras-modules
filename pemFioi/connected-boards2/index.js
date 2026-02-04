@@ -10,11 +10,6 @@ var boardProgramming = (function (exports) {
               if (board === element.name) return element;
           });
       }
-      getCustomBlocks(context, strings) {
-          return {
-              customBlocks: {}
-          };
-      }
       getCustomFeatures(context, strings) {
           return {};
       }
@@ -33,3443 +28,7 @@ var boardProgramming = (function (exports) {
       ConnectionMethod["Bluetooth"] = "bt";
   })(ConnectionMethod || (ConnectionMethod = {}));
 
-  const buzzerSound = {
-      context: null,
-      default_freq: 200,
-      channels: {},
-      muted: {},
-      getContext: function() {
-          if (!this.context) {
-              // @ts-ignore
-              this.context = 'AudioContext' in window || 'webkitAudioContext' in window ? new (window.AudioContext || window.webkitAudioContext)() : null;
-          }
-          return this.context;
-      },
-      startOscillator: function(freq) {
-          var o = this.context.createOscillator();
-          o.type = 'sine';
-          o.frequency.value = freq;
-          o.connect(this.context.destination);
-          o.start();
-          return o;
-      },
-      start: function(channel, freq = this.default_freq) {
-          if (!this.channels[channel]) {
-              this.channels[channel] = {
-                  muted: false
-              };
-          }
-          if (this.channels[channel].freq === freq) {
-              return;
-          }
-          var context = this.getContext();
-          if (!context) {
-              return;
-          }
-          this.stop(channel);
-          if (freq == 0 || this.channels[channel].muted) {
-              return;
-          }
-          this.channels[channel].oscillator = this.startOscillator(freq);
-          this.channels[channel].freq = freq;
-      },
-      stop: function(channel) {
-          if (this.channels[channel]) {
-              this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
-              delete this.channels[channel].oscillator;
-              delete this.channels[channel].freq;
-          }
-      },
-      mute: function(channel) {
-          if (!this.channels[channel]) {
-              this.channels[channel] = {
-                  muted: true
-              };
-              return;
-          }
-          this.channels[channel].muted = true;
-          this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
-          delete this.channels[channel].oscillator;
-      },
-      unmute: function(channel) {
-          if (!this.channels[channel]) {
-              this.channels[channel] = {
-                  muted: false
-              };
-              return;
-          }
-          this.channels[channel].muted = false;
-          if (this.channels[channel].freq) {
-              this.channels[channel].oscillator = this.startOscillator(this.channels[channel].freq);
-          }
-      },
-      isMuted: function(channel) {
-          if (this.channels[channel]) {
-              return this.channels[channel].muted;
-          }
-          return false;
-      },
-      stopAll: function() {
-          for(var channel in this.channels){
-              if (this.channels.hasOwnProperty(channel)) {
-                  this.stop(channel);
-              }
-          }
-      }
-  };
-
-  function arrayContains(array, needle) {
-      for(let index in array){
-          if (needle == array[index]) {
-              return true;
-          }
-      }
-      return false;
-  }
-  /**
-   * This method allow us to verify if the current value is primitive. A primitive is a string or a number or boolean
-   * (any value that can be safely compared
-   * @param obj The object to check if it is a primitive or not
-   * @return {boolean} true if object is primitive, false otherwise
-   */ function isPrimitive(obj) {
-      return obj !== Object(obj);
-  }
-  /**
-   * THis function allow us to compare two objects. Do not call with {@code null} or {@code undefined}
-   * Be careful! Do not use this with circular objects.
-   * @param obj1 The first object to compare
-   * @param obj2 The second object to compare
-   * @return {boolean} true if objects are equals, false otherwise.
-   */ function deepEqual(obj1, obj2) {
-      if (obj1 === obj2) return true;
-      // if one is primitive and not the other, then we can return false. If both are primitive, then the up
-      // comparison can return true
-      if (isPrimitive(obj1) || isPrimitive(obj2)) return false;
-      if (Object.keys(obj1).length !== Object.keys(obj2).length) return false;
-      // compare objects with same number of keys
-      for(let key in obj1){
-          if (!(key in obj2)) return false; //other object doesn't have this prop
-          if (!deepEqual(obj1[key], obj2[key])) return false;
-      }
-      return true;
-  }
-  function deepSubsetEqual(obj1, obj2) {
-      if (obj1 === obj2) return true;
-      // if one is primitive and not the other, then we can return false. If both are primitive, then the up
-      // comparison can return true
-      if (isPrimitive(obj1) || isPrimitive(obj2)) return false;
-      // compare objects with same number of keys
-      for(let key in obj2){
-          if (!(key in obj1)) return false; //other object doesn't have this prop
-          if (!deepSubsetEqual(obj1[key], obj2[key])) return false;
-      }
-      return true;
-  }
-  function getImg(filename) {
-      // Get the path to an image stored in bebras-modules
-      return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
-  }
-  function deepMerge(...objects) {
-      const isObject = (obj)=>obj && typeof obj === 'object';
-      return objects.reduce((prev, obj)=>{
-          Object.keys(obj).forEach((key)=>{
-              const pVal = prev[key];
-              const oVal = obj[key];
-              if (Array.isArray(pVal) && Array.isArray(oVal)) {
-                  prev[key] = pVal.concat(...oVal);
-              } else if (isObject(pVal) && isObject(oVal)) {
-                  prev[key] = deepMerge(pVal, oVal);
-              } else {
-                  prev[key] = oVal;
-              }
-          });
-          return prev;
-      }, {});
-  }
-  function textEllipsis(text, maxLength) {
-      return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
-  }
-
-  class LocalQuickStore {
-      write(prefix, key, value) {
-          this.Store[key] = value;
-      }
-      read(prefix, key, value) {
-          return this.Store[key];
-      }
-      getStateData() {
-          // round trip this trought json so we actually copy everything
-          // without keeping any references to objects
-          return JSON.parse(JSON.stringify(this.Store));
-      }
-      static renderDifferences(expectedState, state) {
-          let strings = window.task.displayedSubTask.context.setLocalLanguageStrings(window.localLanguageStrings);
-          let mainDiv = document.createElement("div");
-          for(let p in expectedState){
-              if (expectedState.hasOwnProperty(p) && !state.hasOwnProperty(p)) {
-                  let div = document.createElement("div");
-                  $(div).text(strings.messages.cloudKeyNotExists.format(p));
-                  $(mainDiv).append(div);
-              }
-              if (expectedState[p] != state[p]) {
-                  let div = document.createElement("div");
-                  let message = strings.messages.cloudWrongValue.format(p, expectedState[p], state[p]);
-                  $(div).text(message);
-                  $(mainDiv).append(div);
-              }
-          }
-          for(let p in state){
-              if (state.hasOwnProperty(p) && !expectedState.hasOwnProperty(p)) {
-                  let div = document.createElement("div");
-                  $(div).text(strings.messages.cloudUnexpectedKey.format(p));
-                  $(mainDiv).append(div);
-              }
-          }
-          return mainDiv;
-      }
-      static compareState(state1, state2) {
-          return deepEqual(state1, state2);
-      }
-      constructor(){
-          this.connected = false;
-          this.Store = {};
-          this.connected = true;
-          this.rwpassword = "dummy";
-      }
-  }
-
-  class QuickStore {
-      read(identifier, key, callback) {
-          let data = {
-              prefix: identifier,
-              key: key
-          };
-          this.post('/api/data/read', data, callback);
-      }
-      write(identifier, key, value, callback) {
-          if (identifier !== this.rwidentifier) {
-              callback({
-                  sucess: false,
-                  message: "Écriture sur un identifiant en lecture seule : " + identifier
-              });
-          } else {
-              let data = {
-                  prefix: identifier,
-                  password: this.rwpassword,
-                  key: key,
-                  value: JSON.stringify(value)
-              };
-              this.post('/api/data/write', data, callback);
-          }
-      }
-      post(path, data, callback) {
-          $.ajax({
-              type: 'POST',
-              url: this.url + path,
-              crossDomain: true,
-              data: data,
-              dataType: 'json',
-              success: callback
-          });
-      }
-      constructor(rwidentifier, rwpassword){
-          this.url = 'https://cloud.quick-pi.org';
-          this.connected = false;
-          this.rwidentifier = rwidentifier;
-          this.rwpassword = rwpassword;
-          this.connected = !!rwpassword;
-      }
-  }
-
-  if (!window.OffscreenCanvas) {
-      window.OffscreenCanvas = class OffscreenCanvas1 {
-          constructor(width, height){
-              this.canvas = document.createElement("canvas");
-              this.canvas.width = width;
-              this.canvas.height = height;
-              this.canvas.convertToBlob = ()=>{
-                  return new Promise((resolve)=>{
-                      this.canvas.toBlob(resolve);
-                  });
-              };
-              return this.canvas;
-          }
-      };
-  }
-  class screenImageData {
-      addData(scale, data) {
-          this.imagedata.push({
-              scale: scale,
-              data: data
-          });
-      }
-      getData(scale) {
-          for(var i = 0; i < this.imagedata.length; i++){
-              if (this.imagedata[i].scale == scale) return this.imagedata[i].data;
-          }
-          return null;
-      }
-      constructor(){
-          this.isDrawingData = true;
-          this.imagedata = [];
-      }
-  }
-  class screenDrawing {
-      resetCanvas() {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this.canvas[i] = new OffscreenCanvas(this.width * scale, this.height * scale);
-              var ctx = this.canvas[i].getContext('2d');
-              ctx.imageSmoothingEnabled = false;
-              ctx.fillStyle = "white";
-              ctx.fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);
-              ctx.fillStyle = "black";
-              ctx.strokeStyle = "black";
-              ctx.lineWidth = scale;
-          }
-      }
-      getStateData() {
-          var imageData = new screenImageData();
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              var ctx = this.canvas[i].getContext('2d');
-              var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
-              imageData.addData(scale, imagedata);
-          }
-          return imageData;
-      }
-      fill(color) {
-          this.noFillStatus = false;
-          for(var i = 0; i < this.scales.length; i++){
-              var canvas = this.canvas[i];
-              var ctx = canvas.getContext('2d');
-              if (color) ctx.fillStyle = "black";
-              else ctx.fillStyle = "white";
-          }
-      }
-      noFill() {
-          this.noFillStatus = true;
-      }
-      stroke(color) {
-          this.noStrokeStatus = false;
-          for(var i = 0; i < this.scales.length; i++){
-              var canvas = this.canvas[i];
-              var ctx = canvas.getContext('2d');
-              if (color) ctx.strokeStyle = "black";
-              else ctx.strokeStyle = "white";
-          }
-      }
-      noStroke() {
-          this.noStrokeStatus = true;
-      }
-      _drawPoint(canvas, scale, x, y) {
-          var ctx = canvas.getContext('2d');
-          ctx.fillRect(scale * x, scale * y, scale * 1, scale * 1);
-      }
-      drawPoint(x, y) {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this._drawPoint(this.canvas[i], scale, x, y);
-          }
-      }
-      isPointSet(x, y) {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              if (scale == 1) {
-                  var ctx = this.canvas[i].getContext('2d');
-                  var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
-                  var basepos = (x + y * this.canvas[i].width) * 4;
-                  var r = imagedata.data[basepos];
-                  var g = imagedata.data[basepos + 1];
-                  var b = imagedata.data[basepos + 2];
-                  imagedata.data[basepos + 3];
-                  if (r != 255 && g != 255 && b != 255) return true;
-                  break;
-              }
-          }
-          return false;
-      }
-      _drawLine(canvas, scale, x0, y0, x1, y1) {
-          var ctx = canvas.getContext('2d');
-          ctx.beginPath();
-          ctx.moveTo(scale * x0, scale * y0);
-          ctx.lineTo(scale * x1, scale * y1);
-          ctx.closePath();
-          ctx.stroke();
-      }
-      drawLine(x0, y0, x1, y1) {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this._drawLine(this.canvas[i], scale, x0, y0, x1, y1);
-          }
-      }
-      _drawRectangle(canvas, scale, x0, y0, width, height) {
-          var ctx = canvas.getContext('2d');
-          if (!this.noFillStatus) {
-              ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
-          }
-          if (!this.noStrokeStatus) {
-              ctx.strokeRect(scale * x0, scale * y0, scale * width, scale * height);
-          }
-      }
-      drawRectangle(x0, y0, width, height) {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this._drawRectangle(this.canvas[i], scale, x0, y0, width, height);
-          }
-      }
-      _drawCircle(canvas, scale, x0, y0, diameter) {
-          var ctx = canvas.getContext('2d');
-          ctx.beginPath();
-          ctx.arc(scale * x0, scale * y0, scale * diameter / 2, 0, Math.PI * 2);
-          ctx.closePath();
-          if (!this.noFillStatus) {
-              ctx.fill();
-          }
-          if (!this.noStrokeStatus) {
-              ctx.stroke();
-          }
-      }
-      drawCircle(x0, y0, diameter) {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this._drawCircle(this.canvas[i], scale, x0, y0, diameter);
-          }
-      }
-      _clearScreen(canvas, scale) {
-          var ctx = canvas.getContext('2d');
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = "black";
-          ctx.strokeStyle = "black";
-      }
-      clearScreen() {
-          for(var i = 0; i < this.scales.length; i++){
-              var scale = this.scales[i];
-              this._clearScreen(this.canvas[i], scale);
-          }
-      }
-      copyToCanvas(canvas, scale) {
-          for(var i = 0; i < this.scales.length; i++){
-              var currentScale = this.scales[i];
-              if (currentScale == scale) {
-                  var ctx = canvas.getContext('2d');
-                  ctx.drawImage(this.canvas[i], 0, 0, this.canvas[i].width, this.canvas[i].height, 0, 0, canvas.width, canvas.height);
-              }
-          }
-      }
-      static renderToCanvas(state, canvas, scale) {
-          var ctx = canvas.getContext('2d');
-          ctx.putImageData(state.getData(scale), 0, 0);
-      }
-      static renderDifferences(dataExpected, dataWrong, canvas, scale) {
-          var ctx = canvas.getContext('2d');
-          var expectedData = dataExpected.getData(scale);
-          var actualData = dataWrong.getData(scale);
-          var newData = ctx.createImageData(canvas.width, canvas.height);
-          for(var i = 0; i < newData.data.length; i += 4){
-              var actualSet = false;
-              var expectedSet = false;
-              if (expectedData.data[i + 0] != 255 && expectedData.data[i + 1] != 255 && expectedData.data[i + 2] != 255) {
-                  expectedSet = true;
-              }
-              if (actualData.data[i + 0] != 255 && actualData.data[i + 1] != 255 && actualData.data[i + 2] != 255) {
-                  actualSet = true;
-              }
-              if (expectedSet && actualSet) {
-                  newData.data[i + 0] = 0;
-                  newData.data[i + 1] = 0;
-                  newData.data[i + 2] = 0;
-              } else if (expectedSet) {
-                  newData.data[i + 0] = 100;
-                  newData.data[i + 1] = 100;
-                  newData.data[i + 2] = 100;
-              } else if (actualSet) {
-                  newData.data[i + 0] = 255;
-                  newData.data[i + 1] = 0;
-                  newData.data[i + 2] = 0;
-              } else {
-                  newData.data[i + 0] = 255;
-                  newData.data[i + 1] = 255;
-                  newData.data[i + 2] = 255;
-              }
-              newData.data[i + 3] = 255;
-          }
-          ctx.putImageData(newData, 0, 0);
-      }
-      constructor(onScreenCanvas){
-          this.width = 128;
-          this.height = 32;
-          this.scales = [
-              0.5,
-              1,
-              2
-          ];
-          this.canvas = [
-              null,
-              null,
-              null
-          ];
-          this.resetCanvas();
-          this.noFillStatus = false;
-          this.noStrokeStatus = false;
-      }
-  }
-
-  function quickpiModuleDefinition(context, strings) {
-      const sensorHandler = context.sensorHandler;
-      const blockDefinitions = {
-          sensors: [
-              {
-                  name: "currentTime",
-                  yieldsValue: 'int'
-              },
-              {
-                  name: "waitForButton",
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("button")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "isButtonPressed",
-                  yieldsValue: 'bool'
-              },
-              {
-                  name: "isButtonPressedWithName",
-                  yieldsValue: 'bool',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("button")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "buttonWasPressed",
-                  yieldsValue: 'bool',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("button")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "onButtonPressed",
-                  params: [
-                      "String",
-                      "Statement"
-                  ],
-                  blocklyInit () {
-                      return function() {
-                          this.setColour(context.blocklyHelper.getDefaultColours().categories["sensors"]);
-                          this.appendDummyInput("PARAM_0").appendField(strings.label.onButtonPressed).appendField(new window.Blockly.FieldDropdown(sensorHandler.getSensorNames("button")), 'PARAM_0').appendField(strings.label.onButtonPressedEnd);
-                          this.appendStatementInput("PARAM_1").setCheck(null).appendField(strings.label.onButtonPressedDo);
-                          this.setPreviousStatement(false);
-                          this.setNextStatement(false);
-                          this.setOutput(null);
-                      };
-                  },
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("button")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readTemperature",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("temperature")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readRotaryAngle",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("potentiometer")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readDistance",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("range")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readLightIntensity",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("light")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readHumidity",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("humidity")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readAcceleration",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": [
-                                  [
-                                      "x",
-                                      "x"
-                                  ],
-                                  [
-                                      "y",
-                                      "y"
-                                  ],
-                                  [
-                                      "z",
-                                      "z"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "computeRotation",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": [
-                                  [
-                                      "pitch",
-                                      "pitch"
-                                  ],
-                                  [
-                                      "roll",
-                                      "roll"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readSoundLevel",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("sound")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readMagneticForce",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": [
-                                  [
-                                      "x",
-                                      "x"
-                                  ],
-                                  [
-                                      "y",
-                                      "y"
-                                  ],
-                                  [
-                                      "z",
-                                      "z"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "computeCompassHeading",
-                  yieldsValue: 'int'
-              },
-              {
-                  name: "readInfraredState",
-                  yieldsValue: 'bool',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("irrecv")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "readIRMessage",
-                  yieldsValue: 'string',
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("irrecv")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='readIRMessage'>" + "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>10000</field></shadow></value>" + "</block>"
-              },
-              {
-                  name: "readAngularVelocity",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": [
-                                  [
-                                      "x",
-                                      "x"
-                                  ],
-                                  [
-                                      "y",
-                                      "y"
-                                  ],
-                                  [
-                                      "z",
-                                      "z"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setGyroZeroAngle"
-              },
-              {
-                  name: "computeRotationGyro",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": [
-                                  [
-                                      "x",
-                                      "x"
-                                  ],
-                                  [
-                                      "y",
-                                      "y"
-                                  ],
-                                  [
-                                      "z",
-                                      "z"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              }
-          ],
-          actuator: [
-              {
-                  name: "turnLedOn"
-              },
-              {
-                  name: "turnLedOff"
-              },
-              {
-                  name: "turnBuzzerOn"
-              },
-              {
-                  name: "turnBuzzerOff"
-              },
-              {
-                  name: "setLedState",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          },
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_1",
-                              "options": [
-                                  [
-                                      strings.messages.on.toUpperCase(),
-                                      "1"
-                                  ],
-                                  [
-                                      strings.messages.off.toUpperCase(),
-                                      "0"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setLedMatrixOne",
-                  params: [
-                      "String",
-                      "Number",
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_2"
-                          },
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_3",
-                              "options": [
-                                  [
-                                      strings.messages.on.toUpperCase(),
-                                      "1"
-                                  ],
-                                  [
-                                      strings.messages.off.toUpperCase(),
-                                      "0"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setBuzzerState",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("buzzer")
-                          },
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_1",
-                              "options": [
-                                  [
-                                      strings.messages.on.toUpperCase(),
-                                      "1"
-                                  ],
-                                  [
-                                      strings.messages.off.toUpperCase(),
-                                      "0"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setBuzzerNote",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("buzzer")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='setBuzzerNote'>" + "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>200</field></shadow></value>" + "</block>"
-              },
-              {
-                  name: "getBuzzerNote",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("buzzer")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setLedBrightness",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='setLedBrightness'>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "getLedBrightness",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "isLedOn",
-                  yieldsValue: 'bool'
-              },
-              {
-                  name: "isLedOnWithName",
-                  yieldsValue: 'bool',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "isBuzzerOn",
-                  yieldsValue: 'bool'
-              },
-              {
-                  name: "isBuzzerOnWithName",
-                  yieldsValue: 'bool',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("buzzer")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "toggleLedState",
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("led")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setServoAngle",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("servo")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='setServoAngle'>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "getServoAngle",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("servo")
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setContinousServoDirection",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("servo")
-                          },
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_1",
-                              "options": [
-                                  [
-                                      "forward",
-                                      "1"
-                                  ],
-                                  [
-                                      "backwards",
-                                      "-1"
-                                  ],
-                                  [
-                                      "stop",
-                                      "0"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "setInfraredState",
-                  params: [
-                      "String",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("irtrans")
-                          },
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_1",
-                              "options": [
-                                  [
-                                      strings.messages.on.toUpperCase(),
-                                      "1"
-                                  ],
-                                  [
-                                      strings.messages.off.toUpperCase(),
-                                      "0"
-                                  ]
-                              ]
-                          }
-                      ]
-                  }
-              },
-              {
-                  name: "sendIRMessage",
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_dropdown",
-                              "name": "PARAM_0",
-                              "options": sensorHandler.getSensorNames("irtrans")
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              "text": ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='sendIRMessage'>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "presetIRMessage",
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              "text": ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              "text": ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='presetIRMessage'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "sleep",
-                  params: [
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              "value": 0
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='sleep'>" + "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>1000</field></shadow></value>" + "</block>"
-              }
-          ],
-          display: [
-              {
-                  name: "displayText",
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  variants: [
-                      [
-                          null
-                      ],
-                      [
-                          null,
-                          null
-                      ]
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              "text": ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='displayText'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "displayText2Lines",
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              "text": ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              "text": ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='displayText2Lines'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "drawPoint",
-                  params: [
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='drawPoint'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "isPointSet",
-                  yieldsValue: 'bool',
-                  params: [
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='isPointSet'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "drawLine",
-                  params: [
-                      "Number",
-                      "Number",
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_2"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_3"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='drawLine'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "drawRectangle",
-                  params: [
-                      "Number",
-                      "Number",
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_2"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_3"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='drawRectangle'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "drawCircle",
-                  params: [
-                      "Number",
-                      "Number",
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1"
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_2"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='drawCircle'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "clearScreen"
-              },
-              {
-                  name: "updateScreen"
-              },
-              {
-                  name: "autoUpdate",
-                  params: [
-                      "Boolean"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='autoUpdate'>" + "<value name='PARAM_0'><shadow type='logic_boolean'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "fill",
-                  params: [
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='fill'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "noFill"
-              },
-              {
-                  name: "stroke",
-                  params: [
-                      "Number"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='stroke'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "</block>"
-              },
-              {
-                  name: "noStroke"
-              }
-          ],
-          internet: [
-              {
-                  name: "getTemperatureFromCloud",
-                  yieldsValue: 'int',
-                  params: [
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "field_input",
-                              "name": "PARAM_0",
-                              text: "Paris"
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='getTemperatureFromCloud'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "connectToCloudStore",
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              text: ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              text: ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='connectToCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "writeToCloudStore",
-                  params: [
-                      "String",
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              text: ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              text: ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_2",
-                              text: ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='writeToCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_2'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              },
-              {
-                  name: "readFromCloudStore",
-                  yieldsValue: 'string',
-                  params: [
-                      "String",
-                      "String"
-                  ],
-                  blocklyJson: {
-                      "args0": [
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_0",
-                              text: ""
-                          },
-                          {
-                              "type": "input_value",
-                              "name": "PARAM_1",
-                              text: ""
-                          }
-                      ]
-                  },
-                  blocklyXml: "<block type='readFromCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>"
-              }
-          ]
-      };
-      let getTemperatureFromCloudURl = "https://cloud.quick-pi.org/cache/weather.php";
-      let getTemperatureFromCloudSupportedTowns = [];
-      // setup the supported towns
-      $.get(getTemperatureFromCloudURl + "?q=" + "supportedtowns", function(towns) {
-          getTemperatureFromCloudSupportedTowns = JSON.parse(towns);
-      });
-      // We create a cache so there is less calls to the api and we get the results of the temperature faster
-      let getTemperatureFromCloudCache = {};
-      const blockImplementations = {
-          turnLedOn: function(callback) {
-              let sensor = sensorHandler.findSensorByType("led");
-              context.registerQuickPiEvent(sensor.name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("turnLedOn()", cb);
-              }
-          },
-          turnLedOff: function(callback) {
-              let sensor = sensorHandler.findSensorByType("led");
-              context.registerQuickPiEvent(sensor.name, false);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("turnLedOff()", cb);
-              }
-          },
-          setLedMatrixOne: function(name, i, j, state, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (i < 0 || i > 5 || j < 0 || j > 5) {
-                  throw "invalid led position";
-              }
-              sensor.state[i][j] = state ? 1 : 0;
-              context.registerQuickPiEvent(name, sensor.state);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  const command = "setLedMatrixState(\"" + name + "\"," + JSON.stringify(sensor.state) + ")";
-                  const cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          turnBuzzerOn: function(callback) {
-              context.registerQuickPiEvent("buzzer1", true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("turnBuzzerOn()", cb);
-              }
-          },
-          turnBuzzerOff: function(callback) {
-              context.registerQuickPiEvent("buzzer1", false);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("turnBuzzerOff()", cb);
-              }
-          },
-          waitForButton: function(name, callback) {
-              //        context.registerQuickPiEvent("button", "D22", "wait", false);
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading) {
-                  context.advanceToNextRelease("button", sensor.port);
-                  context.waitDelay(callback);
-              } else if (context.offLineMode) {
-                  if (sensor) {
-                      let cb = context.runner.waitCallback(callback);
-                      sensor.onPressed = function() {
-                          cb();
-                      };
-                  } else {
-                      context.waitDelay(callback);
-                  }
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("waitForButton(\"" + name + "\")", cb);
-              }
-          },
-          isButtonPressed: function(arg1, arg2) {
-              let callback;
-              let sensor;
-              let name;
-              if (typeof arg2 == "undefined") {
-                  // no arguments
-                  callback = arg1;
-                  sensor = sensorHandler.findSensorByType("button");
-                  name = sensor.name;
-              } else {
-                  callback = arg2;
-                  sensor = sensorHandler.findSensorByName(arg1, true);
-                  name = arg1;
-              }
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  if (sensor.type == "stick") {
-                      context.getSensorState(name);
-                      let stickDefinition = sensorHandler.findSensorDefinition(sensor);
-                      let buttonstate = stickDefinition.getButtonState(name, sensor.state);
-                      context.runner.noDelay(callback, buttonstate);
-                  } else {
-                      let state = context.getSensorState(name);
-                      context.runner.noDelay(callback, state);
-                  }
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  if (sensor.type == "stick") {
-                      let stickDefinition = sensorHandler.findSensorDefinition(sensor);
-                      sensor.getLiveState(function(returnVal) {
-                          sensor.state = returnVal;
-                          sensorHandler.drawSensor(sensor);
-                          let buttonstate = stickDefinition.getButtonState(name, sensor.state);
-                          cb(buttonstate);
-                      });
-                  } else {
-                      sensor.getLiveState(function(returnVal) {
-                          sensor.state = returnVal != "0";
-                          sensorHandler.drawSensor(sensor);
-                          cb(returnVal != "0");
-                      });
-                  }
-              }
-          },
-          buttonWasPressed: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.getSensorState(name);
-                  let wasPressed = !!sensor.wasPressed;
-                  sensor.wasPressed = false;
-                  context.runner.noDelay(callback, wasPressed);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("buttonWasPressed(\"" + name + "\")", function(returnVal) {
-                      cb(returnVal != "0");
-                  });
-              }
-          },
-          setLedState: function(name, state, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              let command = "setLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
-              context.registerQuickPiEvent(name, state ? true : false);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          setBuzzerState: function(name, state, callback) {
-              sensorHandler.findSensorByName(name, true);
-              let command = "setBuzzerState(\"" + name + "\"," + (state ? "True" : "False") + ")";
-              context.registerQuickPiEvent(name, state ? true : false);
-              if (context.display) {
-                  state ? buzzerSound.start(name) : buzzerSound.stop(name);
-              }
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          isBuzzerOn: function(arg1, arg2) {
-              let callback = arg2;
-              let sensor = sensorHandler.findSensorByName(arg1, true);
-              if (typeof arg2 == "undefined") {
-                  // no arguments
-                  callback = arg1;
-                  sensor = sensorHandler.findSensorByType("buzzer");
-              }
-              let command = "isBuzzerOn(\"" + sensor.name + "\")";
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState("buzzer1");
-                  context.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          setBuzzerNote: function(name, frequency, callback) {
-              sensorHandler.findSensorByName(name, true);
-              let command = "setBuzzerNote(\"" + name + "\"," + frequency + ")";
-              context.registerQuickPiEvent(name, frequency);
-              if (context.display && context.offLineMode) {
-                  buzzerSound.start(name, frequency);
-              }
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          getBuzzerNote: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              let command = "getBuzzerNote(\"" + name + "\")";
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback, sensor.state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          setLedBrightness: function(name, level, callback) {
-              sensorHandler.findSensorByName(name, true);
-              if (typeof level == "object") {
-                  level = level.valueOf();
-              }
-              let command = "setLedBrightness(\"" + name + "\"," + level + ")";
-              context.registerQuickPiEvent(name, level);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          getLedBrightness: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              let command = "getLedBrightness(\"" + name + "\")";
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback, sensor.state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          isLedOn: function(arg1, arg2) {
-              let callback = arg2;
-              let sensor = sensorHandler.findSensorByName(arg1, true);
-              if (typeof arg2 == "undefined") {
-                  // no arguments
-                  callback = arg1;
-                  sensor = sensorHandler.findSensorByType("led");
-              }
-              let command = "getLedState(\"" + sensor.name + "\")";
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback, sensor.state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          toggleLedState: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              let command = "toggleLedState(\"" + name + "\")";
-              let state = sensor.state;
-              context.registerQuickPiEvent(name, !state);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      return returnVal != "0";
-                  });
-              }
-          },
-          displayText: function(line1, arg2, arg3) {
-              let line2 = arg2;
-              let callback = arg3;
-              if (typeof arg3 == "undefined") {
-                  // Only one argument
-                  line2 = null;
-                  callback = arg2;
-              }
-              let sensor = sensorHandler.findSensorByType("screen");
-              let command = "displayText(\"" + line1 + "\", \"\")";
-              context.registerQuickPiEvent(sensor.name, {
-                  line1: line1,
-                  line2: line2
-              });
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(retval) {
-                      cb();
-                  });
-              }
-          },
-          readTemperature: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.runner.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          sleep: function(time, callback) {
-              context.increaseTimeBy(time);
-              if (!context.display || context.autoGrading) {
-                  context.runner.noDelay(callback);
-              } else {
-                  context.runner.waitDelay(callback, null, time);
-              }
-          },
-          setServoAngle: function(name, angle, callback) {
-              sensorHandler.findSensorByName(name, true);
-              if (angle > 180) angle = 180;
-              else if (angle < 0) angle = 0;
-              context.registerQuickPiEvent(name, angle);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let command = "setServoAngle(\"" + name + "\"," + angle + ")";
-                  const cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          getServoAngle: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              let command = "getServoAngle(\"" + name + "\")";
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback, sensor.state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      returnVal = parseFloat(returnVal);
-                      cb(returnVal);
-                  });
-              }
-          },
-          setContinousServoDirection: function(name, direction, callback) {
-              sensorHandler.findSensorByName(name, true);
-              let angle = 90;
-              if (direction > 0) {
-                  angle = 0;
-              } else if (direction < 0) {
-                  angle = 180;
-              }
-              context.registerQuickPiEvent(name, angle);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let command = "setServoAngle(\"" + name + "\"," + angle + ")";
-                  const cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-          },
-          readRotaryAngle: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          readDistance: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          readLightIntensity: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          readHumidity: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.waitDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          currentTime: function(callback) {
-              let millis = new Date().getTime();
-              if (context.autoGrading) {
-                  millis = context.currentTime;
-              }
-              context.runner.waitDelay(callback, millis);
-          },
-          getTemperatureFromCloud: function(location, callback) {
-              let url = getTemperatureFromCloudURl;
-              if (!arrayContains(getTemperatureFromCloudSupportedTowns, location)) throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
-              let cache = getTemperatureFromCloudCache;
-              if (cache[location] != undefined && (Date.now() - cache[location].lastUpdate) / 1000 / 60 < 10) {
-                  context.waitDelay(callback, cache[location].temperature);
-                  return;
-              }
-              let cb = context.runner.waitCallback(callback);
-              $.get(url + "?q=" + location, function(data) {
-                  // If the server return invalid it mean that the town given is not supported
-                  if (data === "invalid") {
-                      // This only happen when the user give an invalid town to the server, which should never happen because
-                      // the validity of the user input is checked above.
-                      cb(0);
-                  } else {
-                      cache[location] = {
-                          lastUpdate: Date.now(),
-                          temperature: data
-                      }, cb(data);
-                  }
-              });
-          },
-          initScreenDrawing: function(sensor) {
-              if (!sensor.screenDrawing) sensor.screenDrawing = new screenDrawing(sensor.canvas);
-          },
-          drawPoint: function(x, y, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.drawPoint(x, y);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "drawPoint(" + x + "," + y + ")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          isPointSet: function(x, y, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              let value = sensor.screenDrawing.isPointSet(x, y);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback, value);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "isPointSet(" + x + "," + y + ")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          drawLine: function(x0, y0, x1, y1, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.drawLine(x0, y0, x1, y1);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "drawLine(" + x0 + "," + y0 + "," + x1 + "," + y1 + ")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          drawRectangle: function(x0, y0, width, height, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.drawRectangle(x0, y0, width, height);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "drawRectangle(" + x0 + "," + y0 + "," + width + "," + height + ")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          drawCircle: function(x0, y0, diameter, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.drawCircle(x0, y0, diameter, diameter);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "drawCircle(" + x0 + "," + y0 + "," + diameter + ")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          clearScreen: function(callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.clearScreen();
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "clearScreen()";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          updateScreen: function(callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "updateScreen()";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          autoUpdate: function(autoupdate, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "autoUpdate(\"" + (autoupdate ? "True" : "False") + "\")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          fill: function(color, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.fill(color);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "fill(\"" + color + "\")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          noFill: function(callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.noFill();
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "NoFill()";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          stroke: function(color, callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.stroke(color);
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "stroke(\"" + color + "\")";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          noStroke: function(callback) {
-              let sensor = sensorHandler.findSensorByType("screen");
-              context.quickpi.initScreenDrawing(sensor);
-              sensor.screenDrawing.noStroke();
-              context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "noStroke()";
-                  context.quickPiConnection.sendCommand(command, function() {
-                      cb();
-                  });
-              }
-          },
-          readAcceleration: function(axis, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("accelerometer");
-                  let index = 0;
-                  if (axis == "x") index = 0;
-                  else if (axis == "y") index = 1;
-                  else if (axis == "z") index = 2;
-                  let state = context.getSensorState(sensor.name);
-                  if (Array.isArray(state)) context.waitDelay(callback, state[index]);
-                  else context.waitDelay(callback, 0);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "readAcceleration(\"" + axis + "\")";
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      cb(Number(returnVal));
-                  });
-              }
-          },
-          computeRotation: function(rotationType, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("accelerometer");
-                  let zsign = 1;
-                  let result = 0;
-                  if (sensor.state[2] < 0) zsign = -1;
-                  if (rotationType == "pitch") {
-                      result = 180 * Math.atan2(sensor.state[0], zsign * Math.sqrt(sensor.state[1] * sensor.state[1] + sensor.state[2] * sensor.state[2])) / Math.PI;
-                  } else if (rotationType == "roll") {
-                      result = 180 * Math.atan2(sensor.state[1], zsign * Math.sqrt(sensor.state[0] * sensor.state[0] + sensor.state[2] * sensor.state[2])) / Math.PI;
-                  }
-                  result = Math.round(result);
-                  context.waitDelay(callback, result);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let command = "computeRotation(\"" + rotationType + "\")";
-                  context.quickPiConnection.sendCommand(command, function(returnVal) {
-                      cb(returnVal);
-                  });
-              }
-          },
-          readSoundLevel: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.runner.noDelay(callback, state);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          readMagneticForce: function(axis, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("magnetometer");
-                  let index = 0;
-                  if (axis == "x") index = 0;
-                  else if (axis == "y") index = 1;
-                  else if (axis == "z") index = 2;
-                  context.waitDelay(callback, sensor.state[index]);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let sensor = sensorHandler.findSensorByType("magnetometer");
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      if (axis == "x") returnVal = returnVal[0];
-                      else if (axis == "y") returnVal = returnVal[1];
-                      else if (axis == "z") returnVal = returnVal[2];
-                      cb(returnVal);
-                  });
-              }
-          },
-          computeCompassHeading: function(callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("magnetometer");
-                  let heading = Math.atan2(sensor.state[0], sensor.state[1]) * (180 / Math.PI) + 180;
-                  heading = Math.round(heading);
-                  context.runner.noDelay(callback, heading);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let sensor = sensorHandler.findSensorByType("magnetometer");
-                  context.quickPiConnection.sendCommand("readMagnetometerLSM303C()", function(returnVal) {
-                      sensor.state = JSON.parse(returnVal);
-                      sensorHandler.drawSensor(sensor);
-                      returnVal = Math.atan2(sensor.state[0], sensor.state[1]) * (180 / Math.PI) + 180;
-                      returnVal = Math.floor(returnVal);
-                      cb(returnVal);
-                  }, true);
-              }
-          },
-          readInfraredState: function(name, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let state = context.getSensorState(name);
-                  context.runner.noDelay(callback, state ? true : false);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      cb(returnVal);
-                  });
-              }
-          },
-          setInfraredState: function(name, state, callback) {
-              const sensor = sensorHandler.findSensorByName(name, true);
-              context.registerQuickPiEvent(name, !!state);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.setLiveState(state, cb);
-              }
-          },
-          onButtonPressed: function(name, func, callback) {
-              sensorHandler.findSensorByName(name, true);
-              context.waitForEvent(function(callback) {
-                  context.quickpi.isButtonPressed(name, callback);
-              }, func);
-              context.waitDelay(callback);
-          },
-          //// Gyroscope
-          readAngularVelocity: function(axis, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("gyroscope");
-                  let index = 0;
-                  if (axis == "x") index = 0;
-                  else if (axis == "y") index = 1;
-                  else if (axis == "z") index = 2;
-                  context.waitDelay(callback, sensor.state[index]);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  let sensor = context.findSensor("gyroscope", "i2c");
-                  sensor.getLiveState(function(returnVal) {
-                      sensor.state = returnVal;
-                      sensorHandler.drawSensor(sensor);
-                      if (axis == "x") returnVal = returnVal[0];
-                      else if (axis == "y") returnVal = returnVal[1];
-                      else if (axis == "z") returnVal = returnVal[2];
-                      cb(returnVal);
-                  });
-              }
-          },
-          setGyroZeroAngle: function(callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("gyroscope");
-                  sensor.rotationAngles = [
-                      0,
-                      0,
-                      0
-                  ];
-                  sensor.lastSpeedChange = new Date();
-                  context.runner.noDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("setGyroZeroAngle()", function(returnVal) {
-                      cb();
-                  }, true);
-              }
-          },
-          computeRotationGyro: function(axis, callback) {
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  let sensor = sensorHandler.findSensorByType("gyroscope");
-                  let ret = 0;
-                  if (sensor.rotationAngles != undefined) {
-                      for(let i = 0; i < 3; i++)sensor.rotationAngles[i] += sensor.state[i] * ((+new Date() - sensor.lastSpeedChange) / 1000);
-                      sensor.lastSpeedChange = new Date();
-                      if (axis == "x") ret = sensor.rotationAngles[0];
-                      else if (axis == "y") ret = sensor.rotationAngles[1];
-                      else if (axis == "z") ret = sensor.rotationAngles[2];
-                  }
-                  context.runner.noDelay(callback, ret);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.findSensor("gyroscope", "i2c");
-                  context.quickPiConnection.sendCommand("computeRotationGyro()", function(returnVal) {
-                      //sensor.state = returnVal;
-                      //sensorHandler.drawSensor(sensor);
-                      returnVal = JSON.parse(returnVal);
-                      if (axis == "x") returnVal = returnVal[0];
-                      else if (axis == "y") returnVal = returnVal[1];
-                      else if (axis == "z") returnVal = returnVal[2];
-                      cb(returnVal);
-                  }, true);
-              }
-          },
-          connectToCloudStore: function(prefix, password, callback) {
-              let sensor = sensorHandler.findSensorByType("cloudstore");
-              if (!context.display || context.autoGrading) {
-                  sensor.quickStore = new LocalQuickStore();
-              } else {
-                  sensor.quickStore = new QuickStore(prefix, password);
-              }
-              context.runner.noDelay(callback, 0);
-          },
-          writeToCloudStore: function(identifier, key, value, callback) {
-              let sensor = sensorHandler.findSensorByType("cloudstore");
-              if (!sensor.quickStore || !sensor.quickStore.connected) {
-                  context.success = false;
-                  throw "Cloud store not connected";
-              }
-              if (!context.display || context.autoGrading) {
-                  sensor.quickStore.write(identifier, key, value);
-                  context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
-                  context.runner.noDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.quickStore.write(identifier, key, value, function(data) {
-                      if (!data || !data.success) {
-                          if (data && data.message) context.failImmediately = "cloudstore: " + data.message;
-                          else context.failImmediately = "Error trying to communicate with cloud store";
-                      }
-                      cb();
-                  });
-              }
-          },
-          readFromCloudStore: function(identifier, key, callback) {
-              let sensor = sensorHandler.findSensorByType("cloudstore");
-              if (!sensor.quickStore) {
-                  if (!context.display || context.autoGrading) {
-                      sensor.quickStore = new LocalQuickStore();
-                  } else {
-                      sensor.quickStore = new QuickStore();
-                  }
-              }
-              if (!context.display || context.autoGrading) {
-                  let state = context.getSensorState(sensor.name);
-                  let value = "";
-                  if (state.hasOwnProperty(key)) {
-                      value = state[key];
-                  } else {
-                      context.success = false;
-                      throw "Key not found";
-                  }
-                  sensor.quickStore.write(identifier, key, value);
-                  context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
-                  context.runner.noDelay(callback, value);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.quickStore.read(identifier, key, function(data) {
-                      let value = "";
-                      if (data && data.success) {
-                          try {
-                              value = JSON.parse(data.value);
-                          } catch (err) {
-                              value = data.value;
-                          }
-                      } else {
-                          if (data && data.message) context.failImmediately = "cloudstore: " + data.message;
-                          else context.failImmediately = "Error trying to communicate with cloud store";
-                      }
-                      cb(value);
-                  });
-              }
-          },
-          readIRMessage: function(name, timeout, callback) {
-              let sensor = sensorHandler.findSensorByName(name, true);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.getSensorState(name);
-                  let cb = context.runner.waitCallback(callback);
-                  sensor.waitingForIrMessage = function(command) {
-                      clearTimeout(sensor.waitingForIrMessageTimeout);
-                      sensor.waitingForIrMessage = null;
-                      cb(command);
-                  };
-                  sensor.waitingForIrMessageTimeout = setTimeout(function() {
-                      if (sensor.waitingForIrMessage) {
-                          sensor.waitingForIrMessage = null;
-                          cb("none");
-                      }
-                  }, timeout);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("readIRMessage(\"irrec1\", " + timeout + ")", function(returnVal) {
-                      if (typeof returnVal === 'string') returnVal = returnVal.replace(/['"]+/g, '');
-                      cb(returnVal);
-                  }, true);
-              }
-          },
-          sendIRMessage: function(name, preset, callback) {
-              sensorHandler.findSensorByName(name, true);
-              //context.registerQuickPiEvent(name, state ? true : false);
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + preset + "\")", function(returnVal) {
-                      cb();
-                  }, true);
-              }
-          },
-          presetIRMessage: function(preset, data, callback) {
-              //let sensor = sensorHandler.findSensorByName(name, true);
-              //context.registerQuickPiEvent(name, state ? true : false);
-              if (!context.remoteIRcodes) context.remoteIRcodes = {};
-              context.remoteIRcodes[preset] = data;
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  context.waitDelay(callback);
-              } else {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand("presetIRMessage(\"" + preset + "\", \"" + JSON.stringify(JSON.parse(data)) + "\")", function(returnVal) {
-                      cb();
-                  }, true);
-              }
-          }
-      };
-      blockImplementations.isButtonPressedWithName = blockImplementations.isButtonPressed;
-      blockImplementations.isLedOnWithName = blockImplementations.isLedOn;
-      blockImplementations.displayText2Lines = blockImplementations.displayText;
-      blockImplementations.isBuzzerOnWithName = blockImplementations.isBuzzerOn;
-      return {
-          blockDefinitions,
-          blockImplementations
-      };
-  }
-
-  function thingzAccelerometerModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          classDefinitions: {
-              sensors: {
-                  Accel: {
-                      blocks: [
-                          {
-                              name: "get_x",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          },
-                          {
-                              name: "get_y",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          },
-                          {
-                              name: "get_z",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Accel: {
-                  get_x: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readAcceleration('x', callback);
-                  },
-                  get_y: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readAcceleration('y', callback);
-                  },
-                  get_z: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readAcceleration('z', callback);
-                  }
-              }
-          },
-          classInstances: {
-              accelerometer: 'Accel'
-          }
-      };
-  }
-
-  function thingzButtonsModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          classDefinitions: {
-              sensors: {
-                  Button: {
-                      blocks: [
-                          {
-                              name: "is_pressed",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Boolean"
-                              }
-                          }
-                      ]
-                  },
-                  ButtonTouch: {
-                      blocks: [
-                          {
-                              name: "is_touched",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Boolean"
-                              }
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Button: {
-                  is_pressed: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(self.__variableName, callback);
-                  }
-              },
-              ButtonTouch: {
-                  is_touched: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.isButtonPressedWithName(self.__variableName, callback);
-                  }
-              }
-          },
-          classInstances: {
-              button_a: 'Button',
-              button_b: 'Button',
-              touch_n: 'ButtonTouch',
-              touch_s: 'ButtonTouch',
-              touch_e: 'ButtonTouch',
-              touch_w: 'ButtonTouch'
-          }
-      };
-  }
-
-  function thingzTemperatureModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          blockDefinitions: {
-              sensors: [
-                  {
-                      name: 'thingz.temperature',
-                      yieldsValue: 'int'
-                  }
-              ]
-          },
-          blockImplementations: {
-              'thingz.temperature': function(callback) {
-                  const sensor = context.sensorHandler.findSensorByType('temperature');
-                  quickPiModuleDefinition.blockImplementations.readTemperature(sensor.name, callback);
-              }
-          }
-      };
-  }
-
-  function thingzLedModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          classDefinitions: {
-              sensors: {
-                  Led: {
-                      blocks: [
-                          {
-                              name: 'read_light_level',
-                              yieldsValue: 'int'
-                          }
-                      ]
-                  }
-              },
-              actuator: {
-                  Led: {
-                      blocks: [
-                          {
-                              name: "set_colors",
-                              params: [
-                                  "Number",
-                                  "Number",
-                                  "Number"
-                              ]
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Led: {
-                  set_colors: function(self, red, green, blue, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('ledrgb');
-                      const newState = [
-                          red,
-                          green,
-                          blue
-                      ];
-                      context.registerQuickPiEvent(sensor.name, newState);
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          let cb = context.runner.waitCallback(callback);
-                          sensor.setLiveState(newState, cb);
-                      }
-                  },
-                  read_light_level: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('light');
-                      quickPiModuleDefinition.blockImplementations.readLightIntensity(sensor.name, callback);
-                  }
-              }
-          },
-          classInstances: {
-              led: 'Led'
-          }
-      };
-  }
-
-  function machinePinModuleDefinition(context, strings) {
-      return {
-          classDefinitions: {
-              actuator: {
-                  Pin: {
-                      defaultInstanceName: 'pin',
-                      init: {
-                          variants: [
-                              [
-                                  "Number"
-                              ],
-                              [
-                                  "Number",
-                                  "Number"
-                              ]
-                          ]
-                      },
-                      blocks: [
-                          {
-                              name: "on"
-                          },
-                          {
-                              name: "off"
-                          }
-                      ],
-                      constants: [
-                          {
-                              name: "IN",
-                              value: 1
-                          },
-                          {
-                              name: "OUT",
-                              value: 3
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Pin: {
-                  __constructor: function*() {
-                      const args = [
-                          ...arguments
-                      ];
-                      args.pop();
-                      const [self, pinNumber, mode] = args;
-                      self.pinNumber = pinNumber;
-                      self.mode = mode != null ? mode : 3; // Pin.OUT
-                  },
-                  on: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByPort(`D${self.pinNumber}`);
-                      if (!sensor) {
-                          throw `There is no sensor connected to the digital port D${self.pinNumber}`;
-                      }
-                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
-                      if (!sensorDef.disablePinControl) {
-                          context.registerQuickPiEvent(sensor.name, true);
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          let command = "turnPortOn(\"" + sensor.name + "\")";
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  off: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByPort(`D${self.pinNumber}`);
-                      if (!sensor) {
-                          throw `There is no sensor connected to the digital port D${self.pinNumber}`;
-                      }
-                      let command = "turnPortOff(\"" + sensor.name + "\")";
-                      const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
-                      if (!sensorDef.disablePinControl) {
-                          context.registerQuickPiEvent(sensor.name, false);
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          let cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  }
-              }
-          }
-      };
-  }
-
-  function machinePwmModuleDefinition(context, strings) {
-      const pwmDuty = (self, duty, resolution, callback)=>{
-          const sensor = context.sensorHandler.findSensorByPort(`D${self.pin.pinNumber}`);
-          if (!sensor) {
-              throw `There is no sensor connected to the digital port D${self.pin.pinNumber}`;
-          }
-          const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
-          if (!sensorDef.getStateFromPwm) {
-              throw "This sensor may not be controlled by a PWM";
-          }
-          const newState = sensorDef.getStateFromPwm(duty, resolution);
-          let command = "pwmDuty(" + self.pin.pinNumber + ", " + duty + ", " + resolution + ")";
-          self.currentDuty = duty;
-          context.registerQuickPiEvent(sensor.name, newState);
-          if (!context.display || context.autoGrading || context.offLineMode) {
-              context.waitDelay(callback);
-          } else {
-              let cb = context.runner.waitCallback(callback);
-              context.quickPiConnection.sendCommand(command, cb);
-          }
-      };
-      return {
-          classDefinitions: {
-              actuator: {
-                  PWM: {
-                      defaultInstanceName: 'pwm',
-                      init: {
-                          params: [
-                              null,
-                              "Number",
-                              "Number"
-                          ]
-                      },
-                      blocks: [
-                          {
-                              name: "duty",
-                              params: [
-                                  "Number"
-                              ]
-                          },
-                          {
-                              name: "duty_u16",
-                              params: [
-                                  "Number"
-                              ]
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              PWM: {
-                  __constructor: function*(self, pin, freq, duty) {
-                      self.pin = pin;
-                      self.freq = freq;
-                      self.currentDuty = duty;
-                  },
-                  duty: function(self, duty, callback) {
-                      pwmDuty(self, duty, Math.pow(2, 10), callback);
-                  },
-                  duty_u16: function(self, duty, callback) {
-                      pwmDuty(self, duty, Math.pow(2, 16), callback);
-                  }
-              }
-          }
-      };
-  }
-
-  function timeSleepModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          blockDefinitions: {
-              actuator: [
-                  {
-                      name: "time.sleep",
-                      params: [
-                          "Number"
-                      ],
-                      blocklyJson: {
-                          "args0": [
-                              {
-                                  "type": "input_value",
-                                  "name": "PARAM_0",
-                                  "value": 0
-                              }
-                          ]
-                      },
-                      blocklyXml: "<block type='time.sleep'>" + "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>1</field></shadow></value>" + "</block>"
-                  },
-                  {
-                      name: "time.sleep_ms",
-                      params: [
-                          "Number"
-                      ],
-                      blocklyJson: {
-                          "args0": [
-                              {
-                                  "type": "input_value",
-                                  "name": "PARAM_0",
-                                  "value": 0
-                              }
-                          ]
-                      },
-                      blocklyXml: "<block type='time.sleep_ms'>" + "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>1000</field></shadow></value>" + "</block>"
-                  },
-                  {
-                      name: "time.sleep_us",
-                      params: [
-                          "Number"
-                      ],
-                      blocklyJson: {
-                          "args0": [
-                              {
-                                  "type": "input_value",
-                                  "name": "PARAM_0",
-                                  "value": 0
-                              }
-                          ]
-                      },
-                      blocklyXml: "<block type='time.sleep_us'>" + "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>10</field></shadow></value>" + "</block>"
-                  }
-              ]
-          },
-          blockImplementations: {
-              'time.sleep': function(time, callback) {
-                  quickPiModuleDefinition.blockImplementations.sleep(time * 1000, callback);
-              },
-              'time.sleep_ms': function(time, callback) {
-                  quickPiModuleDefinition.blockImplementations.sleep(time, callback);
-              },
-              'time.sleep_us': function(time, callback) {
-                  quickPiModuleDefinition.blockImplementations.sleep(time / 1000, callback);
-              }
-          }
-      };
-  }
-
   var img$1 = "data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3c!-- Generator: Adobe Illustrator 21.1.0%2c SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3e%3csvg version='1.1' id='galaxia' inkscape:version='1.3.2 (091e20e%2c 2023-11-25%2c custom)' sodipodi:docname='galaxia.svg' xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape' xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 162.1 255.3' style='enable-background:new 0 0 162.1 255.3%3b' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:none%3bstroke:%238A8989%3b%7d .st1%7bfill:%23B8E986%3b%7d .st2%7bfill:url(%23SVGID_1_)%3b%7d .st3%7bfill:url(%23Path-10_1_)%3b%7d .st4%7bfill:%232E5E95%3b%7d .st5%7bfill:url(%23rect3_2_)%3b%7d .st6%7bfill:url(%23rect2_1_)%3b%7d .st7%7bfill:url(%23rect2-2_1_)%3b%7d .st8%7bfill:%234A4A4A%3b%7d .st9%7bfill:%23333333%3b%7d .st10%7bfill:%230B356F%3b%7d .st11%7bfill:%23101010%3bstroke:white%3bstroke-width:1.603%3b%7d .st12%7bfill:%23111111%3b%7d .st13%7bfill:url(%23screen-reflect_1_)%3b%7d .st14%7bfill:%23101010%3b%7d .st15%7bfill:url(%23rect1-3-6_2_)%3b%7d .st16%7bfill:%236AA2F0%3b%7d .st17%7bfill:url(%23front_1_)%3b%7d .st18%7bfill:url(%23button-sys-top_1_)%3b%7d .st19%7bfill:url(%23rect1-3-6-8_2_)%3b%7d .st20%7bfill:%230B356F%3bfill-opacity:0%3bstroke:white%3bstroke-width:0.5%3bstroke-linejoin:round%3b%7d .st21%7bfill:url(%23path11_1_)%3b%7d .st22%7bfill:url(%23path11-9_1_)%3b%7d .st23%7bfill:url(%23path11-7_1_)%3b%7d .st24%7bfill:url(%23path11-5_1_)%3b%7d .st25%7bfill:url(%23path11-78_1_)%3b%7d .st26%7bfill:url(%23rect12_1_)%3b%7d .st27%7bfill:url(%23rect12-9_1_)%3b%7d .st28%7bfill:url(%23rect12-0_1_)%3b%7d .st29%7bfill:url(%23rect12-5_1_)%3b%7d .st30%7bfill:url(%23rect12-91_1_)%3b%7d .st31%7bfill:url(%23rect12-2_1_)%3b%7d .st32%7bfill:url(%23rect12-00_1_)%3b%7d .st33%7bfill:url(%23rect12-59_1_)%3b%7d .st34%7bfill:url(%23rect12-50_1_)%3b%7d .st35%7bfill:url(%23rect12-8_1_)%3b%7d .st36%7bfill:url(%23rect12-01_1_)%3b%7d .st37%7bfill:url(%23rect12-502_1_)%3b%7d .st38%7bfill:url(%23rect12-57_1_)%3b%7d .st39%7bfill:url(%23rect12-3_1_)%3b%7d .st40%7bfill:url(%23rect12-4_1_)%3b%7d .st41%7bfill:url(%23rect12-31_1_)%3b%7d .st42%7bfill:url(%23rect12-5023_1_)%3b%7d .st43%7bfill:url(%23rect12-010_1_)%3b%7d .st44%7bfill:url(%23rect12-82_1_)%3b%7d .st45%7bfill:url(%23rect12-915_1_)%3b%7d .st46%7bfill:white%3b%7d .st47%7bfont-family:'Arial'%3b%7d .st48%7bfont-size:15.8224px%3b%7d .st49%7bfont-size:5.356px%3b%7d .st50%7bfill:none%3bstroke:white%3bstroke-width:0.5%3bstroke-miterlimit:10%3b%7d .st51%7bfill:none%3bstroke:white%3bstroke-width:0.2%3bstroke-miterlimit:10%3b%7d%3c/style%3e%3cg id='led-component'%3e %3cpath id='led-wire-4' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8' class='st0' d=' M85%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-3' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-2' class='st0' d=' M92%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-2' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-5' class='st0' d=' M88.5%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led-wire-1' inkscape:original-d='m 138.99653%2c85.032809 c 0%2c1.413629 0%2c2.827256 0%2c4.240885' inkscape:path-effect='%23path-effect8-1' class='st0' d=' M95.4%2c21.5c0%2c1.5%2c0%2c3%2c0%2c4.4'/%3e %3cpath id='led' inkscape:label='led' sodipodi:nodetypes='cccccc' class='st1' d='M90%2c0c-3.8%2c0.1-6.7%2c3.4-6.7%2c7.2 c0%2c4.1-0.1%2c8.7-0.1%2c13c0%2c0.9%2c0.8%2c1.7%2c1.7%2c1.7h10.7c0.9%2c0%2c1.7-0.8%2c1.7-1.7L97.1%2c6.9C97.1%2c3%2c93.9-0.1%2c90%2c0z'/%3e %3cg id='led-reflect'%3e %3clinearGradient id='SVGID_1_' gradientUnits='userSpaceOnUse' x1='90.3304' y1='2.7957' x2='95.3505' y2='7.6366'%3e %3cstop offset='0' style='stop-color:white'/%3e %3cstop offset='0.9991' style='stop-color:white%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath class='st2' d='M94.4%2c8.5c-0.6%2c0-1-0.4-1-1c0-1.6-1.3-2.9-2.9-2.9c-0.6%2c0-1-0.4-1-1s0.4-1%2c1-1c2.7%2c0%2c4.9%2c2.2%2c4.9%2c4.9 C95.4%2c8.1%2c94.9%2c8.5%2c94.4%2c8.5z'/%3e %3c/g%3e %3cg id='led-filament'%3e %3cg id='E.03.f---Concours---QuickPI-_x28_connection-error_x29_' transform='translate(-315%2c -448)'%3e %3cg id='Group-11' transform='translate(302%2c 419)'%3e %3clinearGradient id='Path-10_1_' gradientUnits='userSpaceOnUse' x1='-569.5046' y1='659.9916' x2='-569.5046' y2='659.3275' gradientTransform='matrix(17 0 0 -11.6073 9784.9883 7700.646)'%3e %3cstop offset='0' style='stop-color:%232E5E95%3bstop-opacity:0.4'/%3e %3cstop offset='1' style='stop-color:%232E5E95%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath id='Path-10' class='st3' d='M97.8%2c46.7v-1.2c0-0.5%2c0.2-0.9%2c0.5-1.2c0.3-0.3%2c0.5-0.8%2c0.5-1.2v-2.5c0-0.4%2c0.3-0.7%2c0.7-0.7 h0.2c0.2%2c0%2c0.4%2c0.2%2c0.4%2c0.4c0%2c0.2%2c0.2%2c0.4%2c0.4%2c0.4h5.5c0.2%2c0%2c0.4-0.2%2c0.4-0.4c0-0.2%2c0.2-0.4%2c0.4-0.4h0.4c0.5%2c0%2c0.8%2c0.4%2c0.8%2c0.8 v2.3c0%2c0.5%2c0.2%2c0.9%2c0.5%2c1.2s0.5%2c0.8%2c0.5%2c1.2v1.2c0%2c0.5-0.4%2c0.9-0.9%2c0.9h0c-0.5%2c0-0.9-0.4-0.9-0.9c0-0.6-0.2-1.1-0.6-1.5 l-0.3-0.3c-0.6-0.6-0.7-1.4-0.4-2.1l0.3-0.7c0.1-0.2%2c0-0.4-0.2-0.4c0%2c0-0.1%2c0-0.1%2c0c-0.3%2c0-0.6%2c0.1-0.9%2c0.2l-2.6%2c1.5 c-0.7%2c0.4-1.4%2c0.9-1.9%2c1.5l-0.3%2c0.3c-0.4%2c0.4-0.6%2c0.9-0.6%2c1.5c0%2c0.5-0.4%2c0.9-0.9%2c0.9h0C98.2%2c47.6%2c97.8%2c47.2%2c97.8%2c46.7z'/%3e %3c/g%3e %3c/g%3e %3c/g%3e%3c/g%3e%3cg id='board'%3e %3cpath id='rect3_1_' class='st4' d='M24.5%2c20.8c-2.9%2c0-5.3%2c2.3-5.3%2c5.2v224c0%2c2.9%2c2.3%2c5.2%2c5.3%2c5.2h132.4c2.9%2c0%2c5.2-2.3%2c5.2-5.2v-224 c0-2.9-2.3-5.2-5.2-5.2h-55.6c-0.7%2c4.2-1.5%2c8.4-2.2%2c12.6H81.3L80%2c20.8H24.5z'/%3e %3clinearGradient id='rect3_2_' gradientUnits='userSpaceOnUse' x1='25.97' y1='17.2623' x2='154.47' y2='240.2623'%3e %3cstop offset='0' style='stop-color:%236BAAF4'/%3e %3cstop offset='1' style='stop-color:%234A90E2'/%3e %3c/linearGradient%3e %3cpath id='rect3' class='st5' d='M24.5%2c12.4c-2.9%2c0-5.3%2c2.4-5.3%2c5.3v224c0%2c2.9%2c2.4%2c5.2%2c5.2%2c5.2h132.4c2.9%2c0%2c5.2-2.4%2c5.2-5.2v-224 c0-2.9-2.3-5.2-5.2-5.2h-52.1c-2%2c0-3.7%2c1.4-4.1%2c3.4c-0.4%2c2.1-0.7%2c4.2-1.1%2c6.3c-0.3%2c1.6-1.7%2c2.9-3.4%2c2.9H84.4 c-1.8%2c0-3.2-1.3-3.4-3.1l-0.6-5.8c-0.2-2.1-2-3.7-4.1-3.7H24.5z'/%3e%3c/g%3e%3cg id='cable'%3e %3clinearGradient id='rect2_1_' gradientUnits='userSpaceOnUse' x1='-297.9723' y1='421.476' x2='-294.3843' y2='421.476' gradientTransform='matrix(2.8346 0 0 -2.8346 844.646 1236.2024)'%3e %3cstop offset='0' style='stop-color:black%3bstop-opacity:0'/%3e %3cstop offset='0.5' style='stop-color:black'/%3e %3cstop offset='1' style='stop-color:black'/%3e %3c/linearGradient%3e %3crect id='rect2' y='39.1' class='st6' width='10.2' height='4.7'/%3e %3clinearGradient id='rect2-2_1_' gradientUnits='userSpaceOnUse' x1='17.6471' y1='44.5313' x2='17.6471' y2='37.7196'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect2-2' x='16' y='37.2' class='st7' width='3.2' height='8.5'/%3e %3crect id='rect2-2_2_' x='16' y='44.7' class='st8' width='3.2' height='1'/%3e %3cpath id='rect2-2-4' sodipodi:nodetypes='sccsssss' d='M12.3%2c36.2l5.8%2c0c0%2c2.7%2c0%2c10.5%2c0%2c10.5h-5.8c-1.4%2c0-2.5-1.1-2.5-2.4v-5.8 C9.8%2c37.3%2c10.9%2c36.3%2c12.3%2c36.2L12.3%2c36.2z'/%3e %3cpath id='rect2-2-4_1_' sodipodi:nodetypes='sccsssss' class='st9' d='M12.3%2c36.2l5.8%2c0c0%2c2.2%2c0%2c8.7%2c0%2c8.7h-5.8 c-1.4%2c0-2.5-0.9-2.5-2v-4.8C9.8%2c37.1%2c10.9%2c36.2%2c12.3%2c36.2L12.3%2c36.2z'/%3e%3c/g%3e%3cg id='Screen'%3e %3cpath id='rect1_1_' class='st10' d='M36.3%2c43.4h109.5c3.4%2c0%2c6.2%2c2.8%2c6.2%2c6.2v78c0%2c3.4-2.8%2c6.2-6.2%2c6.2H36.3c-3.4%2c0-6.2-2.8-6.2-6.2 v-78C30.1%2c46.2%2c32.9%2c43.4%2c36.3%2c43.4z'/%3e %3cpath id='rect1' class='st11' d='M36.3%2c40.4h109.5c3.4%2c0%2c6.2%2c2.8%2c6.2%2c6.2v78c0%2c3.4-2.8%2c6.2-6.2%2c6.2H36.3c-3.4%2c0-6.2-2.8-6.2-6.2 v-78C30.1%2c43.2%2c32.9%2c40.4%2c36.3%2c40.4z'/%3e %3cpath id='screen-inner' class='st12' d='M142.1%2c124.3H40.9c-1.6%2c0-2.9-1.3-2.9-2.9V49.7c0-1.6%2c1.3-2.9%2c2.9-2.9h101.2 c1.6%2c0%2c2.9%2c1.3%2c2.9%2c2.9v71.6C145%2c123%2c143.7%2c124.3%2c142.1%2c124.3z'/%3e %3clinearGradient id='screen-reflect_1_' gradientUnits='userSpaceOnUse' x1='134.4387' y1='126.9072' x2='40.0091' y2='36.3318'%3e %3cstop offset='0' style='stop-color:%2367696B'/%3e %3cstop offset='0.9997' style='stop-color:%23B1B3B4%3bstop-opacity:0'/%3e %3c/linearGradient%3e %3cpath id='screen-reflect' inkscape:label='screen-inner' class='st13' d='M40.8%2c46.8h101.1c1.7%2c0%2c3.2%2c1.4%2c3.2%2c3.2L40.8%2c124.3 c-1.7%2c0-3.2-1.4-3.2-3.2V50C37.6%2c48.3%2c39%2c46.8%2c40.8%2c46.8z'/%3e %3crect id='rect5' x='26.6' y='46.8' class='st14' width='7.8' height='76.3'/%3e %3crect id='rect5-8' x='24' y='60.4' class='st8' width='10.8' height='52.3'/%3e %3crect id='rect5-8_1_' x='31.7' y='60.4' class='st9' width='3.1' height='52.3'/%3e%3c/g%3e%3cg id='button-a'%3e %3cpath id='rect1-3-6_1_' class='st8' d='M121.7%2c142.2h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9V171c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c143.1%2c120.7%2c142.2%2c121.7%2c142.2z'/%3e %3clinearGradient id='rect1-3-6_2_' gradientUnits='userSpaceOnUse' x1='135.6954' y1='141.1228' x2='135.6954' y2='171.3371'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='rect1-3-6' class='st15' d='M121.7%2c140.5h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c141.3%2c120.7%2c140.5%2c121.7%2c140.5z'/%3e %3cellipse id='path2' class='st8' cx='123.8' cy='144.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3' class='st8' cx='147.5' cy='144.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1' class='st8' cx='147.5' cy='167.6' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-2' class='st8' cx='123.8' cy='167.6' rx='2.1' ry='2'/%3e %3ccircle id='button-a-bot' inkscape:label='button-a-bot' class='st10' cx='135.7' cy='155.8' r='10.9'%3e %3c/circle%3e %3ccircle id='button-a-top' inkscape:label='button-a-top' class='st16' cx='135.7' cy='153.2' r='10.9'%3e %3c/circle%3e%3c/g%3e%3cg id='button-sys'%3e %3cpath id='shadow' class='st8' d='M137.5%2c17.8h16.3c0.6%2c0%2c1.1%2c0.5%2c1.1%2c1.1v15.7c0%2c0.6-0.5%2c1.1-1.1%2c1.1h-16.3c-0.6%2c0-1.1-0.5-1.1-1.1 V18.9C136.4%2c18.3%2c136.9%2c17.8%2c137.5%2c17.8z'/%3e %3clinearGradient id='front_1_' gradientUnits='userSpaceOnUse' x1='145.6426' y1='16.181' x2='145.6426' y2='33.4903'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='front' class='st17' d='M137.5%2c16.4h16.3c0.6%2c0%2c1.1%2c0.5%2c1.1%2c1.1v15.7c0%2c0.6-0.5%2c1.1-1.1%2c1.1h-16.3c-0.6%2c0-1.1-0.5-1.1-1.1 V17.5C136.4%2c16.9%2c136.9%2c16.4%2c137.5%2c16.4z'/%3e %3cellipse id='path2-5' class='st8' cx='138.7' cy='18.4' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-9' class='st8' cx='152.6' cy='18.4' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-1-6' class='st8' cx='152.6' cy='32.2' rx='1.2' ry='1.2'/%3e %3cellipse id='path2-3-1-2-6' class='st8' cx='138.7' cy='32.2' rx='1.2' ry='1.2'/%3e %3ccircle id='button-sys-bot' inkscape:label='button-sys-bot' class='st10' cx='145.6' cy='25.3' r='6.4'%3e %3c/circle%3e %3clinearGradient id='button-sys-top_1_' gradientUnits='userSpaceOnUse' x1='140.2529' y1='23.3427' x2='151.8014' y2='23.3427'%3e %3cstop offset='0' style='stop-color:%236BAAF4'/%3e %3cstop offset='1' style='stop-color:%234A90E2'/%3e %3c/linearGradient%3e %3ccircle id='button-sys-top' inkscape:label='button-sys-top' class='st18' cx='145.6' cy='23.3' r='6.4'%3e %3c/circle%3e%3c/g%3e%3cg id='button-b'%3e %3cpath id='rect1-3-6-8_1_' class='st8' d='M121.7%2c185.3h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c186.1%2c120.7%2c185.3%2c121.7%2c185.3z'/%3e %3clinearGradient id='rect1-3-6-8_2_' gradientUnits='userSpaceOnUse' x1='135.6954' y1='184.2388' x2='135.6954' y2='214.7807'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='rect1-3-6-8' class='st19' d='M121.7%2c183.6h28c1%2c0%2c1.9%2c0.8%2c1.9%2c1.9v26.9c0%2c1-0.8%2c1.9-1.9%2c1.9h-28c-1%2c0-1.9-0.8-1.9-1.9 v-26.9C119.8%2c184.4%2c120.7%2c183.6%2c121.7%2c183.6z'/%3e %3cellipse id='path2-8' class='st8' cx='123.8' cy='187.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-12' class='st8' cx='147.5' cy='187.1' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-1' class='st8' cx='147.5' cy='210.7' rx='2.1' ry='2'/%3e %3cellipse id='path2-3-1-2-4' class='st8' cx='123.8' cy='210.7' rx='2.1' ry='2'/%3e %3ccircle id='button-b-bot' inkscape:label='button-b-bot' class='st10' cx='135.7' cy='198.9' r='10.9'%3e %3c/circle%3e %3ccircle id='button-b-top' inkscape:label='button-b-top' class='st16' cx='135.7' cy='196.2' r='10.9'%3e %3c/circle%3e%3c/g%3e%3cpath id='pad-left' inkscape:label='pad-left' class='st20' d='M36.5%2c149.8c-6.9%2c7.1-10.8%2c16.6-10.8%2c26.5c0%2c9.8%2c3.8%2c19.2%2c10.6%2c26.3 l17.3-17.3c-2.2-2.5-3.4-5.7-3.4-9c0-3.4%2c1.3-6.7%2c3.6-9.2L36.5%2c149.8z'/%3e%3cpath id='pad-up' inkscape:label='pad-up' class='st20' d='M90.9%2c148.2c-7.1-6.9-16.6-10.8-26.5-10.8c-9.8%2c0-19.2%2c3.8-26.3%2c10.6 l17.3%2c17.3c2.5-2.2%2c5.7-3.4%2c9-3.4c3.4%2c0%2c6.7%2c1.3%2c9.2%2c3.6L90.9%2c148.2z'/%3e%3cpath id='pad-right' inkscape:label='pad-right' class='st20' d='M92.1%2c203c6.9-7.1%2c10.8-16.6%2c10.8-26.5c0-9.8-3.8-19.2-10.6-26.3 L75%2c167.4c2.2%2c2.5%2c3.4%2c5.7%2c3.4%2c9c0%2c3.4-1.3%2c6.7-3.6%2c9.2L92.1%2c203z'/%3e%3cpath id='pad-down' inkscape:label='pad-down' class='st20' d='M37.5%2c204.2c7.1%2c6.9%2c16.6%2c10.8%2c26.5%2c10.8c9.8%2c0%2c19.2-3.8%2c26.3-10.6 l-17.3-17.3c-2.5%2c2.2-5.7%2c3.4-9%2c3.4c-3.4%2c0-6.7-1.3-9.2-3.6L37.5%2c204.2z'/%3e%3cg id='connection'%3e %3crect id='rect14' x='20.3' y='245.3' class='st16' width='5.1' height='5.5'/%3e %3crect id='rect14-5' x='156.3' y='245.3' class='st16' width='5.1' height='5.5'/%3e %3crect id='rect14-0-7' x='66.6' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-3' x='36.7' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-6' x='98.2' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3crect id='rect14-0-7-5' x='128.2' y='245.3' class='st16' width='16.6' height='5.5'/%3e %3clinearGradient id='path11_1_' gradientUnits='userSpaceOnUse' x1='30.939' y1='250.2664' x2='30.939' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11' class='st21' d='M30.9%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3H39l0-18.9 C39%2c227.5%2c35.4%2c223.9%2c30.9%2c223.9L30.9%2c223.9z'/%3e %3clinearGradient id='path11-9_1_' gradientUnits='userSpaceOnUse' x1='59.3629' y1='250.2664' x2='59.3629' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-9' class='st22' d='M59.4%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C67.4%2c227.5%2c63.8%2c223.9%2c59.4%2c223.9L59.4%2c223.9z'/%3e %3clinearGradient id='path11-7_1_' gradientUnits='userSpaceOnUse' x1='90.7304' y1='250.2664' x2='90.7304' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-7' class='st23' d='M90.7%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C98.8%2c227.5%2c95.2%2c223.9%2c90.7%2c223.9L90.7%2c223.9z'/%3e %3clinearGradient id='path11-5_1_' gradientUnits='userSpaceOnUse' x1='122.0979' y1='250.2664' x2='122.0979' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-5' class='st24' d='M122.1%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C130.2%2c227.5%2c126.6%2c223.9%2c122.1%2c223.9L122.1%2c223.9z'/%3e %3clinearGradient id='path11-78_1_' gradientUnits='userSpaceOnUse' x1='150.5217' y1='250.2664' x2='150.5217' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3cpath id='path11-78' class='st25' d='M150.5%2c223.9c-4.5%2c0-8.1%2c3.6-8.1%2c8.1c0%2c7%2c0%2c12.7%2c0%2c18.9h2.5l0.8-3h9.3l0.9%2c3h2.6l0-18.9 C158.6%2c227.5%2c155%2c223.9%2c150.5%2c223.9L150.5%2c223.9z'/%3e %3clinearGradient id='rect12_1_' gradientUnits='userSpaceOnUse' x1='160.6279' y1='250.2664' x2='160.6279' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12' x='159.1' y='234.4' class='st26' width='3' height='16.5'/%3e %3clinearGradient id='rect12-9_1_' gradientUnits='userSpaceOnUse' x1='137.7817' y1='250.2664' x2='137.7817' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-9' x='136.6' y='234.4' class='st27' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-0_1_' gradientUnits='userSpaceOnUse' x1='134.838' y1='250.2664' x2='134.838' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-0' x='133.6' y='234.4' class='st28' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-5_1_' gradientUnits='userSpaceOnUse' x1='131.8944' y1='250.2664' x2='131.8944' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-5' x='130.7' y='234.4' class='st29' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-91_1_' gradientUnits='userSpaceOnUse' x1='140.7253' y1='250.2664' x2='140.7253' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-91' x='139.5' y='234.4' class='st30' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-2_1_' gradientUnits='userSpaceOnUse' x1='112.3015' y1='250.2664' x2='112.3015' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-2' x='111.1' y='234.4' class='st31' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-00_1_' gradientUnits='userSpaceOnUse' x1='109.3578' y1='250.2664' x2='109.3578' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-00' x='108.1' y='234.4' class='st32' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-59_1_' gradientUnits='userSpaceOnUse' x1='106.4142' y1='250.2664' x2='106.4142' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-59' x='105.2' y='234.4' class='st33' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-50_1_' gradientUnits='userSpaceOnUse' x1='103.4706' y1='250.2664' x2='103.4706' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-50' x='102.2' y='234.4' class='st34' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-8_1_' gradientUnits='userSpaceOnUse' x1='100.5269' y1='250.2664' x2='100.5269' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-8' x='99.3' y='234.4' class='st35' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-01_1_' gradientUnits='userSpaceOnUse' x1='80.9339' y1='250.2664' x2='80.9339' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-01' x='79.7' y='234.4' class='st36' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-502_1_' gradientUnits='userSpaceOnUse' x1='77.9903' y1='250.2664' x2='77.9903' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-502' x='76.8' y='234.4' class='st37' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-57_1_' gradientUnits='userSpaceOnUse' x1='75.0467' y1='250.2664' x2='75.0467' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-57' x='73.8' y='234.4' class='st38' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-3_1_' gradientUnits='userSpaceOnUse' x1='72.103' y1='250.2664' x2='72.103' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-3' x='70.9' y='234.4' class='st39' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-4_1_' gradientUnits='userSpaceOnUse' x1='69.1594' y1='250.2664' x2='69.1594' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-4' x='67.9' y='234.4' class='st40' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-31_1_' gradientUnits='userSpaceOnUse' x1='49.5665' y1='250.2664' x2='49.5665' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-31' x='48.3' y='234.4' class='st41' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-5023_1_' gradientUnits='userSpaceOnUse' x1='46.6229' y1='250.2664' x2='46.6229' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-5023' x='45.4' y='234.4' class='st42' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-010_1_' gradientUnits='userSpaceOnUse' x1='43.6792' y1='250.2664' x2='43.6792' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-010' x='42.4' y='234.4' class='st43' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-82_1_' gradientUnits='userSpaceOnUse' x1='40.7355' y1='250.2664' x2='40.7355' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-82' x='39.5' y='234.4' class='st44' width='2.5' height='16.5'/%3e %3clinearGradient id='rect12-915_1_' gradientUnits='userSpaceOnUse' x1='20.8083' y1='250.2664' x2='20.8083' y2='223.0977'%3e %3cstop offset='0' style='stop-color:%23FAFAFA'/%3e %3cstop offset='1' style='stop-color:%23B1B3B4'/%3e %3c/linearGradient%3e %3crect id='rect12-915' x='19.3' y='234.4' class='st45' width='3.1' height='16.5'/%3e %3ccircle id='path12' class='st8' cx='30.9' cy='232.3' r='6.6'/%3e %3ccircle id='path12-2' class='st8' cx='59.4' cy='232.3' r='6.6'/%3e %3ccircle id='path12-7' class='st8' cx='90.7' cy='232.3' r='6.6'/%3e %3ccircle id='path12-4' class='st8' cx='122.1' cy='232.3' r='6.6'/%3e %3ccircle id='path12-23' class='st8' cx='150.5' cy='232.3' r='6.6'/%3e %3cpath class='st14' d='M37.6%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1s-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7S37.6%2c228.6%2c37.6%2c232.3z'/%3e %3cpath class='st14' d='M66%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C63%2c225.6%2c66%2c228.6%2c66%2c232.3z'/%3e %3cpath class='st14' d='M97.4%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C94.4%2c225.6%2c97.4%2c228.6%2c97.4%2c232.3z'/%3e %3cpath class='st14' d='M128.7%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C125.8%2c225.6%2c128.7%2c228.6%2c128.7%2c232.3z'/%3e %3cpath class='st14' d='M157.2%2c232.3c0%2c0.2%2c0%2c0.4%2c0%2c0.6c-0.3-3.4-3.1-6.1-6.6-6.1c-3.5%2c0-6.3%2c2.7-6.6%2c6.1c0-0.2%2c0-0.4%2c0-0.6 c0-3.7%2c3-6.7%2c6.6-6.7C154.2%2c225.6%2c157.2%2c228.6%2c157.2%2c232.3z'/%3e%3c/g%3e%3ctext transform='matrix(1 0 0 1 104.5744 148.2085)' class='st46 st47 st48'%3eA%3c/text%3e%3ctext transform='matrix(1 0 0 1 108.1418 28.5307)' class='st46 st47 st49'%3eSYST%c3%88ME%3c/text%3e%3ctext transform='matrix(1 0 0 1 104.3547 219.7241)' class='st46 st47 st48'%3eB%3c/text%3e%3cg id='Arrow-A'%3e %3cpath id='path135' class='st46' d='M115.4%2c157.9l-1.5%2c0.9V157L115.4%2c157.9z'/%3e %3cpath class='st50' d='M113.9%2c157.9c-2.8%2c0-5.1-2.2-5.1-5'/%3e%3c/g%3e%3cg id='Arrow-B'%3e %3cpath id='path135-3' class='st46' d='M115.4%2c196.8l-1.5%2c0.9v-1.8L115.4%2c196.8z'/%3e %3cpath class='st50' d='M108.9%2c201.9c0-2.8%2c2.2-5.1%2c5-5.1'/%3e%3c/g%3e%3cg id='Arrow-Sys'%3e %3cpath class='st51' d='M126.8%2c22.7c0.7-2.7%2c3.4-4.4%2c6.1-3.7'/%3e %3cg%3e %3cpolygon class='st46' points='132.4%2c19.4 134.6%2c19.4 132.7%2c18.3 '/%3e %3c/g%3e%3c/g%3e%3c/svg%3e";
-
-  function _extends$7() {
-      _extends$7 = Object.assign || function(target) {
-          for(var i = 1; i < arguments.length; i++){
-              var source = arguments[i];
-              for(var key in source){
-                  if (Object.prototype.hasOwnProperty.call(source, key)) {
-                      target[key] = source[key];
-                  }
-              }
-          }
-          return target;
-      };
-      return _extends$7.apply(this, arguments);
-  }
-  function networkWlanModuleDefinition(context, strings) {
-      return {
-          constants: [
-              {
-                  name: 'STA_IF',
-                  value: 0
-              },
-              {
-                  name: 'AP_IF',
-                  value: 1
-              }
-          ],
-          classDefinitions: {
-              actuator: {
-                  WLAN: {
-                      defaultInstanceName: 'wlan',
-                      init: {
-                          params: [
-                              "Number"
-                          ]
-                      },
-                      blocks: [
-                          {
-                              name: "active",
-                              params: [
-                                  "Boolean"
-                              ]
-                          },
-                          {
-                              name: "scan"
-                          },
-                          {
-                              name: "connect",
-                              params: [
-                                  "String",
-                                  "String"
-                              ]
-                          },
-                          {
-                              name: "disconnect"
-                          },
-                          {
-                              name: "isconnected",
-                              yieldsValue: "bool"
-                          },
-                          {
-                              name: "ifconfig",
-                              yieldsValue: "string"
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              WLAN: {
-                  __constructor: function*(self, interfaceId) {
-                      self.interface = interfaceId;
-                  },
-                  active: function(self, active, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
-                              active: !!active
-                          }));
-                          context.waitDelay(callback);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = `wifiSetActive("${sensor.name}", ${active ? 1 : 0})`;
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  scan: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          var _sensor_state;
-                          if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
-                              throw strings.messages.wifiNotActive;
-                          }
-                          context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
-                              scanning: true
-                          }));
-                          let cb = context.runner.waitCallback(callback);
-                          setTimeout(()=>{
-                              context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
-                                  scanning: false
-                              }));
-                              cb();
-                          }, 1000);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = "wifiScan(\"" + sensor.name + "\")";
-                          context.quickPiConnection.sendCommand(command, (result)=>{
-                              cb(JSON.parse(result));
-                          });
-                      }
-                  },
-                  connect: function(self, ssid, password, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          var _sensor_state;
-                          if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
-                              throw strings.messages.wifiNotActive;
-                          }
-                          const cb = context.runner.waitCallback(callback);
-                          setTimeout(()=>{
-                              context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
-                                  connected: true,
-                                  ssid,
-                                  password
-                              }));
-                              cb();
-                          }, 500);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = "wifiConnect(\"" + sensor.name + "\", \"" + ssid + "\", \"" + password + "\")";
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  disconnect: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          var _sensor_state;
-                          if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
-                              throw strings.messages.wifiNotActive;
-                          }
-                          const cb = context.runner.waitCallback(callback);
-                          setTimeout(()=>{
-                              context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
-                                  connected: false,
-                                  ssid: null,
-                                  password: null
-                              }));
-                              cb();
-                          }, 500);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = "wifiDisconnect(\"" + sensor.name + "\")";
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  isconnected: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          const state = context.getSensorState(sensor.name);
-                          context.runner.noDelay(callback, !!state.connected);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = "wifiIsConnected(\"" + sensor.name + "\")";
-                          context.quickPiConnection.sendCommand(command, function(returnVal) {
-                              cb(!!returnVal);
-                          });
-                      }
-                  },
-                  ifconfig: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('wifi');
-                      if (!sensor) {
-                          throw `There is no Wi-Fi sensor.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          const state = context.getSensorState(sensor.name);
-                          if (!(state == null ? void 0 : state.active)) {
-                              throw strings.messages.wifiNotActive;
-                          }
-                          const ips = [
-                              '192.168.1.4',
-                              '255.255.255.0',
-                              '192.168.1.1',
-                              '8.8.8.8'
-                          ];
-                          context.runner.noDelay(callback, ips);
-                      } else {
-                          const command = "wifiIfConfig(\"" + sensor.name + "\")";
-                          const cb = context.runner.waitCallback(callback);
-                          context.quickPiConnection.sendCommand(command, (result)=>{
-                              cb(JSON.parse(result));
-                          });
-                      }
-                  }
-              }
-          }
-      };
-  }
-
-  function asyncGeneratorStep$7(gen, resolve, reject, _next, _throw, key, arg) {
-      try {
-          var info = gen[key](arg);
-          var value = info.value;
-      } catch (error) {
-          reject(error);
-          return;
-      }
-      if (info.done) {
-          resolve(value);
-      } else {
-          Promise.resolve(value).then(_next, _throw);
-      }
-  }
-  function _async_to_generator$7(fn) {
-      return function() {
-          var self = this, args = arguments;
-          return new Promise(function(resolve, reject) {
-              var gen = fn.apply(self, args);
-              function _next(value) {
-                  asyncGeneratorStep$7(gen, resolve, reject, _next, _throw, "next", value);
-              }
-              function _throw(err) {
-                  asyncGeneratorStep$7(gen, resolve, reject, _next, _throw, "throw", err);
-              }
-              _next(undefined);
-          });
-      };
-  }
-  function _extends$6() {
-      _extends$6 = Object.assign || function(target) {
-          for(var i = 1; i < arguments.length; i++){
-              var source = arguments[i];
-              for(var key in source){
-                  if (Object.prototype.hasOwnProperty.call(source, key)) {
-                      target[key] = source[key];
-                  }
-              }
-          }
-          return target;
-      };
-      return _extends$6.apply(this, arguments);
-  }
-  function getRealValue(object) {
-      if (!object) {
-          return object;
-      }
-      if (object.toJSON) {
-          return object.toJSON();
-      }
-      return object;
-  }
-  function formatString(str) {
-      return str.replace(/"/g, '\\"');
-  }
-  function requestsModuleDefinition(context, strings) {
-      function makeRequest(sensor, fetchParameters, callback) {
-          return _makeRequest.apply(this, arguments);
-      }
-      function _makeRequest() {
-          _makeRequest = _async_to_generator$7(function*(sensor, fetchParameters, callback) {
-              const fetchUrl = fetchParameters.url;
-              const fetchArguments = _extends$6({
-                  method: fetchParameters.method,
-                  headers: getRealValue(fetchParameters.headers)
-              }, fetchParameters.body ? {
-                  body: getRealValue(fetchParameters.body)
-              } : {});
-              if (!context.display || context.autoGrading || context.offLineMode) {
-                  var _sensor_state;
-                  if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
-                      throw strings.messages.wifiNotActive;
-                  }
-                  context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
-                      lastRequest: _extends$6({
-                          url: fetchUrl
-                      }, fetchArguments)
-                  }));
-                  let result = null;
-                  try {
-                      // @ts-ignore
-                      result = yield fetch(fetchUrl, _extends$6({}, fetchArguments, fetchArguments.body ? {
-                          body: new URLSearchParams(fetchArguments.body)
-                      } : {}));
-                  } catch (e) {
-                      console.error(e);
-                      throw strings.messages.networkRequestFailed.format(fetchParameters.url);
-                  }
-                  const text = yield result.text();
-                  callback({
-                      __className: 'Response',
-                      arguments: [
-                          result.status,
-                          text
-                      ]
-                  });
-              } else {
-                  let command;
-                  if ('GET' === fetchArguments.method) {
-                      var _fetchArguments_headers;
-                      command = `requestsGet("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify((_fetchArguments_headers = fetchArguments.headers) != null ? _fetchArguments_headers : {}))}')`;
-                  } else {
-                      var _fetchArguments_body, _fetchArguments_headers1;
-                      command = `requestsPost("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify((_fetchArguments_body = fetchArguments.body) != null ? _fetchArguments_body : {}))}', '${formatString(JSON.stringify((_fetchArguments_headers1 = fetchArguments.headers) != null ? _fetchArguments_headers1 : {}))}')`;
-                  }
-                  yield new Promise((resolve, reject)=>{
-                      context.quickPiConnection.sendCommand(command, (result)=>{
-                          try {
-                              const [status, text] = JSON.parse(result);
-                              callback({
-                                  __className: 'Response',
-                                  arguments: [
-                                      status,
-                                      text
-                                  ]
-                              });
-                              resolve();
-                          } catch (e) {
-                              console.error(result);
-                              reject(result);
-                          }
-                      });
-                  });
-              }
-          });
-          return _makeRequest.apply(this, arguments);
-      }
-      return {
-          classDefinitions: {
-              actuator: {
-                  Response: {
-                      defaultInstanceName: 'response',
-                      init: {
-                          params: [
-                              "Number",
-                              "String"
-                          ],
-                          hidden: true
-                      },
-                      blocks: [
-                          {
-                              name: "json"
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Response: {
-                  __constructor: function*(self, statusCode, text) {
-                      self.status_code = statusCode;
-                      self.text = text;
-                  },
-                  json: function*(self) {
-                      try {
-                          return JSON.parse(self.text);
-                      } catch (e) {
-                          console.error(e);
-                          throw strings.messages.nonValidJson;
-                      }
-                  }
-              }
-          },
-          blockDefinitions: {
-              actuator: [
-                  {
-                      name: 'get',
-                      variants: [
-                          [
-                              "String"
-                          ],
-                          [
-                              "String",
-                              null
-                          ]
-                      ],
-                      yieldsValue: 'string'
-                  },
-                  {
-                      name: 'post',
-                      variants: [
-                          [
-                              "String",
-                              null
-                          ],
-                          [
-                              "String",
-                              null,
-                              null
-                          ]
-                      ],
-                      yieldsValue: 'string'
-                  }
-              ]
-          },
-          blockImplementations: {
-              get: function() {
-                  const args = [
-                      ...arguments
-                  ];
-                  const callback = args.pop();
-                  const [url, headers] = args;
-                  const sensor = context.sensorHandler.findSensorByType('wifi');
-                  if (!sensor) {
-                      throw `There is no Wi-Fi sensor to make the request.`;
-                  }
-                  const cb = context.runner.waitCallback(callback);
-                  return makeRequest(sensor, {
-                      method: 'GET',
-                      url,
-                      headers
-                  }, cb);
-              },
-              post: function() {
-                  const args = [
-                      ...arguments
-                  ];
-                  const callback = args.pop();
-                  const [url, data, headers] = args;
-                  const sensor = context.sensorHandler.findSensorByType('wifi');
-                  if (!sensor) {
-                      throw `There is no Wi-Fi sensor to make the request.`;
-                  }
-                  const cb = context.runner.waitCallback(callback);
-                  return makeRequest(sensor, {
-                      method: 'POST',
-                      url,
-                      headers,
-                      body: data
-                  }, cb);
-              }
-          }
-      };
-  }
-
-  function jsonModuleDefinition(context, strings) {
-      return {
-          blockDefinitions: {
-              actuator: [
-                  {
-                      name: 'dumps',
-                      params: [
-                          null
-                      ],
-                      yieldsValue: 'string'
-                  }
-              ]
-          },
-          blockImplementations: {
-              dumps: function(params, callback) {
-                  const serialized = JSON.stringify(params);
-                  context.waitDelay(callback, serialized);
-              }
-          }
-      };
-  }
-
-  function machinePulseModuleDefinition(context, strings) {
-      return {
-          blockDefinitions: {
-              sensors: [
-                  {
-                      name: 'time_pulse_us',
-                      params: [
-                          null,
-                          'Number',
-                          'Number'
-                      ],
-                      yieldsValue: 'int'
-                  }
-              ]
-          },
-          blockImplementations: {
-              time_pulse_us: function(pin, pulseLevel, timeoutUs, callback) {
-                  const sensor = context.sensorHandler.findSensorByPort(`D${pin.pinNumber}`);
-                  if (!sensor) {
-                      throw `There is no sensor connected to the digital port D${pin.pinNumber}`;
-                  }
-                  let command = "getTimePulseUs(\"" + sensor.name + `", ${pulseLevel}, ${timeoutUs})`;
-                  if (!context.display || context.autoGrading || context.offLineMode) {
-                      let distance = context.getSensorState(sensor.name);
-                      const duration = distance / 343 * 2 / 100 * 1e6;
-                      context.waitDelay(callback, duration);
-                  } else {
-                      let cb = context.runner.waitCallback(callback);
-                      context.quickPiConnection.sendCommand(command, cb);
-                  }
-              }
-          }
-      };
-  }
 
   function getSessionStorage(name) {
       // Use a try in case it gets blocked
@@ -4304,102 +863,6 @@ elif program_exists:
   """)
   f.close()*/ ;
 
-  function thingzCompassModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          classDefinitions: {
-              sensors: {
-                  Compass: {
-                      blocks: [
-                          {
-                              name: "get_x",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          },
-                          {
-                              name: "get_y",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          },
-                          {
-                              name: "get_z",
-                              yieldsValue: true,
-                              blocklyJson: {
-                                  output: "Number"
-                              }
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Compass: {
-                  get_x: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readMagneticForce('x', callback);
-                  },
-                  get_y: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readMagneticForce('y', callback);
-                  },
-                  get_z: function(self, callback) {
-                      quickPiModuleDefinition.blockImplementations.readMagneticForce('z', callback);
-                  }
-              }
-          },
-          classInstances: {
-              compass: 'Compass'
-          }
-      };
-  }
-
-  function mergeModuleDefinitions(moduleDefinitions) {
-      const moduleDefinitionToBoardBlocks = {
-          'classDefinitions': 'customClasses',
-          'classInstances': 'customClassInstances',
-          'classImplementations': 'customClassImplementations',
-          'blockImplementations': 'customBlockImplementations',
-          'blockDefinitions': 'customBlocks',
-          'constants': 'customConstants'
-      };
-      const toBeMerged = {};
-      const addToMerge = (boardCustomBlockName, moduleName, moduleDef)=>{
-          if (!(boardCustomBlockName in toBeMerged)) {
-              toBeMerged[boardCustomBlockName] = {};
-          }
-          if (!(moduleName in toBeMerged[boardCustomBlockName])) {
-              toBeMerged[boardCustomBlockName][moduleName] = [];
-          }
-          toBeMerged[boardCustomBlockName][moduleName].push(moduleDef);
-      };
-      for (let [moduleName, moduleSelfDefinitions] of Object.entries(moduleDefinitions)){
-          for (let moduleSelfDefinition of moduleSelfDefinitions){
-              for (let [moduleDefinitionName, boardCustomBlockName] of Object.entries(moduleDefinitionToBoardBlocks)){
-                  if (moduleSelfDefinition[moduleDefinitionName]) {
-                      addToMerge(boardCustomBlockName, moduleName, moduleSelfDefinition[moduleDefinitionName]);
-                  }
-              }
-          }
-      }
-      const boardCustomBlocks = {};
-      for (let [boardCustomBlockName, elements] of Object.entries(toBeMerged)){
-          boardCustomBlocks[boardCustomBlockName] = {};
-          for (let [moduleName, moduleDefinitionsList] of Object.entries(elements)){
-              if (Array.isArray(moduleDefinitionsList[0])) {
-                  boardCustomBlocks[boardCustomBlockName][moduleName] = moduleDefinitionsList.reduce((cur, next)=>[
-                          ...cur,
-                          ...next
-                      ], []);
-              } else {
-                  boardCustomBlocks[boardCustomBlockName][moduleName] = deepMerge(...moduleDefinitionsList);
-              }
-          }
-      }
-      return boardCustomBlocks;
-  }
-
   const gesturesList = {
       shake: 'shake',
       up: 'logo up',
@@ -4428,6 +891,27 @@ elif program_exists:
               let command = "readAcceleration(\"" + axis + "\")";
               context.quickPiConnection.sendCommand(command, function(returnVal) {
                   cb(Number(returnVal));
+              });
+          }
+      };
+      const computeRotation = (rotationType, callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let sensor = sensorHandler.findSensorByType("accelerometer");
+              let zsign = 1;
+              let result = 0;
+              if (sensor.state[2] < 0) zsign = -1;
+              if (rotationType == "pitch") {
+                  result = 180 * Math.atan2(sensor.state[0], zsign * Math.sqrt(sensor.state[1] * sensor.state[1] + sensor.state[2] * sensor.state[2])) / Math.PI;
+              } else if (rotationType == "roll") {
+                  result = 180 * Math.atan2(sensor.state[1], zsign * Math.sqrt(sensor.state[0] * sensor.state[0] + sensor.state[2] * sensor.state[2])) / Math.PI;
+              }
+              result = Math.round(result);
+              context.waitDelay(callback, result);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let command = "computeRotation(\"" + rotationType + "\")";
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  cb(returnVal);
               });
           }
       };
@@ -4507,6 +991,37 @@ elif program_exists:
                       }
                   }
               }
+          },
+          computeRotation: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "computeRotation",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": [
+                                      [
+                                          "pitch",
+                                          "pitch"
+                                      ],
+                                      [
+                                          "roll",
+                                          "roll"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: computeRotation
+                  }
+              ]
           },
           wasGesture: {
               category: 'sensors',
@@ -5010,6 +1525,13 @@ elif program_exists:
   }
 
   function timeModuleDefinition(context) {
+      const currentTime = (callback)=>{
+          let millis = new Date().getTime();
+          if (context.autoGrading) {
+              millis = context.currentTime;
+          }
+          context.runner.waitDelay(callback, millis);
+      };
       const sleep = function(time, callback) {
           context.increaseTimeBy(time);
           if (!context.display || context.autoGrading) {
@@ -5019,6 +1541,16 @@ elif program_exists:
           }
       };
       return {
+          currentTime: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "currentTime",
+                      yieldsValue: 'int',
+                      handler: currentTime
+                  }
+              ]
+          },
           sleep: {
               category: 'actuator',
               blocks: [
@@ -5163,6 +1695,229 @@ elif program_exists:
       };
   }
 
+  function jsonModuleDefinition(context) {
+      const dumps = function(params, callback) {
+          const serialized = JSON.stringify(params);
+          context.waitDelay(callback, serialized);
+      };
+      return {
+          jsonDumps: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: 'dumps',
+                      params: [
+                          null
+                      ],
+                      yieldsValue: 'string',
+                      handler: dumps
+                  }
+              ]
+          }
+      };
+  }
+
+  function pinModuleDefinition(context) {
+      const pinConstructor = function*() {
+          const args = [
+              ...arguments
+          ];
+          args.pop();
+          const [self, pinNumber, mode] = args;
+          self.pinNumber = pinNumber;
+          self.mode = mode != null ? mode : 3; // Pin.OUT
+      };
+      const pinOn = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByPort(`D${self.pinNumber}`);
+          if (!sensor) {
+              throw `There is no sensor connected to the digital port D${self.pinNumber}`;
+          }
+          const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+          if (!sensorDef.disablePinControl) {
+              context.registerQuickPiEvent(sensor.name, true);
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let command = "turnPortOn(\"" + sensor.name + "\")";
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const pinOff = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByPort(`D${self.pinNumber}`);
+          if (!sensor) {
+              throw `There is no sensor connected to the digital port D${self.pinNumber}`;
+          }
+          let command = "turnPortOff(\"" + sensor.name + "\")";
+          const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+          if (!sensorDef.disablePinControl) {
+              context.registerQuickPiEvent(sensor.name, false);
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      return {
+          machinePin: {
+              category: 'actuator',
+              classMethods: {
+                  Pin: {
+                      defaultInstanceName: 'pin',
+                      init: {
+                          variants: [
+                              [
+                                  "Number"
+                              ],
+                              [
+                                  "Number",
+                                  "Number"
+                              ]
+                          ],
+                          handler: pinConstructor
+                      },
+                      methods: {
+                          on: {
+                              handler: pinOn
+                          },
+                          off: {
+                              handler: pinOff
+                          }
+                      }
+                  }
+              },
+              classConstants: {
+                  Pin: {
+                      IN: '1',
+                      OUT: '3'
+                  }
+              }
+          }
+      };
+  }
+
+  function pulseModuleDefinition(context) {
+      const timePulseUs = function(pin, pulseLevel, timeoutUs, callback) {
+          const sensor = context.sensorHandler.findSensorByPort(`D${pin.pinNumber}`);
+          if (!sensor) {
+              throw `There is no sensor connected to the digital port D${pin.pinNumber}`;
+          }
+          let command = "getTimePulseUs(\"" + sensor.name + `", ${pulseLevel}, ${timeoutUs})`;
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let distance = context.getSensorState(sensor.name);
+              const duration = distance / 343 * 2 / 100 * 1e6;
+              context.waitDelay(callback, duration);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      return {
+          timePulseUs: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: 'time_pulse_us',
+                      params: [
+                          null,
+                          'Number',
+                          'Number'
+                      ],
+                      yieldsValue: 'int',
+                      handler: timePulseUs
+                  }
+              ]
+          }
+      };
+  }
+
+  function pwmModuleDefinition(context) {
+      const pwmDuty = (self, duty, resolution, callback)=>{
+          const sensor = context.sensorHandler.findSensorByPort(`D${self.pin.pinNumber}`);
+          if (!sensor) {
+              throw `There is no sensor connected to the digital port D${self.pin.pinNumber}`;
+          }
+          const sensorDef = context.sensorHandler.findSensorDefinition(sensor);
+          if (!sensorDef.getStateFromPwm) {
+              throw "This sensor may not be controlled by a PWM";
+          }
+          const newState = sensorDef.getStateFromPwm(duty, resolution);
+          let command = "pwmDuty(" + self.pin.pinNumber + ", " + duty + ", " + resolution + ")";
+          self.currentDuty = duty;
+          context.registerQuickPiEvent(sensor.name, newState);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const pwmConstructor = function*(self, pin, freq, duty) {
+          self.pin = pin;
+          self.freq = freq;
+          self.currentDuty = duty;
+      };
+      const duty = function(self, duty, callback) {
+          pwmDuty(self, duty, Math.pow(2, 10), callback);
+      };
+      const dutyU16 = function(self, duty, callback) {
+          pwmDuty(self, duty, Math.pow(2, 16), callback);
+      };
+      return {
+          pwmInit: {
+              category: 'actuator',
+              classMethods: {
+                  PWM: {
+                      defaultInstanceName: 'pwm',
+                      init: {
+                          params: [
+                              null,
+                              "Number",
+                              "Number"
+                          ],
+                          handler: pwmConstructor
+                      }
+                  }
+              }
+          },
+          pwmDuty: {
+              category: 'actuator',
+              classMethods: {
+                  PWM: {
+                      defaultInstanceName: 'pwm',
+                      methods: {
+                          duty: {
+                              params: [
+                                  "Number"
+                              ],
+                              handler: duty
+                          }
+                      }
+                  }
+              }
+          },
+          pwmDutyU16: {
+              category: 'actuator',
+              classMethods: {
+                  PWM: {
+                      defaultInstanceName: 'pwm',
+                      methods: {
+                          duty_u16: {
+                              params: [
+                                  "Number"
+                              ],
+                              handler: dutyU16
+                          }
+                      }
+                  }
+              }
+          }
+      };
+  }
+
   function asyncGeneratorStep$5(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
@@ -5192,6 +1947,578 @@ elif program_exists:
           });
       };
   }
+  function _extends$7() {
+      _extends$7 = Object.assign || function(target) {
+          for(var i = 1; i < arguments.length; i++){
+              var source = arguments[i];
+              for(var key in source){
+                  if (Object.prototype.hasOwnProperty.call(source, key)) {
+                      target[key] = source[key];
+                  }
+              }
+          }
+          return target;
+      };
+      return _extends$7.apply(this, arguments);
+  }
+  function getRealValue(object) {
+      if (!object) {
+          return object;
+      }
+      if (object.toJSON) {
+          return object.toJSON();
+      }
+      return object;
+  }
+  function formatString(str) {
+      return str.replace(/"/g, '\\"');
+  }
+  function requestsModuleDefinition(context, strings) {
+      function makeRequest(sensor, fetchParameters, callback) {
+          return _makeRequest.apply(this, arguments);
+      }
+      function _makeRequest() {
+          _makeRequest = _async_to_generator$5(function*(sensor, fetchParameters, callback) {
+              const fetchUrl = fetchParameters.url;
+              const fetchArguments = _extends$7({
+                  method: fetchParameters.method,
+                  headers: getRealValue(fetchParameters.headers)
+              }, fetchParameters.body ? {
+                  body: getRealValue(fetchParameters.body)
+              } : {});
+              if (!context.display || context.autoGrading || context.offLineMode) {
+                  var _sensor_state;
+                  if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
+                      throw strings.messages.wifiNotActive;
+                  }
+                  context.registerQuickPiEvent(sensor.name, _extends$7({}, sensor.state, {
+                      lastRequest: _extends$7({
+                          url: fetchUrl
+                      }, fetchArguments)
+                  }));
+                  let result = null;
+                  try {
+                      // @ts-ignore
+                      result = yield fetch(fetchUrl, _extends$7({}, fetchArguments, fetchArguments.body ? {
+                          body: new URLSearchParams(fetchArguments.body)
+                      } : {}));
+                  } catch (e) {
+                      console.error(e);
+                      throw strings.messages.networkRequestFailed.format(fetchParameters.url);
+                  }
+                  const text = yield result.text();
+                  callback({
+                      __className: 'Response',
+                      arguments: [
+                          result.status,
+                          text
+                      ]
+                  });
+              } else {
+                  let command;
+                  if ('GET' === fetchArguments.method) {
+                      var _fetchArguments_headers;
+                      command = `requestsGet("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify((_fetchArguments_headers = fetchArguments.headers) != null ? _fetchArguments_headers : {}))}')`;
+                  } else {
+                      var _fetchArguments_body, _fetchArguments_headers1;
+                      command = `requestsPost("${sensor.name}", "${formatString(fetchUrl)}", '${formatString(JSON.stringify((_fetchArguments_body = fetchArguments.body) != null ? _fetchArguments_body : {}))}', '${formatString(JSON.stringify((_fetchArguments_headers1 = fetchArguments.headers) != null ? _fetchArguments_headers1 : {}))}')`;
+                  }
+                  yield new Promise((resolve, reject)=>{
+                      context.quickPiConnection.sendCommand(command, (result)=>{
+                          try {
+                              const [status, text] = JSON.parse(result);
+                              callback({
+                                  __className: 'Response',
+                                  arguments: [
+                                      status,
+                                      text
+                                  ]
+                              });
+                              resolve();
+                          } catch (e) {
+                              console.error(result);
+                              reject(result);
+                          }
+                      });
+                  });
+              }
+          });
+          return _makeRequest.apply(this, arguments);
+      }
+      const responseConstructor = function*(self, statusCode, text) {
+          self.status_code = statusCode;
+          self.text = text;
+      };
+      const responseJson = function*(self) {
+          try {
+              return JSON.parse(self.text);
+          } catch (e) {
+              console.error(e);
+              throw strings.messages.nonValidJson;
+          }
+      };
+      const requestsGet = function() {
+          const args = [
+              ...arguments
+          ];
+          const callback = args.pop();
+          const [url, headers] = args;
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor to make the request.`;
+          }
+          const cb = context.runner.waitCallback(callback);
+          return makeRequest(sensor, {
+              method: 'GET',
+              url,
+              headers
+          }, cb);
+      };
+      const requestsPost = function() {
+          const args = [
+              ...arguments
+          ];
+          const callback = args.pop();
+          const [url, data, headers] = args;
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor to make the request.`;
+          }
+          const cb = context.runner.waitCallback(callback);
+          return makeRequest(sensor, {
+              method: 'POST',
+              url,
+              headers,
+              body: data
+          }, cb);
+      };
+      return {
+          requestsGet: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: 'get',
+                      variants: [
+                          [
+                              "String"
+                          ],
+                          [
+                              "String",
+                              null
+                          ]
+                      ],
+                      yieldsValue: 'string',
+                      handler: requestsGet
+                  }
+              ]
+          },
+          requestsPost: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: 'post',
+                      variants: [
+                          [
+                              "String",
+                              null
+                          ],
+                          [
+                              "String",
+                              null,
+                              null
+                          ]
+                      ],
+                      yieldsValue: 'string',
+                      handler: requestsPost
+                  }
+              ]
+          },
+          requestsResponse: {
+              category: 'actuator',
+              classMethods: {
+                  Response: {
+                      defaultInstanceName: 'response',
+                      init: {
+                          params: [
+                              "Number",
+                              "String"
+                          ],
+                          hidden: true,
+                          handler: responseConstructor
+                      },
+                      methods: {
+                          json: {
+                              handler: responseJson
+                          }
+                      }
+                  }
+              }
+          }
+      };
+  }
+
+  function _extends$6() {
+      _extends$6 = Object.assign || function(target) {
+          for(var i = 1; i < arguments.length; i++){
+              var source = arguments[i];
+              for(var key in source){
+                  if (Object.prototype.hasOwnProperty.call(source, key)) {
+                      target[key] = source[key];
+                  }
+              }
+          }
+          return target;
+      };
+      return _extends$6.apply(this, arguments);
+  }
+  function wlanModuleDefinition(context, strings) {
+      const wlanConstructor = function*(self, interfaceId) {
+          self.interface = interfaceId;
+      };
+      const wlanActive = function(self, active, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
+                  active: !!active
+              }));
+              context.waitDelay(callback);
+          } else {
+              const cb = context.runner.waitCallback(callback);
+              const command = `wifiSetActive("${sensor.name}", ${active ? 1 : 0})`;
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const wlanScan = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              var _sensor_state;
+              if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
+                  throw strings.messages.wifiNotActive;
+              }
+              context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
+                  scanning: true
+              }));
+              let cb = context.runner.waitCallback(callback);
+              setTimeout(()=>{
+                  context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
+                      scanning: false
+                  }));
+                  cb();
+              }, 1000);
+          } else {
+              const cb = context.runner.waitCallback(callback);
+              const command = "wifiScan(\"" + sensor.name + "\")";
+              context.quickPiConnection.sendCommand(command, (result)=>{
+                  cb(JSON.parse(result));
+              });
+          }
+      };
+      const wlanConnect = function(self, ssid, password, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              var _sensor_state;
+              if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
+                  throw strings.messages.wifiNotActive;
+              }
+              const cb = context.runner.waitCallback(callback);
+              setTimeout(()=>{
+                  context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
+                      connected: true,
+                      ssid,
+                      password
+                  }));
+                  cb();
+              }, 500);
+          } else {
+              const cb = context.runner.waitCallback(callback);
+              const command = "wifiConnect(\"" + sensor.name + "\", \"" + ssid + "\", \"" + password + "\")";
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const wlanDisconnect = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              var _sensor_state;
+              if (!((_sensor_state = sensor.state) == null ? void 0 : _sensor_state.active)) {
+                  throw strings.messages.wifiNotActive;
+              }
+              const cb = context.runner.waitCallback(callback);
+              setTimeout(()=>{
+                  context.registerQuickPiEvent(sensor.name, _extends$6({}, sensor.state, {
+                      connected: false,
+                      ssid: null,
+                      password: null
+                  }));
+                  cb();
+              }, 500);
+          } else {
+              const cb = context.runner.waitCallback(callback);
+              const command = "wifiDisconnect(\"" + sensor.name + "\")";
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const wlanIsconnected = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              const state = context.getSensorState(sensor.name);
+              context.runner.noDelay(callback, !!state.connected);
+          } else {
+              const cb = context.runner.waitCallback(callback);
+              const command = "wifiIsConnected(\"" + sensor.name + "\")";
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  cb(!!returnVal);
+              });
+          }
+      };
+      const wlanIfconfig = function(self, callback) {
+          const sensor = context.sensorHandler.findSensorByType('wifi');
+          if (!sensor) {
+              throw `There is no Wi-Fi sensor.`;
+          }
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              const state = context.getSensorState(sensor.name);
+              if (!(state == null ? void 0 : state.active)) {
+                  throw strings.messages.wifiNotActive;
+              }
+              const ips = [
+                  '192.168.1.4',
+                  '255.255.255.0',
+                  '192.168.1.1',
+                  '8.8.8.8'
+              ];
+              context.runner.noDelay(callback, ips);
+          } else {
+              const command = "wifiIfConfig(\"" + sensor.name + "\")";
+              const cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, (result)=>{
+                  cb(JSON.parse(result));
+              });
+          }
+      };
+      return {
+          wlanInit: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      init: {
+                          params: [
+                              "Number"
+                          ],
+                          handler: wlanConstructor
+                      }
+                  }
+              },
+              constants: {
+                  STA_IF: '0',
+                  AP_IF: '1'
+              }
+          },
+          wlanActive: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          active: {
+                              params: [
+                                  "Boolean"
+                              ],
+                              handler: wlanActive
+                          }
+                      }
+                  }
+              }
+          },
+          wlanScan: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          scan: {
+                              handler: wlanScan
+                          }
+                      }
+                  }
+              }
+          },
+          wlanConnect: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          connect: {
+                              params: [
+                                  "String",
+                                  "String"
+                              ],
+                              handler: wlanConnect
+                          }
+                      }
+                  }
+              }
+          },
+          wlanDisconnect: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          disconnect: {
+                              handler: wlanDisconnect
+                          }
+                      }
+                  }
+              }
+          },
+          wlanIsConnected: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          isconnected: {
+                              yieldsValue: "bool",
+                              handler: wlanIsconnected
+                          }
+                      }
+                  }
+              }
+          },
+          wlanIfConfig: {
+              category: 'actuator',
+              classMethods: {
+                  WLAN: {
+                      defaultInstanceName: 'wlan',
+                      methods: {
+                          ifconfig: {
+                              yieldsValue: "string",
+                              handler: wlanIfconfig
+                          }
+                      }
+                  }
+              }
+          }
+      };
+  }
+
+  function ledRgbModuleDefinition(context) {
+      const ledSetColors = function(red, green, blue, callback) {
+          const sensor = context.sensorHandler.findSensorByType('ledrgb');
+          const newState = [
+              red,
+              green,
+              blue
+          ];
+          context.registerQuickPiEvent(sensor.name, newState);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.setLiveState(newState, cb);
+          }
+      };
+      return {
+          ledSetColors: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setLedColors",
+                      params: [
+                          "Number",
+                          "Number",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_2"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='setLedColors'>" + "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: ledSetColors
+                  }
+              ],
+              classMethods: {
+                  Led: {
+                      instances: [
+                          'led'
+                      ],
+                      methods: {
+                          set_colors: {
+                              params: [
+                                  "Number",
+                                  "Number",
+                                  "Number"
+                              ],
+                              yieldsValue: 'int',
+                              handler: function(self, red, green, blue, callback) {
+                                  ledSetColors(red, green, blue, callback);
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      };
+  }
+
+  function asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, key, arg) {
+      try {
+          var info = gen[key](arg);
+          var value = info.value;
+      } catch (error) {
+          reject(error);
+          return;
+      }
+      if (info.done) {
+          resolve(value);
+      } else {
+          Promise.resolve(value).then(_next, _throw);
+      }
+  }
+  function _async_to_generator$4(fn) {
+      return function() {
+          var self = this, args = arguments;
+          return new Promise(function(resolve, reject) {
+              var gen = fn.apply(self, args);
+              function _next(value) {
+                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "next", value);
+              }
+              function _throw(err) {
+                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "throw", err);
+              }
+              _next(undefined);
+          });
+      };
+  }
   function _extends$5() {
       _extends$5 = Object.assign || function(target) {
           for(var i = 1; i < arguments.length; i++){
@@ -5215,7 +2542,7 @@ elif program_exists:
           return this.updateState.bind(this);
       }
       fetchGalaxiaCard() {
-          return _async_to_generator$5(function*() {
+          return _async_to_generator$4(function*() {
               // Cache results
               if (!galaxiaSvgInline) {
                   galaxiaSvgInline = decodeURIComponent(img$1.substring(img$1.indexOf(',') + 1));
@@ -5225,7 +2552,7 @@ elif program_exists:
       }
       importGalaxia(selector) {
           var _this = this;
-          return _async_to_generator$5(function*() {
+          return _async_to_generator$4(function*() {
               const svgData = yield _this.fetchGalaxiaCard();
               $(selector).html(svgData).css('user-select', 'none');
               _this.galaxiaSvg = $(selector + ' svg');
@@ -5469,46 +2796,6 @@ elif program_exists:
           }
           return galaxiaConnection;
       }
-      getCustomBlocks(context, strings) {
-          const accelerometerModule = thingzAccelerometerModuleDefinition(context, strings);
-          const compassModule = thingzCompassModuleDefinition(context, strings);
-          const buttonModule = thingzButtonsModuleDefinition(context, strings);
-          const temperatureModule = thingzTemperatureModuleDefinition(context, strings);
-          const ledModule = thingzLedModuleDefinition(context, strings);
-          const pinModule = machinePinModuleDefinition(context);
-          const pwmModule = machinePwmModuleDefinition(context);
-          const pulseModule = machinePulseModuleDefinition(context);
-          const timeModule = timeSleepModuleDefinition(context, strings);
-          const wlanModule = networkWlanModuleDefinition(context, strings);
-          const requestsModule = requestsModuleDefinition(context, strings);
-          const jsonModule = jsonModuleDefinition(context);
-          return mergeModuleDefinitions({
-              thingz: [
-                  accelerometerModule,
-                  compassModule,
-                  buttonModule,
-                  ledModule,
-                  temperatureModule
-              ],
-              machine: [
-                  pinModule,
-                  pwmModule,
-                  pulseModule
-              ],
-              network: [
-                  wlanModule
-              ],
-              requests: [
-                  requestsModule
-              ],
-              time: [
-                  timeModule
-              ],
-              json: [
-                  jsonModule
-              ]
-          });
-      }
       getCustomFeatures(context, strings) {
           const accelerometerModule = accelerometerModuleDefinition(context);
           accelerometerModule.readAcceleration.blocks.forEach((block)=>{
@@ -5535,6 +2822,8 @@ elif program_exists:
                   }
               };
           });
+          const jsonModule = jsonModuleDefinition(context);
+          const ledRgbModule = ledRgbModuleDefinition(context);
           const lightModule = lightModuleDefinition(context);
           lightModule.lightIntensity.blocks.forEach((block)=>{
               block.codeGenerators = {
@@ -5563,13 +2852,19 @@ elif program_exists:
                   }
               };
           });
+          const pinModule = pinModuleDefinition(context);
+          const pulseModule = pulseModuleDefinition(context);
+          const pwmModule = pwmModuleDefinition(context);
+          const requestsModule = requestsModuleDefinition(context, strings);
           const temperatureModule = temperatureModuleDefinition(context);
           const timeModule = timeModuleDefinition(context);
           timeModule.sleep = timeModule.sleep_sec;
-          const features = _extends$5({}, useGeneratorName(accelerometerModule, 'thingz'), useGeneratorName(buttonsModule, 'thingz'), useGeneratorName(lightModule, 'thingz'), useGeneratorName(magnetometerModule, 'thingz'), useGeneratorName(temperatureModule, 'thingz'), useGeneratorName(timeModule, 'time'));
+          const wlanModule = wlanModuleDefinition(context, strings);
+          const features = _extends$5({}, useGeneratorName(accelerometerModule, 'thingz'), useGeneratorName(buttonsModule, 'thingz'), useGeneratorName(jsonModule, 'json'), useGeneratorName(ledRgbModule, 'thingz'), useGeneratorName(lightModule, 'thingz'), useGeneratorName(magnetometerModule, 'thingz'), useGeneratorName(pinModule, 'machine'), useGeneratorName(pulseModule, 'machine'), useGeneratorName(pwmModule, 'machine'), useGeneratorName(requestsModule, 'requests'), useGeneratorName(temperatureModule, 'thingz'), useGeneratorName(timeModule, 'time'), useGeneratorName(wlanModule, 'network'));
           for (let feature of Object.values(features)){
               if (feature.classMethods) {
-                  for (let block of feature.blocks){
+                  var _feature_blocks;
+                  for (let block of (_feature_blocks = feature.blocks) != null ? _feature_blocks : []){
                       block.hidden = true;
                   }
               }
@@ -5598,12 +2893,11 @@ elif program_exists:
           turnLedOff: "éteindre la LED",
           setLedState: "passer la LED %1 à %2 ",
           toggleLedState: "inverser la LED %1",
-          setLedMatrixOne: "passer la LED %1 en position %2, %3 à %4",
           isLedOn: "LED allumée",
           isLedOnWithName: "LED %1 allumée",
           setLedBrightness: "mettre la luminosité de %1 à %2",
           getLedBrightness: "lire la luminosité de %1",
-          setLedColors: "mettre la couleur de %1 à r:%2 g:%3 b:%4",
+          setLedColors: "mettre la couleur de la LED à r:%1 g:%2 b:%3",
           turnBuzzerOn: "allumer le buzzer",
           turnBuzzerOff: "éteindre le buzzer",
           setBuzzerState: "mettre le buzzer %1 à %2",
@@ -5677,7 +2971,6 @@ elif program_exists:
           turnLedOn: "turnLedOn",
           turnLedOff: "turnLedOff",
           setLedState: "setLedState",
-          setLedMatrixOne: "setLedMatrixOne",
           isButtonPressed: "isButtonPressed",
           isButtonPressedWithName: "isButtonPressed",
           waitForButton: "waitForButton",
@@ -5757,7 +3050,6 @@ elif program_exists:
           buttonWasPressed: "buttonWasPressed(button) indique si le bouton a été appuyé depuis le dernier appel à cette fonction",
           onButtonPressed: "onButtonPressed(button, fonction) appelle la fonction indiquée lorsque le bouton est appuyé",
           setLedState: "setLedState(led, state) modifie l'état de la LED : True pour l'allumer, False pour l'éteindre",
-          setLedMatrixOne: "setLedMatrixOne(x, y, state) modifie l'état d'une LED de la matrice",
           toggleLedState: "toggleLedState(led) inverse l'état de la LED",
           displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
           displayText2Lines: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
@@ -5774,7 +3066,6 @@ elif program_exists:
           currentTime: "currentTime() temps en millisecondes depuis le début du programme",
           setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
           getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
-          setLedColors: "setLedColors(led, r, g, b) règle la couleur de la LED",
           getServoAngle: "getServoAngle(servo) retourne l'angle du servomoteur",
           isLedOn: "isLedOn() retourne True si la LED est allumée, False si elle est éteinte",
           isLedOnWithName: "isLedOn(led) retourne True si la LED est allumée, False sinon",
@@ -5825,19 +3116,22 @@ elif program_exists:
           //Continous servo
           setContinousServoDirection: "setContinousServoDirection(servo, direction)",
           // Galaxia
-          "pin.on": "pin.on() allume la broche",
-          "pin.off": "pin.off() éteint la broche",
-          "pwm.__constructor": "pwm = PWM(pin, freq, duty) initialise une sortie PWM sur une broche avec une fréquence et un rapport cyclique",
-          "pwm.duty": "pwm.duty(duty) définit le rapport cyclique pour la sortie PWM",
-          "pwm.duty_u16": "pwm.duty_u16(duty) définit le rapport cyclique avec une résolution de 16 bits",
-          "wlan.__constructor": "wlan = WLAN(interface) initialise l'interface WiFi",
-          "wlan.active": "wlan.active(active) active ou désactive l'interface WiFi",
-          "wlan.connect": "wlan.connect(ssid, password) connecte au réseau WiFi en utilisant le nom et le mot de passe fournis",
+          "Pin.__constructor": "pin = Pin(pinNumber, mode) initialise un pin",
+          "Pin.on": "pin.on() allume la broche",
+          "Pin.off": "pin.off() éteint la broche",
+          "PWM.__constructor": "pwm = PWM(pin, freq, duty) initialise une sortie PWM sur une broche avec une fréquence et un rapport cyclique",
+          "PWM.duty": "pwm.duty(duty) définit le rapport cyclique pour la sortie PWM",
+          "PWM.duty_u16": "pwm.duty_u16(duty) définit le rapport cyclique avec une résolution de 16 bits",
+          "WLAN.__constructor": "wlan = WLAN(interface) initialise l'interface WiFi",
+          "WLAN.active": "wlan.active(active) active ou désactive l'interface WiFi",
+          "WLAN.connect": "wlan.connect(ssid, password) connecte au réseau WiFi en utilisant le nom et le mot de passe fournis",
           "music.pitch": "pitch(frequency) fait sonner à la fréquence indiquée",
           "music.stop": "stop() arrête de jouer la fréquence",
           dumps: "dumps(content) sérialise un objet en une chaîne formatée en JSON",
           get: "get(url) envoie une requête HTTP GET",
           post: "post(url, data, headers) envoie une requête HTTP POST",
+          time_pulse_us: "time_pulse_us(pin, level, timeout) détermine la durée d'une impulsion sur la broche spécifiée",
+          'Led.set_colors': "led.set_colors(red, green, blue) change la couleur de la LED",
           // Microbit
           "Image.__constructor": "Image(leds) crée une image qui peut être affichée sur la grille de leds",
           "Accel.get_x": "retourne la valeur sur l'axe X de l'accélération en m/s²",
@@ -6541,7 +3835,6 @@ elif program_exists:
           turnLedOn: "turnLedOn",
           turnLedOff: "turnLedOff",
           setLedState: "setLedState",
-          setLedMatrixOne: "setLedMatrixOne",
           isButtonPressed: "isButtonPressed",
           isButtonPressedWithName: "isButtonPressed",
           waitForButton: "waitForButton",
@@ -6881,7 +4174,6 @@ elif program_exists:
               waitForButton: "Stops program execution until a button is pressed",
               buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
               setLedState: "Change led state in the given port",
-              setLedMatrixOne: "Change led state in the given port",
               toggleLedState: "If led is on, turns it off, if it's off turns it on",
               isButtonPressedWithName: "Returns the state of a button, Pressed means True and not pressed means False",
               displayText: "Display text in LCD screen",
@@ -10483,6 +7775,91 @@ def detectBoard():
   if (md5('hello') != '5d41402abc4b2a76b9719d911017c592') ;
   var pythonLibHash = md5(pythonLib);
 
+  const buzzerSound = {
+      context: null,
+      default_freq: 200,
+      channels: {},
+      muted: {},
+      getContext: function() {
+          if (!this.context) {
+              // @ts-ignore
+              this.context = 'AudioContext' in window || 'webkitAudioContext' in window ? new (window.AudioContext || window.webkitAudioContext)() : null;
+          }
+          return this.context;
+      },
+      startOscillator: function(freq) {
+          var o = this.context.createOscillator();
+          o.type = 'sine';
+          o.frequency.value = freq;
+          o.connect(this.context.destination);
+          o.start();
+          return o;
+      },
+      start: function(channel, freq = this.default_freq) {
+          if (!this.channels[channel]) {
+              this.channels[channel] = {
+                  muted: false
+              };
+          }
+          if (this.channels[channel].freq === freq) {
+              return;
+          }
+          var context = this.getContext();
+          if (!context) {
+              return;
+          }
+          this.stop(channel);
+          if (freq == 0 || this.channels[channel].muted) {
+              return;
+          }
+          this.channels[channel].oscillator = this.startOscillator(freq);
+          this.channels[channel].freq = freq;
+      },
+      stop: function(channel) {
+          if (this.channels[channel]) {
+              this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
+              delete this.channels[channel].oscillator;
+              delete this.channels[channel].freq;
+          }
+      },
+      mute: function(channel) {
+          if (!this.channels[channel]) {
+              this.channels[channel] = {
+                  muted: true
+              };
+              return;
+          }
+          this.channels[channel].muted = true;
+          this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
+          delete this.channels[channel].oscillator;
+      },
+      unmute: function(channel) {
+          if (!this.channels[channel]) {
+              this.channels[channel] = {
+                  muted: false
+              };
+              return;
+          }
+          this.channels[channel].muted = false;
+          if (this.channels[channel].freq) {
+              this.channels[channel].oscillator = this.startOscillator(this.channels[channel].freq);
+          }
+      },
+      isMuted: function(channel) {
+          if (this.channels[channel]) {
+              return this.channels[channel].muted;
+          }
+          return false;
+      },
+      stopAll: function() {
+          for(var channel in this.channels){
+              if (this.channels.hasOwnProperty(channel)) {
+                  this.stop(channel);
+              }
+          }
+      }
+  };
+
   function buzzerModuleDefinition(context, strings) {
       const sensorHandler = context.sensorHandler;
       const turnBuzzerOn = function(callback) {
@@ -10815,6 +8192,241 @@ def detectBoard():
               }
           }
       };
+  }
+
+  if (!window.OffscreenCanvas) {
+      window.OffscreenCanvas = class OffscreenCanvas1 {
+          constructor(width, height){
+              this.canvas = document.createElement("canvas");
+              this.canvas.width = width;
+              this.canvas.height = height;
+              this.canvas.convertToBlob = ()=>{
+                  return new Promise((resolve)=>{
+                      this.canvas.toBlob(resolve);
+                  });
+              };
+              return this.canvas;
+          }
+      };
+  }
+  class screenImageData {
+      addData(scale, data) {
+          this.imagedata.push({
+              scale: scale,
+              data: data
+          });
+      }
+      getData(scale) {
+          for(var i = 0; i < this.imagedata.length; i++){
+              if (this.imagedata[i].scale == scale) return this.imagedata[i].data;
+          }
+          return null;
+      }
+      constructor(){
+          this.isDrawingData = true;
+          this.imagedata = [];
+      }
+  }
+  class screenDrawing {
+      resetCanvas() {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this.canvas[i] = new OffscreenCanvas(this.width * scale, this.height * scale);
+              var ctx = this.canvas[i].getContext('2d');
+              ctx.imageSmoothingEnabled = false;
+              ctx.fillStyle = "white";
+              ctx.fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);
+              ctx.fillStyle = "black";
+              ctx.strokeStyle = "black";
+              ctx.lineWidth = scale;
+          }
+      }
+      getStateData() {
+          var imageData = new screenImageData();
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              var ctx = this.canvas[i].getContext('2d');
+              var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
+              imageData.addData(scale, imagedata);
+          }
+          return imageData;
+      }
+      fill(color) {
+          this.noFillStatus = false;
+          for(var i = 0; i < this.scales.length; i++){
+              var canvas = this.canvas[i];
+              var ctx = canvas.getContext('2d');
+              if (color) ctx.fillStyle = "black";
+              else ctx.fillStyle = "white";
+          }
+      }
+      noFill() {
+          this.noFillStatus = true;
+      }
+      stroke(color) {
+          this.noStrokeStatus = false;
+          for(var i = 0; i < this.scales.length; i++){
+              var canvas = this.canvas[i];
+              var ctx = canvas.getContext('2d');
+              if (color) ctx.strokeStyle = "black";
+              else ctx.strokeStyle = "white";
+          }
+      }
+      noStroke() {
+          this.noStrokeStatus = true;
+      }
+      _drawPoint(canvas, scale, x, y) {
+          var ctx = canvas.getContext('2d');
+          ctx.fillRect(scale * x, scale * y, scale * 1, scale * 1);
+      }
+      drawPoint(x, y) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawPoint(this.canvas[i], scale, x, y);
+          }
+      }
+      isPointSet(x, y) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              if (scale == 1) {
+                  var ctx = this.canvas[i].getContext('2d');
+                  var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
+                  var basepos = (x + y * this.canvas[i].width) * 4;
+                  var r = imagedata.data[basepos];
+                  var g = imagedata.data[basepos + 1];
+                  var b = imagedata.data[basepos + 2];
+                  imagedata.data[basepos + 3];
+                  if (r != 255 && g != 255 && b != 255) return true;
+                  break;
+              }
+          }
+          return false;
+      }
+      _drawLine(canvas, scale, x0, y0, x1, y1) {
+          var ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.moveTo(scale * x0, scale * y0);
+          ctx.lineTo(scale * x1, scale * y1);
+          ctx.closePath();
+          ctx.stroke();
+      }
+      drawLine(x0, y0, x1, y1) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawLine(this.canvas[i], scale, x0, y0, x1, y1);
+          }
+      }
+      _drawRectangle(canvas, scale, x0, y0, width, height) {
+          var ctx = canvas.getContext('2d');
+          if (!this.noFillStatus) {
+              ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
+          }
+          if (!this.noStrokeStatus) {
+              ctx.strokeRect(scale * x0, scale * y0, scale * width, scale * height);
+          }
+      }
+      drawRectangle(x0, y0, width, height) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawRectangle(this.canvas[i], scale, x0, y0, width, height);
+          }
+      }
+      _drawCircle(canvas, scale, x0, y0, diameter) {
+          var ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.arc(scale * x0, scale * y0, scale * diameter / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          if (!this.noFillStatus) {
+              ctx.fill();
+          }
+          if (!this.noStrokeStatus) {
+              ctx.stroke();
+          }
+      }
+      drawCircle(x0, y0, diameter) {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._drawCircle(this.canvas[i], scale, x0, y0, diameter);
+          }
+      }
+      _clearScreen(canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "black";
+          ctx.strokeStyle = "black";
+      }
+      clearScreen() {
+          for(var i = 0; i < this.scales.length; i++){
+              var scale = this.scales[i];
+              this._clearScreen(this.canvas[i], scale);
+          }
+      }
+      copyToCanvas(canvas, scale) {
+          for(var i = 0; i < this.scales.length; i++){
+              var currentScale = this.scales[i];
+              if (currentScale == scale) {
+                  var ctx = canvas.getContext('2d');
+                  ctx.drawImage(this.canvas[i], 0, 0, this.canvas[i].width, this.canvas[i].height, 0, 0, canvas.width, canvas.height);
+              }
+          }
+      }
+      static renderToCanvas(state, canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          ctx.putImageData(state.getData(scale), 0, 0);
+      }
+      static renderDifferences(dataExpected, dataWrong, canvas, scale) {
+          var ctx = canvas.getContext('2d');
+          var expectedData = dataExpected.getData(scale);
+          var actualData = dataWrong.getData(scale);
+          var newData = ctx.createImageData(canvas.width, canvas.height);
+          for(var i = 0; i < newData.data.length; i += 4){
+              var actualSet = false;
+              var expectedSet = false;
+              if (expectedData.data[i + 0] != 255 && expectedData.data[i + 1] != 255 && expectedData.data[i + 2] != 255) {
+                  expectedSet = true;
+              }
+              if (actualData.data[i + 0] != 255 && actualData.data[i + 1] != 255 && actualData.data[i + 2] != 255) {
+                  actualSet = true;
+              }
+              if (expectedSet && actualSet) {
+                  newData.data[i + 0] = 0;
+                  newData.data[i + 1] = 0;
+                  newData.data[i + 2] = 0;
+              } else if (expectedSet) {
+                  newData.data[i + 0] = 100;
+                  newData.data[i + 1] = 100;
+                  newData.data[i + 2] = 100;
+              } else if (actualSet) {
+                  newData.data[i + 0] = 255;
+                  newData.data[i + 1] = 0;
+                  newData.data[i + 2] = 0;
+              } else {
+                  newData.data[i + 0] = 255;
+                  newData.data[i + 1] = 255;
+                  newData.data[i + 2] = 255;
+              }
+              newData.data[i + 3] = 255;
+          }
+          ctx.putImageData(newData, 0, 0);
+      }
+      constructor(onScreenCanvas){
+          this.width = 128;
+          this.height = 32;
+          this.scales = [
+              0.5,
+              1,
+              2
+          ];
+          this.canvas = [
+              null,
+              null,
+              null
+          ];
+          this.resetCanvas();
+          this.noFillStatus = false;
+          this.noStrokeStatus = false;
+      }
   }
 
   function initScreenDrawing(sensor) {
@@ -11338,6 +8950,1262 @@ def detectBoard():
       };
   }
 
+  function servoModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const setServoAngle = (name, angle, callback)=>{
+          sensorHandler.findSensorByName(name, true);
+          if (angle > 180) angle = 180;
+          else if (angle < 0) angle = 0;
+          context.registerQuickPiEvent(name, angle);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let command = "setServoAngle(\"" + name + "\"," + angle + ")";
+              const cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const getServoAngle = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          let command = "getServoAngle(\"" + name + "\")";
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback, sensor.state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  returnVal = parseFloat(returnVal);
+                  cb(returnVal);
+              });
+          }
+      };
+      const setContinousServoDirection = (name, direction, callback)=>{
+          sensorHandler.findSensorByName(name, true);
+          let angle = 90;
+          if (direction > 0) {
+              angle = 0;
+          } else if (direction < 0) {
+              angle = 180;
+          }
+          context.registerQuickPiEvent(name, angle);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let command = "setServoAngle(\"" + name + "\"," + angle + ")";
+              const cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      return {
+          setServoAngle: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setServoAngle",
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("servo")
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='setServoAngle'>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: setServoAngle
+                  }
+              ]
+          },
+          getServoAngle: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "getServoAngle",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("servo")
+                              }
+                          ]
+                      },
+                      handler: getServoAngle
+                  }
+              ]
+          },
+          setContinousServoDirection: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setContinousServoDirection",
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("servo")
+                              },
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_1",
+                                  "options": [
+                                      [
+                                          "forward",
+                                          "1"
+                                      ],
+                                      [
+                                          "backwards",
+                                          "-1"
+                                      ],
+                                      [
+                                          "stop",
+                                          "0"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: setContinousServoDirection
+                  }
+              ]
+          }
+      };
+  }
+
+  function ledModuleDefinition(context, strings) {
+      const sensorHandler = context.sensorHandler;
+      const turnLedOn = (callback)=>{
+          let sensor = sensorHandler.findSensorByType("led");
+          context.registerQuickPiEvent(sensor.name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("turnLedOn()", cb);
+          }
+      };
+      const turnLedOff = (callback)=>{
+          let sensor = sensorHandler.findSensorByType("led");
+          context.registerQuickPiEvent(sensor.name, false);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("turnLedOff()", cb);
+          }
+      };
+      const setLedState = (name, state, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          let command = "setLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
+          context.registerQuickPiEvent(name, state ? true : false);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const setLedBrightness = (name, level, callback)=>{
+          sensorHandler.findSensorByName(name, true);
+          if (typeof level == "object") {
+              level = level.valueOf();
+          }
+          let command = "setLedBrightness(\"" + name + "\"," + level + ")";
+          context.registerQuickPiEvent(name, level);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, cb);
+          }
+      };
+      const getLedBrightness = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          let command = "getLedBrightness(\"" + name + "\")";
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback, sensor.state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  returnVal = parseFloat(returnVal);
+                  cb(returnVal);
+              });
+          }
+      };
+      const isLedOn = (arg1, arg2)=>{
+          let callback;
+          let sensor;
+          if (typeof arg2 == "undefined") {
+              // no arguments
+              callback = arg1;
+              sensor = sensorHandler.findSensorByType("led");
+          } else {
+              callback = arg2;
+              sensor = sensorHandler.findSensorByName(arg1, true);
+          }
+          let command = "getLedState(\"" + sensor.name + "\")";
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback, sensor.state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  returnVal = parseFloat(returnVal);
+                  cb(returnVal);
+              });
+          }
+      };
+      const toggleLedState = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          let command = "toggleLedState(\"" + name + "\")";
+          let state = sensor.state;
+          context.registerQuickPiEvent(name, !state);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand(command, function(returnVal) {
+                  return returnVal != "0";
+              });
+          }
+      };
+      return {
+          turnLedOn: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "turnLedOn",
+                      handler: turnLedOn
+                  }
+              ]
+          },
+          turnLedOff: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "turnLedOff",
+                      handler: turnLedOff
+                  }
+              ]
+          },
+          setLedState: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setLedState",
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("led")
+                              },
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_1",
+                                  "options": [
+                                      [
+                                          strings.messages.on.toUpperCase(),
+                                          "1"
+                                      ],
+                                      [
+                                          strings.messages.off.toUpperCase(),
+                                          "0"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: setLedState
+                  }
+              ]
+          },
+          setLedBrightness: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setLedBrightness",
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("led")
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='setLedBrightness'>" + "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" + "</block>",
+                      handler: setLedBrightness
+                  }
+              ]
+          },
+          getLedBrightness: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "getLedBrightness",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("led")
+                              }
+                          ]
+                      },
+                      handler: getLedBrightness
+                  }
+              ]
+          },
+          isLedOn: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "isLedOn",
+                      yieldsValue: 'bool',
+                      handler: isLedOn
+                  }
+              ]
+          },
+          isLedOnWithName: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "isLedOnWithName",
+                      yieldsValue: 'bool',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("led")
+                              }
+                          ]
+                      },
+                      handler: isLedOn
+                  }
+              ]
+          },
+          toggleLedState: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "toggleLedState",
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("led")
+                              }
+                          ]
+                      },
+                      handler: toggleLedState
+                  }
+              ]
+          }
+      };
+  }
+
+  function potentiometerModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const readRotaryAngle = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let state = context.getSensorState(name);
+              context.waitDelay(callback, state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.getLiveState(function(returnVal) {
+                  sensor.state = returnVal;
+                  sensorHandler.drawSensor(sensor);
+                  cb(returnVal);
+              });
+          }
+      };
+      return {
+          readRotaryAngle: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readRotaryAngle",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("potentiometer")
+                              }
+                          ]
+                      },
+                      handler: readRotaryAngle
+                  }
+              ]
+          }
+      };
+  }
+
+  function rangeModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const readDistance = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let state = context.getSensorState(name);
+              context.waitDelay(callback, state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.getLiveState(function(returnVal) {
+                  sensor.state = returnVal;
+                  sensorHandler.drawSensor(sensor);
+                  cb(returnVal);
+              });
+          }
+      };
+      return {
+          readDistance: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readDistance",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("range")
+                              }
+                          ]
+                      },
+                      handler: readDistance
+                  }
+              ]
+          }
+      };
+  }
+
+  function gyroscopeModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const readAngularVelocity = (axis, callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let sensor = sensorHandler.findSensorByType("gyroscope");
+              let index = 0;
+              if (axis == "x") index = 0;
+              else if (axis == "y") index = 1;
+              else if (axis == "z") index = 2;
+              context.waitDelay(callback, sensor.state[index]);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              let sensor = context.findSensor("gyroscope", "i2c");
+              sensor.getLiveState(function(returnVal) {
+                  sensor.state = returnVal;
+                  sensorHandler.drawSensor(sensor);
+                  if (axis == "x") returnVal = returnVal[0];
+                  else if (axis == "y") returnVal = returnVal[1];
+                  else if (axis == "z") returnVal = returnVal[2];
+                  cb(returnVal);
+              });
+          }
+      };
+      const setGyroZeroAngle = (callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let sensor = sensorHandler.findSensorByType("gyroscope");
+              sensor.rotationAngles = [
+                  0,
+                  0,
+                  0
+              ];
+              sensor.lastSpeedChange = new Date();
+              context.runner.noDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("setGyroZeroAngle()", function(returnVal) {
+                  cb();
+              }, true);
+          }
+      };
+      const computeRotationGyro = (axis, callback)=>{
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let sensor = sensorHandler.findSensorByType("gyroscope");
+              let ret = 0;
+              if (sensor.rotationAngles != undefined) {
+                  for(let i = 0; i < 3; i++)sensor.rotationAngles[i] += sensor.state[i] * ((+new Date() - +sensor.lastSpeedChange) / 1000);
+                  sensor.lastSpeedChange = new Date();
+                  if (axis == "x") ret = sensor.rotationAngles[0];
+                  else if (axis == "y") ret = sensor.rotationAngles[1];
+                  else if (axis == "z") ret = sensor.rotationAngles[2];
+              }
+              context.runner.noDelay(callback, ret);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.findSensor("gyroscope", "i2c");
+              context.quickPiConnection.sendCommand("computeRotationGyro()", function(returnVal) {
+                  returnVal = JSON.parse(returnVal);
+                  if (axis == "x") returnVal = returnVal[0];
+                  else if (axis == "y") returnVal = returnVal[1];
+                  else if (axis == "z") returnVal = returnVal[2];
+                  cb(returnVal);
+              }, true);
+          }
+      };
+      return {
+          readAngularVelocity: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readAngularVelocity",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": [
+                                      [
+                                          "x",
+                                          "x"
+                                      ],
+                                      [
+                                          "y",
+                                          "y"
+                                      ],
+                                      [
+                                          "z",
+                                          "z"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: readAngularVelocity
+                  }
+              ]
+          },
+          setGyroZeroAngle: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "setGyroZeroAngle",
+                      handler: setGyroZeroAngle
+                  }
+              ]
+          },
+          computeRotationGyro: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "computeRotationGyro",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": [
+                                      [
+                                          "x",
+                                          "x"
+                                      ],
+                                      [
+                                          "y",
+                                          "y"
+                                      ],
+                                      [
+                                          "z",
+                                          "z"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: computeRotationGyro
+                  }
+              ]
+          }
+      };
+  }
+
+  function irtransModuleDefinition(context, strings) {
+      const sensorHandler = context.sensorHandler;
+      const setInfraredState = (name, state, callback)=>{
+          const sensor = sensorHandler.findSensorByName(name, true);
+          context.registerQuickPiEvent(name, !!state);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.setLiveState(state, cb);
+          }
+      };
+      const sendIRMessage = (name, preset, callback)=>{
+          sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + preset + "\")", function(returnVal) {
+                  cb();
+              }, true);
+          }
+      };
+      const presetIRMessage = (preset, data, callback)=>{
+          if (!context.remoteIRcodes) context.remoteIRcodes = {};
+          context.remoteIRcodes[preset] = data;
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.waitDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("presetIRMessage(\"" + preset + "\", \"" + JSON.stringify(JSON.parse(data)) + "\")", function(returnVal) {
+                  cb();
+              }, true);
+          }
+      };
+      return {
+          setInfraredState: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "setInfraredState",
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("irtrans")
+                              },
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_1",
+                                  "options": [
+                                      [
+                                          strings.messages.on.toUpperCase(),
+                                          "1"
+                                      ],
+                                      [
+                                          strings.messages.off.toUpperCase(),
+                                          "0"
+                                      ]
+                                  ]
+                              }
+                          ]
+                      },
+                      handler: setInfraredState
+                  }
+              ]
+          },
+          sendIRMessage: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "sendIRMessage",
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("irtrans")
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  "text": ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='sendIRMessage'>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: sendIRMessage
+                  }
+              ]
+          },
+          presetIRMessage: {
+              category: 'actuator',
+              blocks: [
+                  {
+                      name: "presetIRMessage",
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  "text": ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  "text": ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='presetIRMessage'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: presetIRMessage
+                  }
+              ]
+          }
+      };
+  }
+
+  function irrecvModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const readInfraredState = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let state = context.getSensorState(name);
+              context.runner.noDelay(callback, state ? true : false);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.getLiveState(function(returnVal) {
+                  sensor.state = returnVal;
+                  sensorHandler.drawSensor(sensor);
+                  cb(returnVal);
+              });
+          }
+      };
+      const readIRMessage = (name, timeout, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              context.getSensorState(name);
+              let cb = context.runner.waitCallback(callback);
+              sensor.waitingForIrMessage = function(command) {
+                  clearTimeout(sensor.waitingForIrMessageTimeout);
+                  sensor.waitingForIrMessage = null;
+                  cb(command);
+              };
+              sensor.waitingForIrMessageTimeout = setTimeout(function() {
+                  if (sensor.waitingForIrMessage) {
+                      sensor.waitingForIrMessage = null;
+                      cb("none");
+                  }
+              }, timeout);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              context.quickPiConnection.sendCommand("readIRMessage(\"irrec1\", " + timeout + ")", function(returnVal) {
+                  if (typeof returnVal === 'string') returnVal = returnVal.replace(/['"]+/g, '');
+                  cb(returnVal);
+              }, true);
+          }
+      };
+      return {
+          readInfraredState: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readInfraredState",
+                      yieldsValue: 'bool',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("irrecv")
+                              }
+                          ]
+                      },
+                      handler: readInfraredState
+                  }
+              ]
+          },
+          readIRMessage: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readIRMessage",
+                      yieldsValue: 'string',
+                      params: [
+                          "String",
+                          "Number"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("irrecv")
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='readIRMessage'>" + "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>10000</field></shadow></value>" + "</block>",
+                      handler: readIRMessage
+                  }
+              ]
+          }
+      };
+  }
+
+  function humidityModuleDefinition(context) {
+      const sensorHandler = context.sensorHandler;
+      const readHumidity = (name, callback)=>{
+          let sensor = sensorHandler.findSensorByName(name, true);
+          if (!context.display || context.autoGrading || context.offLineMode) {
+              let state = context.getSensorState(name);
+              context.waitDelay(callback, state);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.getLiveState(function(returnVal) {
+                  sensor.state = returnVal;
+                  sensorHandler.drawSensor(sensor);
+                  cb(returnVal);
+              });
+          }
+      };
+      return {
+          readHumidity: {
+              category: 'sensors',
+              blocks: [
+                  {
+                      name: "readHumidity",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_dropdown",
+                                  "name": "PARAM_0",
+                                  "options": sensorHandler.getSensorNames("humidity")
+                              }
+                          ]
+                      },
+                      handler: readHumidity
+                  }
+              ]
+          }
+      };
+  }
+
+  function arrayContains(array, needle) {
+      for(let index in array){
+          if (needle == array[index]) {
+              return true;
+          }
+      }
+      return false;
+  }
+  /**
+   * This method allow us to verify if the current value is primitive. A primitive is a string or a number or boolean
+   * (any value that can be safely compared
+   * @param obj The object to check if it is a primitive or not
+   * @return {boolean} true if object is primitive, false otherwise
+   */ function isPrimitive(obj) {
+      return obj !== Object(obj);
+  }
+  /**
+   * THis function allow us to compare two objects. Do not call with {@code null} or {@code undefined}
+   * Be careful! Do not use this with circular objects.
+   * @param obj1 The first object to compare
+   * @param obj2 The second object to compare
+   * @return {boolean} true if objects are equals, false otherwise.
+   */ function deepEqual(obj1, obj2) {
+      if (obj1 === obj2) return true;
+      // if one is primitive and not the other, then we can return false. If both are primitive, then the up
+      // comparison can return true
+      if (isPrimitive(obj1) || isPrimitive(obj2)) return false;
+      if (Object.keys(obj1).length !== Object.keys(obj2).length) return false;
+      // compare objects with same number of keys
+      for(let key in obj1){
+          if (!(key in obj2)) return false; //other object doesn't have this prop
+          if (!deepEqual(obj1[key], obj2[key])) return false;
+      }
+      return true;
+  }
+  function deepSubsetEqual(obj1, obj2) {
+      if (obj1 === obj2) return true;
+      // if one is primitive and not the other, then we can return false. If both are primitive, then the up
+      // comparison can return true
+      if (isPrimitive(obj1) || isPrimitive(obj2)) return false;
+      // compare objects with same number of keys
+      for(let key in obj2){
+          if (!(key in obj1)) return false; //other object doesn't have this prop
+          if (!deepSubsetEqual(obj1[key], obj2[key])) return false;
+      }
+      return true;
+  }
+  function getImg(filename) {
+      // Get the path to an image stored in bebras-modules
+      return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
+  }
+  function textEllipsis(text, maxLength) {
+      return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
+  }
+
+  class LocalQuickStore {
+      write(prefix, key, value) {
+          this.Store[key] = value;
+      }
+      read(prefix, key, value) {
+          return this.Store[key];
+      }
+      getStateData() {
+          // round trip this trought json so we actually copy everything
+          // without keeping any references to objects
+          return JSON.parse(JSON.stringify(this.Store));
+      }
+      static renderDifferences(expectedState, state) {
+          let strings = window.task.displayedSubTask.context.setLocalLanguageStrings(window.localLanguageStrings);
+          let mainDiv = document.createElement("div");
+          for(let p in expectedState){
+              if (expectedState.hasOwnProperty(p) && !state.hasOwnProperty(p)) {
+                  let div = document.createElement("div");
+                  $(div).text(strings.messages.cloudKeyNotExists.format(p));
+                  $(mainDiv).append(div);
+              }
+              if (expectedState[p] != state[p]) {
+                  let div = document.createElement("div");
+                  let message = strings.messages.cloudWrongValue.format(p, expectedState[p], state[p]);
+                  $(div).text(message);
+                  $(mainDiv).append(div);
+              }
+          }
+          for(let p in state){
+              if (state.hasOwnProperty(p) && !expectedState.hasOwnProperty(p)) {
+                  let div = document.createElement("div");
+                  $(div).text(strings.messages.cloudUnexpectedKey.format(p));
+                  $(mainDiv).append(div);
+              }
+          }
+          return mainDiv;
+      }
+      static compareState(state1, state2) {
+          return deepEqual(state1, state2);
+      }
+      constructor(){
+          this.connected = false;
+          this.Store = {};
+          this.connected = true;
+          this.rwpassword = "dummy";
+      }
+  }
+
+  class QuickStore {
+      read(identifier, key, callback) {
+          let data = {
+              prefix: identifier,
+              key: key
+          };
+          this.post('/api/data/read', data, callback);
+      }
+      write(identifier, key, value, callback) {
+          if (identifier !== this.rwidentifier) {
+              callback({
+                  sucess: false,
+                  message: "Écriture sur un identifiant en lecture seule : " + identifier
+              });
+          } else {
+              let data = {
+                  prefix: identifier,
+                  password: this.rwpassword,
+                  key: key,
+                  value: JSON.stringify(value)
+              };
+              this.post('/api/data/write', data, callback);
+          }
+      }
+      post(path, data, callback) {
+          $.ajax({
+              type: 'POST',
+              url: this.url + path,
+              crossDomain: true,
+              data: data,
+              dataType: 'json',
+              success: callback
+          });
+      }
+      constructor(rwidentifier, rwpassword){
+          this.url = 'https://cloud.quick-pi.org';
+          this.connected = false;
+          this.rwidentifier = rwidentifier;
+          this.rwpassword = rwpassword;
+          this.connected = !!rwpassword;
+      }
+  }
+
+  const getTemperatureFromCloudUrl = "https://cloud.quick-pi.org/cache/weather.php";
+  let getTemperatureFromCloudSupportedTowns = [];
+  let getTemperatureFromCloudCache = {};
+  // Load supported towns
+  if (typeof $ !== 'undefined') {
+      $.get(getTemperatureFromCloudUrl + "?q=" + "supportedtowns", function(towns) {
+          getTemperatureFromCloudSupportedTowns = JSON.parse(towns);
+      });
+  }
+  function cloudStoreModuleDefinition(context, strings) {
+      const sensorHandler = context.sensorHandler;
+      const getTemperatureFromCloud = (location, callback)=>{
+          if (!arrayContains(getTemperatureFromCloudSupportedTowns, location)) throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
+          let cache = getTemperatureFromCloudCache;
+          if (cache[location] != undefined && (Date.now() - cache[location].lastUpdate) / 1000 / 60 < 10) {
+              context.waitDelay(callback, cache[location].temperature);
+              return;
+          }
+          let cb = context.runner.waitCallback(callback);
+          $.get(getTemperatureFromCloudUrl + "?q=" + location, function(data) {
+              if (data === "invalid") {
+                  cb(0);
+              } else {
+                  cache[location] = {
+                      lastUpdate: Date.now(),
+                      temperature: data
+                  };
+                  cb(data);
+              }
+          });
+      };
+      const connectToCloudStore = (prefix, password, callback)=>{
+          let sensor = sensorHandler.findSensorByType("cloudstore");
+          if (!context.display || context.autoGrading) {
+              sensor.quickStore = new LocalQuickStore();
+          } else {
+              sensor.quickStore = new QuickStore(prefix, password);
+          }
+          context.runner.noDelay(callback, 0);
+      };
+      const writeToCloudStore = (identifier, key, value, callback)=>{
+          let sensor = sensorHandler.findSensorByType("cloudstore");
+          if (!sensor.quickStore || !sensor.quickStore.connected) {
+              context.success = false;
+              throw "Cloud store not connected";
+          }
+          if (!context.display || context.autoGrading) {
+              sensor.quickStore.write(identifier, key, value);
+              context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
+              context.runner.noDelay(callback);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.quickStore.write(identifier, key, value, function(data) {
+                  if (!data || !data.success) {
+                      if (data && data.message) context.failImmediately = "cloudstore: " + data.message;
+                      else context.failImmediately = "Error trying to communicate with cloud store";
+                  }
+                  cb();
+              });
+          }
+      };
+      const readFromCloudStore = (identifier, key, callback)=>{
+          let sensor = sensorHandler.findSensorByType("cloudstore");
+          if (!sensor.quickStore) {
+              if (!context.display || context.autoGrading) {
+                  sensor.quickStore = new LocalQuickStore();
+              } else {
+                  sensor.quickStore = new QuickStore();
+              }
+          }
+          if (!context.display || context.autoGrading) {
+              let state = context.getSensorState(sensor.name);
+              let value = "";
+              if (state.hasOwnProperty(key)) {
+                  value = state[key];
+              } else {
+                  context.success = false;
+                  throw "Key not found";
+              }
+              sensor.quickStore.write(identifier, key, value);
+              context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
+              context.runner.noDelay(callback, value);
+          } else {
+              let cb = context.runner.waitCallback(callback);
+              sensor.quickStore.read(identifier, key, function(data) {
+                  let value = "";
+                  if (data && data.success) {
+                      try {
+                          value = JSON.parse(data.value);
+                      } catch (err) {
+                          value = data.value;
+                      }
+                  } else {
+                      if (data && data.message) context.failImmediately = "cloudstore: " + data.message;
+                      else context.failImmediately = "Error trying to communicate with cloud store";
+                  }
+                  cb(value);
+              });
+          }
+      };
+      return {
+          getTemperatureFromCloud: {
+              category: 'internet',
+              blocks: [
+                  {
+                      name: "getTemperatureFromCloud",
+                      yieldsValue: 'int',
+                      params: [
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "field_input",
+                                  "name": "PARAM_0",
+                                  text: "Paris"
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='getTemperatureFromCloud'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: getTemperatureFromCloud
+                  }
+              ]
+          },
+          connectToCloudStore: {
+              category: 'internet',
+              blocks: [
+                  {
+                      name: "connectToCloudStore",
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  text: ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  text: ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='connectToCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: connectToCloudStore
+                  }
+              ]
+          },
+          writeToCloudStore: {
+              category: 'internet',
+              blocks: [
+                  {
+                      name: "writeToCloudStore",
+                      params: [
+                          "String",
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  text: ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  text: ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_2",
+                                  text: ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='writeToCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_2'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: writeToCloudStore
+                  }
+              ]
+          },
+          readFromCloudStore: {
+              category: 'internet',
+              blocks: [
+                  {
+                      name: "readFromCloudStore",
+                      yieldsValue: 'string',
+                      params: [
+                          "String",
+                          "String"
+                      ],
+                      blocklyJson: {
+                          "args0": [
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_0",
+                                  text: ""
+                              },
+                              {
+                                  "type": "input_value",
+                                  "name": "PARAM_1",
+                                  text: ""
+                              }
+                          ]
+                      },
+                      blocklyXml: "<block type='readFromCloudStore'>" + "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" + "</block>",
+                      handler: readFromCloudStore
+                  }
+              ]
+          }
+      };
+  }
+
   function _extends$4() {
       _extends$4 = Object.assign || function(target) {
           for(var i = 1; i < arguments.length; i++){
@@ -11582,29 +10450,30 @@ def detectBoard():
       getConnection() {
           return getQuickPiConnection;
       }
-      getCustomBlocks(context, strings) {
-          const quickpiModule = quickpiModuleDefinition(context, strings);
-          return mergeModuleDefinitions({
-              quickpi: [
-                  quickpiModule
-              ]
-          });
-      }
       getCustomFeatures(context, strings) {
           const accelerometerModule = accelerometerModuleDefinition(context);
           const buttonsModule = buttonsModuleDefinition(context, strings);
           const buzzerModule = buzzerModuleDefinition(context, strings);
           delete buzzerModule.pitch;
           delete buzzerModule.stop;
+          const cloudStoreModule = cloudStoreModuleDefinition(context, strings);
+          const gyroscopeModule = gyroscopeModuleDefinition(context);
+          const humidityModule = humidityModuleDefinition(context);
+          const irtransModule = irtransModuleDefinition(context, strings);
+          const irrecvModule = irrecvModuleDefinition(context);
+          const ledModule = ledModuleDefinition(context, strings);
           const lightModule = lightModuleDefinition(context);
           const magnetometerModule = magnetometerModuleDefinition(context);
+          const potentiometerModule = potentiometerModuleDefinition(context);
+          const rangeModule = rangeModuleDefinition(context);
           const screenModule = screenModuleDefinition(context, strings);
+          const servoModule = servoModuleDefinition(context);
           const soundModule = soundModuleDefinition(context);
           const temperatureModule = temperatureModuleDefinition(context);
           const timeModule = timeModuleDefinition(context);
           delete timeModule.sleep_sec;
           delete timeModule.sleep_us;
-          const features = _extends$4({}, accelerometerModule, buttonsModule, buzzerModule, lightModule, magnetometerModule, screenModule, soundModule, temperatureModule, timeModule);
+          const features = _extends$4({}, accelerometerModule, buttonsModule, buzzerModule, cloudStoreModule, gyroscopeModule, humidityModule, irrecvModule, irtransModule, ledModule, lightModule, magnetometerModule, potentiometerModule, rangeModule, screenModule, servoModule, soundModule, temperatureModule, timeModule);
           for(let feature in features){
               delete features[feature].classMethods;
           }
@@ -17027,9 +15896,6 @@ def turnLedOn():
 def turnLedOff():
     setLedState("led", 0)
 
-def setLedRgbState(pin, rgb):
-    led.set_colors(rgb[0], rgb[1], rgb[2])
- 
 def isButtonPressed(name):
     if name == "button_a":
         return button_a.is_pressed()
@@ -17087,7 +15953,7 @@ def wasGesture(gesture):
 
 `;
 
-  function asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, key, arg) {
+  function asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
           var value = info.value;
@@ -17101,16 +15967,16 @@ def wasGesture(gesture):
           Promise.resolve(value).then(_next, _throw);
       }
   }
-  function _async_to_generator$4(fn) {
+  function _async_to_generator$3(fn) {
       return function() {
           var self = this, args = arguments;
           return new Promise(function(resolve, reject) {
               var gen = fn.apply(self, args);
               function _next(value) {
-                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "next", value);
+                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "next", value);
               }
               function _throw(err) {
-                  asyncGeneratorStep$4(gen, resolve, reject, _next, _throw, "throw", err);
+                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "throw", err);
               }
               _next(undefined);
           });
@@ -17120,7 +15986,7 @@ def wasGesture(gesture):
       return _getSerial.apply(this, arguments);
   }
   function _getSerial() {
-      _getSerial = _async_to_generator$4(function*(filters) {
+      _getSerial = _async_to_generator$3(function*(filters) {
           const allPorts = yield navigator.serial.getPorts();
           const savedBoard = getSessionStorage('microbit_board');
           let port;
@@ -17150,7 +16016,7 @@ def wasGesture(gesture):
       return _serialWrite.apply(this, arguments);
   }
   function _serialWrite() {
-      _serialWrite = _async_to_generator$4(function*(port, data) {
+      _serialWrite = _async_to_generator$3(function*(port, data) {
           const writer = port.writable.getWriter();
           const encoder = new TextEncoder();
           yield writer.write(encoder.encode(data));
@@ -17206,7 +16072,7 @@ def wasGesture(gesture):
       }
       connect(url) {
           var _this = this;
-          return _async_to_generator$4(function*() {
+          return _async_to_generator$3(function*() {
               _this.resetProperties();
               _this.connecting = true;
               try {
@@ -17234,7 +16100,7 @@ def wasGesture(gesture):
       }
       serialStartRead(port) {
           var _this = this;
-          return _async_to_generator$4(function*() {
+          return _async_to_generator$3(function*() {
               _this.reader = port.readable.getReader();
               while(true){
                   const { value, done } = yield _this.reader.read();
@@ -17248,7 +16114,7 @@ def wasGesture(gesture):
       }
       transferPythonLib() {
           var _this = this;
-          return _async_to_generator$4(function*() {
+          return _async_to_generator$3(function*() {
               console.log('start transfer');
               yield serialWrite(_this.serial, "\x03");
               yield _this.transferModule('fioilib.py', microbitPythonLib);
@@ -17259,7 +16125,7 @@ def wasGesture(gesture):
       }
       transferModule(moduleFile, moduleContent) {
           var _this = this;
-          return _async_to_generator$4(function*() {
+          return _async_to_generator$3(function*() {
               const size = 1200; // Max 1kb size
               const numChunks = Math.ceil(moduleContent.length / size);
               yield new Promise((resolve)=>_this.executeSerial(`f = open("${moduleFile}", "w")\r\n`, resolve));
@@ -17300,7 +16166,7 @@ def wasGesture(gesture):
           }
           this.releasing = true;
           var _this = this;
-          const endRelease = /*#__PURE__*/ _async_to_generator$4(function*() {
+          const endRelease = /*#__PURE__*/ _async_to_generator$3(function*() {
               if (!_this.releaseTimeout) {
                   return;
               }
@@ -17436,1183 +16302,6 @@ elif program_exists:
       print("Hello, world!")
   """)
   f.close()*/ ;
-
-  const displayAlphabet = {
-      'A': [
-          '09900',
-          '90090',
-          '99990',
-          '90090',
-          '90090'
-      ],
-      'B': [
-          '99900',
-          '90090',
-          '99900',
-          '90090',
-          '99900'
-      ],
-      'C': [
-          '09990',
-          '90000',
-          '90000',
-          '90000',
-          '09990'
-      ],
-      'D': [
-          '99900',
-          '90090',
-          '90090',
-          '90090',
-          '99900'
-      ],
-      'E': [
-          '99990',
-          '90000',
-          '99900',
-          '90000',
-          '99990'
-      ],
-      'F': [
-          '99990',
-          '90000',
-          '99900',
-          '90000',
-          '90000'
-      ],
-      'G': [
-          '09990',
-          '90000',
-          '90099',
-          '90009',
-          '09990'
-      ],
-      'H': [
-          '90090',
-          '90090',
-          '99990',
-          '90090',
-          '90090'
-      ],
-      'I': [
-          '99900',
-          '09000',
-          '09000',
-          '09000',
-          '99900'
-      ],
-      'J': [
-          '99999',
-          '00090',
-          '00090',
-          '90090',
-          '09900'
-      ],
-      'K': [
-          '90090',
-          '90900',
-          '99000',
-          '90900',
-          '90090'
-      ],
-      'L': [
-          '90000',
-          '90000',
-          '90000',
-          '90000',
-          '99990'
-      ],
-      'M': [
-          '90009',
-          '90909',
-          '90009',
-          '90009',
-          '90009'
-      ],
-      'N': [
-          '90009',
-          '99009',
-          '90909',
-          '90099',
-          '90009'
-      ],
-      'O': [
-          '09900',
-          '90090',
-          '90090',
-          '90090',
-          '09900'
-      ],
-      'P': [
-          '99900',
-          '90090',
-          '99900',
-          '90000',
-          '90000'
-      ],
-      'Q': [
-          '09900',
-          '90090',
-          '90090',
-          '09900',
-          '00990'
-      ],
-      'R': [
-          '99900',
-          '90090',
-          '99900',
-          '90090',
-          '90009'
-      ],
-      'S': [
-          '09990',
-          '90000',
-          '09900',
-          '00090',
-          '99900'
-      ],
-      'T': [
-          '99999',
-          '00900',
-          '00900',
-          '00900',
-          '00900'
-      ],
-      'U': [
-          '90090',
-          '90090',
-          '90090',
-          '90090',
-          '09900'
-      ],
-      'V': [
-          '90009',
-          '90009',
-          '90009',
-          '09090',
-          '00900'
-      ],
-      'W': [
-          '90009',
-          '90009',
-          '90909',
-          '99099',
-          '90009'
-      ],
-      'X': [
-          '90090',
-          '90090',
-          '09900',
-          '90090',
-          '90090'
-      ],
-      'Y': [
-          '90009',
-          '09090',
-          '00900',
-          '00900',
-          '00900'
-      ],
-      'Z': [
-          '99990',
-          '00900',
-          '09000',
-          '90000',
-          '99990'
-      ],
-      'a': [
-          '00000',
-          '09990',
-          '90090',
-          '90090',
-          '09999'
-      ],
-      'b': [
-          '90000',
-          '90000',
-          '99900',
-          '90090',
-          '99900'
-      ],
-      'c': [
-          '00000',
-          '09990',
-          '90000',
-          '90000',
-          '09990'
-      ],
-      'd': [
-          '00090',
-          '00090',
-          '09990',
-          '90090',
-          '09990'
-      ],
-      'e': [
-          '09900',
-          '90090',
-          '99900',
-          '90000',
-          '09990'
-      ],
-      'f': [
-          '00990',
-          '09000',
-          '99900',
-          '09000',
-          '09000'
-      ],
-      'g': [
-          '09990',
-          '90090',
-          '09990',
-          '00090',
-          '09900'
-      ],
-      'h': [
-          '90000',
-          '90000',
-          '99900',
-          '90090',
-          '90090'
-      ],
-      'i': [
-          '09000',
-          '00000',
-          '09000',
-          '09000',
-          '09000'
-      ],
-      'j': [
-          '00090',
-          '00000',
-          '00090',
-          '00090',
-          '09900'
-      ],
-      'k': [
-          '90000',
-          '90900',
-          '99000',
-          '90900',
-          '90090'
-      ],
-      'l': [
-          '09000',
-          '09000',
-          '09000',
-          '09000',
-          '00990'
-      ],
-      'm': [
-          '00000',
-          '99099',
-          '90909',
-          '90009',
-          '90009'
-      ],
-      'n': [
-          '00000',
-          '99900',
-          '90090',
-          '90090',
-          '90090'
-      ],
-      'o': [
-          '00000',
-          '09900',
-          '90090',
-          '90090',
-          '09900'
-      ],
-      'p': [
-          '00000',
-          '99900',
-          '90090',
-          '99900',
-          '90000'
-      ],
-      'q': [
-          '00000',
-          '09990',
-          '90090',
-          '09990',
-          '00090'
-      ],
-      'r': [
-          '00000',
-          '09990',
-          '90000',
-          '90000',
-          '90000'
-      ],
-      's': [
-          '00000',
-          '00990',
-          '09000',
-          '00900',
-          '99000'
-      ],
-      't': [
-          '09000',
-          '09990',
-          '09000',
-          '09000',
-          '00999'
-      ],
-      'u': [
-          '00000',
-          '90090',
-          '90090',
-          '90090',
-          '09999'
-      ],
-      'v': [
-          '00000',
-          '90009',
-          '90009',
-          '09090',
-          '00900'
-      ],
-      'w': [
-          '00000',
-          '90009',
-          '90009',
-          '90909',
-          '99099'
-      ],
-      'x': [
-          '00000',
-          '90090',
-          '09900',
-          '09900',
-          '90090'
-      ],
-      'y': [
-          '00000',
-          '90009',
-          '09090',
-          '00900',
-          '99000'
-      ],
-      'z': [
-          '00000',
-          '99990',
-          '00900',
-          '09000',
-          '99990'
-      ],
-      '0': [
-          '09900',
-          '90090',
-          '90090',
-          '90090',
-          '09900'
-      ],
-      '1': [
-          '00900',
-          '09900',
-          '00900',
-          '00900',
-          '09990'
-      ],
-      '2': [
-          '99900',
-          '00090',
-          '09900',
-          '90000',
-          '99990'
-      ],
-      '3': [
-          '99990',
-          '00090',
-          '00900',
-          '90090',
-          '09900'
-      ],
-      '4': [
-          '00090',
-          '00990',
-          '09090',
-          '99999',
-          '00090'
-      ],
-      '5': [
-          '99999',
-          '90000',
-          '99990',
-          '00009',
-          '99990'
-      ],
-      '6': [
-          '00090',
-          '00900',
-          '09990',
-          '90009',
-          '09990'
-      ],
-      '7': [
-          '99999',
-          '00090',
-          '00900',
-          '09000',
-          '90000'
-      ],
-      '8': [
-          '09990',
-          '90009',
-          '09990',
-          '90009',
-          '09990'
-      ],
-      '9': [
-          '09990',
-          '90009',
-          '09990',
-          '00900',
-          '09000'
-      ],
-      '!': [
-          '09000',
-          '09000',
-          '09000',
-          '00000',
-          '09000'
-      ],
-      '"': [
-          '09090',
-          '09090',
-          '00000',
-          '00000',
-          '00000'
-      ],
-      '$': [
-          '09990',
-          '99009',
-          '09990',
-          '90099',
-          '09990'
-      ],
-      '%': [
-          '99009',
-          '90090',
-          '00900',
-          '09009',
-          '90099'
-      ],
-      '^': [
-          '00900',
-          '09090',
-          '00000',
-          '00000',
-          '00000'
-      ],
-      '&': [
-          '09900',
-          '90090',
-          '09900',
-          '90090',
-          '09909'
-      ],
-      '*': [
-          '00000',
-          '09090',
-          '00900',
-          '09090',
-          '00000'
-      ],
-      '(': [
-          '00900',
-          '09000',
-          '09000',
-          '09000',
-          '00900'
-      ],
-      ')': [
-          '09000',
-          '00900',
-          '00900',
-          '00900',
-          '09000'
-      ],
-      '[': [
-          '09990',
-          '09000',
-          '09000',
-          '09000',
-          '09990'
-      ],
-      ']': [
-          '09990',
-          '00090',
-          '00090',
-          '00090',
-          '09990'
-      ],
-      '{': [
-          '00990',
-          '00900',
-          '09900',
-          '00900',
-          '00990'
-      ],
-      '}': [
-          '99000',
-          '09000',
-          '09900',
-          '09000',
-          '99000'
-      ],
-      '@': [
-          '09990',
-          '90009',
-          '90909',
-          '90099',
-          '09900'
-      ],
-      "'": [
-          '09000',
-          '09000',
-          '00000',
-          '00000',
-          '00000'
-      ],
-      '~': [
-          '00000',
-          '00000',
-          '09900',
-          '00099',
-          '00000'
-      ],
-      ':': [
-          '00000',
-          '09000',
-          '00000',
-          '09000',
-          '00000'
-      ],
-      '#': [
-          '09090',
-          '99999',
-          '09090',
-          '99999',
-          '09090'
-      ],
-      '/': [
-          '00009',
-          '00090',
-          '00900',
-          '09000',
-          '90000'
-      ],
-      '\\': [
-          '90000',
-          '09000',
-          '00900',
-          '00090',
-          '00009'
-      ],
-      '?': [
-          '09990',
-          '90009',
-          '00990',
-          '00000',
-          '00900'
-      ],
-      '.': [
-          '00000',
-          '00000',
-          '00000',
-          '09000',
-          '00000'
-      ],
-      ',': [
-          '00000',
-          '00000',
-          '00000',
-          '00900',
-          '09000'
-      ],
-      '<': [
-          '00090',
-          '00900',
-          '09000',
-          '00900',
-          '00090'
-      ],
-      '>': [
-          '09000',
-          '00900',
-          '00090',
-          '00900',
-          '09000'
-      ],
-      ' ': [
-          '00000',
-          '00000',
-          '00000',
-          '00000',
-          '00000'
-      ],
-      '-': [
-          '00000',
-          '00000',
-          '09990',
-          '00000',
-          '00000'
-      ],
-      '+': [
-          '00000',
-          '00900',
-          '09990',
-          '00900',
-          '00000'
-      ],
-      '_': [
-          '00000',
-          '00000',
-          '00000',
-          '00000',
-          '99999'
-      ],
-      '=': [
-          '00000',
-          '09990',
-          '00000',
-          '09990',
-          '00000'
-      ]
-  };
-
-  function asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, key, arg) {
-      try {
-          var info = gen[key](arg);
-          var value = info.value;
-      } catch (error) {
-          reject(error);
-          return;
-      }
-      if (info.done) {
-          resolve(value);
-      } else {
-          Promise.resolve(value).then(_next, _throw);
-      }
-  }
-  function _async_to_generator$3(fn) {
-      return function() {
-          var self = this, args = arguments;
-          return new Promise(function(resolve, reject) {
-              var gen = fn.apply(self, args);
-              function _next(value) {
-                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "next", value);
-              }
-              function _throw(err) {
-                  asyncGeneratorStep$3(gen, resolve, reject, _next, _throw, "throw", err);
-              }
-              _next(undefined);
-          });
-      };
-  }
-  function convertImageFromString$1(str) {
-      return str.split(':').map((e)=>e.split('').map(Number)).slice(0, 5);
-  }
-  const DISPLAY_INTERVAL$1 = 625;
-  function displayModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      function displayLedStates(sensor, states, command, callback) {
-          return _displayLedStates.apply(this, arguments);
-      }
-      function _displayLedStates() {
-          _displayLedStates = _async_to_generator$3(function*(sensor, states, command, callback) {
-              const live = !(!context.display || context.autoGrading || context.offLineMode);
-              if (live) {
-                  let cb = context.runner.waitCallback(callback);
-                  context.quickPiConnection.sendCommand(command, cb);
-              }
-              for (let state of states){
-                  context.registerQuickPiEvent(sensor.name, state);
-                  yield new Promise((resolve)=>setTimeout(resolve, DISPLAY_INTERVAL$1));
-              }
-              if (!live) {
-                  context.waitDelay(callback);
-              }
-          });
-          return _displayLedStates.apply(this, arguments);
-      }
-      return {
-          classDefinitions: {
-              actuator: {
-                  Display: {
-                      blocks: [
-                          {
-                              name: "show",
-                              params: [
-                                  null
-                              ]
-                          },
-                          {
-                              name: "clear"
-                          },
-                          {
-                              name: "get_pixel",
-                              params: [
-                                  "Number",
-                                  "Number"
-                              ]
-                          },
-                          {
-                              name: "set_pixel",
-                              params: [
-                                  "Number",
-                                  "Number",
-                                  "Number"
-                              ]
-                          }
-                      ]
-                  },
-                  Image: {
-                      defaultInstanceName: 'image',
-                      init: {
-                          params: [
-                              "String"
-                          ]
-                      },
-                      blocks: [],
-                      constants: [
-                          {
-                              name: "HEART",
-                              value: "09090:99999:99999:09990:00900:"
-                          },
-                          {
-                              name: "HEART_SMALL",
-                              value: "00000:09090:09990:00900:00000:"
-                          },
-                          {
-                              name: "HAPPY",
-                              value: "00000:09090:00000:90009:09990:"
-                          },
-                          {
-                              name: "SMILE",
-                              value: "00000:00000:00000:90009:09990:"
-                          },
-                          {
-                              name: "SAD",
-                              value: "00000:09090:00000:09990:90009:"
-                          },
-                          {
-                              name: "CONFUSED",
-                              value: "00000:09090:00000:09090:90909:"
-                          },
-                          {
-                              name: "ANGRY",
-                              value: "90009:09090:00000:99999:90909:"
-                          },
-                          {
-                              name: "ASLEEP",
-                              value: "00000:99099:00000:09990:00000:"
-                          },
-                          {
-                              name: "SURPRISED",
-                              value: "09090:00000:00900:09090:00900:"
-                          },
-                          {
-                              name: "SILLY",
-                              value: "90009:00000:99999:00909:00999:"
-                          },
-                          {
-                              name: "FABULOUS",
-                              value: "99999:99099:00000:09090:09990:"
-                          },
-                          {
-                              name: "MEH",
-                              value: "09090:00000:00090:00900:09000:"
-                          },
-                          {
-                              name: "YES",
-                              value: "00000:00009:00090:90900:09000:"
-                          },
-                          {
-                              name: "NO",
-                              value: "90009:09090:00900:09090:90009:"
-                          },
-                          {
-                              name: "CLOCK12",
-                              value: "00900:00900:00900:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK1",
-                              value: "00090:00090:00900:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK2",
-                              value: "00000:00099:00900:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK3",
-                              value: "00000:00000:00999:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK4",
-                              value: "00000:00000:00900:00099:00000:"
-                          },
-                          {
-                              name: "CLOCK5",
-                              value: "00000:00000:00900:00090:00090:"
-                          },
-                          {
-                              name: "CLOCK6",
-                              value: "00000:00000:00900:00900:00900:"
-                          },
-                          {
-                              name: "CLOCK7",
-                              value: "00000:00000:00900:09000:09000:"
-                          },
-                          {
-                              name: "CLOCK8",
-                              value: "00000:00000:00900:99000:00000:"
-                          },
-                          {
-                              name: "CLOCK9",
-                              value: "00000:00000:99900:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK10",
-                              value: "00000:99000:00900:00000:00000:"
-                          },
-                          {
-                              name: "CLOCK11",
-                              value: "09000:09000:00900:00000:00000:"
-                          },
-                          {
-                              name: "ARROW_N",
-                              value: "00900:09990:90909:00900:00900:"
-                          },
-                          {
-                              name: "ARROW_NE",
-                              value: "00999:00099:00909:09000:90000:"
-                          },
-                          {
-                              name: "ARROW_E",
-                              value: "00900:00090:99999:00090:00900:"
-                          },
-                          {
-                              name: "ARROW_SE",
-                              value: "90000:09000:00909:00099:00999:"
-                          },
-                          {
-                              name: "ARROW_S",
-                              value: "00900:00900:90909:09990:00900:"
-                          },
-                          {
-                              name: "ARROW_SW",
-                              value: "00009:00090:90900:99000:99900:"
-                          },
-                          {
-                              name: "ARROW_W",
-                              value: "00900:09000:99999:09000:00900:"
-                          },
-                          {
-                              name: "ARROW_NW",
-                              value: "99900:99000:90900:00090:00009:"
-                          },
-                          {
-                              name: "TRIANGLE",
-                              value: "00000:00900:09090:99999:00000:"
-                          },
-                          {
-                              name: "TRIANGLE_LEFT",
-                              value: "90000:99000:90900:90090:99999:"
-                          },
-                          {
-                              name: "CHESSBOARD",
-                              value: "09090:90909:09090:90909:09090:"
-                          },
-                          {
-                              name: "DIAMOND",
-                              value: "00900:09090:90009:09090:00900:"
-                          },
-                          {
-                              name: "DIAMOND_SMALL",
-                              value: "00000:00900:09090:00900:00000:"
-                          },
-                          {
-                              name: "SQUARE",
-                              value: "99999:90009:90009:90009:99999:"
-                          },
-                          {
-                              name: "SQUARE_SMALL",
-                              value: "00000:09990:09090:09990:00000:"
-                          },
-                          {
-                              name: "RABBIT",
-                              value: "90900:90900:99990:99090:99990:"
-                          },
-                          {
-                              name: "COW",
-                              value: "90009:90009:99999:09990:00900:"
-                          },
-                          {
-                              name: "MUSIC_CROTCHET",
-                              value: "00900:00900:00900:99900:99900:"
-                          },
-                          {
-                              name: "MUSIC_QUAVER",
-                              value: "00900:00990:00909:99900:99900:"
-                          },
-                          {
-                              name: "MUSIC_QUAVERS",
-                              value: "09999:09009:09009:99099:99099:"
-                          },
-                          {
-                              name: "PITCHFORK",
-                              value: "90909:90909:99999:00900:00900:"
-                          },
-                          {
-                              name: "XMAS",
-                              value: "00900:09990:00900:09990:99999:"
-                          },
-                          {
-                              name: "PACMAN",
-                              value: "09999:99090:99900:99990:09999:"
-                          },
-                          {
-                              name: "TARGET",
-                              value: "00900:09990:99099:09990:00900:"
-                          },
-                          {
-                              name: "TSHIRT",
-                              value: "99099:99999:09990:09990:09990:"
-                          },
-                          {
-                              name: "ROLLERSKATE",
-                              value: "00099:00099:99999:99999:09090:"
-                          },
-                          {
-                              name: "DUCK",
-                              value: "09900:99900:09999:09990:00000:"
-                          },
-                          {
-                              name: "HOUSE",
-                              value: "00900:09990:99999:09990:09090:"
-                          },
-                          {
-                              name: "TORTOISE",
-                              value: "00000:09990:99999:09090:00000:"
-                          },
-                          {
-                              name: "BUTTERFLY",
-                              value: "99099:99999:00900:99999:99099:"
-                          },
-                          {
-                              name: "STICKFIGURE",
-                              value: "00900:99999:00900:09090:90009:"
-                          },
-                          {
-                              name: "GHOST",
-                              value: "99999:90909:99999:99999:90909:"
-                          },
-                          {
-                              name: "SWORD",
-                              value: "00900:00900:00900:09990:00900:"
-                          },
-                          {
-                              name: "GIRAFFE",
-                              value: "99000:09000:09000:09990:09090:"
-                          },
-                          {
-                              name: "SKULL",
-                              value: "09990:90909:99999:09990:09990:"
-                          },
-                          {
-                              name: "UMBRELLA",
-                              value: "09990:99999:00900:90900:09900:"
-                          },
-                          {
-                              name: "SNAKE",
-                              value: "99000:99099:09090:09990:00000:"
-                          }
-                      ]
-                  }
-              },
-              sensors: {
-                  Display: {
-                      blocks: [
-                          {
-                              name: "read_light_level",
-                              yieldsValue: 'int'
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Display: {
-                  __constructor: function*(self) {},
-                  show: function(self, image, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('ledmatrix');
-                      if (!sensor) {
-                          throw `There is no LED matrix.`;
-                      }
-                      let command;
-                      let statesToDisplay;
-                      if (image.image) {
-                          command = `ledMatrixShowImage("${sensor.name}", Image("${image.image}"))`;
-                          statesToDisplay = [
-                              convertImageFromString$1(image.image)
-                          ];
-                      } else if (String(image).match(/[0-9]{5}:[0-9]{5}:[0-9]{5}:[0-9]{5}:[0-9]{5}:?/)) {
-                          command = `ledMatrixShowImage("${sensor.name}", Image("${image}"))`;
-                          statesToDisplay = [
-                              convertImageFromString$1(image)
-                          ];
-                      } else {
-                          command = `ledMatrixShowImage("${sensor.name}", "${image}")`;
-                          statesToDisplay = [];
-                          for (let char of String(image).split('')){
-                              if (char in displayAlphabet) {
-                                  statesToDisplay.push(displayAlphabet[char]);
-                              } else {
-                                  statesToDisplay.push(displayAlphabet['?']);
-                              }
-                          }
-                      }
-                      return displayLedStates(sensor, statesToDisplay, command, callback);
-                  },
-                  clear: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('ledmatrix');
-                      if (!sensor) {
-                          throw `There is no LED matrix.`;
-                      }
-                      const newState = [
-                          ...new Array(5)
-                      ].fill([
-                          ...new Array(5)
-                      ].fill(0));
-                      context.registerQuickPiEvent(sensor.name, newState);
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = `ledMatrixClear("${sensor.name}")`;
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  get_pixel: function(self, x, y, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('ledmatrix');
-                      if (!sensor) {
-                          throw `There is no LED matrix.`;
-                      }
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          let state = context.getSensorState(sensor.name);
-                          context.waitDelay(callback, state[y][x]);
-                      } else {
-                          let cb = context.runner.waitCallback(callback);
-                          let command = `ledMatrixGetPixel("${sensor.name}", ${x}, ${y})`;
-                          context.quickPiConnection.sendCommand(command, function(returnVal) {
-                              cb(Number(returnVal));
-                          });
-                      }
-                  },
-                  set_pixel: function(self, x, y, intensity, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('ledmatrix');
-                      if (!sensor) {
-                          throw `There is no LED matrix.`;
-                      }
-                      let state = context.getSensorState(sensor.name);
-                      state[y][x] = intensity;
-                      context.registerQuickPiEvent(sensor.name, state);
-                      if (!context.display || context.autoGrading || context.offLineMode) {
-                          context.waitDelay(callback);
-                      } else {
-                          const cb = context.runner.waitCallback(callback);
-                          const command = `ledMatrixSetPixel("${sensor.name}", ${x}, ${y}, ${intensity})`;
-                          context.quickPiConnection.sendCommand(command, cb);
-                      }
-                  },
-                  read_light_level: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('light');
-                      quickPiModuleDefinition.blockImplementations.readLightIntensity(sensor.name, callback);
-                  }
-              },
-              Image: {
-                  __constructor: function*(self, image) {
-                      self.image = image;
-                  }
-              }
-          },
-          classInstances: {
-              display: 'Display'
-          }
-      };
-  }
-
-  function microphoneModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          classDefinitions: {
-              sensors: {
-                  Microphone: {
-                      blocks: [
-                          {
-                              name: "sound_level",
-                              yieldsValue: 'int'
-                          }
-                      ]
-                  }
-              }
-          },
-          classImplementations: {
-              Microphone: {
-                  sound_level: function(self, callback) {
-                      const sensor = context.sensorHandler.findSensorByType('sound');
-                      quickPiModuleDefinition.blockImplementations.readSoundLevel(sensor.name, callback);
-                  }
-              }
-          },
-          classInstances: {
-              microphone: 'Microphone'
-          }
-      };
-  }
-
-  function musicModuleDefinition(context, strings) {
-      const quickPiModuleDefinition = quickpiModuleDefinition(context, strings);
-      return {
-          blockDefinitions: {
-              actuator: [
-                  {
-                      name: "music.pitch",
-                      params: [
-                          "Number"
-                      ],
-                      blocklyJson: {
-                          "args0": [
-                              {
-                                  "type": "input_value",
-                                  "name": "PARAM_0",
-                                  "value": 0
-                              }
-                          ]
-                      },
-                      blocklyXml: "<block type='music.pitch'>" + "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>200</field></shadow></value>" + "</block>"
-                  },
-                  {
-                      name: "music.stop"
-                  }
-              ]
-          },
-          blockImplementations: {
-              'music.pitch': function(frequency, callback) {
-                  const sensor = context.sensorHandler.findSensorByType('buzzer');
-                  quickPiModuleDefinition.blockImplementations.setBuzzerNote(sensor.name, frequency, callback);
-              },
-              'music.stop': function(callback) {
-                  const sensor = context.sensorHandler.findSensorByType('buzzer');
-                  quickPiModuleDefinition.blockImplementations.setBuzzerState(sensor.name, false, callback);
-              }
-          }
-      };
-  }
 
   /**
    * Parser/writer for the "Intel hex" format.
@@ -22175,6 +19864,653 @@ elif program_exists:
       return _downloadFileContent.apply(this, arguments);
   }
 
+  const displayAlphabet = {
+      'A': [
+          '09900',
+          '90090',
+          '99990',
+          '90090',
+          '90090'
+      ],
+      'B': [
+          '99900',
+          '90090',
+          '99900',
+          '90090',
+          '99900'
+      ],
+      'C': [
+          '09990',
+          '90000',
+          '90000',
+          '90000',
+          '09990'
+      ],
+      'D': [
+          '99900',
+          '90090',
+          '90090',
+          '90090',
+          '99900'
+      ],
+      'E': [
+          '99990',
+          '90000',
+          '99900',
+          '90000',
+          '99990'
+      ],
+      'F': [
+          '99990',
+          '90000',
+          '99900',
+          '90000',
+          '90000'
+      ],
+      'G': [
+          '09990',
+          '90000',
+          '90099',
+          '90009',
+          '09990'
+      ],
+      'H': [
+          '90090',
+          '90090',
+          '99990',
+          '90090',
+          '90090'
+      ],
+      'I': [
+          '99900',
+          '09000',
+          '09000',
+          '09000',
+          '99900'
+      ],
+      'J': [
+          '99999',
+          '00090',
+          '00090',
+          '90090',
+          '09900'
+      ],
+      'K': [
+          '90090',
+          '90900',
+          '99000',
+          '90900',
+          '90090'
+      ],
+      'L': [
+          '90000',
+          '90000',
+          '90000',
+          '90000',
+          '99990'
+      ],
+      'M': [
+          '90009',
+          '90909',
+          '90009',
+          '90009',
+          '90009'
+      ],
+      'N': [
+          '90009',
+          '99009',
+          '90909',
+          '90099',
+          '90009'
+      ],
+      'O': [
+          '09900',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'P': [
+          '99900',
+          '90090',
+          '99900',
+          '90000',
+          '90000'
+      ],
+      'Q': [
+          '09900',
+          '90090',
+          '90090',
+          '09900',
+          '00990'
+      ],
+      'R': [
+          '99900',
+          '90090',
+          '99900',
+          '90090',
+          '90009'
+      ],
+      'S': [
+          '09990',
+          '90000',
+          '09900',
+          '00090',
+          '99900'
+      ],
+      'T': [
+          '99999',
+          '00900',
+          '00900',
+          '00900',
+          '00900'
+      ],
+      'U': [
+          '90090',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'V': [
+          '90009',
+          '90009',
+          '90009',
+          '09090',
+          '00900'
+      ],
+      'W': [
+          '90009',
+          '90009',
+          '90909',
+          '99099',
+          '90009'
+      ],
+      'X': [
+          '90090',
+          '90090',
+          '09900',
+          '90090',
+          '90090'
+      ],
+      'Y': [
+          '90009',
+          '09090',
+          '00900',
+          '00900',
+          '00900'
+      ],
+      'Z': [
+          '99990',
+          '00900',
+          '09000',
+          '90000',
+          '99990'
+      ],
+      'a': [
+          '00000',
+          '09990',
+          '90090',
+          '90090',
+          '09999'
+      ],
+      'b': [
+          '90000',
+          '90000',
+          '99900',
+          '90090',
+          '99900'
+      ],
+      'c': [
+          '00000',
+          '09990',
+          '90000',
+          '90000',
+          '09990'
+      ],
+      'd': [
+          '00090',
+          '00090',
+          '09990',
+          '90090',
+          '09990'
+      ],
+      'e': [
+          '09900',
+          '90090',
+          '99900',
+          '90000',
+          '09990'
+      ],
+      'f': [
+          '00990',
+          '09000',
+          '99900',
+          '09000',
+          '09000'
+      ],
+      'g': [
+          '09990',
+          '90090',
+          '09990',
+          '00090',
+          '09900'
+      ],
+      'h': [
+          '90000',
+          '90000',
+          '99900',
+          '90090',
+          '90090'
+      ],
+      'i': [
+          '09000',
+          '00000',
+          '09000',
+          '09000',
+          '09000'
+      ],
+      'j': [
+          '00090',
+          '00000',
+          '00090',
+          '00090',
+          '09900'
+      ],
+      'k': [
+          '90000',
+          '90900',
+          '99000',
+          '90900',
+          '90090'
+      ],
+      'l': [
+          '09000',
+          '09000',
+          '09000',
+          '09000',
+          '00990'
+      ],
+      'm': [
+          '00000',
+          '99099',
+          '90909',
+          '90009',
+          '90009'
+      ],
+      'n': [
+          '00000',
+          '99900',
+          '90090',
+          '90090',
+          '90090'
+      ],
+      'o': [
+          '00000',
+          '09900',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      'p': [
+          '00000',
+          '99900',
+          '90090',
+          '99900',
+          '90000'
+      ],
+      'q': [
+          '00000',
+          '09990',
+          '90090',
+          '09990',
+          '00090'
+      ],
+      'r': [
+          '00000',
+          '09990',
+          '90000',
+          '90000',
+          '90000'
+      ],
+      's': [
+          '00000',
+          '00990',
+          '09000',
+          '00900',
+          '99000'
+      ],
+      't': [
+          '09000',
+          '09990',
+          '09000',
+          '09000',
+          '00999'
+      ],
+      'u': [
+          '00000',
+          '90090',
+          '90090',
+          '90090',
+          '09999'
+      ],
+      'v': [
+          '00000',
+          '90009',
+          '90009',
+          '09090',
+          '00900'
+      ],
+      'w': [
+          '00000',
+          '90009',
+          '90009',
+          '90909',
+          '99099'
+      ],
+      'x': [
+          '00000',
+          '90090',
+          '09900',
+          '09900',
+          '90090'
+      ],
+      'y': [
+          '00000',
+          '90009',
+          '09090',
+          '00900',
+          '99000'
+      ],
+      'z': [
+          '00000',
+          '99990',
+          '00900',
+          '09000',
+          '99990'
+      ],
+      '0': [
+          '09900',
+          '90090',
+          '90090',
+          '90090',
+          '09900'
+      ],
+      '1': [
+          '00900',
+          '09900',
+          '00900',
+          '00900',
+          '09990'
+      ],
+      '2': [
+          '99900',
+          '00090',
+          '09900',
+          '90000',
+          '99990'
+      ],
+      '3': [
+          '99990',
+          '00090',
+          '00900',
+          '90090',
+          '09900'
+      ],
+      '4': [
+          '00090',
+          '00990',
+          '09090',
+          '99999',
+          '00090'
+      ],
+      '5': [
+          '99999',
+          '90000',
+          '99990',
+          '00009',
+          '99990'
+      ],
+      '6': [
+          '00090',
+          '00900',
+          '09990',
+          '90009',
+          '09990'
+      ],
+      '7': [
+          '99999',
+          '00090',
+          '00900',
+          '09000',
+          '90000'
+      ],
+      '8': [
+          '09990',
+          '90009',
+          '09990',
+          '90009',
+          '09990'
+      ],
+      '9': [
+          '09990',
+          '90009',
+          '09990',
+          '00900',
+          '09000'
+      ],
+      '!': [
+          '09000',
+          '09000',
+          '09000',
+          '00000',
+          '09000'
+      ],
+      '"': [
+          '09090',
+          '09090',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '$': [
+          '09990',
+          '99009',
+          '09990',
+          '90099',
+          '09990'
+      ],
+      '%': [
+          '99009',
+          '90090',
+          '00900',
+          '09009',
+          '90099'
+      ],
+      '^': [
+          '00900',
+          '09090',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '&': [
+          '09900',
+          '90090',
+          '09900',
+          '90090',
+          '09909'
+      ],
+      '*': [
+          '00000',
+          '09090',
+          '00900',
+          '09090',
+          '00000'
+      ],
+      '(': [
+          '00900',
+          '09000',
+          '09000',
+          '09000',
+          '00900'
+      ],
+      ')': [
+          '09000',
+          '00900',
+          '00900',
+          '00900',
+          '09000'
+      ],
+      '[': [
+          '09990',
+          '09000',
+          '09000',
+          '09000',
+          '09990'
+      ],
+      ']': [
+          '09990',
+          '00090',
+          '00090',
+          '00090',
+          '09990'
+      ],
+      '{': [
+          '00990',
+          '00900',
+          '09900',
+          '00900',
+          '00990'
+      ],
+      '}': [
+          '99000',
+          '09000',
+          '09900',
+          '09000',
+          '99000'
+      ],
+      '@': [
+          '09990',
+          '90009',
+          '90909',
+          '90099',
+          '09900'
+      ],
+      "'": [
+          '09000',
+          '09000',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '~': [
+          '00000',
+          '00000',
+          '09900',
+          '00099',
+          '00000'
+      ],
+      ':': [
+          '00000',
+          '09000',
+          '00000',
+          '09000',
+          '00000'
+      ],
+      '#': [
+          '09090',
+          '99999',
+          '09090',
+          '99999',
+          '09090'
+      ],
+      '/': [
+          '00009',
+          '00090',
+          '00900',
+          '09000',
+          '90000'
+      ],
+      '\\': [
+          '90000',
+          '09000',
+          '00900',
+          '00090',
+          '00009'
+      ],
+      '?': [
+          '09990',
+          '90009',
+          '00990',
+          '00000',
+          '00900'
+      ],
+      '.': [
+          '00000',
+          '00000',
+          '00000',
+          '09000',
+          '00000'
+      ],
+      ',': [
+          '00000',
+          '00000',
+          '00000',
+          '00900',
+          '09000'
+      ],
+      '<': [
+          '00090',
+          '00900',
+          '09000',
+          '00900',
+          '00090'
+      ],
+      '>': [
+          '09000',
+          '00900',
+          '00090',
+          '00900',
+          '09000'
+      ],
+      ' ': [
+          '00000',
+          '00000',
+          '00000',
+          '00000',
+          '00000'
+      ],
+      '-': [
+          '00000',
+          '00000',
+          '09990',
+          '00000',
+          '00000'
+      ],
+      '+': [
+          '00000',
+          '00900',
+          '09990',
+          '00900',
+          '00000'
+      ],
+      '_': [
+          '00000',
+          '00000',
+          '00000',
+          '00000',
+          '99999'
+      ],
+      '=': [
+          '00000',
+          '09990',
+          '00000',
+          '09990',
+          '00000'
+      ]
+  };
+
   function asyncGeneratorStep$1(gen, resolve, reject, _next, _throw, key, arg) {
       try {
           var info = gen[key](arg);
@@ -22988,32 +21324,6 @@ elif program_exists:
           }
           return microbitConnection;
       }
-      getCustomBlocks(context, strings) {
-          const accelerometerModule = thingzAccelerometerModuleDefinition(context, strings);
-          const compassModule = thingzCompassModuleDefinition(context, strings);
-          const buttonModule = thingzButtonsModuleDefinition(context, strings);
-          const temperatureModule = thingzTemperatureModuleDefinition(context, strings);
-          const timeModule = timeSleepModuleDefinition(context, strings);
-          const displayModule = displayModuleDefinition(context, strings);
-          const microphoneModule = microphoneModuleDefinition(context, strings);
-          const musicModule = musicModuleDefinition(context, strings);
-          return mergeModuleDefinitions({
-              microbit: [
-                  accelerometerModule,
-                  compassModule,
-                  buttonModule,
-                  temperatureModule,
-                  displayModule,
-                  microphoneModule
-              ],
-              music: [
-                  musicModule
-              ],
-              time: [
-                  timeModule
-              ]
-          });
-      }
       getCustomFeatures(context, strings) {
           const accelerometerModule = accelerometerModuleDefinition(context);
           accelerometerModule.readAcceleration.blocks.forEach((block)=>{
@@ -23140,7 +21450,8 @@ elif program_exists:
           const features = _extends({}, useGeneratorName(accelerometerModule, 'microbit'), useGeneratorName(buttonsModule, 'microbit'), useGeneratorName(buzzerModule, 'music'), useGeneratorName(ledMatrixModule, 'microbit'), useGeneratorName(lightMatrixModule, 'microbit'), useGeneratorName(magnetometerModule, 'microbit'), useGeneratorName(soundModule, 'microbit'), useGeneratorName(temperatureModule, 'microbit'), useGeneratorName(timeModule, 'time'));
           for (let feature of Object.values(features)){
               if (feature.classMethods) {
-                  for (let block of feature.blocks){
+                  var _feature_blocks;
+                  for (let block of (_feature_blocks = feature.blocks) != null ? _feature_blocks : []){
                       block.hidden = true;
                   }
               }
