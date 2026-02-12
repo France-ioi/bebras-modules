@@ -35,7 +35,8 @@
                 'feedback_score_binary_mistake': 'There is at least one mistake.',
                 'feedback_answer_saved': 'Your answer has been saved.',
                 'prompt_single': 'Select one answer',
-                'prompt_multiple': 'Select 0 to %% answers'
+                'prompt_multiple': 'Select 0 to %% answers',
+                'return_to_quiz': 'Return to quiz'
             },
             fr: {
                 'score': 'Score',
@@ -66,6 +67,7 @@
                 'feedback_answer_saved': 'Votre réponse a été enregistrée.',
                 'prompt_single': 'Sélectionnez une réponse',
                 'prompt_multiple': 'Sélectionnez de 0 à %% réponses',
+                'return_to_quiz': 'Retour au quiz'
             },
         },
 
@@ -515,9 +517,10 @@
                 }
                 var scoreSettings = {
                     maxScore: taskParams.maxScore,
-                    minScore: taskParams.minScore,
+                    minScore: 0, // taskParams.minScore,
                     noScore: taskParams.noScore,
                     score_calculation: 'score_calculation' in quiz_settings ? quiz_settings.score_calculation : {},
+                    weights: quiz_settings.weights || null,
                     questions_info: q.getQuestionsInfo()
                 };
 

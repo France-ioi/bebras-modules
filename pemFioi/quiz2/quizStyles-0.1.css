@@ -494,22 +494,29 @@ solution {
 * SCORE
 *
 */
-#score {
+#score, .score {
   border-top: 1px solid #e1e1e1;
   border-bottom: 1px solid #e1e1e1;
-  margin-top: 2em;
   font-size: 26px;
   padding: 14px 0;
   color: #4a90e2;
   display: flex;
 }
 
-#score .scoreLabel {
+#score {
+  margin-top: 2em;
+}
+
+#score .scoreLabel, .score .scoreLabel {
   flex-grow: 1;
 }
 
-#score .max-value {
+#score .max-value, .score .max-value {
   color: #9b9b9b;
+}
+
+.feedback-btn {
+  cursor: pointer;
 }
 
 /*
@@ -665,6 +672,7 @@ button,
 
 .quiz-popup-inner {
   position: absolute;
+  font-family: 'Titillium Web', Arial, Helvetica, sans-serif;
   left: 0px;
   z-index: 10002;
   text-align: center;
@@ -716,6 +724,7 @@ button,
   top: 10px;
   z-index: 1;
 }
+
 .fill-gaps-toolbar:before {
   content: '';
   background: white;
@@ -781,9 +790,9 @@ button,
 
 .fill-gaps-text .correct span {
   color: #00aa1f;
-;
+  ;
   border-color: #00aa1f;
-;
+  ;
 }
 
 .fill-gaps-text .mistake span {

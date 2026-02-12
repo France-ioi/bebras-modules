@@ -307,8 +307,79 @@ Quiz.UI = function(params) {
         },
 
         displayOverallFeedback: function (feedback) {
+            function displayFeedbackMessage(msg) {
+                $('.quiz-toolbar').before('<div class="alert-message feedback-message"><i class="fas fa-clipboard-list icon"></i> ' + msg + '</div>');
+            }
             if (!feedback) { return; }
-            $('.taskContent').append('<div class="alert-message feedback-message"><i class="fas fa-clipboard-list icon"></i> ' + feedback + '</div>');
+            if (typeof feedback === 'string') {
+                displayFeedbackMessage(feedback);
+                return;
+            }
+
+            if (feedback.message) {
+                displayFeedbackMessage(feedback.message);
+            }
+            if (feedback.buttons) {
+                if (feedback.message) {
+                    $('.feedback-message').append('<br><br>');
+                } else {
+                    displayFeedbackMessage('');
+                }
+
+                feedback.buttons.forEach(function (button) {
+                    var btn = $('<button class="btn btn-success feedback-btn">' + button.text + '</button>');
+                    $('.feedback-message').append(btn);
+                    btn.click(function () {
+                        if (button.target) {
+                            platform.openUrl(button.target);
+                        }
+                    });
+                });
+            }
+            if (feedback.popup) {
+                var popup = $(
+                    '<div class="quiz-popup-inner"><div class="content" style="max-width: 1200px;"></div></div>\
+                    <div class="quiz-popup">\
+                        <div class="opacity-overlay"></div>\
+                    </div>'
+                );
+                $(document.body).append(popup);
+                var content = "";
+                content += '<div class="score">' + $('#score').html() + '</div>';
+                if (feedback.message) {
+                    content += '<div class="alert-message feedback-message"><i class="fas fa-clipboard-list icon"></i> ' + feedback.message + '</div>';
+                }
+                if (feedback.buttons) {
+                    feedback.buttons.forEach(function (button, idx) {
+                        content += '<button class="btn btn-success feedback-btn popup-button-' + idx + '">' + button.text + '</button>';
+                    });
+                }
+                content += '<button class="btn btn-success close-popup">' + lang.translate('return_to_quiz') + '</button>';
+                popup.find('.content').html(content);
+                popup.find('.close-popup').click(function () {
+                    popup.remove();
+                });
+                if (feedback.buttons) {
+                    feedback.buttons.forEach(function (button, idx) {
+                        popup.find('.popup-button-' + idx).click(function () {
+                            if (button.target) {
+                                platform.openUrl(button.target);
+                            }
+                            popup.remove();
+                        });
+                    });
+                }
+                var inner = $(popup[0]);
+                inner.css('top', (Math.max(0, $('.quiz-toolbar').offset().top - 40 - inner.outerHeight())) + 'px');
+                $('html, body').animate({ scrollTop: inner.offset().top }, 300);
+                setTimeout(function () {
+                    platform.updateDisplay({ scrollTop: inner.offset().top });
+                }, 300);
+            }
+
+
+
+
         },
 
         getSubmittingSingle: function () {

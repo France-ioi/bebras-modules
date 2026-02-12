@@ -5,20 +5,31 @@
 
         var nb_valid = 0;
         var nb_answers = 0;
+        var total_weight = 0;
 
         return {
 
             addAnswer: function(answer_score) {
                 nb_answers += 1;
+                var cur_score = 0;
                 if(typeof answer_score === 'boolean') {
-                    nb_valid += answer_score ? 1 : 0;
+                    cur_score = answer_score ? 1 : 0;
                 } else {
-                    nb_valid += parseFloat(answer_score) || 0;
+                    cur_score = parseFloat(answer_score) || 0;
                 }
+                if (score_settings && score_settings.weights) {
+                    var weight = parseFloat(score_settings.weights[nb_answers - 1]) || 1;
+                    cur_score *= weight;
+                    total_weight += weight;
+                }
+                nb_valid += cur_score;
             },
 
             getScore: function() {
                 if(score_settings) {
+                    if (score_settings.weights && total_weight > 0) {
+                        nb_valid = nb_valid * nb_total / total_weight;
+                    }
                     var score = (nb_valid / nb_total * (score_settings.maxScore - score_settings.minScore)
                                + score_settings.minScore
                                + (nb_total - nb_answers) / nb_total * score_settings.noScore);
