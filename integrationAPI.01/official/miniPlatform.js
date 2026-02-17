@@ -196,7 +196,7 @@ function getLanguageString(key) {
 
         this.addHintRequest = function(hint_params, callback) {
             try {
-                hint_params = jwt.decode(hint_params).askedHint;
+                hint_params = jwt.decode(hint_params).claim.askedHint;
             } catch(e) {}
             var hintsReq = JSON.parse(this.data.sHintsRequested);
             var exists = hintsReq.find(function(h) {
