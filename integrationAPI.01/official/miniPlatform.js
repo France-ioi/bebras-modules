@@ -165,11 +165,7 @@ function getLanguageString(key) {
             decode: function(token) {
                 var parts = token.split('.');
 
-                return {
-                    header: JSON.parse(window.jwt.decode64(parts[0])),
-                    claim: JSON.parse(window.jwt.decode64(parts[1])),
-                    signature: (parts[2] || '')
-                };
+                return JSON.parse(window.jwt.decode64(parts[1]));
             },
             encode64: function (value) {
                 var encoded = btoa(unescape(encodeURIComponent(value)));
