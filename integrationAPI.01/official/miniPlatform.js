@@ -165,11 +165,7 @@ function getLanguageString(key) {
             decode: function(token) {
                 var parts = token.split('.');
 
-                return {
-                    header: JSON.parse(window.jwt.decode64(parts[0])),
-                    claim: JSON.parse(window.jwt.decode64(parts[1])),
-                    signature: (parts[2] || '')
-                };
+                return JSON.parse(window.jwt.decode64(parts[1]));
             },
             encode64: function (value) {
                 var encoded = btoa(unescape(encodeURIComponent(value)));
@@ -196,7 +192,7 @@ function getLanguageString(key) {
 
         this.addHintRequest = function(hint_params, callback) {
             try {
-                hint_params = jwt.decode(hint_params).claim.askedHint;
+                hint_params = jwt.decode(hint_params).askedHint;
             } catch(e) {}
             var hintsReq = JSON.parse(this.data.sHintsRequested);
             var exists = hintsReq.find(function(h) {
