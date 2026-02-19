@@ -176,7 +176,8 @@ function getLanguageString(key) {
                     .replace(/=+$/g, '');
             },
             decode64: function (value) {
-                return decodeURIComponent(escape(atob(value)));
+                var v = value.replace(/-/g, '+').replace(/_/g, '/');
+                return decodeURIComponent(escape(atob(v)));
             }
         };
     }
