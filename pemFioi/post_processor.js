@@ -15,7 +15,7 @@
         });
     }
 
-    if(window.MathJax) {
+    if (window.MathJax && window.MathJax.Hub) {
         MathJax.Hub.Config({
             tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
         });
