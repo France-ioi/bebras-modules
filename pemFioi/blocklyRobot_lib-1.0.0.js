@@ -2495,38 +2495,6 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       gems: {
-         newBlocks: [
-            {
-               name: "writeCode",
-               strings: {
-                  fr: {
-                     label: "écrire le code",
-                     code: "ecrireCode",
-                     description: "ecrireCode(): écrit le code sur la case du robot et ouvre la porte si le code est correct"
-                  }
-               },
-               category: "robot",
-               type: "actions",
-               block: {
-                  name: "writeCode",
-                  params: [null] 
-               },
-               func: function(value, callback) {
-                  var robot = this.getRobot();  
-                  var answer = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].answer;
-                  var row_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].row_door;
-                  var col_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].col_door;
-                  if (answer == value) {
-                     var doors = this.getItemsOn(row_door, col_door, function(obj) { return obj.isDoor === true; });
-                     for (var iDoor = 0;iDoor < doors.length;iDoor++) {
-                        this.destroy(doors[iDoor]);
-                     }
-                  }
-                  this.writeNumber(robot.row, robot.col, value);
-                  this.waitDelay(callback);
-               }
-            }
-         ],
          backgroundColor: "#BF5E47",
          borderColor: "#96413B",
          itemTypes: {
