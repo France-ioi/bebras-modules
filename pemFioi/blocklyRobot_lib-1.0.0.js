@@ -1079,12 +1079,15 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser le domino",
+               onObject: "sur un domino"
             },
             code: {
-               withdrawObject: "ramasserDomino"
+               withdrawObject: "ramasserDomino",
+               onObject: "surDomino"
             },
             description: {
-               withdrawObject: "ramasserDomino() ramasse le domino sur la case du robot"
+               withdrawObject: "ramasserDomino() ramasse le domino sur la case du robot",
+               onObject:"surDomino() teste si le robot est sur la case d'un domino"
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
@@ -2287,6 +2290,70 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkSpecificCollection
       },
+      bridges: {
+         newBlocks: [
+            {
+             name: "dropBridgeInFront",
+             strings: {
+               fr: {
+                 label: "construire un pont devant",
+                 code: "construirePontDevant",
+                 description: "construirePontDevant(): construit un pont sur la case devant le robot"
+               }
+             },
+             category: "robot",
+             type: "actions",
+             block: {
+               name: "dropBridgeInFront"
+             },
+             func: function(callback) {  
+               var coords = context.coordsInFront();
+               if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isOccupied === true; }).length != 0) {
+                  this.leave(window.languageStrings.messages.failureDropPlatform);
+               }
+               this.destroyMask(coords.row, coords.col);
+               this.dropObject({type: "bridge"}, coords); 
+               var obstacles = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; });
+               for(var iObstacle = 0;iObstacle < obstacles.length;iObstacle++) {
+                  obstacles[iObstacle].isObstacle = false;
+               }
+               this.callCallback(callback);
+             }
+           },
+           {
+            name: "waterInFront",
+            strings: {
+               fr: {
+                 label: "eau devant",
+                 code: "eauDevant",
+                 description: "eauDevant(): indique s'il y a de l'eau devant le robot"
+               }
+             },
+            category: "robot", 
+            type: "sensors",
+            block: { name: "waterInFront", yieldsValue: true },
+            func: function(callback) {
+               var coords = context.coordsInFront();
+               this.callCallback(callback, this.hasOn(coords.row, coords.col, function(item) { return ((item.isObstacle === true) && (item.isOccupied === false)); }));
+            }
+           }
+         ],
+
+         backgroundColor: "#5cb1d6",
+         borderColor: "#fff",
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 70, nbStates: 9, isRobot: true, offsetX: -5, offsetY: 5, zOrder: 3 },
+            treasure: { num: 2, img: "treasure.png", side: 70, isExit: true, isOccupied: true, offsetX: -5, zOrder: 0},
+            water : { num: 1, side: 60, isObstacle: true, isOccupied: false, zOrder: 0 },
+            island : { num: 3, img: "island.png", side: 60, isOccupied: true, zOrder: 0 },  
+            bridge: { num: 4, img: "bridge.png", side: 60, isOccupied: true, zOrder: 2 },
+            wave : { num: 5, img: "wave.png", side: 60, zOrder: 0},
+            obstacle : { num: 6, img: "obstacle.png", side: 60, isObstacle: true, isOccupied: true, zOrder: 0 },
+            mask: {num: 7, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
+         },
+         checkEndCondition: robotEndConditions.checkReachExit
+
+      },
       fishing: {
          backgroundColor: "#57b8bf",
          borderColor: "#489a9c",
@@ -2428,13 +2495,50 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       gems: {
+         newBlocks: [
+            {
+               name: "writeCode",
+               strings: {
+                  fr: {
+                     label: "écrire le code",
+                     code: "ecrireCode",
+                     description: "ecrireCode(): écrit le code sur la case du robot et ouvre la porte si le code est correct"
+                  }
+               },
+               category: "robot",
+               type: "actions",
+               block: {
+                  name: "writeCode",
+                  params: [null] 
+               },
+               func: function(value, callback) {
+                  var robot = this.getRobot();  
+                  var answer = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].answer;
+                  var row_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].row_door;
+                  var col_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].col_door;
+                  if (answer == value) {
+                     var doors = this.getItemsOn(row_door, col_door, function(obj) { return obj.isDoor === true; });
+                     for (var iDoor = 0;iDoor < doors.length;iDoor++) {
+                        this.destroy(doors[iDoor]);
+                     }
+                  }
+                  this.writeNumber(robot.row, robot.col, value);
+                  this.waitDelay(callback);
+               }
+            }
+         ],
          backgroundColor: "#BF5E47",
          borderColor: "#96413B",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             gem: { num: 3, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
             obstacle: { num: 4, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
-            number: { num: 5, side: 60, zOrder: 1 }
+            number: { num: 5, side: 60, zOrder: 1 },
+            door: { num: 6, img: "door.png", side: 60, isObstacle: true, isDoor:true, zOrder: 0 },
+            mask: {num:7, img: "mask.png", isMask: true, side: 60, zOrder: 2},
+            board_background: { num: 8, img: "board.png", side: 60, zOrder: 0 },
+            code_background: { num: 9, img: "code.png", side: 60, zOrder: 0 },
+            board: { side: 60, isWritable: true, zOrder: 1 },
          },
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
       },
@@ -2833,7 +2937,7 @@ var getContext = function(display, infos, curLevel) {
    if(infos.contextType != undefined) {
       loadContext(infos.contextType);
    }
-   
+      
    infos.newBlocks.push({
       name: "row",
       type: "sensors",
@@ -3174,6 +3278,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "readNumber", yieldsValue: 'int' },
       func: function(callback) {
          var robot = this.getRobot();
+         this.destroyMask(robot.row, robot.col);
          this.callCallback(callback, this.readNumber(robot.row, robot.col));
       }
    });
