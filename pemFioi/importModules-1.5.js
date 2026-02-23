@@ -52,6 +52,7 @@
          'showdown': {src: modulesPath+"/ext/showdown/showdown.min.js", id: "showdown"},
          'showdownConvert': {src: modulesPath+"/pemFioi/showdownConvert.js", id: "showdownConvert"},
          'mathjax': {src: modulesPath+"/ext/mathjax/MathJax.js?config=TeX-MML-AM_CHTML", id: "mathjax"},
+         'mathjax4': {src: modulesPath + "/ext/mathjax4/tex-mml-chtml.js", id: "mathjax4"},
          'post_processor': {src: modulesPath+"/pemFioi/post_processor.js", id: "post_processor"},
 
          'prismjs': {src: modulesPath+"/ext/prismjs/prism.js", id: "prismjs"},

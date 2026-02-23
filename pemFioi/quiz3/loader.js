@@ -40,7 +40,7 @@ function loadQuizModules() {
 
     // text processing
     if(quiz_settings.mathjax) {
-        modules.push('mathjax');
+        modules.push('mathjax4');
     }
     if(task_data_info.markdown) {
         modules.push('showdown');
