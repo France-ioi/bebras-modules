@@ -1193,7 +1193,9 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "prendre les poissons",
                dropObject: "déposer les poissons",
+               withdrawNum: "prendre %1 poissons",
                withdrawNum_noShadow: "prendre %1 poissons",
+               dropNum: "déposer %1 poissons",
                dropNum_noShadow: "déposer %1 poissons",
                nbWithdrawables: "nombre de poissons sur la case",
                containerSize: "nombre de poissons commandés",
@@ -1341,7 +1343,9 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "ramasser le livre",
                dropObject: "déposer le livre",
+               withdrawNum: "ramasser %1 livres",
                withdrawNum_noShadow: "ramasser %1 livres",
+               dropNum: "déposer %1 livres",
                dropNum_noShadow: "déposer %1 livres",
                nbWithdrawables: "nombre de livres sur la case",
                containerSize: "nombre de livres commandés",
@@ -1558,7 +1562,9 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "ramasser le bois",
                dropObject: "donner le bois au castor",
+               withdrawNum: "ramasser %1 bûches",
                withdrawNum_noShadow: "ramasser %1 bûches",
+               dropNum: "donner %1 bûches",
                dropNum_noShadow: "donner %1 bûches",
                nbWithdrawables: "nombre de bûches sur la case",
                containerSize: "nombre de bûches demandé",
