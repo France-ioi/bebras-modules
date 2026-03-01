@@ -3589,7 +3589,24 @@ var getContext = function(display, infos, curLevel) {
          this.last_connect = plugs[0];
       }
    };
-      
+
+   window.taskGetResourcesPost = function (res, callback) {
+      var typeData = contextParams[infos.contextType];
+      if (typeData.itemTypes) {
+         for (var key in typeData.itemTypes) {
+            var params = typeData.itemTypes[key];
+            if (params.img) {
+               var imgPath = params.img;
+               if (window.modulesPath) {
+                  imgPath = window.modulesPath + "img/algorea/" + imgPath;
+               }
+               res.task.push({ type: 'image', url: imgPath });
+            }
+         }
+      }
+      callback(res);
+   }
+
    return context;
 };
 
@@ -3601,7 +3618,7 @@ var getResources = function(subTask) {
       for(var key in typeData.itemTypes){
          var params = typeData.itemTypes[key];
          if(params.img){
-            res.push({ type: 'image', url: params.img });
+            res.task.push({ type: 'image', url: params.img });
          }
       }
    }
