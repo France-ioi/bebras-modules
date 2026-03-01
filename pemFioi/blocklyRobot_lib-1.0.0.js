@@ -1136,6 +1136,23 @@ var getContext = function(display, infos, curLevel) {
             }
          },
       },
+      pearls: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser la perle",
+            },
+            code: {
+               withdrawObject: "ramasserPerle"
+            },
+            description: {
+               withdrawObject: "ramasserPerle() ramasse la perle sur la case du robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, le robot a ramassé toutes les perles demandées !",
+               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les perles demandées."
+            }
+         },
+      },
       fishing: {
          fr: {
             label: {
@@ -2292,6 +2309,101 @@ var getContext = function(display, infos, curLevel) {
             TCH: { num: 12, img: "biscuit_triangle_choc_hole.png", side: 60, isWithdrawable: true, isTriangle: true, isChocolate: true, isHole: true, zOrder: 1 },
             TPF: { num: 13, img: "biscuit_triangle.png", side: 60, isWithdrawable: true, isTriangle: true, zOrder: 1 },
             TPH: { num: 14, img: "biscuit_triangle_hole.png", side: 60, isWithdrawable: true, isTriangle: true, isHole: true, zOrder: 1 },
+            board_background: { num: 15, color: "#ffffff", side: 60, zOrder: 0 },
+            board: {num: 16, side: 60, isWritable: true, zOrder: 1 },
+            obstacle: { num: 17, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
+         },
+         checkEndCondition: robotEndConditions.checkSpecificCollection
+      },
+      pearls: {
+         newBlocks: [
+           {
+             name: "onBlue",
+             strings: {
+               fr: {
+                 label: "sur du bleu",
+                 code: "surBleu",
+                 description: "surBleu(): Le robot est-il sur un objet bleu ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onBlue",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isBlue===true;}));
+             }
+           },
+           {
+             name: "onHole",
+             strings: {
+               fr: {
+                 label: "sur trou",
+                 code: "surTrou",
+                 description: "surTrou(): Le robot est-il sur un objet troué ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onHole",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isHole===true;}));
+             }
+           },
+           {
+             name: "onYellow",
+             strings: {
+               fr: {
+                 label: "sur du jaune",
+                 code: "surJaune",
+                 description: "surJaune(): Le robot est-il sur un objet jaune ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onYellow",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isYellow===true;}));
+             }
+           },
+           {
+             name: "onBlack",
+             strings: {
+               fr: {
+                 label: "sur du noir",
+                 code: "surNoir",
+                 description: "surNoir(): Le robot est-il sur un objet noir ?"
+               }
+             },
+             category: "robot",
+             type: "sensors",
+             block: {
+               name: "onBlack",
+               yieldsValue: true
+             },
+             func: function(callback) {
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isBlack===true;}));
+             }
+           }
+         ],
+         noBorders: true,
+         backgroundColor: "#E9E9E9",
+         itemTypes: {
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
+            PB: { num: 3, img: "pearl_blue.png", side: 60, isWithdrawable: true, isBlue: true, isHole: true, Order: 1 },
+            PY: { num: 4, img: "pearl_yellow.png", side: 60, isWithdrawable: true, isYellow: true, isHole: true, zOrder: 1 },
+            PBK: { num: 5, img: "pearl_black.png", side: 60, isWithdrawable: true, isBlack: true, isHole: true, zOrder: 1 },
+            BB: { num: 6, img: "marble_blue.png", side: 60, isWithdrawable: true, isBlue: true, zOrder: 1 },
+            BY: { num: 7, img: "marble_yellow.png", side: 60, isWithdrawable: true, isYellow: true, zOrder: 1 },
+            BBK: { num: 8, img: "marble_black.png", side: 60, isWithdrawable: true, isBlack: true, zOrder: 1 },
             board_background: { num: 15, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 16, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 17, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
