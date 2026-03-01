@@ -280,8 +280,8 @@ var getContext = function(display, infos, curLevel) {
       return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
    };
    function getImgPath(url) {
-      if(modulesPath != undefined){
-         return modulesPath+"img/algorea/"+url
+      if (window.modulesPath != undefined) {
+         return window.modulesPath + "img/algorea/" + url;
       }
       return imgUrlWithPrefix(url)
    };
