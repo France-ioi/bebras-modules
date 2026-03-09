@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  if (window.taskData || window.taskSettings) {
+  if (window.taskData || window.ClientExecutionParameters) {
     if (window.taskData && window.taskData.waitInit) {
       window.taskData.waitInit();
     }
