@@ -668,7 +668,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
 
    context.reset = function(gridInfos) {
       if (gridInfos) {
-         context.gridInfos = gridInfos.gridInfos;
+         context.gridInfos = gridInfos;
          context.tiles = gridInfos.tiles;
          context.initItems = gridInfos.initItems;
          context.nbRows = context.tiles.length;
