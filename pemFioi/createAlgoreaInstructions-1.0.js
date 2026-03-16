@@ -21,6 +21,7 @@ function createAlgoreaInstructions(subTask) {
 
 function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
    var nbTests = data[level].length;
+   var imgPath = (typeof window.modulesPath !== 'undefined') ? window.modulesPath + "img/algorea/" : "";
 
    return getAlgoreaIntro();
 
@@ -275,7 +276,6 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
          return "<p>"+gridInfos.intro.text+"</p>"
       }
 
-      var imgPath = (typeof window.modulesPath !== 'undefined') ? window.modulesPath + "img/algorea/" : "";
       var imagesHtml = "";
       
       // Resolve filter function based on level or global
