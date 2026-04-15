@@ -81,6 +81,7 @@ var importableModules = function () {
 
       'codecast7.6_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.6/index.css", id: "codecast7.6_css"},
       'codecast7.6_js': {src: modulesPath+"/ext/codecast/7.6/index.js", id: "codecast7.6_js"},
+      'codecast7.6_js_modern': {src: modulesPath+"/ext/codecast/7.6/index.modern.js", id: "codecast7.6_js", type: "module"},
       'codecast7.6_loader': {src: modulesPath+"/ext/codecast/7.6/codecast-loader.js", id: "codecast7.6_loader"},
 
       // Bundles
@@ -174,7 +175,7 @@ var bundledModules = function () {
       {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
       {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
       {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
-      {name: 'codecast-7.6', included: ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']}
+      {name: 'codecast-7.6', included: window.location.protocol !== 'file:' ? ['codecast7.6_css', 'codecast7.6_js_modern', 'codecast7.6_loader'] : ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']}
    ];
 };
 
@@ -266,6 +267,8 @@ function importModules(modulesList) {
          var modId = curModule.id ? curModule.id : moduleName;
          if(curModule.type == 'stylesheet') {
             modulesStr += '<link class="'+modClass+'" rel="stylesheet" type="text/css" href="'+modSrc+'" id="'+modId+'">';
+         } else if(curModule.type == 'module') {
+            modulesStr += '<script class="'+modClass+'" type="module" src="'+modSrc+'" id="'+modId+'"></script>';
          } else {
             modulesStr += '<script class="'+modClass+'" type="text/javascript" src="'+modSrc+'" id="'+modId+'"></script>';
          }
