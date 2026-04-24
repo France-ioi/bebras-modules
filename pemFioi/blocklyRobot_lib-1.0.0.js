@@ -224,6 +224,7 @@ var getContext = function(display, infos, curLevel) {
                failureDropObject: "On ne peut pas poser d'objet ici",
                failureDropPlatform: "Il y a déjà une plateforme ici",
                failureDropWater: "Il y a déjà de l'eau ici",
+               failureDropToken: "Il y a déjà un jeton ici",
                failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
@@ -2173,7 +2174,28 @@ var getContext = function(display, infos, curLevel) {
              func: function(callback) {
                this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
              }
-           }
+           },
+           {
+               name: "dropToken",
+               strings: {
+                  fr: {
+                    label: "déposer un jeton",
+                    code: "deposerJeton",
+                    description: "deposerJeton(): Le robot dépose un jeton sur la case."
+                  }
+                },
+               category: "robot",
+               type: "actions",
+               block: { name: "dropToken" },
+               func: function(callback) {
+                  var coords = {row: this.getRobot().row, col: this.getRobot().col};
+                  if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isToken === true; }).length != 0) {
+                     this.leave(window.languageStrings.messages.failureDropToken);
+                  }
+                  this.dropObject({type: "token"}, coords);
+                  this.callCallback(callback);
+               }
+             }
          ],
          noBorders: true,
          backgroundColor: "#a40e0e",
@@ -2192,8 +2214,15 @@ var getContext = function(display, infos, curLevel) {
             mask: {num: 12, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
             board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
-            obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
-         }
+            obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
+            token_place: { num: 15, isContainer: true, zOrder: 0, containerFilter: function(obj){return obj.isToken === true;} },
+            token: {num: 16, img: "token.png", side: 60, isToken: true }
+         },
+         bagInit: {
+            count: 200,
+            type: "token"
+         },
+         ignoreBag: true,
       },
       biscuits: {
          newBlocks: [
@@ -2615,6 +2644,38 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       gems: {
+         newBlocks: [
+            {
+               name: "writeCode",
+               strings: {
+                  fr: {
+                     label: "écrire le code",
+                     code: "ecrireCode",
+                     description: "ecrireCode(): écrit le code sur la case du robot et ouvre la porte si le code est correct"
+                  }
+               },
+               category: "robot",
+               type: "actions",
+               block: {
+                  name: "writeCode",
+                  params: [null] 
+               },
+               func: function(value, callback) {
+                  var robot = this.getRobot();  
+                  var answer = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].answer;
+                  var row_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].row_door;
+                  var col_door = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.answer !== undefined; })[0].col_door;
+                  if (answer == value) {
+                     var doors = this.getItemsOn(row_door, col_door, function(obj) { return obj.isDoor === true; });
+                     for (var iDoor = 0;iDoor < doors.length;iDoor++) {
+                        this.destroy(doors[iDoor]);
+                     }
+                  }
+                  this.writeNumber(robot.row, robot.col, value);
+                  this.waitDelay(callback);
+               }
+            }
+         ],
          backgroundColor: "#BF5E47",
          borderColor: "#96413B",
          itemTypes: {
@@ -2901,6 +2962,7 @@ var getContext = function(display, infos, curLevel) {
             obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
             objet1: { num: 7, img: "objet1.png", side: 60, isWithdrawable: true, zOrder: 1 },
             objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
+            mask: {num: 9, img: "mask.png", side: 60, isMask: true, zOrder: 2 },
             number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
@@ -4590,18 +4652,17 @@ var getContext = function(display, infos, curLevel) {
          if(container.containerSize == undefined && container.containerFilter == undefined) {
             container.containerSize = 1;
          }
+
          var filter;
-         if(container.containerFilter == undefined)
+         if (container.containerFilter != undefined) {
+            filter = container.containerFilter;
+         } else {
             filter = function(obj) { return obj.isWithdrawable === true; };
-         else
-            filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
-         
+         }
          if(container.containerSize != undefined && context.getItemsOn(coords.row, coords.col, filter).length > container.containerSize) {
             context.leave(window.languageStrings.messages.failureDropObject);
             return;
-         }
-
-         
+         }        
 
          if(container.containerFilter != undefined) {
             if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) }) && (context.infos.blockingFilter !== false)) {
@@ -5078,10 +5139,11 @@ var robotEndConditions = {
                   container.containerSize = 1;
                }
                var filter;
-               if(container.containerFilter == undefined)
+               if (container.containerFilter != undefined) {
+                  filter = container.containerFilter;
+               } else {
                   filter = function(obj) { return obj.isWithdrawable === true; };
-               else
-                  filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+               }
                
                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
                   solved = false;
@@ -5219,7 +5281,8 @@ var robotEndFunctionGenerator = {
          }
          
          for(var item in context.bag) {
-            if(!filter(context.bag[item])) {
+            var obj = context.bag[item];
+            if(obj.isWithdrawable && !filter(obj)) {
                context.success = false;
                context.leave(window.languageStrings.messages.failureUnfilteredObject);
             }
@@ -5265,6 +5328,22 @@ var robotEndFunctionGenerator = {
             context.success = false;
             context.leave(window.languageStrings.messages.failureNumbersWritten);
          }
+      };
+   },
+   combineEndFunctions: function(firstFunction, secondFunction) {
+      return function(context, lastTurn) {
+         let oldLeave = context.leave;
+         
+         context.leave = function(message) {
+            context.leave = oldLeave;
+            if(!context.success) {
+               context.leave(message);
+            } else {
+               secondFunction(context, lastTurn);
+            }
+         };
+
+         firstFunction(context, lastTurn);
       };
    }
 };
