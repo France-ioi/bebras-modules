@@ -83,6 +83,11 @@ var importableModules = function () {
       'codecast7.6_js': {src: modulesPath+"/ext/codecast/7.6/index.js", id: "codecast7.6_js"},
       'codecast7.6_loader': {src: modulesPath+"/ext/codecast/7.6/codecast-loader.js", id: "codecast7.6_loader"},
 
+      'codecast7.7_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.7/index.css", id: "codecast7.7_css"},
+      'codecast7.7_js': {src: modulesPath+"/ext/codecast/7.7/index.js", id: "codecast7.7_js"},
+      'codecast7.7_js_modern': {src: modulesPath+"/ext/codecast/7.7/index.modern.js", id: "codecast7.7_js_modern", type: "module"},
+      'codecast7.7_loader': {src: modulesPath+"/ext/codecast/7.7/codecast-loader.js", id: "codecast7.7_loader"},
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
@@ -174,7 +179,8 @@ var bundledModules = function () {
       {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
       {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
       {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
-      {name: 'codecast-7.6', included: ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']}
+      {name: 'codecast-7.6', included: ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']},
+      {name: 'codecast-7.7', included: window.location.protocol !== 'file:' ? ['codecast7.7_css', 'codecast7.7_js_modern', 'codecast7.7_loader'] : ['codecast7.7_css', 'codecast7.7_js', 'codecast7.7_loader']}
    ];
 };
 
