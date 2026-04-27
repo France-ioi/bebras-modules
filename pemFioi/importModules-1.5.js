@@ -151,7 +151,6 @@
          'codecast7.5_loader': {src: modulesPath+"/ext/codecast/7.5/codecast-loader.js", id: "codecast7.5_loader"},
          'codecast7.6_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.6/index.css", id: "codecast7.6_css"},
          'codecast7.6_js': {src: modulesPath+"/ext/codecast/7.6/index.js", id: "codecast7.6_js"},
-         'codecast7.6_js_modern': {src: modulesPath+"/ext/codecast/7.6/index.modern.js", id: "codecast7.6_js", type: "module"},
          'codecast7.6_loader': {src: modulesPath+"/ext/codecast/7.6/codecast-loader.js", id: "codecast7.6_loader"},
 
          'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
@@ -306,7 +305,7 @@
          {name: 'codecast-7.3', included: ['codecast7.3_css', 'codecast7.3_js', 'codecast7.3_loader']},
          {name: 'codecast-7.4', included: ['codecast7.4_css', 'codecast7.4_js', 'codecast7.4_loader']},
          {name: 'codecast-7.5', included: ['codecast7.5_css', 'codecast7.5_js', 'codecast7.5_loader']},
-         {name: 'codecast-7.6', included: window.location.protocol !== 'file:' ? ['codecast7.6_css', 'codecast7.6_js_modern', 'codecast7.6_loader'] : ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']}
+         {name: 'codecast-7.6', included: ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
 //      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
