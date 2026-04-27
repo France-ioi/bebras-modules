@@ -201,10 +201,28 @@ window.implementGetResources = function(task) {
 
       taskResourcesLoaded = true;
 
-      if(window.taskGetResourcesPost) {
-        window.taskGetResourcesPost(res, callback);
+      if (window.taskGetResourcesPostListeners && window.taskGetResourcesPostListeners.length) {
+         var currentListener = 0;
+         function executeNextListener() {
+            if (currentListener > window.taskGetResourcesPostListeners.length - 1) {
+               if (window.taskGetResourcesPost) {
+                  window.taskGetResourcesPost(res, callback);
+               } else {
+                  callback(res);
+               }
+               return;
+            }
+
+            var listener = window.taskGetResourcesPostListeners[currentListener];
+            currentListener++;
+            listener(res, executeNextListener);
+         }
+
+         executeNextListener();
+      } else if(window.taskGetResourcesPost) {
+         window.taskGetResourcesPost(res, callback);
       } else {
-        callback(res);
+         callback(res);
       }
    };
 }
