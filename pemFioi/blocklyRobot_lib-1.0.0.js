@@ -1124,12 +1124,15 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser le biscuit",
+               dropObject: "déposer le biscuit"
             },
             code: {
-               withdrawObject: "ramasserBiscuit"
+               withdrawObject: "ramasserBiscuit",
+               dropObject: "deposerBiscuit"
             },
             description: {
-               withdrawObject: "ramasserBiscuit() ramasse le biscuit sur la case du robot"
+               withdrawObject: "ramasserBiscuit() ramasse le biscuit sur la case du robot",
+               dropObject: "deposerBiscuit() dépose le dernier biscuit ramassé, sur la case du robot"
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les biscuits demandés !",
