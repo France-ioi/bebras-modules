@@ -3336,6 +3336,9 @@ var getContext = function(display, infos, curLevel) {
          sensors: []
       }
    };
+
+   // Export context params so that they are available for migration purposes
+   context.contextParams = contextParams;
    
    for(var command in infos.newBlocks) {
       cmd = infos.newBlocks[command];
