@@ -173,6 +173,16 @@ var getContext = function(display, infos, curLevel) {
                west: "ouest() déplace le robot d'une case vers l'ouest",
                north: "nord() déplace le robot d'une case vers le nord",
                south: "sud() déplace le robot d'une case vers le sud",
+               shoot: "tirerLaser(direction) fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
+               shoot_noShadow: "tirerLaser() fait tirer un rayon laser au robot, dans la direction indiquée en paramètre",
+               readNumber: "nombreSurCase() capteur qui lit le nombre sur la case où se trouve le robot",
+               writeNumber: "ecrireNombre(nombre) écrit le nombre en paramètre sur la case où se trouve le robot",
+               withdrawObject: "ramasserObjet() ramasse l'objet sur la case du robot",
+               dropObject: "deposerObjet() dépose l'objet sur la case du robot",
+               platformInFront: "plateformeDevant() teste s'il y a une plateforme devant le robot",
+               platformAbove: "plateformeDessus() teste s'il y a une plateforme au-dessus du robot",
+               dropPlatformInFront: "construirePlateformeDevant() construit une plateforme sur la case devant le robot",
+               jump: "sauter() fait sauter le robot sur la plateforme juste au-dessus de lui"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -200,10 +210,13 @@ var getContext = function(display, infos, curLevel) {
                failureReadHere: "Il n'y a pas de nombre écrit ici !",
                successNumbersWritten: "Bravo, votre robot a écrit les bons nombres !",
                failureNumbersWritten: "Votre robot n'a pas écrit les bons nombres !",
+               failureMissingNumber: "Le robot n'a pas écrit tous les nombres.",
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser d'objet ici",
                failureDropPlatform: "Il y a déjà une plateforme ici",
+               failureDropWater: "Il y a déjà de l'eau ici",
+               failureDropToken: "Il y a déjà un jeton ici",
                failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
@@ -219,7 +232,9 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case.",
-               noContainer: "Il n'y a pas de conteneur ici !"
+               noContainer: "Il n'y a pas de conteneur ici !",
+               failureLineBreak: "Le robot ne peut pas changer de ligne.",
+               failureFuse: "Le robot a tiré sur un fusible !"
             },
             cardinals: {
                north: "Nord",
@@ -1137,9 +1152,15 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser le domino",
+               onObject: "sur un domino"
             },
             code: {
-               withdrawObject: "ramasserDomino"
+               withdrawObject: "ramasserDomino",
+               onObject: "surDomino"
+            },
+            description: {
+               withdrawObject: "ramasserDomino() ramasse le domino sur la case du robot",
+               onObject:"surDomino() teste si le robot est sur la case d'un domino"
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
@@ -1175,12 +1196,15 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser le biscuit",
+               dropObject: "déposer le biscuit"
             },
             code: {
-               withdrawObject: "ramasserBiscuit"
+               withdrawObject: "ramasserBiscuit",
+               dropObject: "deposerBiscuit"
             },
             description: {
-               withdrawObject: "ramasserBiscuit() ramasse le biscuit sur la case du robot"
+               withdrawObject: "ramasserBiscuit() ramasse le biscuit sur la case du robot",
+               dropObject: "deposerBiscuit() dépose le dernier biscuit ramassé, sur la case du robot"
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les biscuits demandés !",
@@ -1188,33 +1212,51 @@ var getContext = function(display, infos, curLevel) {
             }
          },
       },
+      pearls: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser la perle",
+            },
+            code: {
+               withdrawObject: "ramasserPerle"
+            },
+            description: {
+               withdrawObject: "ramasserPerle() ramasse la perle sur la case du robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, le robot a ramassé toutes les perles demandées !",
+               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les perles demandées."
+            }
+         },
+      },
       fishing: {
          fr: {
             label: {
-               withdrawObject: "prendre les poissons",
-               dropObject: "déposer les poissons",
+               withdrawObject: "prendre le poisson",
+               dropObject: "déposer le poisson",
                withdrawNum: "prendre %1 poissons",
                withdrawNum_noShadow: "prendre %1 poissons",
                dropNum: "déposer %1 poissons",
                dropNum_noShadow: "déposer %1 poissons",
                nbWithdrawables: "nombre de poissons sur la case",
                containerSize: "nombre de poissons commandés",
-               onObject: "poissons sur la case",
+               onObject: "poisson sur la case",
                onContainer: "sur une île",
             },
             code: {
-               withdrawObject: "prendrePoissons",
-               dropObject: "deposerPoissons",
-               onObject: "surPoissons",
+               withdrawObject: "prendrePoisson",
+               dropObject: "deposerPoisson",
+               onObject: "surPoisson",
                onContainer: "surIle",
                nbWithdrawables: "nbPoissonsSur",
                containerSize: "nbPoissonsCommandes",
                withdrawNum: "prendre",
+               withdrawNum_noShadow: "prendre"
             },
             description: {
-               withdrawObject: "prendrePoissons() prend les poissons qui se trouvent sur la case",
-               dropObject: "deposerPoissons() dépose sur la case les poissons transportés",
-               onObject: "surPoissons() indique s'il y a un ou des poissons sur la case",
+               withdrawObject: "prendrePoisson() prend le poisson qui se trouve sur la case",
+               dropObject: "deposerPoisson() dépose sur la case un poisson transporté",
+               onObject: "surPoisson() indique s'il y a un ou des poissons sur la case",
                onContainer: "surIle() indique s'il y a une île sur la case",
                nbWithdrawables: "nbPoissonsSur() indique combien de poissons sont sur la case",
                containerSize: "nbPoissonsCommandes() indique il faut livrer de poissons sur l'île",
@@ -1259,7 +1301,85 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
-      
+      gears: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser la roue dentée",
+               dropObject: "accrocher la roue dentée",
+               onObject: "sur une roue dentée",
+               onContainer: "sur une machine"
+            },
+            code: {
+               withdrawObject: "ramasserRoue",
+               dropObject: "deposerRoue",
+               onObject: "surRoueDentee",
+               onContainer: "surMachine"
+            },
+            messages: {
+               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
+               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà une roue ici !",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
+            },
+            description: {
+               withdrawObject: "ramasserRoue() ramasse la roue sur la case du robot",
+               dropObject: "deposerRoue() dépose la roue sur la case du robot",
+               onObject: "surObjet() teste si le robot est sur une case avec une roue dentée",
+               onContainer: "surConteneur() teste si le robot est sur une case avec une machine"
+            }
+         },
+
+         en: {
+            label: {
+               withdrawObject: "pick up the gear",
+               dropObject: "accrocher la roue dentée",
+               onObject: "sur une roue dentée",
+               onContainer: "sur une machine"
+            },
+            code: {
+               withdrawObject: "pickGear",
+               dropObject: "attachGear",
+               onObject: "onGear",
+               onContainer: "onMachine"
+            },
+            messages: {
+               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
+               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà une plateforme ici !",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
+            }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger el engranaje",
+               dropObject: "soltar el engranaje",
+               onObject: "sobre engranaje",
+               onContainer: "sobre una máquina"
+            },
+            code: {
+               withdrawObject: "recogerEngranaje",
+               dropObject: "soltarEngranaje",
+               onObject: "sobreEngranaje",
+               onContainer: "sobreMaquina"
+            },
+            messages: {
+               successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
+               failureContainersFilled: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
+               failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
+            }
+         }
+      },
       marbles: {
          fr: {
             label: {
@@ -1415,7 +1535,12 @@ var getContext = function(display, infos, curLevel) {
              code: {
                 dropObject: "peindreCase",
                 onContainer: "surCaseMarquee",
-                readNumber: "nombreSurCase",
+                readNumber: "nombreSurCase"
+            },
+            description: {
+               dropObject: "peindreCase() peint la case sous le robot",
+               onContainer: "surCaseMarquee() indique si le robot est sur une case marquée",
+               readNumber: "nombreSurCase() renvoie le nombre écrit sur la case sous le robot"
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
@@ -1436,6 +1561,11 @@ var getContext = function(display, infos, curLevel) {
                 onContainer: "sobreCasillaMarcada",
                 readNumber: "númeroEnCasilla",
              },
+            description: {
+               dropObject: "pintarCasilla() pinta la casilla bajo el robot",
+               onContainer: "sobreCasillaMarcada() indica si el robot está sobre una casilla marcada",
+               readNumber: "númeroEnCasilla() devuelve el número escrito en la casilla bajo el robot",
+            },
              messages: {
                successContainersFilled: "Bravo, ¡su robot ha pintado el patrón!",
                failureContainersFilled: "El robot no pintó las casillas correctas.",
@@ -1459,6 +1589,10 @@ var getContext = function(display, infos, curLevel) {
             label: {
                obstacleRight: "asteroïde à droite",
                obstacleInFront: "asteroïde devant",
+               onExit: "sur une fusée"
+            },
+            code: {
+               onExit: "surFusee"
             },
             messages: {
                successReachExit: "Bravo, le robot a rejoint la fusée !",
@@ -1478,6 +1612,66 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "¡Cuidado con el asteroide!"
             }
          }
+      },
+      seashells: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le coquillage",
+               dropObject: "déposer les coquillages",
+               withdrawNum: "prendre %1 coquillages",
+               withdrawNum_noShadow: "prendre %1 coquillages",
+               dropNum: "déposer %1 coquillages",
+               dropNum_noShadow: "déposer %1 coquillages",
+               nbWithdrawables: "nombre de coquillages sur la case",
+               containerSize: "taille du panier",
+               onObject: "sur un coquillage",
+               onContainer: "sur un panier",
+               obstacleNorth: "rocher au nord",
+               obstacleSouth: "rocher au sud",
+               obstacleEast: "rocher à l'est",
+               obstacleWest: "rocher à l'ouest"
+            },
+            code: {
+               withdrawObject: "ramasserCoquillage",
+               dropObject: "deposerCoquillages",
+               onObject: "surCoquillage",
+               onContainer: "surPanier",
+               nbWithdrawables: "nbCoquillages",
+               containerSize: "taillePanier",
+               withdrawNum: "ramasser",
+               withdrawNum_noShadow: "ramasser",
+               obstacleNorth: "rocherNord",
+               obstacleSouth: "rocherSud",
+               obstacleEast: "rocherEst",
+               obstacleWest: "rocherOuest"
+            },
+            description: {
+               withdrawObject: "ramasserCoquillage() ramasse le coquillage qui se trouve sur la case",
+               dropObject: "deposerCoquillages() dépose tous les coquillages transportés",
+               onObject: "surCoquillage() indique s'il y a un ou des coquillages sur la case",
+               onContainer: "surPanier() indique s'il y a un panier sur la case",
+               nbWithdrawables: "nbCoquillages() indique combien de coquillages sont sur la case",
+               containerSize: "taillePanier() indique combien le panier doit contenir de coquillages",
+               dropNum: "deposer(nbCoquillages) dépose nbCoquillages coquillagess sur la case",
+               withdrawNum: "ramasser(nbCoquillages) ramasse nbCoquillages coquillages sur la case",
+               obstacleNorth: "rocherNord() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleSouth: "rocherSud() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleEast: "rocherEst() teste s'il y a un rocher sur la case au nord du robot",
+               obstacleWest: "rocherOuest() teste s'il y a un rocher sur la case au nord du robot"
+            },
+            messages: {
+               emptyBag: "Le robot ne porte pas de coquillage !",
+               successContainersFilled: "Bravo, votre robot a collecté tous les coquillages !",
+               failureContainersFilledLess: "Il reste encore au moins un coquillage à ramasser.",
+               failureContainersFilledBag: "Il faut apporter les coquillages dans le panier !",
+               failureDropObject: "Ce panier a déjà assez de coquillages.",
+               nothingToPickUp: "Pas de coquillage ici !",
+               failureContainersFilledBag: "Votre robot a ramassé trop de coquillages.",
+               failureDropObject: "Votre robot essaie de déposer trop de coquillages dans ce panier.",
+               obstacle: "Le robot essaie de foncer dans un rocher.",
+               failureReachExit: "Le robot n'a pas déposé les coquillages dans le panier."
+            }
+         },
       },
       sokoban: {
          fr: {
@@ -2082,7 +2276,7 @@ var getContext = function(display, infos, curLevel) {
                   fr: {
                      label: "sur carré",
                      code: "surCarre",
-                     description: "surCarre(): Le robot est-il sur du bleu ?"
+                     description: "surCarre(): Le robot est-il sur un carré ?"
                   },
                   es: {
                      label: "sobre cuadrado",
@@ -3291,7 +3485,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "dropPlatformInFront",
       type: "actions",

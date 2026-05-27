@@ -488,7 +488,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
    };
 
    function createSokobanInstructions() {
-      var nbBoxes = countItem(4);
+      var nbBoxes = countItem(4) + countInitItems('box');
 
       var html = "<p>";
       html += strings.sokoban(nbBoxes);
@@ -969,6 +969,18 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       }
       return nbTarget
    };
+
+   function countInitItems(type) {
+      var nbCount = 0;
+      var initItems = data[level][0].initItems || [];
+      for (var i = 0; i < initItems.length; i++) {
+         if (initItems[i].type === type) {
+            nbCount++;
+         }
+      }
+
+      return nbCount;
+   }
 
 
 
