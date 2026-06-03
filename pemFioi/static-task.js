@@ -22,7 +22,9 @@ var languageNames = {
    java: 'Java',
    ocaml: 'OCaml',
    jvs: 'JavaScool',
-   pseudo: 'Pseudo-code'
+   pseudo: 'Pseudo-code',
+   blockly: 'Blockly',
+   scrtach: 'Scratch'
 };
 
 task.showViews = function (views, success, error) {
@@ -202,6 +204,8 @@ function loadAceEditor(element, lang, source) {
       jvs: 'java',
       ocaml: 'ocaml',
       pseudo: 'plain_text',
+      blockly: 'plain_text',
+      scratch: 'plain_text'
    };
 
    if (!(lang in modeMatching)) {
