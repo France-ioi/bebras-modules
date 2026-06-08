@@ -168,7 +168,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       }
 
       var canFall = false;
-      var maxH = 3;
+      var maxH = 2;
       var tiles = data[level][0].tiles;
       var nbRows = tiles.length;
       var nbCol = tiles[0].length;

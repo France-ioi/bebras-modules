@@ -892,13 +892,17 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                successContainersFilled: "Bravo, le château est bien chauffé !",
+               successContainersFilledSingular: "Bravo, il y a un bon feu dans la cheminée !",
                failureContainersFilled: "Votre robot n'a pas mis du bois dans toutes les cheminées.",
+               failureContainersFilledSingular: "Votre robot n'a pas mis le bois dans la cheminée.",
                failureContainersFilledLess: "Votre robot n'a pas mis du bois dans toutes les cheminées..",
+               failureContainersFilledLessSingular: "Votre robot n'a pas mis le bois dans la cheminée.",
                failureContainersFilledBag: "Votre robot doit déposer le bois dans la cheminée.",
                failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
-               failureDropObject: "Il y a déjà du bois dans cette cheminée.",
+               failureDropObject: "Le robot essaie de déploser du bois alors qu'il y en a déjà dans cette cheminée !",
                failureDropPlatform: "Il y a déjà une plateforme ici !",
-               emptyBag: "Le robot essaie de déposer du bois alors qu'il n'en transporte pas !"
+               emptyBag: "Le robot essaie de déposer du bois alors qu'il n'en transporte pas !",
+               tooManyObjects: "Le robot essaie de transporter trop de bois à la fois !"
             }
          },
 
