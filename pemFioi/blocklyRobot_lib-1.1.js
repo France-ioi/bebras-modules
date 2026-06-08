@@ -1697,7 +1697,9 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                successContainersFilled: "Bravo, les caisses sont bien rangées !",
+               successContainersFilledSingular: "Bravo, la caisse est bien rangée !",
                failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
+               failureContainersFilledSingular: "La caisse n'est pas à sa place !",
                failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
                failureWhilePushing: "Le robot ne peut pas pousser ici !",
                obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
@@ -3532,9 +3534,10 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   // Export context params so that they are available for migration purposes
+   // Export context params and strings so that they are available for migration purposes
    context.contextParams = contextParams;
-   
+   context.contextStrings = contextStrings;
+
    for(var command in infos.newBlocks) {
       cmd = infos.newBlocks[command];
       context.customBlocks.robot[cmd.type].push(cmd.block);
@@ -4839,9 +4842,9 @@ var robotEndConditions = {
       var solved = true;
       
       var messages = [
-         window.languageStrings.messages.failureContainersFilled,
-         window.languageStrings.messages.failureContainersFilledLess,
-         window.languageStrings.messages.failureContainersFilledBag
+         'failureContainersFilled',
+         'failureContainersFilledLess',
+         'failureContainersFilledBag'
       ];
       var message = 2;
       if (context.infos.maxMoves != undefined) {
@@ -4850,11 +4853,14 @@ var robotEndConditions = {
             throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
          }
       }
+      var containersCount = 0;
+      var notFilledCount = 0;
       for(var row = 0;row < context.nbRows;row++) {
          for(var col = 0;col < context.nbCols;col++) {
             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
             if(containers.length != 0) {
                var container = containers[0];
+               containersCount++;
                if(container.containerSize == undefined && container.containerFilter == undefined) {
                   container.containerSize = 1;
                }
@@ -4890,18 +4896,24 @@ var robotEndConditions = {
                if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
                   solved = false;
                   message = Math.min(message, 0);
+                  notFilledCount++;
                }
             }
          }
       }
-      
+
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successContainersFilled);
+         throw(window.languageStrings.messages.successContainersFilledSingular && containersCount <= 1
+             ? window.languageStrings.messages.successContainersFilledSingular
+             : window.languageStrings.messages.successContainersFilled);
       }
       if(lastTurn) {
          context.success = false;
-         throw(messages[message]);
+
+         throw(window.languageStrings.messages[messages[message] + 'Singular'] && notFilledCount <= 1
+             ? window.languageStrings.messages[messages[message] + 'Singular']
+             : window.languageStrings.messages[messages[message]]);
       }
    },
    checkSpecificCollection: function(context, lastTurn) {
