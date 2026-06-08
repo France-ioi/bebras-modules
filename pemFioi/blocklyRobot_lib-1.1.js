@@ -1545,8 +1545,10 @@ var getContext = function(display, infos, curLevel) {
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
+               failureContainersFilledSingular: "Votre robot n'a pas peint la bonne case.",
                failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
                failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
+               failureContainersFilledLessSingular: "Votre robot n'a pas peint la case.",
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
          },
@@ -4855,6 +4857,7 @@ var robotEndConditions = {
       }
       var containersCount = 0;
       var notFilledCount = 0;
+      var filledLessCount = 0;
       for(var row = 0;row < context.nbRows;row++) {
          for(var col = 0;col < context.nbCols;col++) {
             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
@@ -4873,6 +4876,7 @@ var robotEndConditions = {
                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
                   solved = false;
                   message = Math.min(message, 1);
+                  filledLessCount++;
                }
                else if(context.getItemsOn(row, col, filter).length == 0) {
                   solved = false;
@@ -4911,7 +4915,9 @@ var robotEndConditions = {
       if(lastTurn) {
          context.success = false;
 
-         throw(window.languageStrings.messages[messages[message] + 'Singular'] && notFilledCount <= 1
+         var singular = (0 === message && notFilledCount <= 1) || (1 === message && filledLessCount <= 1);
+
+         throw(window.languageStrings.messages[messages[message] + 'Singular'] && singular
              ? window.languageStrings.messages[messages[message] + 'Singular']
              : window.languageStrings.messages[messages[message]]);
       }
