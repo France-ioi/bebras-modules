@@ -1169,7 +1169,10 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
-               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
+               "successPickedAllWithdrawablesSingular": "Bravo, le robot a ramassé le domino demandé !",
+               "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés.",
+               "failurePickedAllWithdrawablesSingular": "Le robot n'a pas ramassé le domino demandé.",
+               failureUnfilteredObject: "Le robot a ramassé un domino non demandé."
             }
          },
          en: {
@@ -1330,7 +1333,9 @@ var getContext = function(display, infos, curLevel) {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
                successContainersFilled: "Bravo, vous avez rangé les billes !",
+               successContainersFilledSingular: "Bravo, vous avez rangé la bille !",
                failureContainersFilled: "Les billes ne sont pas toutes bien rangées.",
+               failureContainersFilledSingular: "La bille n'est pas rangée dans le trou.",
                failureContainersFilledLess: "Il reste une bille à ranger.",
                failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
             }
@@ -2747,6 +2752,13 @@ var getContext = function(display, infos, curLevel) {
          if(infos[param] === undefined || param == "newBlocks") {
             infos[param] = contextParams[name][param];
          }
+         if (param === 'itemTypes') {
+            for (var itemType in contextParams[name].itemTypes) {
+               if (infos.itemTypes[itemType] === undefined) {
+                  infos.itemTypes[itemType] = contextParams[name].itemTypes[itemType];
+               }
+            }
+         }
       }
    };
    
@@ -4011,7 +4023,22 @@ var getContext = function(display, infos, curLevel) {
       }
       return selected;
    };
-   
+
+   context.countFilter = function (filter) {
+      var filterCount = 0;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            filterCount += context.getItemsOn(row, col, function(obj) { return filter(obj); }).length;
+         }
+      }
+
+      for(var item in context.bag) {
+         filterCount += filter(context.bag[item]) ? 1 : 0;
+      }
+
+      return filterCount;
+   };
+
    context.isOn = function(filter) {
       var item = context.getRobot();
       return context.hasOn(item.row, item.col, filter);
@@ -4736,14 +4763,20 @@ var robotEndConditions = {
             }
          }
       }
-      
+
+      var filterCount = context.countFilter(function(obj) { return obj.isWithdrawable === true; });
+
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         throw(filterCount <= 1 && window.languageStrings.messages.successPickedAllWithdrawablesSingular
+             ? window.languageStrings.messages.successPickedAllWithdrawablesSingular
+             : window.languageStrings.messages.successPickedAllWithdrawables);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+         throw(filterCount <= 1 && window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+             ? window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+             : window.languageStrings.messages.failurePickedAllWithdrawables);
       }
    },
    checkPlugsWired: function(context, lastTurn) {
@@ -4850,7 +4883,8 @@ var robotEndConditions = {
    checkSpecificCollection: function(context, lastTurn) {
       // Look for a custom filter in the task infos, otherwise accept everything (legacy behavior)
       var filter = context.infos.checkFilter || function(obj) { return true; };
-      
+      var filterCount = context.countFilter(filter);
+
       var solved = true;
 
       // 1. Check if there are valid items left on the grid (Failure if yes)
@@ -4874,32 +4908,40 @@ var robotEndConditions = {
             throw(window.languageStrings.messages.failureUnfilteredObject); 
          }
       }
-      
+
       if(solved) {
          context.success = true;
-         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         throw(filterCount <= 1 && window.languageStrings.messages.successPickedAllWithdrawablesSingular
+             ? window.languageStrings.messages.successPickedAllWithdrawablesSingular
+             : window.languageStrings.messages.successPickedAllWithdrawables);
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+         throw(filterCount <= 1 && window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+             ? window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+             : window.languageStrings.messages.failurePickedAllWithdrawables);
       }
    },
    checkBothReachAndCollect: function(context, lastTurn) {
-      var robot = context.getRobot();
+      var filterCount = context.countFilter(function(obj) { return obj.isWithdrawable === true; });
       if(context.isOn(function(obj) { return obj.isExit === true; })) {
          var solved = true;
          for(var row = 0;row < context.nbRows;row++) {
             for(var col = 0;col < context.nbCols;col++) {
                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
                   solved = false;
-                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+                  throw(filterCount <= 1 && window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+                     ? window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+                     : window.languageStrings.messages.failurePickedAllWithdrawables);
                }
             }
          }
          
          if(solved) {
             context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+            throw(filterCount <= 1 && window.languageStrings.messages.successPickedAllWithdrawablesSingular
+                ? window.languageStrings.messages.successPickedAllWithdrawablesSingular
+                : window.languageStrings.messages.successPickedAllWithdrawables);
          }
       }
       if(lastTurn) {
@@ -4941,21 +4983,27 @@ var robotEndFunctionGenerator = {
                }
             }
          }
-         
+
          for(var item in context.bag) {
             if(!filter(context.bag[item])) {
                context.success = false;
                throw(window.languageStrings.messages.failureUnfilteredObject);
             }
          }
-         
+
+         var filterCount = context.countFilter(filter);
+
          if(solved) {
             context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+            throw(filterCount <= 1 && window.languageStrings.messages.successPickedAllWithdrawablesSingular
+                ? window.languageStrings.messages.successPickedAllWithdrawablesSingular
+                : window.languageStrings.messages.successPickedAllWithdrawables);
          }
          if(lastTurn) {
             context.success = false;
-            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+            throw(filterCount <= 1 && window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+               ? window.languageStrings.messages.failurePickedAllWithdrawablesSingular
+                : window.languageStrings.messages.failurePickedAllWithdrawables);
          }
       };
    },
