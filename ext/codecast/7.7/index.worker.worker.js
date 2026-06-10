@@ -1,5 +1,5 @@
 (function() {
-	var e = Object.create, t = Object.defineProperty, a = Object.getOwnPropertyDescriptor, n = Object.getOwnPropertyNames, s = Object.getPrototypeOf, r = Object.prototype.hasOwnProperty, _ = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), i = (_, i, o) => (o = null != _ ? e(s(_)) : {}, ((e, s, _, i) => {
+	var e = Object.create, t = Object.defineProperty, a = Object.getOwnPropertyDescriptor, n = Object.getOwnPropertyNames, s = Object.getPrototypeOf, r = Object.prototype.hasOwnProperty, _ = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), i = (_, i, o) => (o = null != _ ? e(s(_)) : {}, ((e, s, _, i) => {
 		if (s && "object" == typeof s || "function" == typeof s) for (var o, l = n(s), f = 0, h = l.length; f < h; f++) o = l[f], r.call(e, o) || o === _ || t(e, o, {
 			get: ((e) => s[e]).bind(null, o),
 			enumerable: !(i = a(s, o)) || i.enumerable
@@ -2325,7 +2325,8 @@
 		a.new_int_n;
 		var r = a.assert, _ = x(), i = m(), o = w(), l = y();
 		t.exports = function(e) {
-			this.quantize = e, this.iteration_loop = function(e, t, a, f) {
+			var t = e;
+			this.quantize = t, this.iteration_loop = function(e, t, a, f) {
 				var h, c = e.internal_flags, u = n(o.SFBMAX), b = n(576), p = s(2), m = 0, d = c.l3_side, v = new _(m);
 				this.quantize.rv.ResvFrameBegin(e, v), m = v.bits;
 				for (var g = 0; g < c.mode_gr; g++) {
