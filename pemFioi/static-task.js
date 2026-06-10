@@ -243,8 +243,13 @@ function displayCodeSnippets() {
    for (var element of elements) {
       var lang = element.getAttribute('data-lang') || element.getAttribute('data-always-show-lang');
       var source = element.getAttribute('data-code');
+      var previousInnerHTML = element.innerHTML;
       element.innerHTML = '<div class="code-block code" style="margin-bottom: 20px;"><div class="code-header">' + languageNames[lang] + '</div><div class="editor"><div class="inside-editor"></div></div></div>';
-      loadAceEditor(element.querySelector('.inside-editor'), lang, source);
+      if (source) {
+         loadAceEditor(element.querySelector('.inside-editor'), lang, source);
+      } else {
+         element.querySelector('.inside-editor').innerHTML = previousInnerHTML;
+      }
    }
 }
 
