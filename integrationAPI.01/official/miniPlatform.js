@@ -499,6 +499,14 @@ $(document).ready(function() {
             }
             if (success) {success();}
          };
+         platform.showView = function(view, success, error) {
+            var shownViews = {[view]: true};
+             task.showViews(shownViews, function () {
+                 chooseView.update(shownViews);
+                 platform.trigger('showViews', [shownViews]);
+                 success();
+             });
+         };
          platform.log = function(data, success, error) {
             if (success) {success();}
          };
