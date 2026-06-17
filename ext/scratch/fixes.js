@@ -777,6 +777,8 @@ Blockly.Colours['texts'] = {
     'secondary': '#0DA572',
     'tertiary': '#128E65'};
 
+Blockly.Blocks.procedures.HUE = "#aa00ff";
+
 Blockly.Blocks['control_repeat'] = {
   /**
    * Block for repeat n times (external number).
