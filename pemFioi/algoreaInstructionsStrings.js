@@ -478,7 +478,7 @@ var algoreaInstructionsStrings = {
          }
          for(var iConcept = 0; iConcept < concepts.length; iConcept++){
             var concept = concepts[iConcept];
-            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\" class=\"help_concept\">";
+            text += "<a onclick=\"conceptViewer.showConcept('"+concept+"')\" class=\"help_concept\" href=\"#\">";
             text += conceptName(concept,lang);
             text += "</a>";
             if(iConcept == concepts.length - 2){
