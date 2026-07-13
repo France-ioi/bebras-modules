@@ -52,7 +52,7 @@ var algoreaInstructionsStrings = {
 
          return text
       },
-      board: "Une des étendues d'eau a été recouverte d'une planche pour que votre robot puisse passer.",
+      board: "Une des étendues d'eau a été recouverte d'une planche pour que le robot puisse passer.",
       dominoes: function(nbTarget) {
          var text = "Programmez le robot pour qu'il ramasse ";
          if(nbTarget == 1){
@@ -106,7 +106,7 @@ var algoreaInstructionsStrings = {
          return text
       },
       toPickAGem: "Pour ramasser une pierre, le robot doit juste passer sur la case qui la contient.",
-      laser1: "Programmez votre robot pour qu'il allume tous les spots à l'aide de rayons laser.",
+      laser1: "Programmez le robot pour qu'il allume tous les spots à l'aide de rayons laser.",
       laser2: "Un rayon laser allume tous les spots qui se trouvent sur sa trajectoire.",
       overLaser: "Pour utiliser un lanceur laser, le robot doit se placer sur sa case.",
       laserDirection: "Les directions possibles, de 0 à 7, sont indiquées sur le lanceur.",
@@ -310,22 +310,22 @@ var algoreaInstructionsStrings = {
          switch(type){
             case "fishing":
                var str0 = "sur le panneau"
-               var str1 = "de poissons que votre robot doit apporter sur l'île";
+               var str1 = "de poissons que le robot doit apporter sur l'île";
                var str2 = "de poissons";
                break;
             case "packages":
                var str0 = "sur le carton";
-               var str1 = "de livres que votre robot doit apporter dedans";
+               var str1 = "de livres que le robot doit apporter dedans";
                var str2 = "de livres";
                break;
             case "veterinary":
                var str0 = "au dessus du castor";
-               var str1 = "de bûches que votre robot doit lui apporter";
+               var str1 = "de bûches que le robot doit lui apporter";
                var str2 = "de bûches";
                break;
          }
          var text = "Le nombre "+str0+" indique le nombre "+str1+".<br/>";
-         text += "Il faut que votre robot dépose le nombre <b>exact</b> "+str2+" indiqué.";
+         text += "Il faut que le robot dépose le nombre <b>exact</b> "+str2+" indiqué.";
          return text
       },
       quantity_2: function(type) {
@@ -358,7 +358,7 @@ var algoreaInstructionsStrings = {
                var str2 = "bûches";
                break;
          }
-         var text = "La mission de votre robot est "+str1+". ";
+         var text = "La mission du robot est "+str1+". ";
          text += "Pour chaque test, le nombre de "+str2+" est différent, mais le même programme doit fonctionner pour les "+nbTests+" tests.";
          return text
       },
@@ -374,7 +374,7 @@ var algoreaInstructionsStrings = {
                var str = "du castor";
                break;
          }
-         var text = "Pour réussir sa mission, votre robot doit d'abord se rendre sur la case "+str+".";
+         var text = "Pour réussir sa mission, le robot doit d'abord se rendre sur la case "+str+".";
          return text
       },
       variable_3: "Une fois sur cette case, il doit capter le nombre écrit dessus, et stocker cette information dans sa mémoire pour la réutiliser plus tard.",
@@ -438,7 +438,7 @@ var algoreaInstructionsStrings = {
       operations_2: "Dans cette version, vous aurez besoin d'effectuer le calcul :",
       operations_3: "Si vous le souhaitez, vous pouvez créer une nouvelle variable pour y placer le résultat :",
       operations_4: "Mais ce n'est pas obligatoire.",
-      laser_1: "Votre robot doit d'abord avancer sur la case du lanceur laser :",
+      laser_1: "Le robot doit d'abord avancer sur la case du lanceur laser :",
       laser_2: "Lorsque le robot est placé sur la case du lanceur , il peut tirer un rayon laser. Utilisez le bloc :",
       laser_3: "Pour que le robot tire dans la bonne direction, entrez le nombre 3. Les directions sont indiquées sur le lanceur.",
 
