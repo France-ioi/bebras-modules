@@ -418,8 +418,8 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       var html = "";
 
       html += "<p>"+strings.laser1+"</br>"+strings.laser2+"</p>";
-      html +=  "<div style='float: left; vertical-align: top; padding: 5px; margin-right: 5px; border: 1px solid black; max-width: 33%;'>";
-      html += "<div style='width: 90%; max-width: 150px; margin: auto;'>";
+      html +=  "<div style='float: left; vertical-align: top; padding: 5px; margin-right: 10px; border: 1px solid black;'>";
+      html += "<div style='margin: auto;'>";
       html += "<img src='"+imgSrc+".png'/>";
       html += "</div>";
       html += "<p style='text-align: center; margin: 0;'><strong>"+strings.launcher+"</strong></p>";
