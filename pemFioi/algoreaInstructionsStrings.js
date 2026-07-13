@@ -25,7 +25,7 @@ var algoreaInstructionsStrings = {
             text += "un des "+nbExits+" drapeaux";
          }
          
-         text += " sans rentrer dans ";
+         text += " sans foncer dans ";
 
          var obsStr = { 
             2: "un buisson", 
