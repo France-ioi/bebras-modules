@@ -95,7 +95,7 @@ var algoreaInstructionsStrings = {
          }
          return text
       },
-      dontStepOnFlowers: "Le robot ne peut pas accéder à une case s'il y a déjà une fleur dessus.",
+      dontStepOnFlowers: "Le robot ne peut pas aller sur une case s'il y a déjà une fleur dessus.",
       gems: function(nbTarget) {
          var text = "Programmez le robot pour qu'il ramasse ";
          if(nbTarget == 1){
