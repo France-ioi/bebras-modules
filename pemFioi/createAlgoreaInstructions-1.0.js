@@ -502,10 +502,10 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
    };
 
    function createSpaceInstructions() {
-      var nbAsteroids = countItem(4);
-      var nbRockets = countItem(5);
-      var nbItem1 = countItem(7);
-      var nbItem2 = countItem(8);
+      var nbAsteroids = countItem(4) + countInitItems('rocket');
+      var nbRockets = countItem(5) + countInitItems('asteroide');
+      var nbItem1 = countItem(7) + countInitItems('objet1');
+      var nbItem2 = countItem(8) + countInitItems('objet2');
       var nbItems = nbItem1 + nbItem2;
 
       var html = "<p>";
