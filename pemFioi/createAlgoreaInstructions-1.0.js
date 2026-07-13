@@ -259,7 +259,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
          return "<p>"+gridInfos.intro.text+"</p>"
       }
 
-      var nbTarget = countItem(11);
+      var nbTarget = countItem(11) + countInitItems('BB');
       var rollOver = (gridInfos.intro.rollOver === true || countItem([3,4,5,6,7,8,9,10]) > 0);
 
       var html = "<p>"+strings.dominoes(nbTarget);+"</p>";
