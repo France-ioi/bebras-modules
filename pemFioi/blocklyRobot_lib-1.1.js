@@ -4924,7 +4924,8 @@ var robotEndConditions = {
    },
    checkBothReachAndCollect: function(context, lastTurn) {
       var filterCount = context.countFilter(function(obj) { return obj.isWithdrawable === true; });
-      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+      var filterExitCount = context.countFilter(function(obj) { return obj.isExit === true; });
+      if(0 === filterExitCount || context.isOn(function(obj) { return obj.isExit === true; })) {
          var solved = true;
          for(var row = 0;row < context.nbRows;row++) {
             for(var col = 0;col < context.nbCols;col++) {
