@@ -2672,7 +2672,7 @@ var getContext = function(display, infos, curLevel) {
             objet2: { num: 8, img: "solar_panel.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { side: 60, zOrder: 1 }
          },
-         checkEndCondition: robotEndConditions.checkReachExit
+         checkEndCondition: robotEndConditions.checkBothReachAndCollect
       },
       sokoban: {
          backgroundColor: "#c2c6f2",
