@@ -2473,9 +2473,10 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkReachExit
       },
       laser: {
-         backgroundColor: "#33237a",
+         backgroundColor: "#00015e",
+         borderColor: "#40405e",
          itemTypes: {
-            robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2, isOpaque: true },
+            robot: { img: "laser_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2, isOpaque: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, isOpaque: true },
             light: { num: 3, img: "off_spot.png", states: ["off_spot.png", "on_spot.png"], isLight: true, state: 0, side: 60 },
             launcher: { num: 5, img: "launcher.png", isLaser: true, side: 60 },

@@ -418,14 +418,15 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       var html = "";
 
       html += "<p>"+strings.laser1+"</br>"+strings.laser2+"</p>";
-      html +=  "<div style='float: left; vertical-align: top; padding: 5px; margin-right: 10px; border: 1px solid black;'>";
-      html += "<div style='margin: auto;'>";
-      html += "<img src='"+imgSrc+".png'/>";
+
+      html +=  "<div><div style='display: inline-block; vertical-align: top; padding: 5px; margin-right: 10px; border: 1px solid black; max-width: 30%;'>";
+      html += "<div style='width: 90%; max-width: 150px; margin: auto;'>";
+      html += "<img src='"+imgSrc+".png' style='max-width: 100%; height: auto'/>";
       html += "</div>";
       html += "<p style='text-align: center; margin: 0;'><strong>"+strings.launcher+"</strong></p>";
       html += "</div>";
       if(gridInfos.intro.overLaser === true || gridInfos.intro.laserDirection === true){
-         html += "<p>";
+         html += "<div style='display: inline-block; vertical-align: top; max-width: 65%;'>";
          if(gridInfos.intro.overLaser === true){
             html += strings.overLaser+" ";
          }
@@ -434,6 +435,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
          }
          html += "</p>";
       }
+      html += "</div>";
       if(nbMirrors > 0){
          html += "<p>"+strings.mirrors+"</p>";
       }
