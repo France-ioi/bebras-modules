@@ -154,18 +154,21 @@ var algoreaInstructionsStrings = {
          text += " carton avec le nombre de livres indiqué."
          return text
       },
-      paint: function(nbBlack,nbWhite) {
-         var text = "Programmez le robot pour qu'il peigne ";
+      paint: function(nbBlack, hideUniquely) {
+         var text = "Programmez le robot pour qu'il colorie ";
          if(nbBlack == 1){
             text += "la case ";
          }else{
             text += "toutes les cases ";
          }
-         text += "avec un point noir, et uniquement ";
-         if(nbBlack > 1){
-            text += "celles-là";
-         }else{
-            text += "celle-là";
+         text += "avec un point noir";
+         if (!hideUniquely) {
+            text += ", et uniquement ";
+            if (nbBlack > 1) {
+               text += "celles-là";
+            } else {
+               text += "celle-là";
+            }
          }
          text += ".";
          return text

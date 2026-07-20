@@ -480,7 +480,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       var nbWhite = countItem(4);
 
       var html = "<p>";
-      html += strings.paint(nbBlack,nbWhite);
+      html += strings.paint(nbBlack, gridInfos.intro.hideUniquely);
       html += "</p>";
       if(gridInfos.intro.marked == true){
          html += "<p>"+strings.marked+"</p>";
