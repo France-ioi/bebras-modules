@@ -167,46 +167,12 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
          html += "<p>"+strings.oneFirewood+"</p>";
       }
 
-      var canFall = false;
       var maxH = 2;
-      var tiles = data[level][0].tiles;
-      var nbRows = tiles.length;
-      var nbCol = tiles[0].length;
-      for(var row = 0; row < nbRows; row++){
-         for(var col = 0; col < nbCol; col++){
-            if(col < nbCol - 1 && tiles[row][col] == 2 && tiles[row][col + 1] == 1){
-               var fallH = getFallH(row,col + 1);
-               if(fallH >= maxH || fallH + row >= nbRows){
-                  canFall = true;
-                  break;
-               }
-            }
-            if(col > 0 && tiles[row][col] == 2 && tiles[row][col - 1] == 1){
-               var fallH = getFallH(row,col - 1);
-               if(fallH >= maxH || fallH + row >= nbRows){
-                  canFall = true;
-                  break;
-               }
-            }
-         }
-         if(canFall){
-            break;
-         }
-      }
-      if(canFall){
+      if(gridInfos.intro.canFall){
          html += "<p>"+strings.fall(maxH)+"</p>";
       }
 
       return html
-
-      function getFallH(r,c) {
-         for(var row = r + 1; row < nbRows; row++){
-            if(tiles[row][c] != 1){
-               return row - r
-            }
-         }
-         return nbRows - r
-      }
    };
 
    function createChticodeRelInstructions() {
