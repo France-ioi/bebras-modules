@@ -4,6 +4,7 @@
 /*TODO : traduire le context wiring*/
 var robotCommands = [];
 // var imgPath = modulesPath+"img/algorea/";
+var BLOCKLY_ROBOT_VERSION = '1.1';
 
 var initArray = function(n, elem) {
    var res = [];
@@ -2234,8 +2235,8 @@ var getContext = function(display, infos, curLevel) {
          noBorders: false,
          borderColor: "#675B6E",
          itemTypes: {
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             pink_robot: { img: "pink_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             contour: { num: 2, img: "contour.png", side: 60, zOrder: 0 },
             GG: { num: 3, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
             GO: { num: 4, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },

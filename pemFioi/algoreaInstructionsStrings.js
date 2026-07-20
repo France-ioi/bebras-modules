@@ -55,11 +55,20 @@ var algoreaInstructionsStrings = {
       board: "Une des étendues d'eau a été recouverte d'une planche pour que le robot puisse passer.",
       dominoes: function(nbTarget) {
          var text = "Programmez le robot pour qu'il ramasse ";
-         if(nbTarget == 1){
-            text += "le domino avec deux carrés bleus.";
-         }else{
-            text += "tous les dominos avec deux carrés bleus.";
+         if ('1.1' === BLOCKLY_ROBOT_VERSION) {
+            if(nbTarget == 1){
+               text += "le domino avec deux triangles.";
+            }else{
+               text += "tous les dominos avec deux triangles.";
+            }
+         } else {
+            if(nbTarget == 1){
+               text += "le domino avec deux carrés bleus.";
+            }else{
+               text += "tous les dominos avec deux carrés bleus.";
+            }
          }
+
          return text
       },
       rollOver: "Le robot peut passer sur les dominos qu'il ne ramasse pas.",
