@@ -14,7 +14,7 @@ var algoreaInstructionsStrings = {
       },
       oneFirewood: "Le robot ne peut transporter qu'un seul tas de bois à la fois.</br>Chaque cheminée ne peut contenir qu'un seul tas de bois.",
       fall: function(maxH) {
-         return "Le robot tombe s'il n'est pas sur une plateforme, et s'il tombe de plus de "+maxH+" cases, il se casse."
+         return "Le robot tombe s'il n'est pas sur une plateforme. Si le robot tombe de plus de "+maxH+" cases, il se casse."
       },
       chticodeRel: "Programmez le robot pour qu'il passe ramasser toutes les pierres précieuses puis rejoigne la case verte. ",
       course: function(nbExits,obstacles) {
