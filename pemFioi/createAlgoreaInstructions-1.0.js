@@ -394,7 +394,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       if(gridInfos.intro.overLaser === true || gridInfos.intro.laserDirection === true){
          html += "<div style='display: inline-block; vertical-align: top; max-width: 65%;'>";
          if(gridInfos.intro.overLaser === true){
-            html += strings.overLaser+" ";
+            html += strings.overLaser+"<br>";
          }
          if(gridInfos.intro.laserDirection === true){
             html += strings.laserDirection;
@@ -403,7 +403,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       }
       html += "</div>";
       if(nbMirrors > 0){
-         html += "<p>"+strings.mirrors+"</p>";
+         html += "<p style='margin-top: 10px'>"+strings.mirrors+"</p>";
       }
 
       return html
@@ -411,7 +411,7 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
 
    function createMarblesInstructions() {
       var nbHoles = countItem(3);
-      var nbMarbles = countItem(4);
+      var nbMarbles = countItem(4) + countInitItems('marble');
 
       var html = "<p>";
       html += strings.marbles(nbMarbles,nbHoles);

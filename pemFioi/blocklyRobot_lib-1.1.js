@@ -2493,8 +2493,8 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          backgroundColor: "#dadada",
          itemTypes: {
-            red_robot: { img: "red_robot_alt.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
             blue_robot: { img: "blue_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
+            red_robot: { img: "red_robot_alt.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
             hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
