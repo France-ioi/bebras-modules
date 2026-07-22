@@ -2229,6 +2229,25 @@ var getContext = function(display, infos, curLevel) {
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
                }
+            },
+            {
+               name: "onTriangle",
+               strings: {
+                  fr: {
+                     label: "sur triangle",
+                     code: "surTriangle",
+                     description: "surTriangle(): Le robot est-il sur un triangle ?"
+                  },
+               },
+               category: "robot",
+               type: "sensors",
+               block: {
+                  name: "onTriangle",
+                  yieldsValue: true
+               },
+               func: function(callback) {
+                  this.callCallback(callback, this.isOn(function(obj) {return obj.isTriangle===true;}));
+               }
             }
          ],
          backgroundColor: "#4B254E",
@@ -2240,13 +2259,13 @@ var getContext = function(display, infos, curLevel) {
             contour: { num: 2, img: "contour.png", side: 60, zOrder: 0 },
             GG: { num: 3, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
             GO: { num: 4, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
-            GB: { num: 5, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
+            GB: { num: 5, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, isTriangle: true, zOrder: 1 },
             OG: { num: 6, img: "OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
             OO: { num: 7, img: "OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
-            OB: { num: 8, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
-            BG: { num: 9, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
-            BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
-            BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
+            OB: { num: 8, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, isTriangle: true, zOrder: 1 },
+            BG: { num: 9, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isTriangle: true, isCross: true, zOrder: 1 },
+            BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isTriangle: true, isStar: true, zOrder: 1 },
+            BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, isTriangle: true, zOrder: 1 },
             board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
             obstacle: { num: 14, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 }
