@@ -2235,7 +2235,7 @@ var getContext = function(display, infos, curLevel) {
          noBorders: false,
          borderColor: "#675B6E",
          itemTypes: {
-            pink_robot: { img: "pink_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            pink_robot: { img: "pink_robot_above.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             contour: { num: 2, img: "contour.png", side: 60, zOrder: 0 },
             GG: { num: 3, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
@@ -2413,8 +2413,7 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#BFF4A6",
          borderColor: "#A5D88B",
          itemTypes: {
-            garden_robot: { img: "garden_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            robot: { img: "green_robot_above.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             earth: { num: 2, img: "earth.png", side: 60, isContainer: true, zOrder: 0 },
             flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
             flag: { num: 4, img: "flag.png", side: 60, isExit: true, zOrder: 0},
@@ -2664,7 +2663,7 @@ var getContext = function(display, infos, curLevel) {
       rocket: {
          backgroundColor: "#2c293e",
          itemTypes: {
-            robot: { img: "white_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            robot: { img: "space_robot_above.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             board_background: { num: 2, color: "#8d8dbe", side: 60, zOrder: 0},
             stars: { num: 3, img: "stars.png", side: 60, zOrder: 1},
             asteroide: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
