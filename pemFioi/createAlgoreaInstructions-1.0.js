@@ -418,10 +418,12 @@ function getAlgoreaInstructionsAsHtml(strings, gridInfos, data, level, lang) {
       html += "</p>";
 
       if(nbMarbles > 1){
-         html += "<p>";
-         html += strings.oneMarble;
-         html += "</p>";
-         if(nbHoles > 1){
+         if (!gridInfos.intro.hideRobotUniqueMarble) {
+            html += "<p>";
+            html += strings.oneMarble;
+            html += "</p>";
+         }
+         if(nbHoles > 1 && !gridInfos.intro.hideHoleUniqueMarble){
             html += "<p>";
             html += strings.onePerHole;
             html += "</p>";
