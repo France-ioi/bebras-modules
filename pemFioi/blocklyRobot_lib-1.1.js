@@ -842,6 +842,7 @@ var getContext = function(display, infos, curLevel) {
             },
              messages: {
                successContainersFilled: "Bravo, votre robot a rangé les cartes au bon endroit !",
+               successContainersFilledSingular: "Bravo, votre robot a rangé la carte au bon endroit !",
                failureContainersFilled: "Il y a des cartes mal rangées",
                failureContainersFilledLess: "Il y a encore des cartes à ranger.",
                failureContainersFilledBag: "Votre robot doit déposer sa carte."
