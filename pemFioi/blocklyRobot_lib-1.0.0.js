@@ -1140,7 +1140,7 @@ var getContext = function(display, infos, curLevel) {
             }
          },
       },
-      cards: {
+      poker: {
          fr: {
             label: {
                withdrawObject: "ramasser la carte",
@@ -2365,7 +2365,7 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkSpecificCollection
       },
-      cards: {
+      poker: {
          newBlocks: [
            {
              name: "onHearts",
