@@ -183,7 +183,7 @@ var algoreaInstructionsStrings = {
          }
          return text
       },
-      pushBox: "Le robot peut pousser une caisse s'il se met juste devant et que l'espace derrière cette caisse est libre.",
+      pushBox: "Le robot ne peut pousser une caisse que si la caisse est devant lui et que l'espace derrière la caisse est libre.",
       space: function(nbRockets,nbItems) {
          var text = "Programmez le robot pour qu'il ";
          if(nbItems > 0){
