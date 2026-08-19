@@ -124,6 +124,11 @@ var importableModules = function () {
       'codecast7.7_js_modern': {src: modulesPath+"/ext/codecast/7.7/index.modern.js", id: "codecast7.7_js_modern", type: "module"},
       'codecast7.7_loader': {src: modulesPath+"/ext/codecast/7.7/codecast-loader.js", id: "codecast7.7_loader"},
 
+      'codecast7.8_css': {type: "stylesheet", src: modulesPath+"/ext/codecast/7.8/index.css", id: "codecast7.8_css"},
+      'codecast7.8_js': {src: modulesPath+"/ext/codecast/7.8/index.js", id: "codecast7.8_js"},
+      'codecast7.8_js_modern': {src: modulesPath+"/ext/codecast/7.8/index.modern.js", id: "codecast7.8_js_modern", type: "module"},
+      'codecast7.8_loader': {src: modulesPath+"/ext/codecast/7.8/codecast-loader.js", id: "codecast7.8_loader"},
+
       'simple_draw': {src: modulesPath+"/pemFioi/javascool/simple_draw.js", id: "simple_draw"},
       'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"},
 
@@ -250,7 +255,8 @@ var bundledModules = function () {
       {name: 'codecast-7.4', included: ['codecast7.4_css', 'codecast7.4_js', 'codecast7.4_loader']},
       {name: 'codecast-7.5', included: ['codecast7.5_css', 'codecast7.5_js', 'codecast7.5_loader']},
       {name: 'codecast-7.6', included: ['codecast7.6_css', 'codecast7.6_js', 'codecast7.6_loader']},
-      {name: 'codecast-7.7', included: window.location.protocol !== 'file:' ? ['codecast7.7_css', 'codecast7.7_js_modern', 'codecast7.7_loader'] : ['codecast7.7_css', 'codecast7.7_js', 'codecast7.7_loader']}
+      {name: 'codecast-7.7', included: window.location.protocol !== 'file:' ? ['codecast7.7_css', 'codecast7.7_js_modern', 'codecast7.7_loader'] : ['codecast7.7_css', 'codecast7.7_js', 'codecast7.7_loader']},
+      {name: 'codecast-7.8', included: window.location.protocol !== 'file:' ? ['codecast7.8_css', 'codecast7.8_js_modern', 'codecast7.8_loader'] : ['codecast7.8_css', 'codecast7.8_js', 'codecast7.8_loader']}
    ];
 };
 
