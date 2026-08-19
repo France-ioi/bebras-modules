@@ -2825,7 +2825,7 @@ elif program_exists:
                       const axis = block.getFieldValue('PARAM_0');
                       return [
                           `accelerometer.get_${axis}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -2838,7 +2838,7 @@ elif program_exists:
                       const method = 'touch' === button.substring(0, 5) ? 'is_touched' : 'is_pressed';
                       return [
                           `${button}.${method}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -2851,7 +2851,7 @@ elif program_exists:
                   Python: ()=>{
                       return [
                           `display.read_light_level()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -2868,7 +2868,7 @@ elif program_exists:
                       const axis = block.getFieldValue('PARAM_0');
                       return [
                           `compass.get_${axis}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21586,7 +21586,7 @@ elif program_exists:
                       const axis = blocklyBlock.getFieldValue('PARAM_0');
                       return [
                           `accelerometer.get_${axis}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21597,7 +21597,7 @@ elif program_exists:
                       let blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
                       return [
                           `accelerometer.was_gesture(${blockParams})`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21610,7 +21610,7 @@ elif program_exists:
                       const method = 'pin_logo' === button ? 'is_touched' : 'is_pressed';
                       return [
                           `${button}.${method}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21641,7 +21641,7 @@ elif program_exists:
                       const blockParams = getBlockGeneratorParams(block, blocklyBlock, 'Python');
                       return [
                           `display.get_pixel(${blockParams})`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21660,7 +21660,7 @@ elif program_exists:
                   Python: ()=>{
                       return [
                           `display.read_light_level()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21672,7 +21672,7 @@ elif program_exists:
                       const axis = block.getFieldValue('PARAM_0');
                       return [
                           `compass.get_${axis}()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21682,7 +21682,7 @@ elif program_exists:
                   Python: ()=>{
                       return [
                           `compass.heading()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -21693,7 +21693,7 @@ elif program_exists:
                   Python: ()=>{
                       return [
                           `microphone.sound_level()`,
-                          window.Blockly.Python.ORDER_NONE
+                          99
                       ];
                   }
               };
@@ -131836,9 +131836,9 @@ void main() {
       console.log('context features', context.features);
       // Color indexes of block categories (as a hue in the range 0–420)
       context.provideBlocklyColours = function() {
-          window.Blockly.HSV_SATURATION = 0.65;
-          window.Blockly.HSV_VALUE = 0.80;
-          window.Blockly.Blocks.inputs.HUE = 50;
+          if (window.Blockly) {
+              window.Blockly.Blocks.inputs.HUE = 50;
+          }
           return {
               categories: {
                   //actuator: 0,
