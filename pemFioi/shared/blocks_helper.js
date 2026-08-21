@@ -6,7 +6,7 @@ BlocksHelper = {
                 (function() {
                     var block = context.customBlocks[name][category][iBlock];
                     if (block.params) {
-                        block.blocklyJson = { inputsInline: true, args0: {} }
+                        block.blocklyJson = { inputsInline: true, args0: [] }
                         var blockArgs = block.blocklyJson.args0;
                         block.blocklyXml = '<block type="' + block.name + '">';
                         for (var iParam = 0; iParam < block.params.length; iParam++) {

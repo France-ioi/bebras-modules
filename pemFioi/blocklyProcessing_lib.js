@@ -2368,7 +2368,7 @@ var getContext = function(display, infos) {
                      strings.label[block.name] = strings.label[block.name].replace(
                         new RegExp('\s*' + (block.params.length == 0 ? '()%1' : '(%' + block.params.length + ')') + '.*$', 'g'), '$1');
                   }
-                  block.blocklyJson = $.extend({ inputsInline: true, args0: {} }, block.blocklyJson);
+                  block.blocklyJson = $.extend({ inputsInline: true, args0: [] }, block.blocklyJson);
                   block.blocklyXml = '<block type="' + block.name + '">';
                   var blockArgs = block.blocklyJson.args0;
                   for (var iParam = 0; iParam < block.params.length; iParam++) {

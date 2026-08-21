@@ -232,7 +232,7 @@ var getContext = function(display, infos) {
                 var block = context.customBlocks.isndraw[category][iBlock];
                 var params = [];
                 if (block.params) {
-                    block.blocklyJson = { inputsInline: true, args0: {} }
+                    block.blocklyJson = { inputsInline: true, args0: [] }
                     block.blocklyXml = '<block type="' + block.name + '">';
                     var blockArgs = block.blocklyJson.args0;
                     for (var iParam = 0; iParam < block.params.length; iParam++) {
