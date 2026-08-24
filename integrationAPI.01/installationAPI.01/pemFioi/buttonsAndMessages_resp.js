@@ -1611,7 +1611,8 @@ window.displayHelper = {
       }
    },
 
-   useFullWidth: function(options = {}) {
+   useFullWidth: function(options) {
+      options = options || {};
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
