@@ -529,12 +529,12 @@ var getContext = function (display, infos, curLevel) {
                 {
                     name: 'getArgumentsLength',
                     params: [],
-                    yieldsValue: true
+                    yieldsValue: 'int'
                 },
                 {
                     name: 'getArgument',
                     params: ['Number'],
-                    yieldsValue: true
+                    yieldsValue: 'string'
                 }
             ]
         }

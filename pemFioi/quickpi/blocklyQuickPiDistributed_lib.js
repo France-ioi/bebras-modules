@@ -1728,7 +1728,7 @@ var getContext = function (display, infos, curLevel) {
       distributed: {
          // Categories are reflected in the Blockly menu
          actuator: [
-            { name: "getNodeID", yieldsValue: true },
+            { name: "getNodeID", yieldsValue: 'int' },
             { name: "getNeighbors", yieldsValue: true },
             { name: "getNextMessage", yieldsValue: true },
             {
@@ -1744,10 +1744,10 @@ var getContext = function (display, infos, curLevel) {
             },
             { name: "sendMessage", params: [null, null] },
             { name: "submitAnswer", params: [null] },
-            { name: "isMessageWaiting", yieldsValue: true },
+            { name: "isMessageWaiting", yieldsValue: 'bool' },
             { name: "broadcastMessage", params: [null] },
             { name: "log", params: [null] },
-            { name: "currentTime", yieldsValue: true },
+            { name: "currentTime", yieldsValue: 'int' },
          ],
          sensors: [
          ]

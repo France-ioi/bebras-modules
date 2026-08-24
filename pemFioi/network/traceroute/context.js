@@ -484,12 +484,12 @@ var getContext = function (display, infos, curLevel) {
             traceroute: [
                 {
                     name: 'parseArgument',
-                    yieldsValue: true
+                    yieldsValue: 'string'
                 },
                 {
                     name: 'getAddrInfo',
                     params: ['String'],
-                    yieldsValue: true
+                    yieldsValue: 'string'
                 },
                 {
                     name: 'sendPacket',

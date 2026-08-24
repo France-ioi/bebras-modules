@@ -158,8 +158,8 @@ var getContext = function(display, infos) {
             ],
             control: [
                 { name: 'waitForClick', hasHandler: true },
-                { name: 'getX', yieldsValue: true},
-                { name: 'getY', yieldsValue: true},
+                { name: 'getX', yieldsValue: 'int'},
+                { name: 'getY', yieldsValue: 'int'},
                 { name: 'reset' },
                 { name: "resetSize",
                     params: ['Number', 'Number'],

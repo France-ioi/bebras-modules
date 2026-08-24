@@ -917,8 +917,8 @@ var getContext = function(display, infos) {
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
                  [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
-            { name: "row", yieldsValue: true },
-            { name: "col", yieldsValue: true },
+            { name: "row", yieldsValue: 'int' },
+            { name: "col", yieldsValue: 'int' },
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
@@ -959,7 +959,7 @@ var getContext = function(display, infos) {
             },
          ],
          turtleInput: [
-            { name: "inputvalue", yieldsValue: true }
+            { name: "inputvalue", yieldsValue: 'int' }
           ]
       },
       debug: {

@@ -253,10 +253,10 @@ var getContext = function(display, infos) {
             { name: "print", params: [null]}
          ],
          read:  [
-            { name: "read", yieldsValue: true },
-            { name: "readInteger", yieldsValue: true },
-            { name: "readFloat", yieldsValue: true },
-            { name: "eof", yieldsValue: true }
+            { name: "read", yieldsValue: 'string' },
+            { name: "readInteger", yieldsValue: 'int' },
+            { name: "readFloat", yieldsValue: 'int' },
+            { name: "eof", yieldsValue: 'bool' }
          ]
       }
    }

@@ -265,10 +265,10 @@ var getContext = function(display, infos) {
             { name: "print_end", params: [null, null], variants: [[null], [null, null]], blocklyJson: {inputsInline: true}}
          ],
          read:  [
-            { name: "read", yieldsValue: true },
-            { name: "readInteger", yieldsValue: true },
-            { name: "readFloat", yieldsValue: true },
-            { name: "eof", yieldsValue: true }
+            { name: "read", yieldsValue: 'string' },
+            { name: "readInteger", yieldsValue: 'int' },
+            { name: "readFloat", yieldsValue: 'int' },
+            { name: "eof", yieldsValue: 'bool' }
          ]
       }
    }

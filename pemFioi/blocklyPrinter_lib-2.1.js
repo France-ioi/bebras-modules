@@ -369,16 +369,16 @@ var getContext = function(display, infos) {
             { name: "print_end", params: [null, null], variants: [[null], [null, null]], anyArgs: true, blocklyJson: {inputsInline: true}}
          ],
          read:  [
-         { name: "read", yieldsValue: true, blocklyJson: {output: "String"} },
-            { name: "readInteger", yieldsValue: true, blocklyJson: {output: "Number"} },
-            { name: "readFloat", yieldsValue: true, blocklyJson: {output: "Number"} },
-            { name: "eof", yieldsValue: true, blocklyJson: {output: "Boolean"}}
+         { name: "read", yieldsValue: 'string', blocklyJson: {output: "String"} },
+            { name: "readInteger", yieldsValue: 'int', blocklyJson: {output: "Number"} },
+            { name: "readFloat", yieldsValue: 'int', blocklyJson: {output: "Number"} },
+            { name: "eof", yieldsValue: 'bool', blocklyJson: {output: "Boolean"}}
          ],
          manipulate: [
-            { name: "charToNumber", params: ["String"], yieldsValue: true, blocklyJson: {output: "Number"}},
-            { name: "numberToChar", params: ["Number"], yieldsValue: true, blocklyJson: {output: "String"}},
-            { name: "charToAscii",  params: ["String"], yieldsValue: true, blocklyJson: {output: "Number"}},
-            { name: "asciiToChar",  params: ["Number"], yieldsValue: true, blocklyJson: {output: "String"}}
+            { name: "charToNumber", params: ["String"], yieldsValue: 'int', blocklyJson: {output: "Number"}},
+            { name: "numberToChar", params: ["Number"], yieldsValue: 'string', blocklyJson: {output: "String"}},
+            { name: "charToAscii",  params: ["String"], yieldsValue: 'int', blocklyJson: {output: "Number"}},
+            { name: "asciiToChar",  params: ["Number"], yieldsValue: 'string', blocklyJson: {output: "String"}}
          ]
       }
    }

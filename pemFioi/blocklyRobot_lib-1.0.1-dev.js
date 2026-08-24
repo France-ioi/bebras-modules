@@ -1145,7 +1145,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onRightArrow",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.forwardsRight===true;}));
@@ -1170,7 +1170,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onLeftArrow",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.forwardsLeft===true;}));
@@ -1195,7 +1195,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onTopArrow",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.forwardsTop===true;}));
@@ -1220,7 +1220,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onBottomArrow",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.forwardsBottom===true;}));
@@ -1252,7 +1252,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onRound",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1278,7 +1278,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onSquare",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1304,7 +1304,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onTriangle",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1330,7 +1330,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onQuadrille",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1356,7 +1356,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onStriped",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1382,7 +1382,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onDotted",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
@@ -1446,7 +1446,7 @@ var getContext = function(display, infos, curLevel) {
              type: "sensors",
              block: {
                name: "onCross",
-               yieldsValue: true
+               yieldsValue: 'bool'
              },
              func: function(callback) {
                this.callCallback(callback, this.isOn(function(obj) {return obj.isCross===true;}));
@@ -1470,7 +1470,7 @@ var getContext = function(display, infos, curLevel) {
              type: "sensors",
              block: {
                name: "onStar",
-               yieldsValue: true
+               yieldsValue: 'bool'
              },
              func: function(callback) {
                this.callCallback(callback, this.isOn(function(obj) {return obj.isStar===true;}));
@@ -1494,7 +1494,7 @@ var getContext = function(display, infos, curLevel) {
              type: "sensors",
              block: {
                name: "onSquare",
-               yieldsValue: true
+               yieldsValue: 'bool'
              },
              func: function(callback) {
                this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
@@ -1598,7 +1598,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onGreen",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isGreen===true;}));
@@ -1644,7 +1644,7 @@ var getContext = function(display, infos, curLevel) {
                type: "sensors",
                block: {
                   name: "onPaint",
-                  yieldsValue: true
+                  yieldsValue: 'bool'
                },
                func: function(callback) {
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isWithdrawable===true;}));
@@ -1890,7 +1890,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleInFront",
       type: "sensors",
-      block: { name: "obstacleInFront", yieldsValue: true },
+      block: { name: "obstacleInFront", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.obstacleInFront());
       }
@@ -1899,7 +1899,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleEast",
       type: "sensors",
-      block: { name: "obstacleEast", yieldsValue: true },
+      block: { name: "obstacleEast", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
@@ -1909,7 +1909,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleWest",
       type: "sensors",
-      block: { name: "obstacleWest", yieldsValue: true },
+      block: { name: "obstacleWest", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
@@ -1919,7 +1919,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleNorth",
       type: "sensors",
-      block: { name: "obstacleNorth", yieldsValue: true },
+      block: { name: "obstacleNorth", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
@@ -1929,7 +1929,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleSouth",
       type: "sensors",
-      block: { name: "obstacleSouth", yieldsValue: true },
+      block: { name: "obstacleSouth", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
@@ -1939,7 +1939,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleRight",
       type: "sensors",
-      block: { name: "obstacleRight", yieldsValue: true },
+      block: { name: "obstacleRight", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          var coords = this.coordsInFront(1);
@@ -1950,7 +1950,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "obstacleLeft",
       type: "sensors",
-      block: { name: "obstacleLeft", yieldsValue: true },
+      block: { name: "obstacleLeft", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          var coords = this.coordsInFront(3);
@@ -1961,7 +1961,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "gridEdgeEast",
       type: "sensors",
-      block: { name: "gridEdgeEast", yieldsValue: true },
+      block: { name: "gridEdgeEast", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
@@ -1971,7 +1971,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "gridEdgeWest",
       type: "sensors",
-      block: { name: "gridEdgeWest", yieldsValue: true },
+      block: { name: "gridEdgeWest", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
@@ -1981,7 +1981,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "gridEdgeNorth",
       type: "sensors",
-      block: { name: "gridEdgeNorth", yieldsValue: true },
+      block: { name: "gridEdgeNorth", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
@@ -1991,7 +1991,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "gridEdgeSouth",
       type: "sensors",
-      block: { name: "gridEdgeSouth", yieldsValue: true },
+      block: { name: "gridEdgeSouth", yieldsValue: 'bool' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
@@ -2001,7 +2001,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "platformInFront",
       type: "sensors",
-      block: { name: "platformInFront", yieldsValue: true },
+      block: { name: "platformInFront", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.platformInFront());
       }
@@ -2010,7 +2010,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "platformAbove",
       type: "sensors",
-      block: { name: "platformAbove", yieldsValue: true },
+      block: { name: "platformAbove", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.platformAbove());
       }
@@ -2039,7 +2039,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onObject",
       type: "sensors",
-      block: { name: "onObject", yieldsValue: true },
+      block: { name: "onObject", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
       }
@@ -2048,7 +2048,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onContainer",
       type: "sensors",
-      block: { name: "onContainer", yieldsValue: true },
+      block: { name: "onContainer", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
       }
@@ -2057,7 +2057,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onNumber",
       type: "sensors",
-      block: { name: "onNumber", yieldsValue: true },
+      block: { name: "onNumber", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
       }
@@ -2066,7 +2066,7 @@ var getContext = function(display, infos, curLevel) {
 	infos.newBlocks.push({
       name: "onLauncher",
       type: "sensors",
-      block: { name: "onLauncher", yieldsValue: true },
+      block: { name: "onLauncher", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
       }
@@ -2075,7 +2075,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onWritable",
       type: "sensors",
-      block: { name: "onWritable", yieldsValue: true },
+      block: { name: "onWritable", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
       }
@@ -2114,7 +2114,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "pushableInFront",
       type: "sensors",
-      block: { name: "pushableInFront", yieldsValue: true },
+      block: { name: "pushableInFront", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
       }
@@ -2217,7 +2217,7 @@ var getContext = function(display, infos, curLevel) {
       block: {
          name: "shootCondition_noShadow",
          params: [null],
-         yieldsValue: true
+         yieldsValue: 'bool'
       },
       func: function(value, callback) {
          if((typeof value) == "function") {
@@ -2300,7 +2300,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onMale",
       type: "sensors",
-      block: { name: "onMale", yieldsValue: true },
+      block: { name: "onMale", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
       }
@@ -2309,7 +2309,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "onFemale",
       type: "sensors",
-      block: { name: "onFemale", yieldsValue: true },
+      block: { name: "onFemale", yieldsValue: 'bool' },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
       }

@@ -271,7 +271,7 @@ var getContext = function(display, infos, curLevel) {
                 { name: 'getPixelLuminosity',
                     params: ['Number', 'Number'],
                     params_names: ['x', 'y'],
-                    yieldsValue: true
+                    yieldsValue: 'int'
                 },
                 { name: 'setPixelLuminosity',
                     params: ['Number', 'Number', 'Number'],
@@ -280,12 +280,12 @@ var getContext = function(display, infos, curLevel) {
                 { name: 'width',
                     params: [],
                     params_names: [],
-                    yieldsValue: true
+                    yieldsValue: 'int'
                 },
                 { name: 'height',
                     params: [],
                     params_names: [],
-                    yieldsValue: true
+                    yieldsValue: 'int'
                 },
                 { name: 'printResult',
                     params: ['String'],

@@ -127,7 +127,7 @@ var getContext = function(display, infos) {
                     params_names: ['longitude', 'latitude', 'name']
                 },
                 { name: 'getNbCities',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: [],
                     params_names: []
                 },
@@ -136,7 +136,7 @@ var getContext = function(display, infos) {
                     params_names: ['city_idx_1', 'city_idx_2']
                 },
                 { name: 'getNbRoads',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number'],
                     params_names: ['city_idx']
                 },
@@ -146,17 +146,17 @@ var getContext = function(display, infos) {
                     params_names: ['city_idx']
                 },
                 { name: 'getCityLongitude',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number'],
                     params_names: ['city_idx']
                 },
                 { name: 'getCityLatitude',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number'],
                     params_names: ['city_idx']
                 },
                 { name: 'getRoadLength',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number'],
                     params_names: ['road_idx']
                 },
@@ -165,7 +165,7 @@ var getContext = function(display, infos) {
                     params_names: ['road_idx']
                 },
                 { name: 'getDestinationCity',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number', 'Number'],
                     params_names: ['city_idx', 'road_idx']                    
                 },

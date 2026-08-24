@@ -1561,9 +1561,9 @@ var getContext = function(display, infos) {
                   ['image', 'x', 'y']
                ]
             },
-            { name: "focused", yieldsValue: true }, // must be a value
-            { name: "width", yieldsValue: true }, // must be a value
-            { name: "height", yieldsValue: true } // must be a value
+            { name: "focused", yieldsValue: 'bool' }, // must be a value
+            { name: "width", yieldsValue: 'int' }, // must be a value
+            { name: "height", yieldsValue: 'int' } // must be a value
          ],
          shape_2D: [
             { name: "arc",
@@ -1633,12 +1633,12 @@ var getContext = function(display, infos) {
             { name: "bezierPoint",
                params: ['Number', 'Number', 'Number', 'Number', 'Number'],
                params_names: ['a', 'b', 'c', 'd', 't'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "bezierTangent",
                params: ['Number', 'Number', 'Number', 'Number', 'Number'],
                params_names: ['a', 'b', 'c', 'd', 't'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "curve",
                variants: [
@@ -1657,12 +1657,12 @@ var getContext = function(display, infos) {
             { name: "curvePoint",
                params: ['Number', 'Number', 'Number', 'Number', 'Number'],
                params_names: ['a', 'b', 'c', 'd', 't'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "curveTangent",
                params: ['Number', 'Number', 'Number', 'Number', 'Number'],
                params_names: ['a', 'b', 'c', 'd', 't'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "curveTightness",
                params: ['Number'],
@@ -1800,7 +1800,7 @@ var getContext = function(display, infos) {
                params: [{ options: ["CORNER", "CORNERS", "CENTER"] }],
                params_names: ['mode']
             },
-            { name: "isVisible", yieldsValue: true },
+            { name: "isVisible", yieldsValue: 'bool' },
             { name: "setVisible",
                params: ['Boolean'],
                params_names: ['visible']
@@ -1948,32 +1948,32 @@ var getContext = function(display, infos) {
             { name: "modelX",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "modelY",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "modelZ",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "screenX",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "screenY",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "screenZ",
                params: ['Number', 'Number', 'Number'],
                params_names: ['x', 'y', 'z'],
-               yieldsValue: true
+               yieldsValue: 'int'
             }
          ],
          effect_material: [
@@ -2095,7 +2095,7 @@ var getContext = function(display, infos) {
             { name: "alpha",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "blendColor",
                params: ['Colour', 'Colour', 'BlendConst'],
@@ -2105,12 +2105,12 @@ var getContext = function(display, infos) {
             { name: "blue",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "brightness",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "color",
                variants: [
@@ -2130,12 +2130,12 @@ var getContext = function(display, infos) {
             { name: "green",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "hue",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "lerpColor",
                params: ['Colour', 'Colour', 'Number'],
@@ -2145,12 +2145,12 @@ var getContext = function(display, infos) {
             { name: "red",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             },
             { name: "saturation",
                params: ['Colour'],
                params_names: ['color'],
-               yieldsValue: true
+               yieldsValue: 'int'
             }
          ],
          image_displaying: [
@@ -2327,12 +2327,12 @@ var getContext = function(display, infos) {
             { name: "textWidth",
                params: ['String'],
                params_names: ['text'],
-               yieldsValue: true
+               yieldsValue: 'int'
             }
          ],
          typography_metrics: [
-            { name: "textAscent", yieldsValue: true },
-            { name: "textDescent", yieldsValue: true }
+            { name: "textAscent", yieldsValue: 'int' },
+            { name: "textDescent", yieldsValue: 'int' }
          ]
       }
    };

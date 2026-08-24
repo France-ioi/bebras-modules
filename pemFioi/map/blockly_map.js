@@ -109,17 +109,17 @@ var getContext = function(display, infos) {
                     params_names: ['longitude1', 'latitude1', 'longitude2', 'latitude2', 'opacity']
                 },
                 { name: 'geoDistance',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['Number', 'Number', 'Number', 'Number'],
                     params_names: ['longitude1', 'latitude1', 'longitude2', 'latitude2']
                 },
                 { name: 'getLatitude',
-                    yieldsValue: true,
+                    yieldsValue: 'int',
                     params: ['String'],
                     params_names: ['cityName']
                 },
                 { name: 'getLongitude',
-                  yieldsValue: true,
+                  yieldsValue: 'int',
                     params: ['String'],
                     params_names: ['cityName']
                 },

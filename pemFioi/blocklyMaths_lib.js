@@ -67,24 +67,24 @@ var getContext = function(display, infos, curLevel) {
    context.customBlocks = {
       maths: {
          math: [
-            { name: "abs", params: ['Number'], yieldsValue: true },
-            { name: "acos", params: ['Number'], yieldsValue: true },
-            { name: "asin", params: ['Number'], yieldsValue: true },
-            { name: "atan", params: ['Number'], yieldsValue: true },
-            { name: "atan2", params: ['Number', 'Number'], yieldsValue: true },
-            { name: "ceil", params: ['Number'], yieldsValue: true },
-            { name: "cos", params: ['Number'], yieldsValue: true },
-            { name: "exp", params: ['Number'], yieldsValue: true },
-            { name: "floor", params: ['Number'], yieldsValue: true },
-            { name: "log", params: ['Number'], yieldsValue: true },
-            { name: "max", params: ['Number', 'Number'], yieldsValue: true },
-            { name: "min", params: ['Number', 'Number'], yieldsValue: true },
-            { name: "pow", params: ['Number', 'Number'], yieldsValue: true },
-            { name: "random", yieldsValue: true },
-            { name: "round", params: ['Number'], yieldsValue: true },
-            { name: "sin", params: ['Number'], yieldsValue: true },
-            { name: "sqrt", params: ['Number'], yieldsValue: true },
-            { name: "tan", params: ['Number'], yieldsValue: true }
+            { name: "abs", params: ['Number'], yieldsValue: 'int' },
+            { name: "acos", params: ['Number'], yieldsValue: 'int' },
+            { name: "asin", params: ['Number'], yieldsValue: 'int' },
+            { name: "atan", params: ['Number'], yieldsValue: 'int' },
+            { name: "atan2", params: ['Number', 'Number'], yieldsValue: 'int' },
+            { name: "ceil", params: ['Number'], yieldsValue: 'int' },
+            { name: "cos", params: ['Number'], yieldsValue: 'int' },
+            { name: "exp", params: ['Number'], yieldsValue: 'int' },
+            { name: "floor", params: ['Number'], yieldsValue: 'int' },
+            { name: "log", params: ['Number'], yieldsValue: 'int' },
+            { name: "max", params: ['Number', 'Number'], yieldsValue: 'int' },
+            { name: "min", params: ['Number', 'Number'], yieldsValue: 'int' },
+            { name: "pow", params: ['Number', 'Number'], yieldsValue: 'int' },
+            { name: "random", yieldsValue: 'int' },
+            { name: "round", params: ['Number'], yieldsValue: 'int' },
+            { name: "sin", params: ['Number'], yieldsValue: 'int' },
+            { name: "sqrt", params: ['Number'], yieldsValue: 'int' },
+            { name: "tan", params: ['Number'], yieldsValue: 'int' }
          ]
       }
       // We can add multiple namespaces by adding other keys to customBlocks.
