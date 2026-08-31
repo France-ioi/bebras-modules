@@ -24,7 +24,9 @@ var languageNames = {
    jvs: 'JavaScool',
    pseudo: 'Pseudo-code',
    blockly: 'Blockly',
-   scrtach: 'Scratch'
+   scratch: 'Scratch',
+   c_cpp: 'C / C++',
+   java_jvs: 'Java / JavaScool',
 };
 
 task.showViews = function (views, success, error) {
@@ -196,12 +198,14 @@ function loadAceEditor(element, lang, source) {
    var aceEditor = ace.edit(element);
 
    var modeMatching = {
-      python:  'python',
+      python: 'python',
       c: 'c_cpp',
       cpp: 'c_cpp',
+      c_cpp: 'c_cpp',
       java: 'java',
       pascal: 'pascal',
       jvs: 'java',
+      java_jvs: 'java',
       ocaml: 'ocaml',
       pseudo: 'plain_text',
       blockly: 'plain_text',
