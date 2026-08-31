@@ -196,7 +196,7 @@ function loadAceEditor(element, lang, source) {
    var aceEditor = ace.edit(element);
 
    var modeMatching = {
-      python: 'python',
+      python:  'python',
       c: 'c_cpp',
       cpp: 'c_cpp',
       java: 'java',
