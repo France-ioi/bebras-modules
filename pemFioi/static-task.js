@@ -238,12 +238,28 @@ function isLocalStorageEnabled() {
    }
 }
 
+function replaceScriptWithDiv(script) {
+   var div = document.createElement('div');
+   for (var attribute of script.attributes) {
+      if ('type' === attribute.name) { continue; }
+      div.setAttribute(attribute.name, attribute.value);
+   }
+   script.parentNode.replaceChild(div, script);
+   return div;
+}
+
 function displayCodeSnippets() {
    var elements = document.querySelectorAll('[data-show-source]');
    for (var element of elements) {
       var lang = element.getAttribute('data-lang') || element.getAttribute('data-always-show-lang');
       var source = element.getAttribute('data-code');
       var previousInnerHTML = element.innerHTML;
+      if ('SCRIPT' === element.tagName) {
+         if (!source) {
+            source = element.textContent.replace(/^\n+/, '').replace(/\s+$/, '');
+         }
+         element = replaceScriptWithDiv(element);
+      }
       element.innerHTML = '<div class="code-block code" style="margin-bottom: 20px;"><div class="code-header">' + languageNames[lang] + '</div><div class="editor"><div class="inside-editor"></div></div></div>';
       if (source) {
          loadAceEditor(element.querySelector('.inside-editor'), lang, source);
