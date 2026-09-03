@@ -95,6 +95,100 @@ var getContext = function(display, infos) {
             messages: {
                 clickCanvas: 'Veuillez cliquer sur la zone de dessin'
             }
+        },
+        nl: {
+            categories: {
+                draw: 'Tekenen',
+                control: 'Besturing'
+            },
+            label: {
+                setPoint: 'setPoint(%1, %2, %3)',
+                addString: 'addString(%1, %2, %3, %4)',
+                addLine: 'addLine(%1, %2, %3, %4, %5)',
+                addCircle: 'addCircle(%1, %2, %3, %4)',
+                waitForClick: 'waitForClick()',
+                getX: 'getX()',
+                getY: 'getY()',
+                reset: 'reset()',
+                resetSize: 'resetSize(%1, %2)'
+            },
+            code: {
+                setPoint: 'setPoint',
+                addString: 'addString',
+                addLine: 'addLine',
+                addCircle: 'addCircle',
+                waitForClick: 'waitForClick',
+                getX: 'getX',
+                getY: 'getY',
+                reset: 'reset',
+                resetSize: 'resetSize',
+            },
+            description: {
+                setPoint: 'setPoint(x, y, c) Voeg punt (x,y) toe aan een kromme aangeduid door c (er is één kromme per kleur).\n' +
+                    'Elke kromme is een reeks punten verbonden door segmenten.\n'+
+                    'x is een float tussen -width en width\n'+
+                    'y is een float tussen -height en height\n '+
+                    'c duidt zowel de kleur als de kromme aan waaraan het punt wordt toegevoegd.',
+                addString: 'addString(x, y, s, c) Voegt de tekst s toe op positie x,y met kleur c',
+                addLine: 'addLine(x1, y1, x2, y2, c) Voegt een lijn toe tussen de punten (x1, y1) en (x2, y2) met kleur c',
+                addCircle: 'addCircle(x, y, r, c) Voegt een cirkel toe met middelpunt (x,y), straal r en kleur c',
+                waitForClick: 'waitForClick() Wacht op een klik en slaat daarna de coördinaten x en y van de klik op',
+                getX: 'getX() Geeft de X-coördinaat van de laatste klik waarop gewacht werd met waitForClick',
+                getY: 'getY() Geeft de Y-coördinaat van de laatste klik waarop gewacht werd met waitForClick',
+                reset: 'reset() Wis alles. Breedte en hoogte worden teruggezet op 1 (de standaardwaarde)',
+                resetSize: 'resetSize(w,h) Wis alles. Breedte wordt w, hoogte wordt h',
+            },
+            startingBlockName: "Programma",
+            messages: {
+                clickCanvas: 'Klik op het tekenvlak'
+            }
+        },
+        de: {
+            categories: {
+                draw: 'Zeichnen',
+                control: 'Steuerung'
+            },
+            label: {
+                setPoint: 'setPoint(%1, %2, %3)',
+                addString: 'addString(%1, %2, %3, %4)',
+                addLine: 'addLine(%1, %2, %3, %4, %5)',
+                addCircle: 'addCircle(%1, %2, %3, %4)',
+                waitForClick: 'waitForClick()',
+                getX: 'getX()',
+                getY: 'getY()',
+                reset: 'reset()',
+                resetSize: 'resetSize(%1, %2)'
+            },
+            code: {
+                setPoint: 'setPoint',
+                addString: 'addString',
+                addLine: 'addLine',
+                addCircle: 'addCircle',
+                waitForClick: 'waitForClick',
+                getX: 'getX',
+                getY: 'getY',
+                reset: 'reset',
+                resetSize: 'resetSize',
+            },
+            description: {
+                setPoint: 'setPoint(x, y, c) Fügt den Punkt (x,y) zu einer Kurve mit Kennung c hinzu (eine Kurve pro Farbe).\n' +
+                    'Jede Kurve ist eine Folge von Punkten, die durch Segmente verbunden sind.\n'+
+                    'x ist eine Gleitkommazahl zwischen -width und width\n'+
+                    'y ist eine Gleitkommazahl zwischen -height und height\n '+
+                    'c kennzeichnet sowohl die Farbe als auch die Kurve, zu der der Punkt hinzugefügt wird.',
+                addString: 'addString(x, y, s, c) Fügt den Text s an Position x,y mit Farbe c hinzu',
+                addLine: 'addLine(x1, y1, x2, y2, c) Fügt eine Linie zwischen den Punkten (x1, y1) und (x2, y2) mit Farbe c hinzu',
+                addCircle: 'addCircle(x, y, r, c) Fügt einen Kreis mit Mittelpunkt (x,y), Radius r und Farbe c hinzu',
+                waitForClick: 'waitForClick() Wartet auf einen Klick und speichert danach die Koordinaten x und y des Klicks',
+                getX: 'getX() Gibt die X-Koordinate des letzten mit waitForClick abgewarteten Klicks zurück',
+                getY: 'getY() Gibt die Y-Koordinate des letzten mit waitForClick abgewarteten Klicks zurück',
+                reset: 'reset() Löscht alles. Breite und Höhe werden wieder auf 1 gesetzt (Standardwert)',
+                resetSize: 'resetSize(w,h) Löscht alles. Breite wird auf w, Höhe auf h gesetzt',
+            },
+            startingBlockName: "Programm",
+            messages: {
+                clickCanvas: 'Bitte auf die Zeichenfläche klicken'
+            }
         }
     }
 

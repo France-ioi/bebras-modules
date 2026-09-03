@@ -28,6 +28,12 @@ var getContext = function(display, infos, curLevel) {
          messages: {},
          description: {}
       },
+      nl: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
+      },
       es: {
          label: {},
          code: {},
@@ -396,6 +402,201 @@ var getContext = function(display, infos, curLevel) {
                east: "East"
             },
             startingBlockName: "Program of the robot"
+         },
+         nl: {
+            label: {
+               row: "rij van de robot",
+               col: "kolom van de robot",
+               wait: "wachten",
+               north: "beweeg omhoog",
+               south: "beweeg omlaag",
+               east: "beweeg naar rechts",
+               west: "beweeg naar links",
+               left: "draai naar links",
+               right: "draai naar rechts",
+               turnAround: "draai om",
+               forward: "beweeg vooruit",
+               backwards: "beweeg achteruit",
+               jump: "spring",
+               obstacleInFront: "obstakel voor",
+               obstacleEast: "obstakel rechts",
+               obstacleWest: "obstakel links",
+               obstacleNorth: "obstakel boven",
+               obstacleSouth: "obstakel onder",
+               obstacleRight: "obstakel rechts",
+               obstacleLeft: "obstakel links",
+               gridEdgeEast: "rand van het rooster rechts",
+               gridEdgeWest: "rand van het rooster links",
+               gridEdgeNorth: "rand van het rooster boven",
+               gridEdgeSouth: "rand van het rooster onder",
+               platformInFront: "platform voor",
+               platformAbove: "platform boven",
+               withdrawObject: "raap het object op",
+               dropObject: "leg het object neer",
+               onObject: "op een object",
+               onContainer: "op een container",
+               onExit: "op een uitgang",
+               onNumber: "op een nummer",
+               onWritable: "op een bord",
+               onLauncher: "op een laserlanceerder",
+               writeNumber: "schrijf het nummer",
+               readNumber: "nummer van het vakje",
+               pushObject: "duw het object",
+               pushableInFront: "duwbaar object voor",
+               dropNum: "leg %1 objecten neer",
+               dropNum_noShadow: "leg %1 objecten neer",
+               nbWithdrawables: "aantal objecten op het vakje",
+               nbInBag: "aantal objecten in de zak",
+               containerSize: "aantal neer te leggen objecten op het vakje",
+               withdrawNum: "raap %1 objecten op",
+               withdrawNum_noShadow: "raap %1 objecten op",
+               shoot: "schiet een laser in richting %1",
+               shoot_noShadow: "schiet een laser in richting %1",
+               shootCondition: "laserschot keert terug naar startpunt in richting %1",
+               shootCondition_noShadow: "laserschot keert terug naar startpunt in richting %1",
+               connect: "sluit een kabel aan",
+               onMale: "op een mannelijke stekker",
+               onFemale: "op een vrouwelijke stekker",
+               dropPlatformInFront: "bouw een platform voor",
+               dropPlatformAbove: "bouw een platform boven"
+            },
+            code: {
+               row: "rijRobot",
+               col: "kolomRobot",
+               wait: "wachten",
+               north: "omhoog",
+               south: "omlaag",
+               east: "rechts",
+               west: "links",
+               left: "draaiLinks",
+               right: "draaiRechts",
+               turnAround: "draaiOm",
+               forward: "vooruit",
+               backwards: "achteruit",
+               jump: "spring",
+               obstacleInFront: "obstakelVoor",
+               obstacleEast: "obstakelRechts",
+               obstacleWest: "obstakelLinks",
+               obstacleNorth: "obstakelBoven",
+               obstacleSouth: "obstakelOnder",
+               obstacleRight: "obstakelRechtsRel",
+               obstacleLeft: "obstakelLinksRel",
+               gridEdgeEast: "roosterrandRechts",
+               gridEdgeWest: "roosterrandLinks",
+               gridEdgeNorth: "roosterrandBoven",
+               gridEdgeSouth: "roosterrandOnder",
+               platformInFront: "platformVoor",
+               platformAbove: "platformBoven",
+               withdrawObject: "objectOprapen",
+               dropObject: "objectNeerleggen",
+               onObject: "opObject",
+               onContainer: "opContainer",
+               onNumber: "opNummer",
+               onWritable: "opBord",
+               onLauncher: "opLanceerder",
+               writeNumber: "schrijfNummer",
+               readNumber: "nummerOpVakje",
+               pushObject: "duwObject",
+               pushableInFront: "duwbaarVoor",
+               dropNum: "neerleggen",
+               dropNum_noShadow: "neerleggen",
+               containerSize: "aantalObjectenNeerTeLeggen",
+               nbInBag: "aantalObjectenInZak",
+               nbWithdrawables: "aantalObjectenOp",
+               withdrawNum: "oprapen",
+               withdrawNum_noShadow: "oprapen",
+               shoot: "schietLaser",
+               shoot_noShadow: "schietLaser",
+               shootCondition: "schietOpVoorwaarde",
+               shootCondition_noShadow: "schietOpVoorwaarde",
+               connect: "verbindKabel",
+               onMale: "opMannelijkeStekker",
+               onFemale: "opVrouwelijkeStekker",
+               dropPlatformInFront: "bouwPlatformVoor",
+               dropPlatformAbove: "bouwPlatformBoven"
+            },
+            description: {
+               forward: "vooruit() beweegt de robot een vakje vooruit",
+               backwards: "achteruit() beweegt de robot een vakje achteruit",
+               left: "draaiLinks() draait de robot een kwartslag naar links",
+               right: "draaiRechts() draait de robot een kwartslag naar rechts",
+               row: "rijRobot() geeft het rijnummer van de robot terug",
+               col: "kolomRobot() geeft het kolomnummer van de robot terug",
+               turnAround: "draaiOm() laat de robot omdraaien",
+               east: "rechts() verplaatst de robot een vakje naar rechts",
+               west: "links() verplaatst de robot een vakje naar links",
+               north: "omhoog() verplaatst de robot een vakje omhoog",
+               south: "omlaag() verplaatst de robot een vakje omlaag",
+               shoot: "schietLaser(richting) laat de robot een laserstraal afvuren in de opgegeven richting",
+               shoot_noShadow: "schietLaser() laat de robot een laserstraal afvuren in de opgegeven richting",
+               readNumber: "nummerOpVakje() sensor die het nummer leest op het vakje waar de robot staat",
+               writeNumber: "schrijfNummer(nummer) schrijft het nummer uit de parameter op het vakje van de robot",
+               withdrawObject: "objectOprapen() raapt het object op het vakje van de robot op",
+               dropObject: "objectNeerleggen() legt het object neer op het vakje van de robot",
+               platformInFront: "platformVoor() test of er een platform voor de robot is",
+               platformAbove: "platformBoven() test of er een platform boven de robot is",
+               dropPlatformInFront: "bouwPlatformVoor() bouwt een platform op het vakje voor de robot",
+               jump: "spring() laat de robot op het platform vlak boven hem springen"
+            },
+            messages: {
+               leavesGrid: "De robot verlaat het rooster!",
+               obstacle: "De robot probeert naar een obstakel te bewegen!",
+               nothingToPickUp: "Er is niets om op te rapen!",
+               nothingToLookAt: "Er is geen kaart of container op dit vakje",
+               falls: "De robot gaat in de leegte vallen",
+               willFallAndCrash: "De robot gaat van een hoogte vallen en neerstorten!",
+               jumpOutsideGrid: "De robot probeert buiten het rooster te springen!",
+               jumpObstacleBlocking: "De robot probeert te springen, maar een obstakel blokkeert hem",
+               jumpNoPlatform: "De robot probeert te springen, maar er is geen platform boven!",
+               tooManyObjects: "De robot probeert te veel objecten tegelijk te dragen!",
+               emptyBag: "De robot probeert een object neer te leggen terwijl hij er geen draagt!",
+               successReachExit: "Gefeliciteerd, je robot heeft de uitgang bereikt!",
+               failureReachExit: "Je robot heeft de uitgang niet bereikt.",
+               successPickedAllWithdrawables: "Gefeliciteerd, je robot heeft alles opgeraapt!",
+               failurePickedAllWithdrawables: "Je robot heeft niet alles opgeraapt.",
+               successContainersFilled: "Gefeliciteerd, je robot heeft elke container gevuld",
+               failureContainersFilled: "Er ligt een object buiten de containers",
+               failureContainersFilledLess: "Je robot heeft niet elke container gevuld",
+               failureContainersFilledBag: "Je robot heeft niet alle objecten neergelegd",
+               failureUnfilteredObject: "Je robot heeft een ongeldig object opgeraapt",
+               failureTooManyMoves: "Je robot heeft te veel verplaatsingen gedaan.",
+               failureWriteHere: "Je robot kan hier niet schrijven!",
+               failureReadHere: "Er staat hier geen nummer!",
+               successNumbersWritten: "Gefeliciteerd, je robot heeft alle juiste nummers geschreven!",
+               failureNumbersWritten: "Je robot heeft niet de juiste nummers geschreven!",
+               failureMissingNumber: "De robot heeft niet alle nummers geschreven.",
+               failureNothingToPush: "Er is geen object om te duwen!",
+               failureWhilePushing: "De robot kan dit object niet duwen!",
+               failureDropObject: "Je kunt hier geen object neerleggen",
+               failureDropPlatform: "Er is hier al een platform",
+               failureDropWater: "Er is hier al water",
+               failureDropToken: "Er is hier al een fiche",
+               failureDropOutside: "Je robot probeert een object buiten het rooster neer te leggen",
+               failureNotEnoughPlatform: "Niet genoeg platforms",
+               failureLights: "Er blijven nog lampen aan te steken.",
+               successLights: "Gefeliciteerd, je robot heeft alle lampen aangezet!",
+               failureLaser: "De robot moet op een laserlanceerder staan om te kunnen schieten!",
+               failureNoPlug: "De robot moet op een stekker staan om een kabel aan te sluiten!",
+               failureAlreadyWired: "Deze stekker is al verbonden met een kabel!",
+               failureWrongPlugType: "Je kunt deze stekkers niet met elkaar verbinden!",
+               successPlugsWired: "De machine is hersteld!",
+               failurePlugsWired: "De machine werkt niet omdat sommige stekkers niet zijn aangesloten!",
+               failureWireCrossing: "Onmogelijk om deze twee stekkers te verbinden: twee kabels zouden elkaar kruisen!",
+               failureWireTooLong: "Onmogelijk om deze twee stekkers te verbinden: ze liggen te ver uit elkaar!",
+               failureTotalLengthExceeded: "Je hebt niet genoeg kabellengte om deze twee stekkers te verbinden!",
+               failureProjectile: "De robot is geraakt door een projectiel!",
+               failureRewrite: "De robot probeerde een vakje opnieuw te kleuren.",
+               noContainer: "Er is hier geen container!",
+               failureLineBreak: "De robot kan niet van rij veranderen.",
+               failureFuse: "De robot heeft op een zekering geschoten!"
+            },
+            cardinals: {
+               north: "Noord",
+               south: "Zuid",
+               west: "West",
+               east: "Oost"
+            },
+            startingBlockName: "Programma van de robot"
          },
          
          es: {
@@ -823,6 +1024,20 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Yout robot got lost."
             }
          },
+         nl: {
+            messages: {
+               obstacle: "De robot gaat het gemarkeerde parcours verlaten!",
+               successReachExit: "Bravo, je robot heeft de kist opgehaald!",
+               failureReachExit: "Je robot is onderweg verdwaald."
+            }
+         },
+         de: {
+            messages: {
+               obstacle: "Der Roboter wird die markierte Strecke verlassen!",
+               successReachExit: "Bravo, dein Roboter hat die Truhe geholt!",
+               failureReachExit: "Dein Roboter hat sich verlaufen."
+            }
+         },
 
          es: {
             messages: {
@@ -860,6 +1075,36 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Some cards are misplaced",
                failureContainersFilledLess: "There are still misplaced cards.",
                failureContainersFilledBag: "Your robot must drop its card."
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de kaart oprapen",
+               dropObject: "de kaart neerleggen",
+               onObject: "op een kaart",
+               onContainer: "op een neerlegplaats",
+            },
+             messages: {
+               successContainersFilled: "Bravo, je robot heeft de kaarten op de juiste plaats gelegd!",
+               successContainersFilledSingular: "Bravo, je robot heeft de kaart op de juiste plaats gelegd!",
+               failureContainersFilled: "Er liggen kaarten verkeerd",
+               failureContainersFilledLess: "Er zijn nog kaarten om op te bergen.",
+               failureContainersFilledBag: "Je robot moet zijn kaart neerleggen."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "die Karte aufheben",
+               dropObject: "die Karte ablegen",
+               onObject: "auf einer Karte",
+               onContainer: "auf einem Ablageplatz",
+            },
+             messages: {
+               successContainersFilled: "Bravo, dein Roboter hat die Karten am richtigen Ort abgelegt!",
+               successContainersFilledSingular: "Bravo, dein Roboter hat die Karte am richtigen Ort abgelegt!",
+               failureContainersFilled: "Einige Karten liegen falsch",
+               failureContainersFilledLess: "Es sind noch Karten einzusortieren.",
+               failureContainersFilledBag: "Dein Roboter muss seine Karte ablegen."
             }
          },
 
@@ -932,6 +1177,62 @@ var getContext = function(display, infos, curLevel) {
                emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
             }
          },
+         nl: {
+            label: {
+               withdrawObject: "het hout oprapen",
+               dropObject: "het hout neerleggen",
+               onObject: "op hout",
+               onContainer: "op een schoorsteen"
+            },
+            code: {
+               withdrawObject: "raapHoutOp",
+               dropObject: "legHoutNeer",
+               onObject: "opHout",
+               onContainer: "opSchoorsteen"
+            },
+            messages: {
+               successContainersFilled: "Bravo, het kasteel is goed verwarmd!",
+               successContainersFilledSingular: "Bravo, er brandt een goed vuur in de schoorsteen!",
+               failureContainersFilled: "Je robot heeft niet in alle schoorstenen hout gelegd.",
+               failureContainersFilledSingular: "Je robot heeft het hout niet in de schoorsteen gelegd.",
+               failureContainersFilledLess: "Je robot heeft niet in alle schoorstenen hout gelegd.",
+               failureContainersFilledLessSingular: "Je robot heeft het hout niet in de schoorsteen gelegd.",
+               failureContainersFilledBag: "Je robot moet het hout in de schoorsteen leggen.",
+               failureDropOutside: "Je robot probeert een platform buiten het rooster te bouwen.",
+               failureDropObject: "De robot probeert hout neer te leggen terwijl er al hout in deze schoorsteen ligt!",
+               failureDropPlatform: "Er is hier al een platform!",
+               emptyBag: "De robot probeert hout neer te leggen terwijl hij er geen draagt!",
+               tooManyObjects: "De robot probeert te veel hout tegelijk te dragen!"
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "das Holz aufheben",
+               dropObject: "das Holz ablegen",
+               onObject: "auf Holz",
+               onContainer: "auf einem Kamin"
+            },
+            code: {
+               withdrawObject: "holzAufheben",
+               dropObject: "holzAblegen",
+               onObject: "aufHolz",
+               onContainer: "aufKamin"
+            },
+            messages: {
+               successContainersFilled: "Bravo, das Schloss ist gut geheizt!",
+               successContainersFilledSingular: "Bravo, im Kamin brennt ein gutes Feuer!",
+               failureContainersFilled: "Dein Roboter hat nicht in alle Kamine Holz gelegt.",
+               failureContainersFilledSingular: "Dein Roboter hat das Holz nicht in den Kamin gelegt.",
+               failureContainersFilledLess: "Dein Roboter hat nicht in alle Kamine Holz gelegt.",
+               failureContainersFilledLessSingular: "Dein Roboter hat das Holz nicht in den Kamin gelegt.",
+               failureContainersFilledBag: "Dein Roboter muss das Holz in den Kamin legen.",
+               failureDropOutside: "Dein Roboter versucht, eine Plattform außerhalb des Gitters zu bauen.",
+               failureDropObject: "Der Roboter versucht Holz abzulegen, obwohl in diesem Kamin bereits Holz liegt!",
+               failureDropPlatform: "Hier ist bereits eine Plattform!",
+               emptyBag: "Der Roboter versucht Holz abzulegen, ohne welches zu tragen!",
+               tooManyObjects: "Der Roboter versucht, zu viel Holz auf einmal zu tragen!"
+            }
+         },
 
          es: {
             label: {
@@ -974,6 +1275,24 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Your robot didn't reach the green cell."
             }
          },
+         nl: {
+            label: {
+               
+            },
+             messages: {
+               successPickedAllWithdrawables: "Bravo, je robot heeft de opdracht volbracht!",
+               failureReachExit: "Je robot heeft het groene vakje niet bereikt."
+            }
+         },
+         de: {
+            label: {
+               
+            },
+             messages: {
+               successPickedAllWithdrawables: "Bravo, dein Roboter hat die Mission geschafft!",
+               failureReachExit: "Dein Roboter hat das grüne Feld nicht erreicht."
+            }
+         },
 
          es: {
             label: {
@@ -1002,6 +1321,24 @@ var getContext = function(display, infos, curLevel) {
              messages: {
                successReachExit: "Congratulations, your robot reached the green cells!",
                failureReachExit: "Your robot didn't reach the green cell."
+            }
+         },
+         nl: {
+            label: {
+               
+            },
+             messages: {
+               successReachExit: "Bravo, je robot heeft het groene vakje bereikt!",
+               failureReachExit: "Je robot heeft het groene vakje niet bereikt."
+            }
+         },
+         de: {
+            label: {
+               
+            },
+             messages: {
+               successReachExit: "Bravo, dein Roboter hat das grüne Feld erreicht!",
+               failureReachExit: "Dein Roboter hat das grüne Feld nicht erreicht."
             }
          },
 
@@ -1047,6 +1384,38 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                successContainersFilled: "Congratulations, your robot dropped cones on the marked cells!",
                failureContainersFilled: "Some cones are missing or are misplaced."
+            }
+         },
+         nl: {
+            label: {
+               dropObject: "een pion neerzetten",
+               onContainer: "op een gemarkeerd vakje",
+               obstacleInFront: "pion voor"
+            },
+            code: {
+               dropObject: "zetPionNeer",
+               onContainer: "opGemarkeerdVakje",
+               obstacleInFront: "pionVoor"
+            },
+            messages: {
+               successContainersFilled: "Bravo, je robot heeft pionnen op de juiste vakjes gezet!",
+               failureContainersFilled: "Er ontbreken pionnen of ze staan niet op de juiste plaats."
+            }
+         },
+         de: {
+            label: {
+               dropObject: "einen Kegel ablegen",
+               onContainer: "auf einem markierten Feld",
+               obstacleInFront: "Kegel davor"
+            },
+            code: {
+               dropObject: "kegelAblegen",
+               onContainer: "aufMarkiertemFeld",
+               obstacleInFront: "kegelDavor"
+            },
+            messages: {
+               successContainersFilled: "Bravo, dein Roboter hat Kegel auf die richtigen Felder gelegt!",
+               failureContainersFilled: "Es fehlen Kegel oder sie stehen falsch."
             }
          },
 
@@ -1111,6 +1480,54 @@ var getContext = function(display, infos, curLevel) {
 					obstacle: "Be careful, there's a flower!",
             }
          },
+         nl: {
+            label: {
+               dropObject: "een zaadje zaaien",
+               onContainer: "aarde op het vakje",
+               obstacleInFront: "bloem voor"
+            },
+            code: {
+               dropObject: "zaaiZaadje",
+               onContainer: "aardeOpVakje",
+               obstacleInFront: "bloemVoor"
+            },
+            description: {
+               dropObject: "zaaiZaadje() zaait een zaadje op het vakje van de robot",
+               onContainer: "aardeOpVakje() geeft aan of er aarde op het vakje van de robot is",
+               obstacleInFront: "bloemVoor() geeft aan of er een bloem op het vakje voor de robot is"
+            },
+            messages: {
+               successContainersFilled: "Bravo, je robot is een goede tuinier!",
+               failureContainersFilled: "Je robot heeft buiten de aardeszones gezaaid.",
+               failureContainersFilledLess: "Er is nog aarde zonder bloem!",
+               failureDropObject: "Er staat hier al een bloem!",
+               obstacle: "Let op de bloem!",
+            }
+         },
+         de: {
+            label: {
+               dropObject: "einen Samen säen",
+               onContainer: "Erde auf dem Feld",
+               obstacleInFront: "Blume davor"
+            },
+            code: {
+               dropObject: "samenSaeen",
+               onContainer: "erdeAufFeld",
+               obstacleInFront: "blumeDavor"
+            },
+            description: {
+               dropObject: "samenSaeen() sät einen Samen auf das Feld des Roboters",
+               onContainer: "erdeAufFeld() prüft, ob sich Erde auf dem Feld des Roboters befindet",
+               obstacleInFront: "blumeDavor() prüft, ob sich eine Blume auf dem Feld vor dem Roboter befindet"
+            },
+            messages: {
+               successContainersFilled: "Bravo, dein Roboter ist ein guter Gärtner!",
+               failureContainersFilled: "Dein Roboter hat außerhalb der Erde gesät.",
+               failureContainersFilledLess: "Es ist noch Erde ohne Blume übrig!",
+               failureDropObject: "Hier ist bereits eine Blume!",
+               obstacle: "Vorsicht, eine Blume!",
+            }
+         },
 
          es: {
             label: {
@@ -1144,6 +1561,20 @@ var getContext = function(display, infos, curLevel) {
                successReachExit: "Congratulations, the robot reached the flag!",
                failureReachExit: "The robot didn't reach the flag.",
                obstacle: "The robot is attemting to run into a bush!"
+            }
+         },
+         nl: {
+            messages: {
+               successReachExit: "Bravo, de robot heeft de vlag bereikt!",
+               failureReachExit: "De robot is niet op het vakje van de vlag aangekomen.",
+               obstacle: "De robot probeert in een struik te rijden!"
+            }
+         },
+         de: {
+            messages: {
+               successReachExit: "Bravo, der Roboter hat die Flagge erreicht!",
+               failureReachExit: "Der Roboter ist nicht auf dem Flaggenfeld angekommen.",
+               obstacle: "Der Roboter versucht, in einen Busch zu fahren!"
             }
          },
 
@@ -1187,6 +1618,42 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                "successPickedAllWithdrawables": "Congratulations, the robot picked all the requested dominoes!",
                "failurePickedAllWithdrawables": "The robot didn't pick up the requested dominoes!"
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de domino oprapen",
+               onObject: "op een domino"
+            },
+            code: {
+               withdrawObject: "raapDominoOp",
+               onObject: "opDomino"
+            },
+            description: {
+               withdrawObject: "raapDominoOp() raapt de domino op het vakje van de robot op",
+               onObject: "opDomino() test of de robot op het vakje van een domino staat"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, de robot heeft alle gevraagde domino's opgeraapt!",
+               "failurePickedAllWithdrawables": "De robot heeft de gevraagde domino's niet opgeraapt."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "den Domino aufheben",
+               onObject: "auf einem Domino"
+            },
+            code: {
+               withdrawObject: "dominoAufheben",
+               onObject: "aufDomino"
+            },
+            description: {
+               withdrawObject: "dominoAufheben() hebt den Domino auf dem Feld des Roboters auf",
+               onObject: "aufDomino() prüft, ob der Roboter auf einem Dominofeld steht"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, der Roboter hat alle geforderten Dominos aufgehoben!",
+               "failurePickedAllWithdrawables": "Der Roboter hat die geforderten Dominos nicht aufgehoben."
             }
          },
          es: {
@@ -1678,6 +2145,66 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "There is no box to push here!",
                failureWhilePushing: "The robot can't push here!",
                obstacle: "The robot is trying to move into a wall or a box!"
+            }
+         },
+         nl: {
+            label: {
+               pushObject: "de kist duwen",
+               onContainer: "op een gemarkeerd vakje",
+               pushableInFront: "kist voor",
+               obstacleInFront: "obstakel voor",
+               readNumber: "nummer van het vakje"
+            },
+            code: {
+               pushObject: "duwKist",
+               onContainer: "opGemarkeerdVakje",
+               pushableInFront: "kistVoor",
+               obstacleInFront: "obstakelVoor",
+               readNumber: "nummerOpVakje"
+            },
+            description: {
+               onContainer: "opGemarkeerdVakje() geeft aan of de robot op een gemarkeerd vakje staat",
+               pushableInFront: "kistVoor() geeft aan of de robot vlak voor een kist staat",
+               pushObject: "duwKist() laat de robot vooruitgaan terwijl hij de kist ervoor duwt",
+            },
+            messages: {
+               successContainersFilled: "Bravo, de kisten staan goed!",
+               successContainersFilledSingular: "Bravo, de kist staat goed!",
+               failureContainersFilled: "Er zijn nog kisten die niet op hun plaats staan.",
+               failureContainersFilledSingular: "De kist staat niet op haar plaats!",
+               failureNothingToPush: "Er is hier geen kist om te duwen!",
+               failureWhilePushing: "De robot kan hier niet duwen!",
+               obstacle: "De robot probeert tegen een muur of een kist te rijden!"
+            }
+         },
+         de: {
+            label: {
+               pushObject: "die Kiste schieben",
+               onContainer: "auf einem markierten Feld",
+               pushableInFront: "Kiste davor",
+               obstacleInFront: "Hindernis davor",
+               readNumber: "Zahl auf dem Feld"
+            },
+            code: {
+               pushObject: "kisteSchieben",
+               onContainer: "aufMarkiertemFeld",
+               pushableInFront: "kisteDavor",
+               obstacleInFront: "hindernisDavor",
+               readNumber: "zahlAufFeld"
+            },
+            description: {
+               onContainer: "aufMarkiertemFeld() gibt an, ob der Roboter auf einem markierten Feld steht",
+               pushableInFront: "kisteDavor() gibt an, ob der Roboter direkt vor einer Kiste steht",
+               pushObject: "kisteSchieben() bewegt den Roboter vorwärts und schiebt die Kiste davor",
+            },
+            messages: {
+               successContainersFilled: "Bravo, die Kisten sind richtig platziert!",
+               successContainersFilledSingular: "Bravo, die Kiste ist richtig platziert!",
+               failureContainersFilled: "Es gibt noch Kisten, die nicht an ihrem Platz stehen.",
+               failureContainersFilledSingular: "Die Kiste steht nicht an ihrem Platz!",
+               failureNothingToPush: "Hier gibt es keine Kiste zum Schieben!",
+               failureWhilePushing: "Der Roboter kann hier nicht schieben!",
+               obstacle: "Der Roboter versucht, in eine Wand oder eine Kiste zu fahren!"
             }
          },
 
