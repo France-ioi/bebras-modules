@@ -231,6 +231,236 @@ var getContext = function(display, infos, curLevel) {
                     'renderer_html_rows_limit': 'Seuls les %1 premiers enregistrements sont affichés'
                 }
             }
+        },
+        nl: {
+            categories: {
+                database: 'Database',
+                histogram: 'Histogrammen'
+            },
+            label: {
+                loadTable: 'laad tabel(%1)',
+                loadTableFromCsv: 'laad tabel uit csv(%1)',
+                loadTableFromCsvWithTypes: 'laad tabel met types uit csv(%1, %2)',
+                getRecords: 'getRecords(%1)',
+                selectByColumn: 'filter op kolom(%1, %2, %3)',
+                selectByFunction: 'filter op functie(%1, %2)',
+                selectTopRows: 'selecteer bovenste rijen(%1, %2)',
+                getColumn: 'getColumn(%1, %2)',
+                sortByColumn: 'sorteer op kolom(%1, %2, %3)',
+                sortByFunction: 'sortByFunction(%1, %2)',
+                selectColumns: 'selecteer kolommen(%1, %2)',
+                joinTables: 'verbind tabellen(%1, %2, %3, %4, %5)',
+                displayTable: 'toon tabel(%1)',
+                updateWhere: 'updateWhere(%1, %2, %3)',
+                insertRecord: 'voeg record toe(%1, %2)',
+                unionTables: 'unionTables(%1, %2)',
+                displayRecord: 'toon record(%1)',
+                displayTableOnMap: 'toon tabel op kaart(%1, %2, %3, %4)',
+                printConsole: 'schrijf naar console(%1)',
+                displayTableOnGraph: 'toon tabel op grafiek(%1, %2, %3, %4, %5)',
+                displayTablesOnGraph: 'toon tabellen op grafiek(%1, %2, %3, %4, %5, %6, %7)',
+                initHistogram: 'initHistogram(%1, %2)',
+                setHistogramBar: 'setHistogramBar(%1, %2, %3)'
+            },
+            code: {
+                loadTable: 'loadTable',
+                loadTableFromCsv: 'loadTableFromCsv',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
+                getRecords: 'getRecords',
+                selectByColumn: 'selectByColumn',
+                selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
+                getColumn: 'getColumn',
+                sortByColumn: 'sortByColumn',
+                sortByFunction: 'sortByFunction',
+                selectColumns: 'selectColumns',
+                joinTables: 'joinTables',
+                displayTable: 'displayTable',
+                updateWhere: 'updateWhere',
+                insertRecord: 'insertRecord',
+                unionTables: 'unionTables',
+                displayRecord: 'displayRecord',
+                displayTableOnMap: 'displayTableOnMap',
+                printConsole: 'printConsole',
+                displayTableOnGraph: 'displayTableOnGraph',
+                displayTablesOnGraph: 'displayTablesOnGraph',
+                initHistogram: 'initHistogram',
+                setHistogramBar: 'setHistogramBar'
+            },
+            description: {
+                loadTable: '%loadTable(tableName) : geeft de tabel terug waarvan de naam als tekenreeks is doorgegeven.',
+                loadTableFromCsv: '%loadTableFromCsv(csvFileName) : geeft een tabel terug met de gegevens uit het csv-bestand dat als tekenreeks is doorgegeven.',
+                loadTableFromCsvWithTypes: '%loadTableFromCsvWithTypes()',
+                getRecords: '%getRecords()',
+                selectByColumn: 'selectByColumn(table, columnName, value) : geeft een tabel terug met de records van de oorspronkelijke tabel die de waarde \'value\' hebben in de kolom \'columnName\'.',
+                selectByFunction: '%selectByFunction()',
+                selectTopRows: '%selectTopRows(table, nbRows) : geeft een tabel terug met de eerste nbRows records van de oorspronkelijke tabel.',
+                getColumn: '%getColumn()',
+                sortByColumn: '%sortByColumn(table,columnName,direction) : geeft een tabel terug met de records van de oorspronkelijke tabel, gesorteerd. De tweede parameter is een tekenreeks die de kolom voor de sortering aangeeft. De sortering kan oplopend zijn: "asc" of aflopend: "desc".',
+                sortByFunction: '%sortByFunction()',
+                selectColumns: '%selectColumns(table,columnsList) : geeft een tabel terug die bestaat uit de kolommen van de oorspronkelijke tabel die in de tweede parameter staan. De volgorde van de kolommen in de teruggegeven tabel is die van de elementen in de doorgegeven lijst.',
+                joinTables: '%joinTables(table1, column1, table2, column2, type) : geeft een tabel terug die de join is van de twee doorgegeven tabellen. De join gebeurt op de kolommen \'column1\' en \'column2\'. Het type kies je uit \'inner\', \'outer\', \'left\' en \'right\'.',
+                displayTable: '%displayTable(table) : toont de doorgegeven tabel in het visualisatiegebied.',
+                updateWhere: '%updateWhere()',
+                insertRecord: '%insertRecord(table, record) : geeft de oorspronkelijke tabel terug met het doorgegeven record toegevoegd. Dit record wordt als een lijst doorgegeven.',
+                unionTables: '%unionTables()',
+                displayRecord: '%displayRecord()',
+                displayTableOnMap: '%displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : toont de elementen van de kolom die als tweede parameter is doorgegeven op een kaart.',
+                printConsole: '%printConsole()',
+                displayTableOnGraph: '%displayTableOnGraph()',
+                displayTablesOnGraph: '%displayTablesOnGraph()',
+                initHistogram: '%initHistogram()',
+                setHistogramBar: '%setHistogramBar()'
+            },
+            startingBlockName: "Programma",
+            constantLabel: {
+                asc: 'asc',
+                desc: 'desc',
+                inner: 'inner',
+                outer: 'outer',
+                left: 'left',
+                right: 'right',
+                line: 'lijndiagram',
+                bar: 'staafdiagram',
+                plot: 'puntenwolk'
+            },
+            messages: {
+                table_not_found: 'Tabel niet gevonden: ',
+                file_not_found: 'CSV-bestand niet gevonden: ',
+                incorrect_results: 'Foute resultaten',
+                some_results_missing: 'Er ontbreken resultaten',
+                success: 'Gelukt'
+            },
+            ui: {
+                'btn_diplay_table': 'Tonen',
+                'btn_files_repository': 'CSV-bestanden toevoegen...',
+                'files_repository': {
+                    'caption': 'Lijst van CSV-bestanden',
+                    'hint': 'Gebruik het bestandsnummer als parameter voor de functie loadTableFromCsv. Enkel CSV-bestanden met ; als scheidingsteken zijn toegelaten.',
+                    'add': 'Toevoegen',
+                    'incompatible_browser': 'Incompatibele browser',
+                    'confirm_overwrite': 'Bestanden overschrijven?',
+                    'file_not_found': 'Bestand niet gevonden: '
+                },
+                'db_helper': {
+                    'renderer_html_rows_limit': 'Alleen de eerste %1 records worden getoond'
+                }
+            }
+        },
+        de: {
+            categories: {
+                database: 'Datenbank',
+                histogram: 'Histogramme'
+            },
+            label: {
+                loadTable: 'Tabelle laden(%1)',
+                loadTableFromCsv: 'Tabelle aus CSV laden(%1)',
+                loadTableFromCsvWithTypes: 'Tabelle mit Typen aus CSV laden(%1, %2)',
+                getRecords: 'getRecords(%1)',
+                selectByColumn: 'nach Spalte filtern(%1, %2, %3)',
+                selectByFunction: 'nach Funktion filtern(%1, %2)',
+                selectTopRows: 'obere Zeilen auswählen(%1, %2)',
+                getColumn: 'getColumn(%1, %2)',
+                sortByColumn: 'nach Spalte sortieren(%1, %2, %3)',
+                sortByFunction: 'sortByFunction(%1, %2)',
+                selectColumns: 'Spalten auswählen(%1, %2)',
+                joinTables: 'Tabellen verbinden(%1, %2, %3, %4, %5)',
+                displayTable: 'Tabelle anzeigen(%1)',
+                updateWhere: 'updateWhere(%1, %2, %3)',
+                insertRecord: 'Datensatz einfügen(%1, %2)',
+                unionTables: 'unionTables(%1, %2)',
+                displayRecord: 'Datensatz anzeigen(%1)',
+                displayTableOnMap: 'Tabelle auf Karte anzeigen(%1, %2, %3, %4)',
+                printConsole: 'in Konsole ausgeben(%1)',
+                displayTableOnGraph: 'Tabelle auf Diagramm anzeigen(%1, %2, %3, %4, %5)',
+                displayTablesOnGraph: 'Tabellen auf Diagramm anzeigen(%1, %2, %3, %4, %5, %6, %7)',
+                initHistogram: 'initHistogram(%1, %2)',
+                setHistogramBar: 'setHistogramBar(%1, %2, %3)'
+            },
+            code: {
+                loadTable: 'loadTable',
+                loadTableFromCsv: 'loadTableFromCsv',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
+                getRecords: 'getRecords',
+                selectByColumn: 'selectByColumn',
+                selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
+                getColumn: 'getColumn',
+                sortByColumn: 'sortByColumn',
+                sortByFunction: 'sortByFunction',
+                selectColumns: 'selectColumns',
+                joinTables: 'joinTables',
+                displayTable: 'displayTable',
+                updateWhere: 'updateWhere',
+                insertRecord: 'insertRecord',
+                unionTables: 'unionTables',
+                displayRecord: 'displayRecord',
+                displayTableOnMap: 'displayTableOnMap',
+                printConsole: 'printConsole',
+                displayTableOnGraph: 'displayTableOnGraph',
+                displayTablesOnGraph: 'displayTablesOnGraph',
+                initHistogram: 'initHistogram',
+                setHistogramBar: 'setHistogramBar'
+            },
+            description: {
+                loadTable: '%loadTable(tableName) : gibt die Tabelle zurück, deren Name als Zeichenkette übergeben wurde.',
+                loadTableFromCsv: '%loadTableFromCsv(csvFileName) : gibt eine Tabelle mit den Daten der als Zeichenkette übergebenen CSV-Datei zurück.',
+                loadTableFromCsvWithTypes: '%loadTableFromCsvWithTypes()',
+                getRecords: '%getRecords()',
+                selectByColumn: 'selectByColumn(table, columnName, value) : gibt eine Tabelle mit den Datensätzen der Ausgangstabelle zurück, die in der Spalte \'columnName\' den Wert \'value\' haben.',
+                selectByFunction: '%selectByFunction()',
+                selectTopRows: '%selectTopRows(table, nbRows) : gibt eine Tabelle mit den ersten nbRows Datensätzen der Ausgangstabelle zurück.',
+                getColumn: '%getColumn()',
+                sortByColumn: '%sortByColumn(table,columnName,direction) : gibt eine Tabelle mit den sortierten Datensätzen der Ausgangstabelle zurück. Der zweite Parameter ist eine Zeichenkette, die die Spalte für die Sortierung angibt. Die Sortierung kann aufsteigend ("asc") oder absteigend ("desc") sein.',
+                sortByFunction: '%sortByFunction()',
+                selectColumns: '%selectColumns(table,columnsList) : gibt eine Tabelle zurück, die aus den in der zweiten Parameterliste angegebenen Spalten der Ausgangstabelle besteht. Die Reihenfolge der Spalten entspricht der der Listenelemente.',
+                joinTables: '%joinTables(table1, column1, table2, column2, type) : gibt eine Tabelle zurück, die der Join der beiden übergebenen Tabellen ist. Der Join erfolgt über die Spalten \'column1\' und \'column2\'. Der Typ ist einer von \'inner\', \'outer\', \'left\' und \'right\'.',
+                displayTable: '%displayTable(table) : zeigt die übergebene Tabelle im Visualisierungsbereich an.',
+                updateWhere: '%updateWhere()',
+                insertRecord: '%insertRecord(table, record) : gibt die Ausgangstabelle mit dem hinzugefügten Datensatz zurück. Der Datensatz wird als Liste übergeben.',
+                unionTables: '%unionTables()',
+                displayRecord: '%displayRecord()',
+                displayTableOnMap: '%displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : zeigt die Elemente der als zweiten Parameter übergebenen Spalte auf einer Karte an.',
+                printConsole: '%printConsole()',
+                displayTableOnGraph: '%displayTableOnGraph()',
+                displayTablesOnGraph: '%displayTablesOnGraph()',
+                initHistogram: '%initHistogram()',
+                setHistogramBar: '%setHistogramBar()'
+            },
+            startingBlockName: "Programm",
+            constantLabel: {
+                asc: 'asc',
+                desc: 'desc',
+                inner: 'inner',
+                outer: 'outer',
+                left: 'left',
+                right: 'right',
+                line: 'Liniendiagramm',
+                bar: 'Balkendiagramm',
+                plot: 'Streudiagramm'
+            },
+            messages: {
+                table_not_found: 'Tabelle nicht gefunden: ',
+                file_not_found: 'CSV-Datei nicht gefunden: ',
+                incorrect_results: 'Falsche Ergebnisse',
+                some_results_missing: 'Es fehlen Ergebnisse',
+                success: 'Erfolg'
+            },
+            ui: {
+                'btn_diplay_table': 'Anzeigen',
+                'btn_files_repository': 'CSV-Dateien hinzufügen...',
+                'files_repository': {
+                    'caption': 'Liste der CSV-Dateien',
+                    'hint': 'Verwende die Dateinummer als Parameter für die Funktion loadTableFromCsv. Nur CSV-Dateien mit ; als Trennzeichen sind erlaubt.',
+                    'add': 'Hinzufügen',
+                    'incompatible_browser': 'Inkompatibler Browser',
+                    'confirm_overwrite': 'Dateien überschreiben?',
+                    'file_not_found': 'Datei nicht gefunden: '
+                },
+                'db_helper': {
+                    'renderer_html_rows_limit': 'Nur die ersten %1 Datensätze werden angezeigt'
+                }
+            }
         }
     }
 

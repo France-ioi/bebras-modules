@@ -17,6 +17,16 @@
                 validation_success: 'Bravo, vous avez réussi !',
                 validation_mistake: 'Votre réponse contient des erreurs, indiquées en rouge.'                
             },
+            nl: {
+                validate: 'Valideren',
+                validation_success: 'Proficiat, je bent geslaagd!',
+                validation_mistake: 'Jouw antwoord bevat fouten, aangeduid in het rood.'
+            },
+            de: {
+                validate: 'Validieren',
+                validation_success: 'Bravo, du hast es geschafft!',
+                validation_mistake: 'Deine Antwort enthält Fehler, die rot markiert sind.'
+            },
         },
 
         set: function(lng) {
