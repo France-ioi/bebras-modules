@@ -142,7 +142,7 @@ window.implementGetResources = function(task) {
          }
       }
       $('#task img').each(addImageTo(res.task));
-      fillImages($('#task').html(), images, res.task);
+      fillImages($('#task').html(),  images, res.task);
       $('script').each(function() {
          if ($(this).hasClass('remove') || $(this).attr('src') || $(this).attr('href')) {
             return;
