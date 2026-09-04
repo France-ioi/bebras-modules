@@ -73,6 +73,80 @@ var getContext = function(display, infos, curLevel) {
                 result: 'Résultat :',
                 tooltip: 'Coordonnées (%1, %2), luminosité %3'
             }
+        },
+        nl: {
+            categories: {
+                barcode: 'Afbeelding'
+            },
+            label: {
+                getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
+                setPixelLuminosity: 'setPixelLuminosity(%1, %2, %3)',
+                width: 'width()',
+                height: 'height()',
+                printResult: 'printResult(%1)'
+            },
+            code: {
+                getPixelLuminosity: 'getPixelLuminosity',
+                setPixelLuminosity: 'setPixelLuminosity',
+                width: 'width',
+                height: 'height',
+                printResult: 'printResult'
+            },
+            description: {
+                getPixelLuminosity: 'getPixelLuminosity(col, line) geeft de helderheid op de gegeven kolom en rij',
+                setPixelLuminosity: 'setPixelLuminosity(col, line, luminosity) wijzigt de helderheid op de gegeven kolom en rij',
+                width: 'width() geeft de breedte van de afbeelding terug',
+                height: 'height() geeft de hoogte van de afbeelding terug',
+                printResult: 'printResult(string) toont het resultaat'
+            },
+            startingBlockName: "Programma",
+            messages: {
+                success: 'Gelukt',
+                mistake_digit: 'Het cijfer met een rode achtergrond is fout',
+                mistake_empty: 'Je programma heeft niets afgedrukt',
+                mistake_length: 'Het afgedrukte resultaat heeft een foute lengte',
+                mistake_pixel: 'De pixel met een rode rand heeft helderheid %1, maar zou helderheid %2 moeten hebben',
+                mistake_pixel: 'De pixel(s) met een rode rand zijn fout',
+                result: 'Resultaat:',
+                tooltip: 'Coördinaten (%1, %2), helderheid %3'
+            }
+        },
+        de: {
+            categories: {
+                barcode: 'Bild'
+            },
+            label: {
+                getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
+                setPixelLuminosity: 'setPixelLuminosity(%1, %2, %3)',
+                width: 'width()',
+                height: 'height()',
+                printResult: 'printResult(%1)'
+            },
+            code: {
+                getPixelLuminosity: 'getPixelLuminosity',
+                setPixelLuminosity: 'setPixelLuminosity',
+                width: 'width',
+                height: 'height',
+                printResult: 'printResult'
+            },
+            description: {
+                getPixelLuminosity: 'getPixelLuminosity(col, line) liefert die Helligkeit an der angegebenen Spalte und Zeile',
+                setPixelLuminosity: 'setPixelLuminosity(col, line, luminosity) ändert die Helligkeit an der angegebenen Spalte und Zeile',
+                width: 'width() gibt die Breite des Bildes zurück',
+                height: 'height() gibt die Höhe des Bildes zurück',
+                printResult: 'printResult(string) zeigt das Ergebnis an'
+            },
+            startingBlockName: "Programm",
+            messages: {
+                success: 'Erfolg',
+                mistake_digit: 'Die Ziffer mit rotem Hintergrund ist falsch',
+                mistake_empty: 'Dein Programm hat nichts ausgegeben',
+                mistake_length: 'Das ausgegebene Ergebnis hat eine falsche Länge',
+                mistake_pixel: 'Das Pixel mit rotem Rand hat Helligkeit %1, sollte aber Helligkeit %2 haben',
+                mistake_pixel: 'Das/die Pixel mit rotem Rand sind falsch',
+                result: 'Ergebnis:',
+                tooltip: 'Koordinaten (%1, %2), Helligkeit %3'
+            }
         }
     }
 

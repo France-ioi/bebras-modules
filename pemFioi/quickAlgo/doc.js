@@ -41,19 +41,37 @@ var docLanguageStrings = {
   de: {
     lang: 'Deutsch',
 
-    title: 'quickAlgo libraries documentation',
-    library: 'Library:',
-    language: 'Language:',
-    blocklyTitle: 'Documentation for generic Blockly blocks',
-    scratchTitle: 'Documentation for generic Scratch blocks',
-    libTitle: 'Documentation for library',
+    title: 'Dokumentation der quickAlgo-Bibliotheken',
+    library: 'Bibliothek:',
+    language: 'Sprache:',
+    blocklyTitle: 'Dokumentation der generischen Blockly-Blöcke',
+    scratchTitle: 'Dokumentation der generischen Scratch-Blöcke',
+    libTitle: 'Dokumentation der Bibliothek',
 
-    category: 'Category “{}”',
-    subcategory: 'Subcategory “{}”',
-    blocklyColumns: ["Display", "Internal name", "Comment"],
-    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
-    nameUndefined: 'undefined!',
-    action: 'Action',
+    category: 'Kategorie „{}“',
+    subcategory: 'Unterkategorie „{}“',
+    blocklyColumns: ["Darstellung", "Interner Name", "Kommentar"],
+    columns: ["Blockname", "Python-Name", "Interner Name", "Typ", "Argumente", "Beschreibung", "Kommentar"],
+    nameUndefined: 'nicht definiert!',
+    action: 'Aktion',
+    sensor: 'Sensor'
+  },
+  nl: {
+    lang: 'Nederlands',
+
+    title: 'Documentatie van de quickAlgo-bibliotheken',
+    library: 'Bibliotheek:',
+    language: 'Taal:',
+    blocklyTitle: 'Documentatie van de generieke Blockly-blokken',
+    scratchTitle: 'Documentatie van de generieke Scratch-blokken',
+    libTitle: 'Documentatie van de bibliotheek',
+
+    category: 'Categorie « {} »',
+    subcategory: 'Subcategorie « {} »',
+    blocklyColumns: ["Weergave", "Interne naam", "Commentaar"],
+    columns: ["Bloknaam", "Python-naam", "Interne naam", "Type", "Argumenten", "Beschrijving", "Commentaar"],
+    nameUndefined: 'niet gedefinieerd!',
+    action: 'Actie',
     sensor: 'Sensor'
   },
   es: {

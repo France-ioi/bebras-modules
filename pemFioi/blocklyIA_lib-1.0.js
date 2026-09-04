@@ -63,6 +63,12 @@ var getContext = function(display, infos, curLevel) {
         code: {},
         messages: {},
         description: {}
+      },
+      nl: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
       }
    };
    
@@ -102,6 +108,30 @@ var getContext = function(display, infos, curLevel) {
                
             },
             startingBlockName: "Program of the robot"
+         },
+         nl: {
+            label: {
+            },
+            code: {
+               getX: "getX",
+               getY: "getY",
+               log: "log",
+               distance: "distance"
+            },
+            description: {
+               getX: "@(idItem) geeft de x-coördinaat van het punt terug",
+               getY: "@(idItem) geeft de y-coördinaat van het punt terug",
+               log: "@(msg)",
+               distance: "@(x1,y1,x2,y2)"
+            },
+            messages: {
+               noIntegerId: "De identifier moet een geheel getal zijn",
+               invalidId: function(id) {
+                  return "Ongeldige identifier : "+id
+               },
+               success: "Bravo, je bent geslaagd!"
+            },
+            startingBlockName: "Programma van de robot"
          },
          
          es: {

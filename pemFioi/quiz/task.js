@@ -53,6 +53,52 @@
                 'error_regexp': 'Format invalide',
                 'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.'
             },
+            nl: {
+                'score': 'Score',
+                'grader_msg': 'Jouw score is ',
+                'wrong_answer_msg': 'Je hebt minstens één fout.',
+                'wrong_answer_msg_partial_feedback': 'Je hebt minstens één fout. Hier is een hint:',
+                'wrong_answer_msg_not_answered': 'Je hebt deze vraag niet beantwoord',
+                'wrong_fill_gaps_msg': 'Je hebt %% foute antwoorden voor deze vraag, aangeduid in het rood.',
+                'validate': 'Valideren',
+                'solution': 'Toon het antwoord',
+                'restart': 'Herbeginnen',
+                'restart_scratch': 'Herbeginnen vanaf het begin',
+                'restart_current': 'De vraag herbeginnen',
+                'return_to_top': 'Terug naar de lijst van vragen',
+                'cancel': 'Annuleren',
+                'placeholder_text': 'Voer tekst in',
+                'placeholder_number': 'Voer een getal in',
+                'error_number': 'Je moet een getal invoeren.',
+                'placeholder_string': 'Voer een tekenreeks in',
+                'error_string': 'Je moet een tekenreeks invoeren',
+                'placeholder_regexp': 'Voer tekst in',
+                'error_regexp': 'Ongeldig formaat',
+                'error_grading': 'Er is een fout opgetreden bij het indienen, probeer het over enkele minuten opnieuw.'
+            },
+            de: {
+                'score': 'Punktestand',
+                'grader_msg': 'Dein Punktestand ist ',
+                'wrong_answer_msg': 'Du hast mindestens einen Fehler.',
+                'wrong_answer_msg_partial_feedback': 'Du hast mindestens einen Fehler. Hier ist ein Hinweis:',
+                'wrong_answer_msg_not_answered': 'Du hast diese Frage nicht beantwortet',
+                'wrong_fill_gaps_msg': 'Du hast %% falsche Antworten für diese Frage, die rot markiert sind.',
+                'validate': 'Absenden',
+                'solution': 'Antwort anzeigen',
+                'restart': 'Neustarten',
+                'restart_scratch': 'Von vorne neu starten',
+                'restart_current': 'Frage neu starten',
+                'return_to_top': 'Zurück zur Fragenliste',
+                'cancel': 'Abbrechen',
+                'placeholder_text': 'Text eingeben',
+                'placeholder_number': 'Zahl eingeben',
+                'error_number': 'Du musst eine Zahl eingeben.',
+                'placeholder_string': 'Zeichenkette eingeben',
+                'error_string': 'Du musst eine Zeichenkette eingeben',
+                'placeholder_regexp': 'Text eingeben',
+                'error_regexp': 'Ungültiges Format',
+                'error_grading': 'Beim Einreichen ist ein Fehler aufgetreten. Bitte versuche es in einigen Minuten erneut.'
+            },
         },
 
         substrings: {
@@ -62,6 +108,12 @@
                 },
                 fr: {
                     'solution': 'Afficher un indice'
+                },
+                nl: {
+                    'solution': 'Toon een hint'
+                },
+                de: {
+                    'solution': 'Hinweis anzeigen'
                 }
             }
         },

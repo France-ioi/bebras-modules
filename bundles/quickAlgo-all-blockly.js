@@ -467,7 +467,7 @@ SrlLogger.levelLoaded = function(level) {
    SrlLogger.navigation('Exercice');
 };
 
-SrlLogger.validation = function(answer, score, error, experimentation) {
+SrlLogger.validation = function(score, error, experimentation) {
    if(!SrlLogger.active) { return; }
 
    if(error == 'code') {
@@ -480,7 +480,6 @@ SrlLogger.validation = function(answer, score, error, experimentation) {
    var data = {
       reference: 'validation',
       version: SrlLogger.version,
-      answer: answer,
       score: score,
       experimentation: experimentation,
       'type_erreur': error
@@ -6555,7 +6554,7 @@ var initBlocklySubTask = function(subTask, language) {
             }
 
             if(!allowInfiniteLoop) {
-               SrlLogger.validation(subTask.blocklyHelper.programs[0].blockly, success ? 100 : 0, success ? 'none' : 'execution', 0);
+               SrlLogger.validation(success ? 100 : 0, success ? 'none' : 'execution', 0);
             }
          }
          // Log the attempt
@@ -6576,7 +6575,7 @@ var initBlocklySubTask = function(subTask, language) {
       initContextForLevel(initialTestCase);
 
       if(allowInfiniteLoop) {
-         SrlLogger.validation(subTask.blocklyHelper.programs[0].blockly, 0, 'none', 1);
+         SrlLogger.validation(0, 'none', 1);
       }
    };
 

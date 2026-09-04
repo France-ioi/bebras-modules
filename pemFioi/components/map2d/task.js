@@ -37,6 +37,36 @@
                 validation_success: 'Success',
                 validation_mistake: 'Mistake'                
             },
+            nl: {
+                point: 'Punt',
+                line: 'Lijn',
+                area: 'Gebied',
+                delete: 'Verwijderen',
+                undo: 'Ongedaan maken',
+                redo: 'Opnieuw',
+                tag: 'Label',
+                name: 'Naam',
+                save: 'Opslaan',
+                cancel: 'Annuleren',
+                validate: 'Valideren',
+                validation_success: 'Geslaagd',
+                validation_mistake: 'Fout'
+            },
+            de: {
+                point: 'Punkt',
+                line: 'Linie',
+                area: 'Fläche',
+                delete: 'Löschen',
+                undo: 'Rückgängig',
+                redo: 'Wiederholen',
+                tag: 'Markierung',
+                name: 'Name',
+                save: 'Speichern',
+                cancel: 'Abbrechen',
+                validate: 'Validieren',
+                validation_success: 'Erfolg',
+                validation_mistake: 'Fehler'
+            },
         },
 
         set: function(lng) {
