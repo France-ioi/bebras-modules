@@ -42,6 +42,68 @@ var getContext = function(display, infos) {
             moreThan100Moves: "La sortie est correcte, mais vous l'avez produite en plus de 100 étapes…"
          }
       },
+      en: {
+         label: {
+            print: "print",
+            read: "read a line",
+            readInteger: "read an integer on a line",
+            readFloat: "read a floating-point number on a line",
+            eof: "end of input"
+         },
+         code: {
+            print: "print",
+            read: "input",
+            readInteger: "readInteger",
+            readFloat: "readFloat",
+            eof: "eof"
+         },
+         description: {
+         },
+         startingBlockName: "Program",
+         messages: {
+            input: "Input:",
+            output: "Output:",
+            outputWrong: "Your program did not correctly process all the lines.",
+            outputCorrect: "Congratulations! Your program correctly processed all the lines.",
+            tooFewChars: "Line too short: line ",
+            tooManyChars: "Line too long: line ",
+            tooFewLines: "Too few output lines",
+            tooManyLines: "Too many output lines",
+            correctOutput: "The output is correct!",
+            moreThan100Moves: "The output is correct, but you produced it in more than 100 steps…"
+         }
+      },
+      nl: {
+         label: {
+            print: "schrijven",
+            read: "een regel lezen",
+            readInteger: "een geheel getal op een regel lezen",
+            readFloat: "een kommagetal op een regel lezen",
+            eof: "einde van de invoer"
+         },
+         code: {
+            print: "print",
+            read: "input",
+            readInteger: "leesGeheel",
+            readFloat: "leesKommagetal",
+            eof: "eindeInvoer"
+         },
+         description: {
+         },
+         startingBlockName: "Programma",
+         messages: {
+            input: "Invoer:",
+            output: "Uitvoer:",
+            outputWrong: "Je programma heeft niet alle regels correct verwerkt.",
+            outputCorrect: "Bravo! Je programma heeft alle regels correct verwerkt.",
+            tooFewChars: "Regel te kort: regel ",
+            tooManyChars: "Regel te lang: regel ",
+            tooFewLines: "Te weinig regels in de uitvoer",
+            tooManyLines: "Te veel regels in de uitvoer",
+            correctOutput: "De uitvoer is correct!",
+            moreThan100Moves: "De uitvoer is correct, maar je hebt meer dan 100 stappen nodig gehad…"
+         }
+      },
       de: {
          label: {
             print: "schreibe",

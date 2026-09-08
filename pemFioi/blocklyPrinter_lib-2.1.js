@@ -18,7 +18,11 @@ var getContext = function(display, infos) {
             read: "lire une ligne",
             readInteger: "lire un entier sur une ligne",
             readFloat: "lire un nombre à virgule sur une ligne",
-            eof: "fin de la saisie"
+            eof: "fin de la saisie",
+            charToNumber: "caractère vers nombre",
+            numberToChar: "nombre vers caractère",
+            charToAscii: "code ASCII vers caractère",
+            asciiToChar: "caractère vers code ASCII"
          },
          code: {
             print: "print",
@@ -26,7 +30,11 @@ var getContext = function(display, infos) {
             read: "input",
             readInteger: "lireEntier",
             readFloat: "lireDecimal",
-            eof: "finSaisie"
+            eof: "finSaisie",
+            charToNumber: "caractereVersNombre",
+            numberToChar: "nombreVersCaractere",
+            asciiToChar: "asciiVersCaractere",
+            charToAscii: "caractereVersAscii"
          },
          description: {
             print: "print(texte) affiche le texte sur le terminal",
@@ -52,6 +60,108 @@ var getContext = function(display, infos) {
             introChar: "</b>\".<br>(Premier caractère erroné à la colonne ",
             expectedChar: "; attendu: \"<b>",
             answerChar: "</b>\", votre réponse: \"<b>"
+         }
+      },
+      en: {
+         label: {
+            print: "print",
+            print_end: "print %1 ending with %2",
+            read: "read a line",
+            readInteger: "read an integer on a line",
+            readFloat: "read a floating-point number on a line",
+            eof: "end of input",
+            charToNumber: "character to number",
+            numberToChar: "number to character",
+            charToAscii: "ASCII code to character",
+            asciiToChar: "character to ASCII code"
+         },
+         code: {
+            print: "print",
+            print_end: "print_end",
+            read: "input",
+            readInteger: "readInteger",
+            readFloat: "readFloat",
+            eof: "eof",
+            charToNumber: "charToNumber",
+            numberToChar: "numberToChar",
+            asciiToChar: "asciiToChar",
+            charToAscii: "charToAscii"
+         },
+         description: {
+            print: "print(text) displays the text on the terminal",
+            read: "input() returns a string: the next line of the input"
+         },
+         startingBlockName: "Program",
+         messages: {
+            inputPrompt: "Please enter an input for the program.",
+            inputEmpty: "Your program tried to read the input while there was no line left to read!",
+            outputWrong: "Your program did not correctly process all the lines.",
+            outputCorrect: "Congratulations! Your program correctly processed all the lines.",
+            tooFewChars: "Line {0} of your program's output is shorter than expected.",
+            tooManyChars: "Line {0} of your program's output is longer than expected.",
+            tooFewLines: "Too few output lines",
+            tooManyLines: "Too many output lines",
+            correctOutput: "The output is correct!",
+            moreThan100Moves: "The output is correct, but you produced it in more than 100 steps…"
+         },
+         errorStr: {
+            intro: "Your program's output is wrong, on line ",
+            expected: ":<br>Expected: \"<b>",
+            answer: "</b>\",<br>Your answer: \"<b>",
+            introChar: "</b>\".<br>(First wrong character at column ",
+            expectedChar: "; expected: \"<b>",
+            answerChar: "</b>\", your answer: \"<b>"
+         }
+      },
+      nl: {
+         label: {
+            print: "schrijven",
+            print_end: "schrijf %1 en eindig met %2",
+            read: "een regel lezen",
+            readInteger: "een geheel getal op een regel lezen",
+            readFloat: "een kommagetal op een regel lezen",
+            eof: "einde van de invoer",
+            charToNumber: "teken naar getal",
+            numberToChar: "getal naar teken",
+            charToAscii: "ASCII-code naar teken",
+            asciiToChar: "teken naar ASCII-code"
+         },
+         code: {
+            print: "print",
+            print_end: "print_end",
+            read: "input",
+            readInteger: "leesGeheel",
+            readFloat: "leesKommagetal",
+            eof: "eindeInvoer",
+            charToNumber: "tekenNaarGetal",
+            numberToChar: "getalNaarTeken",
+            asciiToChar: "asciiNaarTeken",
+            charToAscii: "tekenNaarAscii"
+         },
+         description: {
+            print: "print(tekst) toont de tekst op de terminal",
+            read: "input() geeft een tekenreeks terug: de volgende regel van de invoer"
+         },
+         startingBlockName: "Programma",
+         messages: {
+            inputPrompt: "Gelieve een invoer voor het programma te schrijven.",
+            inputEmpty: "Je programma probeerde de invoer te lezen terwijl er geen regel meer te lezen was!",
+            outputWrong: "Je programma heeft niet alle regels correct verwerkt.",
+            outputCorrect: "Bravo! Je programma heeft alle regels correct verwerkt.",
+            tooFewChars: "Regel {0} van de uitvoer van je programma is korter dan verwacht.",
+            tooManyChars: "Regel {0} van de uitvoer van je programma is langer dan verwacht.",
+            tooFewLines: "Te weinig regels in de uitvoer",
+            tooManyLines: "Te veel regels in de uitvoer",
+            correctOutput: "De uitvoer is correct!",
+            moreThan100Moves: "De uitvoer is correct, maar je hebt meer dan 100 stappen nodig gehad…"
+         },
+         errorStr: {
+            intro: "De uitvoer van je programma is fout, op regel ",
+            expected: ":<br>Verwacht: \"<b>",
+            answer: "</b>\",<br>Jouw antwoord: \"<b>",
+            introChar: "</b>\".<br>(Eerste foutieve teken in kolom ",
+            expectedChar: "; verwacht: \"<b>",
+            answerChar: "</b>\", jouw antwoord: \"<b>"
          }
       },
       de: {
@@ -83,8 +193,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
-            inputPrompt: "Please input a line for the program.", // TODO :: translate two lines
-            inputEmpty: "Your program tried to read the input while there is no line left to read!",
+            inputPrompt: "Bitte gib eine Eingabe für das Programm ein.",
+            inputEmpty: "Dein Programm hat versucht, die Eingabe zu lesen, obwohl keine Zeile mehr zu lesen war!",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile {0}",
