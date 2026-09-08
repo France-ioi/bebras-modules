@@ -1551,6 +1551,61 @@ var getContext = function(display, infos, curLevel) {
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les biscuits demandés."
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the biscuit",
+               dropObject: "drop the biscuit"
+            },
+            code: {
+               withdrawObject: "pickBiscuit",
+               dropObject: "dropBiscuit"
+            },
+            description: {
+               withdrawObject: "pickBiscuit() picks up the biscuit on the robot's cell",
+               dropObject: "dropBiscuit() drops the last picked biscuit on the robot's cell"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Congratulations, the robot picked up all the required biscuits!",
+               "failurePickedAllWithdrawables": "The robot did not pick up the required biscuits."
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de biscuit oprapen",
+               dropObject: "de biscuit neerleggen"
+            },
+            code: {
+               withdrawObject: "pakBiscuit",
+               dropObject: "legBiscuitNeer"
+            },
+            description: {
+               withdrawObject: "pakBiscuit() raapt de biscuit op van het vakje van de robot",
+               dropObject: "legBiscuitNeer() legt de laatst opgeraapte biscuit neer op het vakje van de robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, de robot heeft alle gevraagde biscuits opgeraapt!",
+               "failurePickedAllWithdrawables": "De robot heeft de gevraagde biscuits niet opgeraapt."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "den Keks aufheben",
+               dropObject: "den Keks ablegen"
+            },
+            code: {
+               withdrawObject: "hebeKeksAuf",
+               dropObject: "legeKeksAb"
+            },
+            description: {
+               withdrawObject: "hebeKeksAuf() hebt den Keks vom Feld des Roboters auf",
+               dropObject: "legeKeksAb() legt den zuletzt aufgehobenen Keks auf dem Feld des Roboters ab"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, der Roboter hat alle geforderten Kekse aufgehoben!",
+               "failurePickedAllWithdrawables": "Der Roboter hat die geforderten Kekse nicht aufgehoben."
+            }
+         }
+
       },
       poker: {
          fr: {
@@ -1568,6 +1623,52 @@ var getContext = function(display, infos, curLevel) {
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les cartes demandées."
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the card",
+            },
+            code: {
+               withdrawObject: "pickCard"
+            },
+            description: {
+               withdrawObject: "pickCard() picks up the card on the robot's cell"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Congratulations, the robot picked up all the required cards!",
+               "failurePickedAllWithdrawables": "The robot did not pick up the required cards."
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de kaart oprapen",
+            },
+            code: {
+               withdrawObject: "pakKaart"
+            },
+            description: {
+               withdrawObject: "pakKaart() raapt de kaart op van het vakje van de robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, de robot heeft alle gevraagde kaarten opgeraapt!",
+               "failurePickedAllWithdrawables": "De robot heeft de gevraagde kaarten niet opgeraapt."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "die Karte aufheben",
+            },
+            code: {
+               withdrawObject: "hebeKarteAuf"
+            },
+            description: {
+               withdrawObject: "hebeKarteAuf() hebt die Karte vom Feld des Roboters auf"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, der Roboter hat alle geforderten Karten aufgehoben!",
+               "failurePickedAllWithdrawables": "Der Roboter hat die geforderten Karten nicht aufgehoben."
+            }
+         }
+
       },
       pearls: {
          fr: {
@@ -1585,6 +1686,52 @@ var getContext = function(display, infos, curLevel) {
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les perles demandées."
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the pearl",
+            },
+            code: {
+               withdrawObject: "pickPearl"
+            },
+            description: {
+               withdrawObject: "pickPearl() picks up the pearl on the robot's cell"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Congratulations, the robot picked up all the required pearls!",
+               "failurePickedAllWithdrawables": "The robot did not pick up the required pearls."
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de parel oprapen",
+            },
+            code: {
+               withdrawObject: "pakParel"
+            },
+            description: {
+               withdrawObject: "pakParel() raapt de parel op van het vakje van de robot"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, de robot heeft alle gevraagde parels opgeraapt!",
+               "failurePickedAllWithdrawables": "De robot heeft de gevraagde parels niet opgeraapt."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "die Perle aufheben",
+            },
+            code: {
+               withdrawObject: "hebePerleAuf"
+            },
+            description: {
+               withdrawObject: "hebePerleAuf() hebt die Perle vom Feld des Roboters auf"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, der Roboter hat alle geforderten Perlen aufgehoben!",
+               "failurePickedAllWithdrawables": "Der Roboter hat die geforderten Perlen nicht aufgehoben."
+            }
+         }
+
       },
       fishing: {
          fr: {
@@ -1634,6 +1781,139 @@ var getContext = function(display, infos, curLevel) {
                failureDropObject: "Votre robot essaie de déposer trop de poissons sur cette île."
             }
          },
+         en: {
+            label: {
+               withdrawObject: "take the fish",
+               dropObject: "drop the fish",
+               withdrawNum: "take %1 fish",
+               withdrawNum_noShadow: "take %1 fish",
+               dropNum: "drop %1 fish",
+               dropNum_noShadow: "drop %1 fish",
+               nbWithdrawables: "number of fish on the cell",
+               containerSize: "number of fish ordered",
+               onObject: "fish on the cell",
+               onContainer: "on an island",
+            },
+            code: {
+               withdrawObject: "takeFish",
+               dropObject: "dropFish",
+               onObject: "onFish",
+               onContainer: "onIsland",
+               nbWithdrawables: "nbFishOn",
+               containerSize: "nbFishOrdered",
+               withdrawNum: "take",
+               withdrawNum_noShadow: "take"
+            },
+            description: {
+               withdrawObject: "takeFish() takes the fish on the cell",
+               dropObject: "dropFish() drops a carried fish on the cell",
+               onObject: "onFish() indicates whether there are one or more fish on the cell",
+               onContainer: "onIsland() indicates whether there is an island on the cell",
+               nbWithdrawables: "nbFishOn() indicates how many fish are on the cell",
+               containerSize: "nbFishOrdered() indicates how many fish must be delivered to the island",
+               dropNum: "drop(nbFish) drops nbFish fish on the cell",
+               withdrawNum: "take(nbFish) takes nbFish fish from the cell",
+            },
+            messages: {
+               emptyBag: "The robot is not carrying a fish!",
+               tooManyObjects: "The robot is already carrying a fish!",
+               successContainersFilled: "Congratulations, your robot brought fish to all the islands!",
+               failureContainersFilled: "Your robot put fish back in the water!",
+               failureContainersFilledLess: "There is still at least one fish to bring to an island.",
+               failureContainersFilledBag: "Your robot took too many fish.",
+               failureDropObject: "Your robot is trying to drop too many fish on this island.",
+               nothingToPickUp: "No fish here!",
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de vis nemen",
+               dropObject: "de vis neerleggen",
+               withdrawNum: "%1 vissen nemen",
+               withdrawNum_noShadow: "%1 vissen nemen",
+               dropNum: "%1 vissen neerleggen",
+               dropNum_noShadow: "%1 vissen neerleggen",
+               nbWithdrawables: "aantal vissen op het vakje",
+               containerSize: "aantal bestelde vissen",
+               onObject: "vis op het vakje",
+               onContainer: "op een eiland",
+            },
+            code: {
+               withdrawObject: "neemVis",
+               dropObject: "legVisNeer",
+               onObject: "opVis",
+               onContainer: "opEiland",
+               nbWithdrawables: "nbVissenOp",
+               containerSize: "nbVissenBesteld",
+               withdrawNum: "neem",
+               withdrawNum_noShadow: "neem"
+            },
+            description: {
+               withdrawObject: "neemVis() neemt de vis die op het vakje ligt",
+               dropObject: "legVisNeer() legt een vervoerde vis neer op het vakje",
+               onObject: "opVis() geeft aan of er een of meer vissen op het vakje liggen",
+               onContainer: "opEiland() geeft aan of er een eiland op het vakje is",
+               nbWithdrawables: "nbVissenOp() geeft aan hoeveel vissen er op het vakje liggen",
+               containerSize: "nbVissenBesteld() geeft aan hoeveel vissen er naar het eiland geleverd moeten worden",
+               dropNum: "legNeer(nbVissen) legt nbVissen vissen neer op het vakje",
+               withdrawNum: "neem(nbVissen) neemt nbVissen vissen van het vakje",
+            },
+            messages: {
+               emptyBag: "De robot draagt geen vis!",
+               tooManyObjects: "De robot draagt al een vis!",
+               successContainersFilled: "Bravo, je robot heeft vis naar alle eilanden gebracht!",
+               failureContainersFilled: "Je robot heeft vis terug in het water gelegd!",
+               failureContainersFilledLess: "Er moet nog minstens één vis naar een eiland gebracht worden.",
+               failureContainersFilledBag: "Je robot heeft te veel vissen genomen.",
+               failureDropObject: "Je robot probeert te veel vissen op dit eiland neer te leggen.",
+               nothingToPickUp: "Geen vis hier!",
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "den Fisch nehmen",
+               dropObject: "den Fisch ablegen",
+               withdrawNum: "%1 Fische nehmen",
+               withdrawNum_noShadow: "%1 Fische nehmen",
+               dropNum: "%1 Fische ablegen",
+               dropNum_noShadow: "%1 Fische ablegen",
+               nbWithdrawables: "Anzahl der Fische auf dem Feld",
+               containerSize: "Anzahl der bestellten Fische",
+               onObject: "Fisch auf dem Feld",
+               onContainer: "auf einer Insel",
+            },
+            code: {
+               withdrawObject: "nimmFisch",
+               dropObject: "legeFischAb",
+               onObject: "aufFisch",
+               onContainer: "aufInsel",
+               nbWithdrawables: "nbFischeAuf",
+               containerSize: "nbFischeBestellt",
+               withdrawNum: "nimm",
+               withdrawNum_noShadow: "nimm"
+            },
+            description: {
+               withdrawObject: "nimmFisch() nimmt den Fisch vom Feld",
+               dropObject: "legeFischAb() legt einen getragenen Fisch auf dem Feld ab",
+               onObject: "aufFisch() zeigt an, ob sich ein oder mehrere Fische auf dem Feld befinden",
+               onContainer: "aufInsel() zeigt an, ob sich eine Insel auf dem Feld befindet",
+               nbWithdrawables: "nbFischeAuf() zeigt an, wie viele Fische auf dem Feld sind",
+               containerSize: "nbFischeBestellt() zeigt an, wie viele Fische zur Insel geliefert werden müssen",
+               dropNum: "legeAb(nbFische) legt nbFische Fische auf dem Feld ab",
+               withdrawNum: "nimm(nbFische) nimmt nbFische Fische vom Feld",
+            },
+            messages: {
+               emptyBag: "Der Roboter trägt keinen Fisch!",
+               tooManyObjects: "Der Roboter trägt bereits einen Fisch!",
+               successContainersFilled: "Bravo, dein Roboter hat Fisch zu allen Inseln gebracht!",
+               failureContainersFilled: "Dein Roboter hat Fisch wieder ins Wasser gelegt!",
+               failureContainersFilledLess: "Es muss noch mindestens ein Fisch zu einer Insel gebracht werden.",
+               failureContainersFilledBag: "Dein Roboter hat zu viele Fische genommen.",
+               failureDropObject: "Dein Roboter versucht, zu viele Fische auf dieser Insel abzulegen.",
+               nothingToPickUp: "Kein Fisch hier!",
+            }
+         },
+
 
          es: {
             label: {
@@ -1826,6 +2106,91 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the marble",
+               dropObject: "drop the marble",
+               onObject: "on a marble",
+               onContainer: "on a hole",
+            },
+            code: {
+               withdrawObject: "pickMarble",
+               dropObject: "dropMarble",
+               onObject: "onMarble",
+               onContainer: "onHole",
+            },
+            description: {
+               withdrawObject: "pickMarble() picks up the marble from the robot's cell",
+               dropObject: "dropMarble() drops the transported marble on the robot's cell",
+               onObject: "onMarble() indicates if a marble is on the robot's cell",
+               onContainer: "onHole() indicates if there is a hole on the robot's cell",
+            },
+            messages: {
+               emptyBag: "The robot is not carrying a marble!",
+               tooManyObjects: "The robot is already carrying a marble!",
+               successContainersFilled: "Bravo, you have put away the marbles!",
+               failureContainersFilled: "The marbles are not all properly put away.",
+               failureContainersFilledLess: "There is one marble left to put away.",
+               failureContainersFilledBag: "The marble must be dropped in the hole!",
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de knikker oprapen",
+               dropObject: "de knikker neerleggen",
+               onObject: "op een knikker",
+               onContainer: "op een gat",
+            },
+            code: {
+               withdrawObject: "pakKnikker",
+               dropObject: "legKnikkerNeer",
+               onObject: "opKnikker",
+               onContainer: "opGat",
+            },
+            description: {
+               withdrawObject: "pakKnikker() raapt de knikker op van het vakje van de robot",
+               dropObject: "legKnikkerNeer() legt de vervoerde knikker neer op het vakje van de robot",
+               onObject: "opKnikker() geeft aan of er een knikker op het vakje van de robot ligt",
+               onContainer: "opGat() geeft aan of er een gat op het vakje van de robot is",
+            },
+            messages: {
+               emptyBag: "De robot draagt geen knikker!",
+               tooManyObjects: "De robot draagt al een knikker!",
+               successContainersFilled: "Bravo, je hebt de knikkers opgeruimd!",
+               failureContainersFilled: "De knikkers zijn niet allemaal goed opgeruimd.",
+               failureContainersFilledLess: "Er is nog een knikker om op te ruimen.",
+               failureContainersFilledBag: "De knikker moet in het gat worden gelegd!",
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "die Murmel aufheben",
+               dropObject: "die Murmel ablegen",
+               onObject: "auf einer Murmel",
+               onContainer: "auf einem Loch",
+            },
+            code: {
+               withdrawObject: "hebeMurmelAuf",
+               dropObject: "legeMurmelAb",
+               onObject: "aufMurmel",
+               onContainer: "aufLoch",
+            },
+            description: {
+               withdrawObject: "hebeMurmelAuf() hebt die Murmel vom Feld des Roboters auf",
+               dropObject: "legeMurmelAb() legt die getragene Murmel auf dem Feld des Roboters ab",
+               onObject: "aufMurmel() zeigt an, ob sich eine Murmel auf dem Feld des Roboters befindet",
+               onContainer: "aufLoch() zeigt an, ob sich ein Loch auf dem Feld des Roboters befindet",
+            },
+            messages: {
+               emptyBag: "Der Roboter trägt keine Murmel!",
+               tooManyObjects: "Der Roboter trägt bereits eine Murmel!",
+               successContainersFilled: "Bravo, Sie haben die Murmeln weggeräumt!",
+               failureContainersFilled: "Die Murmeln sind nicht alle richtig weggeräumt.",
+               failureContainersFilledLess: "Es ist noch eine Murmel wegzuräumen.",
+               failureContainersFilledBag: "Die Murmel muss in das Loch gelegt werden!",
+            }
+         },
+
 
          es: {
             label: {
@@ -1862,6 +2227,40 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Attention à l'astéroïde !"
             }
          },
+         en: {
+            label: {
+               obstacleInFront: "asteroid ahead"
+            },
+            code: {
+               obstacleInFront: "asteroidAhead"
+            },
+            messages: {
+               obstacle: "Watch out for the asteroid!"
+            }
+         },
+         nl: {
+            label: {
+               obstacleInFront: "planetoïde voor"
+            },
+            code: {
+               obstacleInFront: "planetoideVoor"
+            },
+            messages: {
+               obstacle: "Let op voor de planetoïde!"
+            }
+         },
+         de: {
+            label: {
+               obstacleInFront: "Asteroid davor"
+            },
+            code: {
+               obstacleInFront: "asteroidDavor"
+            },
+            messages: {
+               obstacle: "Achtung vor dem Asteroiden!"
+            }
+         },
+
 
          es: {
             label: {
@@ -1917,6 +2316,130 @@ var getContext = function(display, infos, curLevel) {
                failureDropObject: "Ce carton est déjà plein.",
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the book",
+               dropObject: "drop the book",
+               withdrawNum: "pick up %1 books",
+               withdrawNum_noShadow: "pick up %1 books",
+               dropNum: "drop %1 books",
+               dropNum_noShadow: "drop %1 books",
+               nbWithdrawables: "number of books on the cell",
+               containerSize: "number of books ordered",
+               onObject: "books on the cell",
+               onContainer: "on a box",
+            },
+            code: {
+               withdrawObject: "pickBook",
+               dropObject: "dropBook",
+               onObject: "onBooks",
+               onContainer: "onBox",
+               nbWithdrawables: "nbBooksOn",
+               containerSize: "nbBooksOrdered",
+            },
+            description: {
+               withdrawObject: "pickBook() picks up the book on the cell",
+               dropObject: "dropBook() drops the carried book on the cell",
+               onObject: "onBooks() indicates whether there are one or more books on the cell",
+               onContainer: "onBox() indicates whether there is a box on the cell",
+               nbWithdrawables: "nbBooksOn() indicates how many books are on the cell",
+               containerSize: "nbBooksOrdered() indicates how many books are ordered for this box",
+               dropNum: "drop(nbBooks) drops nbBooks books on the cell",
+               withdrawNum: "pick(nbBooks) picks up nbBooks books from the cell",
+            },
+            messages: {
+               emptyBag: "The robot is not carrying a book!",
+               tooManyObjects: "The robot is already carrying a book!",
+               successContainersFilled: "Congratulations, all boxes are full. The packages can now be delivered!",
+               failureContainersFilled: "Not all books have been put in boxes.",
+               failureContainersFilledLess: "There is still at least one book to put in a box.",
+               failureContainersFilledBag: "The books must be put in a box!",
+               failureDropObject: "This box is already full.",
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "het boek oprapen",
+               dropObject: "het boek neerleggen",
+               withdrawNum: "%1 boeken oprapen",
+               withdrawNum_noShadow: "%1 boeken oprapen",
+               dropNum: "%1 boeken neerleggen",
+               dropNum_noShadow: "%1 boeken neerleggen",
+               nbWithdrawables: "aantal boeken op het vakje",
+               containerSize: "aantal bestelde boeken",
+               onObject: "boeken op het vakje",
+               onContainer: "op een doos",
+            },
+            code: {
+               withdrawObject: "pakBoek",
+               dropObject: "legBoekNeer",
+               onObject: "opBoeken",
+               onContainer: "opDoos",
+               nbWithdrawables: "nbBoekenOp",
+               containerSize: "nbBoekenBesteld",
+            },
+            description: {
+               withdrawObject: "pakBoek() raapt het boek op dat op het vakje ligt",
+               dropObject: "legBoekNeer() legt het vervoerde boek neer op het vakje",
+               onObject: "opBoeken() geeft aan of er een of meer boeken op het vakje liggen",
+               onContainer: "opDoos() geeft aan of er een doos op het vakje is",
+               nbWithdrawables: "nbBoekenOp() geeft aan hoeveel boeken er op het vakje liggen",
+               containerSize: "nbBoekenBesteld() geeft aan hoeveel boeken er voor deze doos besteld zijn",
+               dropNum: "legNeer(nbBoeken) legt nbBoeken boeken neer op het vakje",
+               withdrawNum: "pak(nbBoeken) raapt nbBoeken boeken op van het vakje",
+            },
+            messages: {
+               emptyBag: "De robot draagt geen boek!",
+               tooManyObjects: "De robot draagt al een boek!",
+               successContainersFilled: "Bravo, alle dozen zijn vol. De pakketten kunnen nu geleverd worden!",
+               failureContainersFilled: "Niet alle boeken zijn in een doos gestopt.",
+               failureContainersFilledLess: "Er moet nog minstens één boek in een doos gelegd worden.",
+               failureContainersFilledBag: "De boeken moeten in een doos gelegd worden!",
+               failureDropObject: "Deze doos is al vol.",
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "das Buch aufheben",
+               dropObject: "das Buch ablegen",
+               withdrawNum: "%1 Bücher aufheben",
+               withdrawNum_noShadow: "%1 Bücher aufheben",
+               dropNum: "%1 Bücher ablegen",
+               dropNum_noShadow: "%1 Bücher ablegen",
+               nbWithdrawables: "Anzahl der Bücher auf dem Feld",
+               containerSize: "Anzahl der bestellten Bücher",
+               onObject: "Bücher auf dem Feld",
+               onContainer: "auf einem Karton",
+            },
+            code: {
+               withdrawObject: "hebeBuchAuf",
+               dropObject: "legeBuchAb",
+               onObject: "aufBuechern",
+               onContainer: "aufKarton",
+               nbWithdrawables: "nbBuecherAuf",
+               containerSize: "nbBuecherBestellt",
+            },
+            description: {
+               withdrawObject: "hebeBuchAuf() hebt das Buch vom Feld auf",
+               dropObject: "legeBuchAb() legt das getragene Buch auf dem Feld ab",
+               onObject: "aufBuechern() zeigt an, ob sich ein oder mehrere Bücher auf dem Feld befinden",
+               onContainer: "aufKarton() zeigt an, ob sich ein Karton auf dem Feld befindet",
+               nbWithdrawables: "nbBuecherAuf() zeigt an, wie viele Bücher auf dem Feld sind",
+               containerSize: "nbBuecherBestellt() zeigt an, wie viele Bücher für diesen Karton bestellt sind",
+               dropNum: "legeAb(nbBuecher) legt nbBuecher Bücher auf dem Feld ab",
+               withdrawNum: "hebeAuf(nbBuecher) hebt nbBuecher Bücher vom Feld auf",
+            },
+            messages: {
+               emptyBag: "Der Roboter trägt kein Buch!",
+               tooManyObjects: "Der Roboter trägt bereits ein Buch!",
+               successContainersFilled: "Bravo, alle Kartons sind voll. Die Pakete können jetzt geliefert werden!",
+               failureContainersFilled: "Nicht alle Bücher wurden in Kartons gelegt.",
+               failureContainersFilledLess: "Es muss noch mindestens ein Buch in einen Karton gelegt werden.",
+               failureContainersFilledBag: "Die Bücher müssen in einen Karton gelegt werden!",
+               failureDropObject: "Dieser Karton ist bereits voll.",
+            }
+         },
+
 
          es: {
             label: {
@@ -1966,6 +2489,76 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
          },
+         en: {
+             label: {
+               dropObject: "paint the cell",
+               onContainer: "on a marked cell",
+               readNumber: "number on the cell",
+             },
+             code: {
+                dropObject: "paintCell",
+                onContainer: "onMarkedCell",
+                readNumber: "numberOnCell"
+            },
+            description: {
+               dropObject: "paintCell() paints the cell under the robot",
+               onContainer: "onMarkedCell() indicates whether the robot is on a marked cell",
+               readNumber: "numberOnCell() returns the number written on the cell under the robot"
+             },
+             messages: {
+               successContainersFilled: "Congratulations, your robot painted the pattern!",
+               failureContainersFilled: "Your robot did not paint the correct cells.",
+               failureContainersFilledLess: "Your robot did not paint all the marked cells.",
+               failureContainersFilledBag: "Your robot did not place all the objects",
+             }
+         },
+         nl: {
+             label: {
+               dropObject: "het vakje verven",
+               onContainer: "op een gemarkeerd vakje",
+               readNumber: "nummer van het vakje",
+             },
+             code: {
+                dropObject: "verfVakje",
+                onContainer: "opGemarkeerdVakje",
+                readNumber: "nummerOpVakje"
+            },
+            description: {
+               dropObject: "verfVakje() verft het vakje onder de robot",
+               onContainer: "opGemarkeerdVakje() geeft aan of de robot op een gemarkeerd vakje staat",
+               readNumber: "nummerOpVakje() geeft het nummer terug dat op het vakje onder de robot staat"
+             },
+             messages: {
+               successContainersFilled: "Bravo, je robot heeft het motief geverfd!",
+               failureContainersFilled: "Je robot heeft niet de juiste vakjes geverfd.",
+               failureContainersFilledLess: "Je robot heeft niet alle gemarkeerde vakjes geverfd.",
+               failureContainersFilledBag: "Je robot heeft niet alle voorwerpen neergelegd",
+             }
+         },
+         de: {
+             label: {
+               dropObject: "das Feld bemalen",
+               onContainer: "auf einem markierten Feld",
+               readNumber: "Zahl auf dem Feld",
+             },
+             code: {
+                dropObject: "maleFeld",
+                onContainer: "aufMarkiertemFeld",
+                readNumber: "zahlAufFeld"
+            },
+            description: {
+               dropObject: "maleFeld() bemalt das Feld unter dem Roboter",
+               onContainer: "aufMarkiertemFeld() zeigt an, ob der Roboter auf einem markierten Feld steht",
+               readNumber: "zahlAufFeld() gibt die Zahl zurück, die auf dem Feld unter dem Roboter steht"
+             },
+             messages: {
+               successContainersFilled: "Bravo, dein Roboter hat das Muster bemalt!",
+               failureContainersFilled: "Dein Roboter hat nicht die richtigen Felder bemalt.",
+               failureContainersFilledLess: "Dein Roboter hat nicht alle markierten Felder bemalt.",
+               failureContainersFilledBag: "Dein Roboter hat nicht alle Objekte abgelegt",
+             }
+         },
+
 
          es: {
              label: {
@@ -1999,7 +2592,32 @@ var getContext = function(display, infos, curLevel) {
 				   failureContainersFilledLess: "Le dessin n'est pas fini !",
 				   failureDropObject: "Le robot n'a pas peint la case de la bonne couleur.",
             }
+         },
+         en: {
+            messages: {
+               successContainersFilled: "Congratulations, your drawing matches the model. What an artist!",
+               failureContainersFilled: "Look carefully at the model, your drawing is not identical.",
+               failureContainersFilledLess: "The drawing is not finished!",
+               failureDropObject: "The robot did not paint the cell with the right color.",
+            }
+         },
+         nl: {
+            messages: {
+               successContainersFilled: "Bravo, je tekening is identiek aan het model. Wat een kunstenaar!",
+               failureContainersFilled: "Kijk goed naar het model, je tekening is niet identiek.",
+               failureContainersFilledLess: "De tekening is niet af!",
+               failureDropObject: "De robot heeft het vakje niet in de juiste kleur geverfd.",
+            }
+         },
+         de: {
+            messages: {
+               successContainersFilled: "Bravo, deine Zeichnung stimmt mit dem Modell überein. Was für ein Künstler!",
+               failureContainersFilled: "Schau dir das Modell genau an, deine Zeichnung ist nicht identisch.",
+               failureContainersFilledLess: "Die Zeichnung ist noch nicht fertig!",
+               failureDropObject: "Der Roboter hat das Feld nicht in der richtigen Farbe bemalt.",
+            }
          }
+
       },
       rocket: {
          fr: {
@@ -2017,6 +2635,52 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Attention à l'astéroïde !"
             }
          },
+         en: {
+            label: {
+               obstacleRight: "asteroid to the right",
+               obstacleInFront: "asteroid ahead",
+               onExit: "on a rocket"
+            },
+            code: {
+               onExit: "onRocket"
+            },
+            messages: {
+               successReachExit: "Congratulations, the robot reached the rocket!",
+               failureReachExit: "The robot is lost in space. Try again to help it reach the rocket.",
+               obstacle: "Watch out for the asteroid!"
+            }
+         },
+         nl: {
+            label: {
+               obstacleRight: "planetoïde rechts",
+               obstacleInFront: "planetoïde voor",
+               onExit: "op een raket"
+            },
+            code: {
+               onExit: "opRaket"
+            },
+            messages: {
+               successReachExit: "Bravo, de robot heeft de raket bereikt!",
+               failureReachExit: "De robot is verdwaald in de ruimte. Begin opnieuw om hem te helpen de raket te bereiken.",
+               obstacle: "Let op voor de planetoïde!"
+            }
+         },
+         de: {
+            label: {
+               obstacleRight: "Asteroid rechts",
+               obstacleInFront: "Asteroid davor",
+               onExit: "auf einer Rakete"
+            },
+            code: {
+               onExit: "aufRakete"
+            },
+            messages: {
+               successReachExit: "Bravo, der Roboter hat die Rakete erreicht!",
+               failureReachExit: "Der Roboter ist im Weltall verloren. Starte neu, um ihm zu helfen, die Rakete zu erreichen.",
+               obstacle: "Achtung vor dem Asteroiden!"
+            }
+         },
+
 
          es: {
             label: {
@@ -2089,6 +2753,175 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Le robot n'a pas déposé les coquillages dans le panier."
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the seashell",
+               dropObject: "drop the seashells",
+               withdrawNum: "take %1 seashells",
+               withdrawNum_noShadow: "take %1 seashells",
+               dropNum: "drop %1 seashells",
+               dropNum_noShadow: "drop %1 seashells",
+               nbWithdrawables: "number of seashells on the cell",
+               containerSize: "basket size",
+               onObject: "on a seashell",
+               onContainer: "on a basket",
+               obstacleNorth: "rock to the north",
+               obstacleSouth: "rock to the south",
+               obstacleEast: "rock to the east",
+               obstacleWest: "rock to the west"
+            },
+            code: {
+               withdrawObject: "pickSeashell",
+               dropObject: "dropSeashells",
+               onObject: "onSeashell",
+               onContainer: "onBasket",
+               nbWithdrawables: "nbSeashells",
+               containerSize: "basketSize",
+               withdrawNum: "pick",
+               withdrawNum_noShadow: "pick",
+               obstacleNorth: "rockNorth",
+               obstacleSouth: "rockSouth",
+               obstacleEast: "rockEast",
+               obstacleWest: "rockWest"
+            },
+            description: {
+               withdrawObject: "pickSeashell() picks up the seashell on the cell",
+               dropObject: "dropSeashells() drops all carried seashells",
+               onObject: "onSeashell() indicates whether there are one or more seashells on the cell",
+               onContainer: "onBasket() indicates whether there is a basket on the cell",
+               nbWithdrawables: "nbSeashells() indicates how many seashells are on the cell",
+               containerSize: "basketSize() indicates how many seashells the basket must hold",
+               dropNum: "drop(nbSeashells) drops nbSeashells seashells on the cell",
+               withdrawNum: "pick(nbSeashells) picks up nbSeashells seashells from the cell",
+               obstacleNorth: "rockNorth() tests whether there is a rock on the cell north of the robot",
+               obstacleSouth: "rockSouth() tests whether there is a rock on the cell south of the robot",
+               obstacleEast: "rockEast() tests whether there is a rock on the cell east of the robot",
+               obstacleWest: "rockWest() tests whether there is a rock on the cell west of the robot"
+            },
+            messages: {
+               emptyBag: "The robot is not carrying a seashell!",
+               successContainersFilled: "Congratulations, your robot collected all the seashells!",
+               failureContainersFilledLess: "There is still at least one seashell to pick up.",
+               failureContainersFilledBag: "Your robot picked up too many seashells.",
+               failureDropObject: "Your robot is trying to drop too many seashells in this basket.",
+               nothingToPickUp: "No seashell here!",
+               obstacle: "The robot is trying to crash into a rock.",
+               failureReachExit: "The robot did not drop the seashells in the basket."
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "de schelp oprapen",
+               dropObject: "de schelpen neerleggen",
+               withdrawNum: "%1 schelpen nemen",
+               withdrawNum_noShadow: "%1 schelpen nemen",
+               dropNum: "%1 schelpen neerleggen",
+               dropNum_noShadow: "%1 schelpen neerleggen",
+               nbWithdrawables: "aantal schelpen op het vakje",
+               containerSize: "grootte van het mandje",
+               onObject: "op een schelp",
+               onContainer: "op een mandje",
+               obstacleNorth: "rots in het noorden",
+               obstacleSouth: "rots in het zuiden",
+               obstacleEast: "rots in het oosten",
+               obstacleWest: "rots in het westen"
+            },
+            code: {
+               withdrawObject: "pakSchelp",
+               dropObject: "legSchelpenNeer",
+               onObject: "opSchelp",
+               onContainer: "opMandje",
+               nbWithdrawables: "nbSchelpen",
+               containerSize: "grootteMandje",
+               withdrawNum: "pak",
+               withdrawNum_noShadow: "pak",
+               obstacleNorth: "rotsNoord",
+               obstacleSouth: "rotsZuid",
+               obstacleEast: "rotsOost",
+               obstacleWest: "rotsWest"
+            },
+            description: {
+               withdrawObject: "pakSchelp() raapt de schelp op die op het vakje ligt",
+               dropObject: "legSchelpenNeer() legt alle vervoerde schelpen neer",
+               onObject: "opSchelp() geeft aan of er een of meer schelpen op het vakje liggen",
+               onContainer: "opMandje() geeft aan of er een mandje op het vakje is",
+               nbWithdrawables: "nbSchelpen() geeft aan hoeveel schelpen er op het vakje liggen",
+               containerSize: "grootteMandje() geeft aan hoeveel schelpen het mandje moet bevatten",
+               dropNum: "legNeer(nbSchelpen) legt nbSchelpen schelpen neer op het vakje",
+               withdrawNum: "pak(nbSchelpen) raapt nbSchelpen schelpen op van het vakje",
+               obstacleNorth: "rotsNoord() test of er een rots is op het vakje ten noorden van de robot",
+               obstacleSouth: "rotsZuid() test of er een rots is op het vakje ten zuiden van de robot",
+               obstacleEast: "rotsOost() test of er een rots is op het vakje ten oosten van de robot",
+               obstacleWest: "rotsWest() test of er een rots is op het vakje ten westen van de robot"
+            },
+            messages: {
+               emptyBag: "De robot draagt geen schelp!",
+               successContainersFilled: "Bravo, je robot heeft alle schelpen verzameld!",
+               failureContainersFilledLess: "Er moet nog minstens één schelp opgeraapt worden.",
+               failureContainersFilledBag: "Je robot heeft te veel schelpen opgeraapt.",
+               failureDropObject: "Je robot probeert te veel schelpen in dit mandje neer te leggen.",
+               nothingToPickUp: "Geen schelp hier!",
+               obstacle: "De robot probeert tegen een rots te rijden.",
+               failureReachExit: "De robot heeft de schelpen niet in het mandje gelegd."
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "die Muschel aufheben",
+               dropObject: "die Muscheln ablegen",
+               withdrawNum: "%1 Muscheln nehmen",
+               withdrawNum_noShadow: "%1 Muscheln nehmen",
+               dropNum: "%1 Muscheln ablegen",
+               dropNum_noShadow: "%1 Muscheln ablegen",
+               nbWithdrawables: "Anzahl der Muscheln auf dem Feld",
+               containerSize: "Größe des Korbs",
+               onObject: "auf einer Muschel",
+               onContainer: "auf einem Korb",
+               obstacleNorth: "Felsen im Norden",
+               obstacleSouth: "Felsen im Süden",
+               obstacleEast: "Felsen im Osten",
+               obstacleWest: "Felsen im Westen"
+            },
+            code: {
+               withdrawObject: "hebeMuschelAuf",
+               dropObject: "legeMuschelnAb",
+               onObject: "aufMuschel",
+               onContainer: "aufKorb",
+               nbWithdrawables: "nbMuscheln",
+               containerSize: "korbGroesse",
+               withdrawNum: "hebeAuf",
+               withdrawNum_noShadow: "hebeAuf",
+               obstacleNorth: "felsenNord",
+               obstacleSouth: "felsenSued",
+               obstacleEast: "felsenOst",
+               obstacleWest: "felsenWest"
+            },
+            description: {
+               withdrawObject: "hebeMuschelAuf() hebt die Muschel vom Feld auf",
+               dropObject: "legeMuschelnAb() legt alle getragenen Muscheln ab",
+               onObject: "aufMuschel() zeigt an, ob sich eine oder mehrere Muscheln auf dem Feld befinden",
+               onContainer: "aufKorb() zeigt an, ob sich ein Korb auf dem Feld befindet",
+               nbWithdrawables: "nbMuscheln() zeigt an, wie viele Muscheln auf dem Feld sind",
+               containerSize: "korbGroesse() zeigt an, wie viele Muscheln der Korb enthalten muss",
+               dropNum: "legeAb(nbMuscheln) legt nbMuscheln Muscheln auf dem Feld ab",
+               withdrawNum: "hebeAuf(nbMuscheln) hebt nbMuscheln Muscheln vom Feld auf",
+               obstacleNorth: "felsenNord() prüft, ob sich nördlich des Roboters ein Felsen befindet",
+               obstacleSouth: "felsenSued() prüft, ob sich südlich des Roboters ein Felsen befindet",
+               obstacleEast: "felsenOst() prüft, ob sich östlich des Roboters ein Felsen befindet",
+               obstacleWest: "felsenWest() prüft, ob sich westlich des Roboters ein Felsen befindet"
+            },
+            messages: {
+               emptyBag: "Der Roboter trägt keine Muschel!",
+               successContainersFilled: "Bravo, dein Roboter hat alle Muscheln gesammelt!",
+               failureContainersFilledLess: "Es muss noch mindestens eine Muschel aufgehoben werden.",
+               failureContainersFilledBag: "Dein Roboter hat zu viele Muscheln aufgehoben.",
+               failureDropObject: "Dein Roboter versucht, zu viele Muscheln in diesen Korb zu legen.",
+               nothingToPickUp: "Keine Muschel hier!",
+               obstacle: "Der Roboter versucht, gegen einen Felsen zu fahren.",
+               failureReachExit: "Der Roboter hat die Muscheln nicht in den Korb gelegt."
+            }
+         }
+
       },
       sokoban: {
          fr: {
@@ -2270,6 +3103,130 @@ var getContext = function(display, infos, curLevel) {
                failureDropObject: "Ce castor a déjà du bois.",
             }
          },
+         en: {
+            label: {
+               withdrawObject: "pick up the wood",
+               dropObject: "give the wood to the beaver",
+               withdrawNum: "pick up %1 logs",
+               withdrawNum_noShadow: "pick up %1 logs",
+               dropNum: "give %1 logs",
+               dropNum_noShadow: "give %1 logs",
+               nbWithdrawables: "number of logs on the cell",
+               containerSize: "number of logs requested",
+               onObject: "on wood",
+               onContainer: "at a beaver",
+            },
+            code: {
+               withdrawObject: "pickWood",
+               dropObject: "giveWood",
+               onObject: "onWood",
+               onContainer: "atBeaver",
+               nbWithdrawables: "nbLogsOn",
+               containerSize: "nbLogsToDrop",
+            },
+            description: {
+               withdrawObject: "pickWood() picks up the wood on the cell",
+               dropObject: "giveWood() drops the carried wood on the cell",
+               onObject: "onWood() indicates whether there is wood on the cell",
+               onContainer: "atBeaver() indicates whether there is a beaver on the cell",
+               nbWithdrawables: "nbLogsOn() indicates how many logs are on the cell",
+               containerSize: "nbLogsToDrop() indicates how many logs are requested on the cell",
+               dropNum: "drop(nbLogs) drops nbLogs logs on the cell",
+               withdrawNum: "pick(nbLogs) picks up nbLogs logs from the cell",
+            },
+            messages: {
+               emptyBag: "The robot is not carrying wood!",
+               tooManyObjects: "The robot is already carrying wood!",
+               successContainersFilled: "Congratulations, all beavers have wood. They thank your robot!",
+               failureContainersFilled: "Not all the wood has been distributed.",
+               failureContainersFilledLess: "There is still wood to distribute.",
+               failureContainersFilledBag: "The wood must be given to the beaver!",
+               failureDropObject: "This beaver already has wood.",
+            }
+         },
+         nl: {
+            label: {
+               withdrawObject: "het hout oprapen",
+               dropObject: "het hout aan de bever geven",
+               withdrawNum: "%1 blokken oprapen",
+               withdrawNum_noShadow: "%1 blokken oprapen",
+               dropNum: "%1 blokken geven",
+               dropNum_noShadow: "%1 blokken geven",
+               nbWithdrawables: "aantal blokken op het vakje",
+               containerSize: "aantal gevraagde blokken",
+               onObject: "op hout",
+               onContainer: "bij een bever",
+            },
+            code: {
+               withdrawObject: "pakHout",
+               dropObject: "geefHout",
+               onObject: "opHout",
+               onContainer: "bijBever",
+               nbWithdrawables: "nbBlokkenOp",
+               containerSize: "nbBlokkenTeLeggen",
+            },
+            description: {
+               withdrawObject: "pakHout() raapt het hout op dat op het vakje ligt",
+               dropObject: "geefHout() legt het vervoerde hout neer op het vakje",
+               onObject: "opHout() geeft aan of er hout op het vakje ligt",
+               onContainer: "bijBever() geeft aan of er een bever op het vakje is",
+               nbWithdrawables: "nbBlokkenOp() geeft aan hoeveel blokken er op het vakje liggen",
+               containerSize: "nbBlokkenTeLeggen() geeft aan hoeveel blokken er op het vakje gevraagd worden",
+               dropNum: "legNeer(nbBlokken) legt nbBlokken blokken neer op het vakje",
+               withdrawNum: "pak(nbBlokken) raapt nbBlokken blokken op van het vakje",
+            },
+            messages: {
+               emptyBag: "De robot draagt geen hout!",
+               tooManyObjects: "De robot draagt al hout!",
+               successContainersFilled: "Bravo, alle bevers hebben hout. Ze bedanken je robot!",
+               failureContainersFilled: "Niet al het hout is verdeeld.",
+               failureContainersFilledLess: "Er moet nog hout verdeeld worden.",
+               failureContainersFilledBag: "Het hout moet aan de bever gegeven worden!",
+               failureDropObject: "Deze bever heeft al hout.",
+            }
+         },
+         de: {
+            label: {
+               withdrawObject: "das Holz aufheben",
+               dropObject: "das Holz dem Biber geben",
+               withdrawNum: "%1 Holzblöcke aufheben",
+               withdrawNum_noShadow: "%1 Holzblöcke aufheben",
+               dropNum: "%1 Holzblöcke geben",
+               dropNum_noShadow: "%1 Holzblöcke geben",
+               nbWithdrawables: "Anzahl der Holzblöcke auf dem Feld",
+               containerSize: "Anzahl der gewünschten Holzblöcke",
+               onObject: "auf Holz",
+               onContainer: "bei einem Biber",
+            },
+            code: {
+               withdrawObject: "hebeHolzAuf",
+               dropObject: "gibHolz",
+               onObject: "aufHolz",
+               onContainer: "beiBiber",
+               nbWithdrawables: "nbHolzbloeckeAuf",
+               containerSize: "nbHolzbloeckeAbzulegen",
+            },
+            description: {
+               withdrawObject: "hebeHolzAuf() hebt das Holz vom Feld auf",
+               dropObject: "gibHolz() legt das getragene Holz auf dem Feld ab",
+               onObject: "aufHolz() zeigt an, ob sich Holz auf dem Feld befindet",
+               onContainer: "beiBiber() zeigt an, ob sich ein Biber auf dem Feld befindet",
+               nbWithdrawables: "nbHolzbloeckeAuf() zeigt an, wie viele Holzblöcke auf dem Feld sind",
+               containerSize: "nbHolzbloeckeAbzulegen() zeigt an, wie viele Holzblöcke auf dem Feld gewünscht sind",
+               dropNum: "legeAb(nbHolzbloecke) legt nbHolzbloecke Holzblöcke auf dem Feld ab",
+               withdrawNum: "hebeAuf(nbHolzbloecke) hebt nbHolzbloecke Holzblöcke vom Feld auf",
+            },
+            messages: {
+               emptyBag: "Der Roboter trägt kein Holz!",
+               tooManyObjects: "Der Roboter trägt bereits Holz!",
+               successContainersFilled: "Bravo, alle Biber haben Holz. Sie danken deinem Roboter!",
+               failureContainersFilled: "Nicht das gesamte Holz wurde verteilt.",
+               failureContainersFilledLess: "Es muss noch Holz verteilt werden.",
+               failureContainersFilledBag: "Das Holz muss dem Biber gegeben werden!",
+               failureDropObject: "Dieser Biber hat bereits Holz.",
+            }
+         },
+
 
          es: {
             label: {
@@ -2314,6 +3271,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "surFlecheDroite",
                      description: "surFlecheDroite(): Le robot est-il sur une flèche vers la droite ?"
                   },
+                  en: {
+                     label: "on a right arrow",
+                     code: "onRightArrow",
+                     description: "onRightArrow(): Is the robot on a right arrow?"
+                  },
+                  nl: {
+                     label: "op een pijl naar rechts",
+                     code: "opPijlRechts",
+                     description: "opPijlRechts(): Staat de robot op een pijl naar rechts?"
+                  },
+                  de: {
+                     label: "auf einem Pfeil nach rechts",
+                     code: "aufPfeilRechts",
+                     description: "aufPfeilRechts(): Steht der Roboter auf einem Pfeil nach rechts?"
+                  },
                   es: {
                      label: "sobre una flecha hacia la derecha",
                      code: "sobreFlechaHaciaLaDerecha",
@@ -2337,6 +3309,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers la gauche",
                      code: "surFlecheGauche",
                      description: "surFlecheGauche(): Le robot est-il sur une flèche vers la gauche ?"
+                  },
+                  en: {
+                     label: "on a left arrow",
+                     code: "onLeftArrow",
+                     description: "onLeftArrow(): Is the robot on a left arrow?"
+                  },
+                  nl: {
+                     label: "op een pijl naar links",
+                     code: "opPijlLinks",
+                     description: "opPijlLinks(): Staat de robot op een pijl naar links?"
+                  },
+                  de: {
+                     label: "auf einem Pfeil nach links",
+                     code: "aufPfeilLinks",
+                     description: "aufPfeilLinks(): Steht der Roboter auf einem Pfeil nach links?"
                   },
 
                   es: {
@@ -2363,6 +3350,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "surFlecheHaut",
                      description: "surFlecheHaut(): Le robot est-il sur une flèche vers le haut ?"
                   },
+                  en: {
+                     label: "on an up arrow",
+                     code: "onUpArrow",
+                     description: "onUpArrow(): Is the robot on an up arrow?"
+                  },
+                  nl: {
+                     label: "op een pijl naar boven",
+                     code: "opPijlOmhoog",
+                     description: "opPijlOmhoog(): Staat de robot op een pijl naar boven?"
+                  },
+                  de: {
+                     label: "auf einem Pfeil nach oben",
+                     code: "aufPfeilOben",
+                     description: "aufPfeilOben(): Steht der Roboter auf einem Pfeil nach oben?"
+                  },
 
                   es: {
                      label: "sobre una flecha hacia arriba",
@@ -2387,6 +3389,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers le bas",
                      code: "surFlecheBas",
                      description: "surFlecheBas(): Le robot est-il sur une flèche vers le bas ?"
+                  },
+                  en: {
+                     label: "on a down arrow",
+                     code: "onDownArrow",
+                     description: "onDownArrow(): Is the robot on a down arrow?"
+                  },
+                  nl: {
+                     label: "op een pijl naar beneden",
+                     code: "opPijlOmlaag",
+                     description: "opPijlOmlaag(): Staat de robot op een pijl naar beneden?"
+                  },
+                  de: {
+                     label: "auf einem Pfeil nach unten",
+                     code: "aufPfeilUnten",
+                     description: "aufPfeilUnten(): Steht der Roboter auf einem Pfeil nach unten?"
                   },
 
                   es: {
@@ -2428,6 +3445,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "rondCarte",
                      description: "rondCarte(): Le robot est-il sur une carte qui contient un rond ?"
                   },
+                  en: {
+                     label: "circle on the card",
+                     code: "circleOnCard",
+                     description: "circleOnCard(): Is the robot on a card that contains a circle?"
+                  },
+                  nl: {
+                     label: "rondje op de kaart",
+                     code: "rondjeOpKaart",
+                     description: "rondjeOpKaart(): Staat de robot op een kaart met een rondje?"
+                  },
+                  de: {
+                     label: "Kreis auf der Karte",
+                     code: "kreisAufKarte",
+                     description: "kreisAufKarte(): Steht der Roboter auf einer Karte mit einem Kreis?"
+                  },
 
                   es: {
                      label: "círculo sobre la carta",
@@ -2455,6 +3487,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "carreCarte",
                      description: "carreCarte(): Le robot est-il sur une carte qui contient un carré ?"
                   },
+                  en: {
+                     label: "square on the card",
+                     code: "squareOnCard",
+                     description: "squareOnCard(): Is the robot on a card that contains a square?"
+                  },
+                  nl: {
+                     label: "vierkant op de kaart",
+                     code: "vierkantOpKaart",
+                     description: "vierkantOpKaart(): Staat de robot op een kaart met een vierkant?"
+                  },
+                  de: {
+                     label: "Quadrat auf der Karte",
+                     code: "quadratAufKarte",
+                     description: "quadratAufKarte(): Steht der Roboter auf einer Karte mit einem Quadrat?"
+                  },
                   es: {
                      label: "cuadrado sobre la carta",
                      code: "cuadradoCarta",
@@ -2480,6 +3527,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "triangle sur la carte",
                      code: "triangleCarte",
                      description: "rondCarte(): Le robot est-il sur une carte qui contient un triangle ?"
+                  },
+                  en: {
+                     label: "triangle on the card",
+                     code: "triangleOnCard",
+                     description: "triangleOnCard(): Is the robot on a card that contains a triangle?"
+                  },
+                  nl: {
+                     label: "driehoek op de kaart",
+                     code: "driehoekOpKaart",
+                     description: "driehoekOpKaart(): Staat de robot op een kaart met een driehoek?"
+                  },
+                  de: {
+                     label: "Dreieck auf der Karte",
+                     code: "dreieckAufKarte",
+                     description: "dreieckAufKarte(): Steht der Roboter auf einer Karte mit einem Dreieck?"
                   },
                   es: {
                      label: "triángulo sobre la carta",
@@ -2507,6 +3569,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "surQuadrille",
                      description: "surQuadrille(): Le robot est-il sur une carte quadrillée ?"
                   },
+                  en: {
+                     label: "on a checkered pattern",
+                     code: "onCheckered",
+                     description: "onCheckered(): Is the robot on a checkered card?"
+                  },
+                  nl: {
+                     label: "op een geruit motief",
+                     code: "opGeruit",
+                     description: "opGeruit(): Staat de robot op een geruite kaart?"
+                  },
+                  de: {
+                     label: "auf einem karierten Muster",
+                     code: "aufKariert",
+                     description: "aufKariert(): Steht der Roboter auf einer karierten Karte?"
+                  },
                   es: {
                      label: "patrón cuadriculado",
                      code: "sobreCudarícula",
@@ -2533,6 +3610,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "surRaye",
                      description: "surRaye(): Le robot est-il sur une carte rayée ?"
                   },
+                  en: {
+                     label: "on a striped pattern",
+                     code: "onStriped",
+                     description: "onStriped(): Is the robot on a striped card?"
+                  },
+                  nl: {
+                     label: "op een gestreept motief",
+                     code: "opGestreept",
+                     description: "opGestreept(): Staat de robot op een gestreepte kaart?"
+                  },
+                  de: {
+                     label: "auf einem gestreiften Muster",
+                     code: "aufGestreift",
+                     description: "aufGestreift(): Steht der Roboter auf einer gestreiften Karte?"
+                  },
                   es: {
                      label: "patrón rayado",
                      code: "sobreRayado",
@@ -2558,6 +3650,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur un motif à pois",
                      code: "surPois",
                      description: "surPois(): Le robot est-il sur une carte à pois ?"
+                  },
+                  en: {
+                     label: "on a polka-dot pattern",
+                     code: "onPolkaDot",
+                     description: "onPolkaDot(): Is the robot on a polka-dot card?"
+                  },
+                  nl: {
+                     label: "op een gestippeld motief",
+                     code: "opGestippeld",
+                     description: "opGestippeld(): Staat de robot op een gestippelde kaart?"
+                  },
+                  de: {
+                     label: "auf einem gepunkteten Muster",
+                     code: "aufGepunktet",
+                     description: "aufGepunktet(): Steht der Roboter auf einer gepunkteten Karte?"
                   },
                   es: {
                      label: "patrón con puntos",
@@ -2663,6 +3770,21 @@ var getContext = function(display, infos, curLevel) {
                  code: "surCroix",
                  description: "surCroix(): Le robot est-il sur une croix ?"
                },
+               en: {
+                  label: "on a cross",
+                  code: "onCross",
+                  description: "onCross(): Is the robot on a cross?"
+               },
+               nl: {
+                  label: "op een kruis",
+                  code: "opKruis",
+                  description: "opKruis(): Staat de robot op een kruis?"
+               },
+               de: {
+                  label: "auf einem Kreuz",
+                  code: "aufKreuz",
+                  description: "aufKreuz(): Steht der Roboter auf einem Kreuz?"
+               },
                es: {
                  label: "sobre cruz",
                  code: "sobreCruz",
@@ -2686,6 +3808,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur étoile",
                  code: "surEtoile",
                  description: "surEtoile(): Le robot est-il sur une étoile ?"
+               },
+               en: {
+                  label: "on a star",
+                  code: "onStar",
+                  description: "onStar(): Is the robot on a star?"
+               },
+               nl: {
+                  label: "op een ster",
+                  code: "opSter",
+                  description: "opSter(): Staat de robot op een ster?"
+               },
+               de: {
+                  label: "auf einem Stern",
+                  code: "aufStern",
+                  description: "aufStern(): Steht der Roboter auf einem Stern?"
                },
                es: {
                  label: "sobre estrella",
@@ -2711,6 +3848,21 @@ var getContext = function(display, infos, curLevel) {
                  code: "surCarre",
                  description: "surCarre(): Le robot est-il sur un carré ?"
                },
+               en: {
+                  label: "on a square",
+                  code: "onSquare",
+                  description: "onSquare(): Is the robot on a square?"
+               },
+               nl: {
+                  label: "op een vierkant",
+                  code: "opVierkant",
+                  description: "opVierkant(): Staat de robot op een vierkant?"
+               },
+               de: {
+                  label: "auf einem Quadrat",
+                  code: "aufQuadrat",
+                  description: "aufQuadrat(): Steht der Roboter auf einem Quadrat?"
+               },
                es: {
                  label: "sobre cuadrado",
                  code: "sobreCuadrado",
@@ -2734,6 +3886,21 @@ var getContext = function(display, infos, curLevel) {
                     label: "déposer un jeton",
                     code: "deposerJeton",
                     description: "deposerJeton(): Le robot dépose un jeton sur la case."
+                  },
+                  en: {
+                     label: "drop a token",
+                     code: "dropToken",
+                     description: "dropToken(): The robot drops a token on the cell."
+                  },
+                  nl: {
+                     label: "een fiche neerleggen",
+                     code: "legFicheNeer",
+                     description: "legFicheNeer(): De robot legt een fiche neer op het vakje."
+                  },
+                  de: {
+                     label: "einen Spielstein ablegen",
+                     code: "legeSpielsteinAb",
+                     description: "legeSpielsteinAb(): Der Roboter legt einen Spielstein auf dem Feld ab."
                   }
                 },
                category: "robot",
@@ -2786,6 +3953,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur chocolat",
                  code: "surChocolat",
                  description: "surChocolat(): Le robot est-il sur un biscuit au chocolat ?"
+               },
+               en: {
+                  label: "on chocolate",
+                  code: "onChocolate",
+                  description: "onChocolate(): Is the robot on a chocolate biscuit?"
+               },
+               nl: {
+                  label: "op chocolade",
+                  code: "opChocolade",
+                  description: "opChocolade(): Staat de robot op een chocoladebiscuit?"
+               },
+               de: {
+                  label: "auf Schokolade",
+                  code: "aufSchokolade",
+                  description: "aufSchokolade(): Steht der Roboter auf einem Schokoladenkeks?"
                }
              },
              category: "robot",
@@ -2805,6 +3987,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur trou",
                  code: "surTrou",
                  description: "surTrou(): Le robot est-il sur un biscuit troué ?"
+               },
+               en: {
+                  label: "on a hole",
+                  code: "onHole",
+                  description: "onHole(): Is the robot on a holed biscuit?"
+               },
+               nl: {
+                  label: "op een gat",
+                  code: "opGat",
+                  description: "opGat(): Staat de robot op een biscuit met een gat?"
+               },
+               de: {
+                  label: "auf einem Loch",
+                  code: "aufLoch",
+                  description: "aufLoch(): Steht der Roboter auf einem Keks mit einem Loch?"
                }
              },
              category: "robot",
@@ -2824,6 +4021,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur rond",
                  code: "surRond",
                  description: "surRond(): Le robot est-il sur un biscuit rond ?"
+               },
+               en: {
+                  label: "on a circle",
+                  code: "onCircle",
+                  description: "onCircle(): Is the robot on a round biscuit?"
+               },
+               nl: {
+                  label: "op een rondje",
+                  code: "opRondje",
+                  description: "opRondje(): Staat de robot op een ronde biscuit?"
+               },
+               de: {
+                  label: "auf einem Kreis",
+                  code: "aufKreis",
+                  description: "aufKreis(): Steht der Roboter auf einem runden Keks?"
                }
              },
              category: "robot",
@@ -2843,6 +4055,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur triangle",
                  code: "surTriangle",
                  description: "surTriangle(): Le robot est-il sur un biscuit triangle ?"
+               },
+               en: {
+                  label: "on a triangle",
+                  code: "onTriangle",
+                  description: "onTriangle(): Is the robot on a triangle biscuit?"
+               },
+               nl: {
+                  label: "op een driehoek",
+                  code: "opDriehoek",
+                  description: "opDriehoek(): Staat de robot op een driehoekige biscuit?"
+               },
+               de: {
+                  label: "auf einem Dreieck",
+                  code: "aufDreieck",
+                  description: "aufDreieck(): Steht der Roboter auf einem Dreieckskeks?"
                }
              },
              category: "robot",
@@ -2862,6 +4089,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur carré",
                  code: "surCarre",
                  description: "surCarre(): Le robot est-il sur un biscuit carré ?"
+               },
+               en: {
+                  label: "on a square",
+                  code: "onSquare",
+                  description: "onSquare(): Is the robot on a square biscuit?"
+               },
+               nl: {
+                  label: "op een vierkant",
+                  code: "opVierkant",
+                  description: "opVierkant(): Staat de robot op een vierkante biscuit?"
+               },
+               de: {
+                  label: "auf einem Quadrat",
+                  code: "aufQuadrat",
+                  description: "aufQuadrat(): Steht der Roboter auf einem quadratischen Keks?"
                }
              },
              category: "robot",
@@ -2906,6 +4148,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du coeur",
                  code: "surCoeur",
                  description: "surCoeur(): Le robot est-il sur une carte coeur ?"
+               },
+               en: {
+                  label: "on hearts",
+                  code: "onHearts",
+                  description: "onHearts(): Is the robot on a hearts card?"
+               },
+               nl: {
+                  label: "op harten",
+                  code: "opHarten",
+                  description: "opHarten(): Staat de robot op een hartenkaart?"
+               },
+               de: {
+                  label: "auf Herz",
+                  code: "aufHerz",
+                  description: "aufHerz(): Steht der Roboter auf einer Herzkarte?"
                }
              },
              category: "robot",
@@ -2925,6 +4182,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du pique",
                  code: "surPique",
                  description: "surPique(): Le robot est-il sur un carte pique ?"
+               },
+               en: {
+                  label: "on spades",
+                  code: "onSpades",
+                  description: "onSpades(): Is the robot on a spades card?"
+               },
+               nl: {
+                  label: "op schoppen",
+                  code: "opSchoppen",
+                  description: "opSchoppen(): Staat de robot op een schoppenkaart?"
+               },
+               de: {
+                  label: "auf Pik",
+                  code: "aufPik",
+                  description: "aufPik(): Steht der Roboter auf einer Pikkarte?"
                }
              },
              category: "robot",
@@ -2944,6 +4216,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du trèfle",
                  code: "surTrefle",
                  description: "surTrefle(): Le robot est-il sur une carte trèfle ?"
+               },
+               en: {
+                  label: "on clubs",
+                  code: "onClubs",
+                  description: "onClubs(): Is the robot on a clubs card?"
+               },
+               nl: {
+                  label: "op klaveren",
+                  code: "opKlaveren",
+                  description: "opKlaveren(): Staat de robot op een klaverenkaart?"
+               },
+               de: {
+                  label: "auf Kreuz",
+                  code: "aufKreuz",
+                  description: "aufKreuz(): Steht der Roboter auf einer Kreuzkarte?"
                }
              },
              category: "robot",
@@ -2963,6 +4250,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du carreau",
                  code: "surCarreau",
                  description: "surCarreau(): Le robot est-il sur une case carreau ?"
+               },
+               en: {
+                  label: "on diamonds",
+                  code: "onDiamonds",
+                  description: "onDiamonds(): Is the robot on a diamonds card?"
+               },
+               nl: {
+                  label: "op ruiten",
+                  code: "opRuiten",
+                  description: "opRuiten(): Staat de robot op een ruitenkaart?"
+               },
+               de: {
+                  label: "auf Karo",
+                  code: "aufKaro",
+                  description: "aufKaro(): Steht der Roboter auf einer Karokarte?"
                }
              },
              category: "robot",
@@ -2982,6 +4284,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur une seule forme",
                  code: "surUneForme",
                  description: "surUneForme(): Le robot est-il sur une carte contenant une seule forme ?"
+               },
+               en: {
+                  label: "on a single shape",
+                  code: "onOneShape",
+                  description: "onOneShape(): Is the robot on a card containing a single shape?"
+               },
+               nl: {
+                  label: "op één vorm",
+                  code: "opEenVorm",
+                  description: "opEenVorm(): Staat de robot op een kaart met één vorm?"
+               },
+               de: {
+                  label: "auf einer einzelnen Form",
+                  code: "aufEinerForm",
+                  description: "aufEinerForm(): Steht der Roboter auf einer Karte mit einer einzelnen Form?"
                }
              },
              category: "robot",
@@ -3001,6 +4318,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur deux formes",
                  code: "surDeuxFormes",
                  description: "surDeuxFormes(): Le robot est-il sur une carte contenant deux formes ?"
+               },
+               en: {
+                  label: "on two shapes",
+                  code: "onTwoShapes",
+                  description: "onTwoShapes(): Is the robot on a card containing two shapes?"
+               },
+               nl: {
+                  label: "op twee vormen",
+                  code: "opTweeVormen",
+                  description: "opTweeVormen(): Staat de robot op een kaart met twee vormen?"
+               },
+               de: {
+                  label: "auf zwei Formen",
+                  code: "aufZweiFormen",
+                  description: "aufZweiFormen(): Steht der Roboter auf einer Karte mit zwei Formen?"
                }
              },
              category: "robot",
@@ -3041,6 +4373,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du bleu",
                  code: "surBleu",
                  description: "surBleu(): Le robot est-il sur un objet bleu ?"
+               },
+               en: {
+                  label: "on blue",
+                  code: "onBlue",
+                  description: "onBlue(): Is the robot on a blue object?"
+               },
+               nl: {
+                  label: "op blauw",
+                  code: "opBlauw",
+                  description: "opBlauw(): Staat de robot op een blauw object?"
+               },
+               de: {
+                  label: "auf Blau",
+                  code: "aufBlau",
+                  description: "aufBlau(): Steht der Roboter auf einem blauen Objekt?"
                }
              },
              category: "robot",
@@ -3060,6 +4407,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur trou",
                  code: "surTrou",
                  description: "surTrou(): Le robot est-il sur un objet troué ?"
+               },
+               en: {
+                  label: "on a hole",
+                  code: "onHole",
+                  description: "onHole(): Is the robot on a holed object?"
+               },
+               nl: {
+                  label: "op een gat",
+                  code: "opGat",
+                  description: "opGat(): Staat de robot op een object met een gat?"
+               },
+               de: {
+                  label: "auf einem Loch",
+                  code: "aufLoch",
+                  description: "aufLoch(): Steht der Roboter auf einem Objekt mit einem Loch?"
                }
              },
              category: "robot",
@@ -3079,6 +4441,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du jaune",
                  code: "surJaune",
                  description: "surJaune(): Le robot est-il sur un objet jaune ?"
+               },
+               en: {
+                  label: "on yellow",
+                  code: "onYellow",
+                  description: "onYellow(): Is the robot on a yellow object?"
+               },
+               nl: {
+                  label: "op geel",
+                  code: "opGeel",
+                  description: "opGeel(): Staat de robot op een geel object?"
+               },
+               de: {
+                  label: "auf Gelb",
+                  code: "aufGelb",
+                  description: "aufGelb(): Steht der Roboter auf einem gelben Objekt?"
                }
              },
              category: "robot",
@@ -3098,6 +4475,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur du noir",
                  code: "surNoir",
                  description: "surNoir(): Le robot est-il sur un objet noir ?"
+               },
+               en: {
+                  label: "on black",
+                  code: "onBlack",
+                  description: "onBlack(): Is the robot on a black object?"
+               },
+               nl: {
+                  label: "op zwart",
+                  code: "opZwart",
+                  description: "opZwart(): Staat de robot op een zwart object?"
+               },
+               de: {
+                  label: "auf Schwarz",
+                  code: "aufSchwarz",
+                  description: "aufSchwarz(): Steht der Roboter auf einem schwarzen Objekt?"
                }
              },
              category: "robot",
@@ -3136,6 +4528,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "construire un pont devant",
                  code: "construirePontDevant",
                  description: "construirePontDevant(): construit un pont sur la case devant le robot"
+               },
+               en: {
+                  label: "build a bridge ahead",
+                  code: "buildBridgeAhead",
+                  description: "buildBridgeAhead(): builds a bridge on the cell in front of the robot"
+               },
+               nl: {
+                  label: "een brug voor bouwen",
+                  code: "bouwBrugVoor",
+                  description: "bouwBrugVoor(): bouwt een brug op het vakje voor de robot"
+               },
+               de: {
+                  label: "eine Brücke davor bauen",
+                  code: "baueBrueckeDavor",
+                  description: "baueBrueckeDavor(): baut eine Brücke auf dem Feld vor dem Roboter"
                }
              },
              category: "robot",
@@ -3164,6 +4571,21 @@ var getContext = function(display, infos, curLevel) {
                  label: "eau devant",
                  code: "eauDevant",
                  description: "eauDevant(): indique s'il y a de l'eau devant le robot"
+               },
+               en: {
+                  label: "water ahead",
+                  code: "waterAhead",
+                  description: "waterAhead(): indicates whether there is water in front of the robot"
+               },
+               nl: {
+                  label: "water voor",
+                  code: "waterVoor",
+                  description: "waterVoor(): geeft aan of er water voor de robot is"
+               },
+               de: {
+                  label: "Wasser davor",
+                  code: "wasserDavor",
+                  description: "wasserDavor(): zeigt an, ob sich vor dem Roboter Wasser befindet"
                }
              },
             category: "robot", 
@@ -3234,6 +4656,21 @@ var getContext = function(display, infos, curLevel) {
                    label: "sur terre sèche",
                    code: "surTerreSeche",
                    description: "surTerreSeche(): Le robot est-il sur de la terre sèche ?"
+                 },
+                 en: {
+                    label: "on dry soil",
+                    code: "onDrySoil",
+                    description: "onDrySoil(): Is the robot on dry soil?"
+                 },
+                 nl: {
+                    label: "op droge aarde",
+                    code: "opDrogeAarde",
+                    description: "opDrogeAarde(): Staat de robot op droge aarde?"
+                 },
+                 de: {
+                    label: "auf trockener Erde",
+                    code: "aufTrockenerErde",
+                    description: "aufTrockenerErde(): Steht der Roboter auf trockener Erde?"
                  }
                },
                category: "robot",
@@ -3253,6 +4690,21 @@ var getContext = function(display, infos, curLevel) {
                    label: "sur terre",
                    code: "surTerre",
                    description: "surTerre(): Le robot est-il sur de la terre ?"
+                 },
+                 en: {
+                    label: "on soil",
+                    code: "onSoil",
+                    description: "onSoil(): Is the robot on soil?"
+                 },
+                 nl: {
+                    label: "op aarde",
+                    code: "opAarde",
+                    description: "opAarde(): Staat de robot op aarde?"
+                 },
+                 de: {
+                    label: "auf Erde",
+                    code: "aufErde",
+                    description: "aufErde(): Steht der Roboter auf Erde?"
                  }
                },
                category: "robot",
@@ -3272,6 +4724,21 @@ var getContext = function(display, infos, curLevel) {
                     label: "arroser",
                     code: "arroser",
                     description: "arroser(): Le robot arrose la case."
+                  },
+                  en: {
+                     label: "water",
+                     code: "water",
+                     description: "water(): The robot waters the cell."
+                  },
+                  nl: {
+                     label: "begieten",
+                     code: "begiet",
+                     description: "begiet(): De robot begiet het vakje."
+                  },
+                  de: {
+                     label: "gießen",
+                     code: "giessen",
+                     description: "giessen(): Der Roboter gießt das Feld."
                   }
                 },
                category: "robot",
@@ -3340,6 +4807,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "écrire le code",
                      code: "ecrireCode",
                      description: "ecrireCode(): écrit le code sur la case du robot et ouvre la porte si le code est correct"
+                  },
+                  en: {
+                     label: "write the code",
+                     code: "writeCode",
+                     description: "writeCode(): writes the code on the robot's cell and opens the door if the code is correct"
+                  },
+                  nl: {
+                     label: "de code schrijven",
+                     code: "schrijfCode",
+                     description: "schrijfCode(): schrijft de code op het vakje van de robot en opent de deur als de code juist is"
+                  },
+                  de: {
+                     label: "den Code schreiben",
+                     code: "schreibeCode",
+                     description: "schreibeCode(): schreibt den Code auf das Feld des Roboters und öffnet die Tür, wenn der Code richtig ist"
                   }
                },
                category: "robot",
@@ -3388,6 +4870,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur la case verte",
                      code: "surCaseVerte",
                      description: "surCaseVerte(): Le robot est-il sur la case verte ?"
+                  },
+                  en: {
+                     label: "on the green cell",
+                     code: "onGreenCell",
+                     description: "onGreenCell(): Is the robot on the green cell?"
+                  },
+                  nl: {
+                     label: "op het groene vakje",
+                     code: "opGroenVakje",
+                     description: "opGroenVakje(): Staat de robot op het groene vakje?"
+                  },
+                  de: {
+                     label: "auf dem grünen Feld",
+                     code: "aufGruenemFeld",
+                     description: "aufGruenemFeld(): Steht der Roboter auf dem grünen Feld?"
                   },
                   es: {
                      label: "sobre la casilla verde",
@@ -3501,6 +4998,21 @@ var getContext = function(display, infos, curLevel) {
                      code: "surPeinture",
                      description: "surPeinture(): Le robot est-il sur une case déjà peinte ?"
                   },
+                  en: {
+                     label: "paint on the cell",
+                     code: "onPaint",
+                     description: "onPaint(): Is the robot on a cell that is already painted?"
+                  },
+                  nl: {
+                     label: "verf op het vakje",
+                     code: "opVerf",
+                     description: "opVerf(): Staat de robot op een al geverfd vakje?"
+                  },
+                  de: {
+                     label: "Farbe auf dem Feld",
+                     code: "aufFarbe",
+                     description: "aufFarbe(): Steht der Roboter auf einem bereits bemalten Feld?"
+                  },
                   es: {
                      label: "casilla pintada",
                      code: "casillaPintada",
@@ -3548,6 +5060,21 @@ var getContext = function(display, infos, curLevel) {
                        label: translations["fr"][iColor],
                        code: translations["fr"][iColor],
                        description: translations["fr"][iColor] + "(): Peint la case en " + translations["fr"][iColor]
+                    },
+                    en: {
+                       label: translations["en"][iColor],
+                       code: translations["en"][iColor],
+                       description: translations["en"][iColor] + "(): Paints the cell in " + translations["en"][iColor]
+                    },
+                    nl: {
+                       label: translations["nl"][iColor],
+                       code: translations["nl"][iColor],
+                       description: translations["nl"][iColor] + "(): Verft het vakje in " + translations["nl"][iColor]
+                    },
+                    de: {
+                       label: translations["de"][iColor],
+                       code: translations["de"][iColor],
+                       description: translations["de"][iColor] + "(): Malt die Zelle in " + translations["de"][iColor] + " an"
                     }
                   },
                   category: "robot",
@@ -3594,6 +5121,21 @@ var getContext = function(display, infos, curLevel) {
                        label: "Sur " + translations["fr"][iColor],
                        code: "sur" + translations["fr"][iColor],
                        description: "sur" + translations["fr"][iColor] + "(): Teste si la case est en " + translations["fr"][iColor]
+                    },
+                    en: {
+                       label: "On " + translations["en"][iColor],
+                       code: "on" + translations["en"][iColor],
+                       description: "on" + translations["en"][iColor] + "(): Tests if the cell is " + translations["en"][iColor]
+                    },
+                    nl: {
+                       label: "Op " + translations["nl"][iColor],
+                       code: "op" + translations["nl"][iColor],
+                       description: "op" + translations["nl"][iColor] + "(): Test of het vakje " + translations["nl"][iColor] + " is"
+                    },
+                    de: {
+                       label: "Auf " + translations["de"][iColor],
+                       code: "auf" + translations["de"][iColor],
+                       description: "auf" + translations["de"][iColor] + "(): Testet, ob die Zelle " + translations["de"][iColor] + " ist"
                     }
                   },
                   category: "robot",
@@ -3615,7 +5157,12 @@ var getContext = function(display, infos, curLevel) {
             ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"], 
             ["#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd"],
             ["#ffffff", "#ffffff", "#777777", "#777777", "#777777", "#ffffff", "#777777", "#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-            {fr: ["Rouge", "Bleu", "Jaune", "Blanc", "Vert", "Orange", "Rose", "Violet", "Marron", "Gris", "Noir"]}),
+            {
+               fr: ["Rouge", "Bleu", "Jaune", "Blanc", "Vert", "Orange", "Rose", "Violet", "Marron", "Gris", "Noir"],
+               en: ["Red", "Blue", "Yellow", "White", "Green", "Orange", "Pink", "Purple", "Brown", "Grey", "Black"],
+               nl: ["Rood", "Blauw", "Geel", "Wit", "Groen", "Oranje", "Roze", "Paars", "Bruin", "Grijs", "Zwart"],
+               de: ["Rot", "Blau", "Gelb", "Weiß", "Grün", "Orange", "Rosa", "Lila", "Braun", "Grau", "Schwarz"]
+            }),
          backgroundColor: "#ece4ce",
          ignoreBag: true,
          blockingFilter: false,

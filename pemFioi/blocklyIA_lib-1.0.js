@@ -199,6 +199,114 @@ var getContext = function(display, infos, curLevel) {
                failureScore: "La position des centroïdes n'est pas optimisée",
             }
          },
+         en: {
+            code: {
+               getNbItems: "getNbItems",
+               getNbClusters: "getNbClusters",
+               getNbCentroids: "getNbCentroids",
+               getXCentroid: "getXCentroid",
+               getYCentroid: "getYCentroid",
+               
+               showCentroid: "showCentroid",
+               showDistance: "showDistance",
+               setCluster: "setCluster"
+            },
+            description: {
+               getXCentroid: "@(idCentroid)",
+               getYCentroid: "@(idCentroid)",
+               showCentroid: "@(idCluster,x,y)",
+               showDistance: "@(idItem,idCluster)",
+               setCluster: "@(idItem,idCluster)"
+            },
+            messages: {
+               maxNbCentroids: function(max) {
+                  return "You cannot place more than "+max+" centroids"
+               },
+               noConsecutiveId: function(id,prev) {
+                  return "You must place id "+prev+" before id "+id
+               },
+               outOfRange: function(name,min,max) {
+                  return "The value of "+name+" must be between "+min+" and "+max
+               },
+               failureNbCentroids: "The number of centroids is incorrect",
+               failureCentroidPos: "The centroid is not at the barycenter of all the points",
+               failureMissingItem: "One of the points has no class",
+               failureWrongClass: "One of the points does not have the correct class",
+               failureScore: "The position of the centroids is not optimized",
+            }
+         },
+         nl: {
+            code: {
+               getNbItems: "getNbItems",
+               getNbClusters: "getNbClusters",
+               getNbCentroids: "getNbCentroids",
+               getXCentroid: "getXCentroid",
+               getYCentroid: "getYCentroid",
+               
+               showCentroid: "showCentroid",
+               showDistance: "showDistance",
+               setCluster: "setCluster"
+            },
+            description: {
+               getXCentroid: "@(idCentroid)",
+               getYCentroid: "@(idCentroid)",
+               showCentroid: "@(idCluster,x,y)",
+               showDistance: "@(idItem,idCluster)",
+               setCluster: "@(idItem,idCluster)"
+            },
+            messages: {
+               maxNbCentroids: function(max) {
+                  return "Je mag niet meer dan "+max+" centroïdes plaatsen"
+               },
+               noConsecutiveId: function(id,prev) {
+                  return "Je moet id "+prev+" plaatsen vóór id "+id
+               },
+               outOfRange: function(name,min,max) {
+                  return "De waarde van "+name+" moet tussen "+min+" en "+max+" liggen"
+               },
+               failureNbCentroids: "Het aantal centroïdes is onjuist",
+               failureCentroidPos: "De centroïde staat niet in het zwaartepunt van alle punten",
+               failureMissingItem: "Een van de punten heeft geen klasse",
+               failureWrongClass: "Een van de punten heeft niet de juiste klasse",
+               failureScore: "De positie van de centroïdes is niet geoptimaliseerd",
+            }
+         },
+         de: {
+            code: {
+               getNbItems: "getNbItems",
+               getNbClusters: "getNbClusters",
+               getNbCentroids: "getNbCentroids",
+               getXCentroid: "getXCentroid",
+               getYCentroid: "getYCentroid",
+               
+               showCentroid: "showCentroid",
+               showDistance: "showDistance",
+               setCluster: "setCluster"
+            },
+            description: {
+               getXCentroid: "@(idCentroid)",
+               getYCentroid: "@(idCentroid)",
+               showCentroid: "@(idCluster,x,y)",
+               showDistance: "@(idItem,idCluster)",
+               setCluster: "@(idItem,idCluster)"
+            },
+            messages: {
+               maxNbCentroids: function(max) {
+                  return "Sie können nicht mehr als "+max+" Zentroide platzieren"
+               },
+               noConsecutiveId: function(id,prev) {
+                  return "Sie müssen die Id "+prev+" vor der Id "+id+" platzieren"
+               },
+               outOfRange: function(name,min,max) {
+                  return "Der Wert von "+name+" muss zwischen "+min+" und "+max+" liegen"
+               },
+               failureNbCentroids: "Die Anzahl der Zentroide ist falsch",
+               failureCentroidPos: "Der Zentroid liegt nicht im Schwerpunkt aller Punkte",
+               failureMissingItem: "Einer der Punkte hat keine Klasse",
+               failureWrongClass: "Einer der Punkte hat nicht die richtige Klasse",
+               failureScore: "Die Position der Zentroide ist nicht optimiert",
+            }
+         },
       },
       "knn": {
          fr: {
@@ -222,6 +330,75 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                failureMissingItem: "Un des points à prédire n'a pas de classe",
                failureWrongClass: "La classe du point en rouge est incorrecte"
+            }
+         },
+         en: {
+            code: {
+               getNbKnownItems: "getNbKnownItems",
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbNeighbors: "getNbNeighbors",
+               getDistance: "getDistance",
+               getClass: "getClass",
+               predictClass: "predictClass",
+               highlightItemToPredict: "highlightItemToPredict",
+               highlightNearest: "highlightNearest"
+            },
+            description: {
+               getDistance: "@(idItem1,idItem2) returns the distance between 2 points",
+               getClass: "@(idItem)",
+               predictClass: "@(idItem,idClass)",
+               highlightItemToPredict: "@(idItem)",
+               highlightNearest: "@(idItem1,idItem2)"
+            },
+            messages: {
+               failureMissingItem: "One of the points to predict has no class",
+               failureWrongClass: "The class of the point in red is incorrect"
+            }
+         },
+         nl: {
+            code: {
+               getNbKnownItems: "getNbKnownItems",
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbNeighbors: "getNbNeighbors",
+               getDistance: "getDistance",
+               getClass: "getClass",
+               predictClass: "predictClass",
+               highlightItemToPredict: "highlightItemToPredict",
+               highlightNearest: "highlightNearest"
+            },
+            description: {
+               getDistance: "@(idItem1,idItem2) geeft de afstand tussen 2 punten terug",
+               getClass: "@(idItem)",
+               predictClass: "@(idItem,idClass)",
+               highlightItemToPredict: "@(idItem)",
+               highlightNearest: "@(idItem1,idItem2)"
+            },
+            messages: {
+               failureMissingItem: "Een van de te voorspellen punten heeft geen klasse",
+               failureWrongClass: "De klasse van het rode punt is onjuist"
+            }
+         },
+         de: {
+            code: {
+               getNbKnownItems: "getNbKnownItems",
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbNeighbors: "getNbNeighbors",
+               getDistance: "getDistance",
+               getClass: "getClass",
+               predictClass: "predictClass",
+               highlightItemToPredict: "highlightItemToPredict",
+               highlightNearest: "highlightNearest"
+            },
+            description: {
+               getDistance: "@(idItem1,idItem2) gibt die Distanz zwischen 2 Punkten zurück",
+               getClass: "@(idItem)",
+               predictClass: "@(idItem,idClass)",
+               highlightItemToPredict: "@(idItem)",
+               highlightNearest: "@(idItem1,idItem2)"
+            },
+            messages: {
+               failureMissingItem: "Einer der vorherzusagenden Punkte hat keine Klasse",
+               failureWrongClass: "Die Klasse des roten Punkts ist falsch"
             }
          },
       },
@@ -258,6 +435,111 @@ var getContext = function(display, infos, curLevel) {
                },
                tooManyMoves: function(max) {
                   return "Vous ne pouvez pas faire plus de "+max+" déplacements"
+               }
+            }
+         },
+         en: {
+            code: {
+               move: "move",
+               getAltitude: "getAltitude",
+               getCol: "getCol",
+               getRow: "getRow",
+            },
+            description: {
+               move: "@(x,y)",
+               getAltitude: "@(x1,y1)",
+               getCol: "@() return current col",
+               getRow: "@() return current row",
+            },
+            messages: {
+               altitude: "Altitude",
+               wrongFormat: function(type,min,max) {
+                  var str = "The coordinate ";
+                  str += (type == 1) ? "y" : "x";
+                  str += " must be an integer between "+min+" and "+max;
+                  return str
+               },
+               moveFirst: "You must first place yourself on the map",
+               notNeighbor: "You can only call this function on cells neighboring your current position",
+               failureMinimum: "Your final position is not the lowest compared to its nearest neighbors",
+               failureAltitude: function(av,nbTests,target) {
+                  return "The average altitude reached over "+nbTests+" tests of "+av+" is higher than the target of "+target
+               },
+               successAltitude: function(alt) {
+                  return "You reached the altitude of "+alt
+               },
+               tooManyMoves: function(max) {
+                  return "You cannot make more than "+max+" moves"
+               }
+            }
+         },
+         nl: {
+            code: {
+               move: "move",
+               getAltitude: "getAltitude",
+               getCol: "getCol",
+               getRow: "getRow",
+            },
+            description: {
+               move: "@(x,y)",
+               getAltitude: "@(x1,y1)",
+               getCol: "@() return current col",
+               getRow: "@() return current row",
+            },
+            messages: {
+               altitude: "Hoogte",
+               wrongFormat: function(type,min,max) {
+                  var str = "De coördinaat ";
+                  str += (type == 1) ? "y" : "x";
+                  str += " moet een geheel getal zijn tussen "+min+" en "+max;
+                  return str
+               },
+               moveFirst: "Je moet je eerst op de kaart plaatsen",
+               notNeighbor: "Je mag deze functie enkel aanroepen op vakjes die naast je huidige positie liggen",
+               failureMinimum: "Je eindpositie is niet de laagste ten opzichte van de dichtstbijzijnde buren",
+               failureAltitude: function(av,nbTests,target) {
+                  return "De gemiddelde hoogte bereikt over "+nbTests+" tests van "+av+" is hoger dan het doel van "+target
+               },
+               successAltitude: function(alt) {
+                  return "Je hebt de hoogte van "+alt+" bereikt"
+               },
+               tooManyMoves: function(max) {
+                  return "Je mag niet meer dan "+max+" verplaatsingen doen"
+               }
+            }
+         },
+         de: {
+            code: {
+               move: "move",
+               getAltitude: "getAltitude",
+               getCol: "getCol",
+               getRow: "getRow",
+            },
+            description: {
+               move: "@(x,y)",
+               getAltitude: "@(x1,y1)",
+               getCol: "@() return current col",
+               getRow: "@() return current row",
+            },
+            messages: {
+               altitude: "Höhe",
+               wrongFormat: function(type,min,max) {
+                  var str = "Die Koordinate ";
+                  str += (type == 1) ? "y" : "x";
+                  str += " muss eine ganze Zahl zwischen "+min+" und "+max+" sein";
+                  return str
+               },
+               moveFirst: "Sie müssen sich zuerst auf der Karte platzieren",
+               notNeighbor: "Sie dürfen diese Funktion nur auf benachbarte Felder Ihrer aktuellen Position aufrufen",
+               failureMinimum: "Ihre Endposition ist nicht die niedrigste im Vergleich zu den nächsten Nachbarn",
+               failureAltitude: function(av,nbTests,target) {
+                  return "Die mittlere Höhe über "+nbTests+" Tests von "+av+" liegt über dem Ziel von "+target
+               },
+               successAltitude: function(alt) {
+                  return "Sie haben die Höhe von "+alt+" erreicht"
+               },
+               tooManyMoves: function(max) {
+                  return "Sie dürfen nicht mehr als "+max+" Bewegungen machen"
                }
             }
          },
@@ -298,6 +580,120 @@ var getContext = function(display, infos, curLevel) {
                },
                invalidCoordinate: function(ax) {
                   return "La valeur de "+((ax == 0) ? "x" : "y")+" est invalide"
+               },
+            }
+         },
+         en: {
+            code: {
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbKnownItems: "getNbKnownItems",
+               getClass: "getClass",
+               setClass: "setClass",
+               setZoneClass: "setZoneClass",
+               splitHorizontally: "splitHorizontally",
+               splitVertically: "splitVertically",
+
+            },
+            description: {
+               getNbItemsToPredict: "@()",
+               getNbKnownItems: "@()",
+               setClass: "@(idItem,idClass)",
+               getClass: "@(idItem)",
+               setZoneClass: "@(idZone,idClass)",
+               splitHorizontally: "@(idParentZone, y, idTopZone, idBottomZone)",
+               splitVertically: "@(idParentZone, x, idLeftZone, idRightZone)",
+            },
+            messages: {
+               invalidThreshold: function(thr) {
+                  return "Invalid threshold value : "+thr
+               },
+               errorNoClass: "The point in red has no class",
+               errorNoClassZone: "At least one zone has no class",
+               errorWrongClass: "The point in red does not have the correct class",
+               errorTooManyVertices: function(nb,max) {
+                  return "You created "+nb+" nodes but you should not create more than "+max
+               },
+               idAlreadyExists: function(id) {
+                  return "The identifier "+id+" already exists"
+               },
+               invalidCoordinate: function(ax) {
+                  return "The value of "+((ax == 0) ? "x" : "y")+" is invalid"
+               },
+            }
+         },
+         nl: {
+            code: {
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbKnownItems: "getNbKnownItems",
+               getClass: "getClass",
+               setClass: "setClass",
+               setZoneClass: "setZoneClass",
+               splitHorizontally: "splitHorizontally",
+               splitVertically: "splitVertically",
+
+            },
+            description: {
+               getNbItemsToPredict: "@()",
+               getNbKnownItems: "@()",
+               setClass: "@(idItem,idClass)",
+               getClass: "@(idItem)",
+               setZoneClass: "@(idZone,idClass)",
+               splitHorizontally: "@(idParentZone, y, idTopZone, idBottomZone)",
+               splitVertically: "@(idParentZone, x, idLeftZone, idRightZone)",
+            },
+            messages: {
+               invalidThreshold: function(thr) {
+                  return "Ongeldige drempelwaarde : "+thr
+               },
+               errorNoClass: "Het rode punt heeft geen klasse",
+               errorNoClassZone: "Minstens één zone heeft geen klasse",
+               errorWrongClass: "Het rode punt heeft niet de juiste klasse",
+               errorTooManyVertices: function(nb,max) {
+                  return "Je hebt "+nb+" knopen gemaakt terwijl er niet meer dan "+max+" mochten zijn"
+               },
+               idAlreadyExists: function(id) {
+                  return "De identifier "+id+" bestaat al"
+               },
+               invalidCoordinate: function(ax) {
+                  return "De waarde van "+((ax == 0) ? "x" : "y")+" is ongeldig"
+               },
+            }
+         },
+         de: {
+            code: {
+               getNbItemsToPredict: "getNbItemsToPredict",
+               getNbKnownItems: "getNbKnownItems",
+               getClass: "getClass",
+               setClass: "setClass",
+               setZoneClass: "setZoneClass",
+               splitHorizontally: "splitHorizontally",
+               splitVertically: "splitVertically",
+
+            },
+            description: {
+               getNbItemsToPredict: "@()",
+               getNbKnownItems: "@()",
+               setClass: "@(idItem,idClass)",
+               getClass: "@(idItem)",
+               setZoneClass: "@(idZone,idClass)",
+               splitHorizontally: "@(idParentZone, y, idTopZone, idBottomZone)",
+               splitVertically: "@(idParentZone, x, idLeftZone, idRightZone)",
+            },
+            messages: {
+               invalidThreshold: function(thr) {
+                  return "Ungültiger Schwellenwert : "+thr
+               },
+               errorNoClass: "Der rote Punkt hat keine Klasse",
+               errorNoClassZone: "Mindestens eine Zone hat keine Klasse",
+               errorWrongClass: "Der rote Punkt hat nicht die richtige Klasse",
+               errorTooManyVertices: function(nb,max) {
+                  return "Sie haben "+nb+" Knoten erstellt, obwohl höchstens "+max+" erlaubt waren"
+               },
+               idAlreadyExists: function(id) {
+                  return "Die Kennung "+id+" existiert bereits"
+               },
+               invalidCoordinate: function(ax) {
+                  return "Der Wert von "+((ax == 0) ? "x" : "y")+" ist ungültig"
                },
             }
          },
