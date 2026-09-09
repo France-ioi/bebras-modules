@@ -282,18 +282,18 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
 function translate(s, lang)
 {
   var translations = {
-    subject :     { fr : "sujet", en : "subject" },
-    statement :   { fr : "sujet", en : "subject" },
-    solve :       { fr : "résoudre", en : "solve" },
-    solution :    { fr : "correction", en : "solution" },
-    time :        { fr : "temps", en : "time" },
-    memory :      { fr : "mémoire", en : "memory" },
-    input :       { fr : "entrée", en : "input" },
-    output :      { fr : "sortie", en : "output" },
-    limits :      { fr : "limites de temps et de mémoire", en : "time and memory limits" },
-    constraints : { fr : "contraintes", en : "constraints" },
-    examples :    { fr : "exemples", en : "examples" },
-    comments :    { fr : "commentaires", en : "comments" }
+    subject :     { fr : "sujet", en : "subject", nl : "onderwerp", de : "Aufgabe" },
+    statement :   { fr : "sujet", en : "subject", nl : "opgave", de : "Aufgabenstellung" },
+    solve :       { fr : "résoudre", en : "solve", nl : "oplossen", de : "lösen" },
+    solution :    { fr : "correction", en : "solution", nl : "oplossing", de : "Lösung" },
+    time :        { fr : "temps", en : "time", nl : "tijd", de : "Zeit" },
+    memory :      { fr : "mémoire", en : "memory", nl : "geheugen", de : "Speicher" },
+    input :       { fr : "entrée", en : "input", nl : "invoer", de : "Eingabe" },
+    output :      { fr : "sortie", en : "output", nl : "uitvoer", de : "Ausgabe" },
+    limits :      { fr : "limites de temps et de mémoire", en : "time and memory limits", nl : "tijd- en geheugenlimieten", de : "Zeit- und Speicherlimits" },
+    constraints : { fr : "contraintes", en : "constraints", nl : "beperkingen", de : "Einschränkungen" },
+    examples :    { fr : "exemples", en : "examples", nl : "voorbeelden", de : "Beispiele" },
+    comments :    { fr : "commentaires", en : "comments", nl : "commentaren", de : "Kommentare" }
   };
   if (!translations[s] || !translations[s][lang])
   {

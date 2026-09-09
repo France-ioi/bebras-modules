@@ -33,6 +33,32 @@
                 mistake_illegal_data: 'Données non autorisées',
                 mistake_unknown_state: 'Le format du CSV est invalide'
             },
+            nl: {
+                validate: 'Valideren',
+                success: 'Proficiat, je bent geslaagd!',
+                mistake_rows_lack: 'De tabel bevat te weinig rijen',
+                mistake_rows_excess: 'De tabel bevat te veel rijen',
+                mistake_cols_lack: 'De tabel bevat te weinig kolommen',
+                mistake_cols_excess: 'De tabel bevat te veel kolommen',
+                mistake_incorrect_data: 'De gegevens zijn ongeldig',
+                mistake_illegal_state: 'Het CSV-formaat is ongeldig',
+                mistake_illegal_quote: 'Fout met aanhalingstekens',
+                mistake_illegal_data: 'Niet-toegestane gegevens',
+                mistake_unknown_state: 'Het CSV-formaat is ongeldig'
+            },
+            de: {
+                validate: 'Validieren',
+                success: 'Bravo, du hast es geschafft!',
+                mistake_rows_lack: 'Die Tabelle enthält zu wenige Zeilen',
+                mistake_rows_excess: 'Die Tabelle enthält zu viele Zeilen',
+                mistake_cols_lack: 'Die Tabelle enthält zu wenige Spalten',
+                mistake_cols_excess: 'Die Tabelle enthält zu viele Spalten',
+                mistake_incorrect_data: 'Die Daten sind ungültig',
+                mistake_illegal_state: 'Das CSV-Format ist ungültig',
+                mistake_illegal_quote: 'Fehlerhafte Anführungszeichen',
+                mistake_illegal_data: 'Nicht erlaubte Daten',
+                mistake_unknown_state: 'Das CSV-Format ist ungültig'
+            },
         },
 
         set: function(lng) {

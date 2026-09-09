@@ -69,6 +69,68 @@
                 'prompt_multiple': 'Sélectionnez de 0 à %% réponses',
                 'return_to_quiz': 'Retour au quiz'
             },
+            nl: {
+                'score': 'Score',
+                'grader_msg': 'Jouw score is ',
+                'wrong_answer_msg': 'Je hebt minstens één fout.',
+                'wrong_answer_msg_partial_feedback': 'Je hebt minstens één fout. Hier is een hint:',
+                'wrong_answer_msg_not_answered': 'Je hebt deze vraag niet beantwoord.',
+                'wrong_fill_gaps_msg': 'Je hebt %% foute antwoorden voor deze vraag, aangeduid in het rood.',
+                'wrong_partial': 'Je hebt deze vraag niet volledig beantwoord.',
+                'validate': 'Valideren',
+                'solution': 'Toon het antwoord',
+                'restart': 'Herbeginnen',
+                'restart_scratch': 'Herbeginnen vanaf het begin',
+                'restart_current': 'Mijn antwoord wijzigen',
+                'return_to_top': 'Terug naar de lijst van vragen',
+                'move_to_next': 'Volgende vraag',
+                'cancel': 'Annuleren',
+                'placeholder_text': 'Voer tekst in',
+                'placeholder_number': 'Voer een getal in',
+                'error_number': 'Je moet een getal invoeren.',
+                'placeholder_string': 'Voer een tekenreeks in',
+                'error_string': 'Je moet een tekenreeks invoeren',
+                'placeholder_regexp': 'Voer tekst in',
+                'error_regexp': 'Ongeldig formaat',
+                'error_grading': 'Er is een fout opgetreden bij het indienen, probeer het over enkele minuten opnieuw.',
+                'feedback_score_binary_correct': 'Proficiat, alles is correct.',
+                'feedback_score_binary_mistake': 'Er is minstens één fout.',
+                'feedback_answer_saved': 'Jouw antwoord is opgeslagen.',
+                'prompt_single': 'Selecteer één antwoord',
+                'prompt_multiple': 'Selecteer 0 tot %% antwoorden',
+                'return_to_quiz': 'Terug naar de quiz'
+            },
+            de: {
+                'score': 'Punktestand',
+                'grader_msg': 'Dein Punktestand ist ',
+                'wrong_answer_msg': 'Du hast mindestens einen Fehler.',
+                'wrong_answer_msg_partial_feedback': 'Du hast mindestens einen Fehler. Hier ist ein Hinweis:',
+                'wrong_answer_msg_not_answered': 'Du hast diese Frage nicht beantwortet.',
+                'wrong_fill_gaps_msg': 'Du hast %% falsche Antworten für diese Frage, die rot markiert sind.',
+                'wrong_partial': 'Du hast diese Frage nicht vollständig beantwortet.',
+                'validate': 'Absenden',
+                'solution': 'Antwort anzeigen',
+                'restart': 'Neustarten',
+                'restart_scratch': 'Von vorne neu starten',
+                'restart_current': 'Meine Antwort ändern',
+                'return_to_top': 'Zurück zur Fragenliste',
+                'move_to_next': 'Nächste Frage',
+                'cancel': 'Abbrechen',
+                'placeholder_text': 'Text eingeben',
+                'placeholder_number': 'Zahl eingeben',
+                'error_number': 'Du musst eine Zahl eingeben.',
+                'placeholder_string': 'Zeichenkette eingeben',
+                'error_string': 'Du musst eine Zeichenkette eingeben',
+                'placeholder_regexp': 'Text eingeben',
+                'error_regexp': 'Ungültiges Format',
+                'error_grading': 'Beim Einreichen ist ein Fehler aufgetreten. Bitte versuche es in einigen Minuten erneut.',
+                'feedback_score_binary_correct': 'Glückwunsch, alles ist richtig.',
+                'feedback_score_binary_mistake': 'Es gibt mindestens einen Fehler.',
+                'feedback_answer_saved': 'Deine Antwort wurde gespeichert.',
+                'prompt_single': 'Wähle eine Antwort',
+                'prompt_multiple': 'Wähle 0 bis %% Antworten',
+                'return_to_quiz': 'Zurück zum Quiz'
+            },
         },
 
         substrings: {
@@ -78,6 +140,12 @@
                 },
                 fr: {
                     'solution': 'Afficher un indice'
+                },
+                nl: {
+                    'solution': 'Toon een hint'
+                },
+                de: {
+                    'solution': 'Hinweis anzeigen'
                 }
             }
         },

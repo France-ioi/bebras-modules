@@ -115,6 +115,120 @@ var getContext = function(display, infos, curLevel) {
                     'copy_to_clipboard': 'Copy name to clipboard'
                 }
             }
+        },
+        nl: {
+            categories: {
+                sound: 'Geluid',
+                control: 'Besturing'
+            },
+            label: {
+                playSignal: 'playSignal(%1, %2, %3, %4)',
+                playRecord: 'playRecord(%1, %2)',
+                playStop: 'playStop()',
+                sleep: 'sleep(%1)',
+                echo: 'echo(%1)'
+            },
+            code: {
+                playSignal: 'playSignal',
+                playRecord: 'playRecord',
+                sleep: 'sleep',
+                playStop: 'playStop',
+                echo: 'echo'
+            },
+            description: {
+                playSignal: 'playSignal(kanaal, type, frequentie, amplitude)\n' +
+                    'Kanaal: 1, 2 of 3 (tot 3 signalen kunnen tegelijk gespeeld worden)\n' +
+                    'Type: “sinus” - sinusgolf, “carré” - blokgolf, “scie” - zaagtandgolf, “bruit”: witte ruis\n' +
+                    'Frequentie: in Hz, van 100 tot 8000\n' +
+                    'Amplitude: van 0 (stil) tot 1 (100% volume)',
+                playRecord: 'playRecord(url, frequentie) Url : een string: de url van het af te spelen geluid\n' +
+                    'Frequentie : frequentie voor een low-pass filter (hogere frequenties worden weggefilterd)',
+                playStop: 'playStop()',
+                sleep: 'sleep(tijd) Tijd: tijd in ms waarin het programma moet wachten, maar wel geluiden blijft afspelen',
+                echo: 'echo(value) : toon de waarde'
+            },
+            startingBlockName: "Programma",
+            constantLabel: {
+                'sine': 'sinus',
+                'triangle': 'driehoek',
+                'sawtooth': 'zaagtand',
+                'square': 'blok',
+                'noise': 'ruis'
+            },
+            messages: {
+                'loading': 'Bestand laden...',
+                'load_error': 'Er is een fout opgetreden bij het laden van het bestand.'
+            },
+            ui: {
+                'mic': 'Microfoon inschakelen',
+                'btn_files_repository': 'Audiobestanden toevoegen...',
+                'files_repository': {
+                    'caption': 'Lijst van audiobestanden',
+                    'hint': 'Gebruik het bestandsnummer als parameter voor de functie playRecord',
+                    'add': 'Toevoegen',
+                    'incompatible_browser': 'Incompatibele browser',
+                    'confirm_overwrite': 'Bestanden overschrijven?',
+                    'file_not_found': 'Bestand niet gevonden: ',
+                    'copy_to_clipboard': 'Naam naar klembord kopiëren'
+                }
+            }
+        },
+        de: {
+            categories: {
+                sound: 'Ton',
+                control: 'Steuerung'
+            },
+            label: {
+                playSignal: 'playSignal(%1, %2, %3, %4)',
+                playRecord: 'playRecord(%1, %2)',
+                playStop: 'playStop()',
+                sleep: 'sleep(%1)',
+                echo: 'echo(%1)'
+            },
+            code: {
+                playSignal: 'playSignal',
+                playRecord: 'playRecord',
+                sleep: 'sleep',
+                playStop: 'playStop',
+                echo: 'echo'
+            },
+            description: {
+                playSignal: 'playSignal(Kanal, Typ, Frequenz, Amplitude)\n' +
+                    'Kanal: 1, 2 oder 3 (bis zu 3 Signale können gleichzeitig abgespielt werden)\n' +
+                    'Typ: “sinus” - Sinuswelle, “carré” - Rechteckwelle, “scie” - Sägezahnwelle, “bruit”: weißes Rauschen\n' +
+                    'Frequenz: in Hz, von 100 bis 8000\n' +
+                    'Amplitude: von 0 (stumm) bis 1 (100% Lautstärke)',
+                playRecord: 'playRecord(url, Frequenz) Url : eine Zeichenkette: die URL des abzuspielenden Tons\n' +
+                    'Frequenz : Frequenz für einen Tiefpassfilter (höhere Frequenzen werden entfernt)',
+                playStop: 'playStop()',
+                sleep: 'sleep(Zeit) Zeit: Wartezeit in ms, während der das Programm wartet, aber weiterhin Töne abspielt',
+                echo: 'echo(value) : Wert ausgeben'
+            },
+            startingBlockName: "Programm",
+            constantLabel: {
+                'sine': 'Sinus',
+                'triangle': 'Dreieck',
+                'sawtooth': 'Sägezahn',
+                'square': 'Rechteck',
+                'noise': 'Rauschen'
+            },
+            messages: {
+                'loading': 'Datei wird geladen...',
+                'load_error': 'Beim Laden der Datei ist ein Fehler aufgetreten.'
+            },
+            ui: {
+                'mic': 'Mikrofon aktivieren',
+                'btn_files_repository': 'Audiodateien hinzufügen...',
+                'files_repository': {
+                    'caption': 'Liste der Audiodateien',
+                    'hint': 'Verwende die Dateinummer als Parameter für die Funktion playRecord',
+                    'add': 'Hinzufügen',
+                    'incompatible_browser': 'Inkompatibler Browser',
+                    'confirm_overwrite': 'Dateien überschreiben?',
+                    'file_not_found': 'Datei nicht gefunden: ',
+                    'copy_to_clipboard': 'Namen in die Zwischenablage kopieren'
+                }
+            }
         }
     }
 

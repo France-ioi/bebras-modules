@@ -51,6 +51,86 @@ var getContext = function(display, infos) {
             answerChar: "</b>\", votre réponse: \"<b>"
          }
       },
+      en: {
+         label: {
+            print: "print",
+            print_end: "print %1 ending with %2",
+            read: "read a line",
+            readInteger: "read an integer on a line",
+            readFloat: "read a floating-point number on a line",
+            eof: "end of input"
+         },
+         code: {
+            print: "print",
+            print_end: "print",
+            read: "input",
+            readInteger: "readInteger",
+            readFloat: "readFloat",
+            eof: "eof"
+         },
+         description: {
+         },
+         startingBlockName: "Program",
+         messages: {
+            inputPrompt: "Please enter an input for the program.",
+            outputWrong: "Your program did not correctly process all the lines.",
+            outputCorrect: "Congratulations! Your program correctly processed all the lines.",
+            tooFewChars: "Line {0} of your program's output is shorter than expected.",
+            tooManyChars: "Line {0} of your program's output is longer than expected.",
+            tooFewLines: "Your program's output has fewer lines than expected.",
+            tooManyLines: "Your program's output has more lines than expected.",
+            correctOutput: "The output is correct!",
+            moreThan100Moves: "The output is correct, but you produced it in more than 100 steps…"
+         },
+         errorStr: {
+            intro: "Your program's output is wrong, on line ",
+            expected: ":<br>Expected: \"<b>",
+            answer: "</b>\",<br>Your answer: \"<b>",
+            introChar: "</b>\".<br>(First wrong character at column ",
+            expectedChar: "; expected: \"<b>",
+            answerChar: "</b>\", your answer: \"<b>"
+         }
+      },
+      nl: {
+         label: {
+            print: "schrijven",
+            print_end: "schrijf %1 en eindig met %2",
+            read: "een regel lezen",
+            readInteger: "een geheel getal op een regel lezen",
+            readFloat: "een kommagetal op een regel lezen",
+            eof: "einde van de invoer"
+         },
+         code: {
+            print: "print",
+            print_end: "print",
+            read: "input",
+            readInteger: "leesGeheel",
+            readFloat: "leesKommagetal",
+            eof: "eindeInvoer"
+         },
+         description: {
+         },
+         startingBlockName: "Programma",
+         messages: {
+            inputPrompt: "Gelieve een invoer voor het programma te schrijven.",
+            outputWrong: "Je programma heeft niet alle regels correct verwerkt.",
+            outputCorrect: "Bravo! Je programma heeft alle regels correct verwerkt.",
+            tooFewChars: "Regel {0} van de uitvoer van je programma is korter dan verwacht.",
+            tooManyChars: "Regel {0} van de uitvoer van je programma is langer dan verwacht.",
+            tooFewLines: "De uitvoer van je programma heeft minder regels dan verwacht.",
+            tooManyLines: "De uitvoer van je programma heeft meer regels dan verwacht.",
+            correctOutput: "De uitvoer is correct!",
+            moreThan100Moves: "De uitvoer is correct, maar je hebt meer dan 100 stappen nodig gehad…"
+         },
+         errorStr: {
+            intro: "De uitvoer van je programma is fout, op regel ",
+            expected: ":<br>Verwacht: \"<b>",
+            answer: "</b>\",<br>Jouw antwoord: \"<b>",
+            introChar: "</b>\".<br>(Eerste foutieve teken in kolom ",
+            expectedChar: "; verwacht: \"<b>",
+            answerChar: "</b>\", jouw antwoord: \"<b>"
+         }
+      },
       de: {
          label: {
             print: "schreibe",
@@ -72,6 +152,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
+            inputPrompt: "Bitte gib eine Eingabe für das Programm ein.",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile {0}",

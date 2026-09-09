@@ -50,10 +50,10 @@ var conceptViewerStrings = {
     }
   },
   nl: {
-    viewerTitle: "Aide",
-    selectLanguage: "Sélectionnez un langage…",
-    selectTopic: "Sélectionnez une rubrique…",
-    reloadFromTask: "Merci d'ouvrir cette documentation directement depuis l'exercice. Vous pouvez fermer cette fenêtre.",
+    viewerTitle: "Hulp",
+    selectLanguage: "Selecteer een taal…",
+    selectTopic: "Selecteer een rubriek…",
+    reloadFromTask: "Open deze documentatie rechtstreeks vanuit de oefening. Je kan dit venster sluiten.",
     concepts: {
       "taskplatform": 'Het oplossen van de oefeningen',
       "language": "Een programma maken",
@@ -72,6 +72,31 @@ var conceptViewerStrings = {
       "extra_markers": 'Markers',
       "robot_commands": 'Robotbesturing',
       "arguments": 'Functies met argumenten',
+    }
+  },
+  de: {
+    viewerTitle: "Hilfe",
+    selectLanguage: "Wählen Sie eine Sprache…",
+    selectTopic: "Wählen Sie ein Thema…",
+    reloadFromTask: "Bitte öffnen Sie diese Dokumentation direkt aus der Übung. Sie können dieses Fenster schließen.",
+    concepts: {
+      "taskplatform": 'Lösen der Übungen',
+      "language": "Erstellen eines Programms",
+      "blockly_text_print": 'Text anzeigen',
+      "blockly_text_print_noend": 'Text nacheinander anzeigen',
+      "blockly_controls_repeat": 'Wiederholungsschleifen',
+      "blockly_controls_if": 'if-Bedingungen',
+      "blockly_controls_if_else": 'if/else-Bedingungen',
+      "blockly_controls_whileUntil": 'while- oder until-Schleifen',
+      "blockly_controls_infiniteloop": 'Endlosschleife',
+      "blockly_logic_operation": 'Logische Operatoren',
+      "extra_nested_repeat": 'Verschachtelte Schleifen',
+      "extra_variable": 'Variablen',
+      "extra_list": 'Listen',
+      "extra_function": 'Funktionen',
+      "extra_markers": 'Markierungen',
+      "robot_commands": 'Roboterbefehle',
+      "arguments": 'Funktionen mit Argumenten',
     }
   },
   es: {

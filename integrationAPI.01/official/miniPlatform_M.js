@@ -83,6 +83,17 @@
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
          'gradeAnswer': 'Test grader'
       },
+      nl: {
+         'task': 'Vraag',
+         'submission': 'Indiening',
+         'solution': 'Oplossing',
+         'editor': 'Bewerken',
+         'hints': 'Hints',
+         'showSolution': 'Toon de oplossing',
+         'yourScore': "Jouw score:",
+         'canReadSolution': "Je kan de oplossing nu zien onderaan deze pagina.",
+         'gradeAnswer': 'Test de evaluator'
+      },
       es: {
          'task': 'Problema',
          'submission': 'Sumisión',
