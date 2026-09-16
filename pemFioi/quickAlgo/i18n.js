@@ -198,6 +198,18 @@ var quickAlgoLanguageStrings = {
          read: "Reading",
          print: "Writing",
       },
+      description: {
+         if: "Keyword to run a block of instructions only if a condition is satisfied",
+         else: "Keyword to run a block of instructions if the condition after an if is not satisfied",
+         elif: "Keyword to add a branch to a conditional statement",
+         for: "Keyword to repeat a block of instructions a given number of times",
+         while: "Keyword to repeat a block of instructions as long as a condition is satisfied",
+         not: "Logical negation operator",
+         and: "Logical AND operator",
+         or: "Logical OR operator",
+         def: "Keyword to define a function",
+         len: "Function that returns the length of the element passed as parameter"
+      },
       controls: {
          backToFirst: 'Reset',
          playPause: 'Play / Pause',
@@ -354,6 +366,18 @@ var quickAlgoLanguageStrings = {
          read: "Einlesen",
          print: "Ausgeben",
          manipulate: "Umwandeln",
+      },
+      description: {
+         if: "Schlüsselwort, um einen Anweisungsblock nur auszuführen, wenn eine Bedingung erfüllt ist",
+         else: "Schlüsselwort, um einen Anweisungsblock auszuführen, wenn die Bedingung nach einem if nicht erfüllt ist",
+         elif: "Schlüsselwort, um einen weiteren Zweig zu einer bedingten Anweisung hinzuzufügen",
+         for: "Schlüsselwort, um einen Anweisungsblock eine bestimmte Anzahl von Malen zu wiederholen",
+         while: "Schlüsselwort, um einen Anweisungsblock zu wiederholen, solange eine Bedingung erfüllt ist",
+         not: "Logischer Negationsoperator",
+         and: "Logischer UND-Operator",
+         or: "Logischer ODER-Operator",
+         def: "Schlüsselwort, um eine Funktion zu definieren",
+         len: "Funktion, die die Länge des als Parameter übergebenen Elements zurückgibt"
       },
       exerciseTypeAbout: {
          default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
