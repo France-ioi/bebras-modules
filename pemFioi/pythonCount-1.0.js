@@ -34,6 +34,70 @@ var pythonCountPatterns = [
    {pattern: /^[\s\(\),:]+/, block: false}
    ];
 
+/**
+ * Display name for special Python "keywords" used in forbidden/limited checks.
+ * Relies on window.stringsLanguage (fr/en/de/nl/…).
+ */
+function pythonSpecialKeywordName(key) {
+   var langSource = (typeof window !== 'undefined')
+      ? (window.taskLang || window.stringsLanguage || 'fr')
+      : 'fr';
+   var lang = ('' + langSource).substring(0, 2);
+   var names = {
+      fr: {
+         list_brackets: 'crochets [ ]',
+         dict_brackets: 'accolades { }',
+         math_number: 'nombres',
+         var_assign: '= (assignation de variable)',
+         def_args: 'fonction avec arguments'
+      },
+      en: {
+         list_brackets: 'brackets [ ]',
+         dict_brackets: 'braces { }',
+         math_number: 'numbers',
+         var_assign: '= (variable assignment)',
+         def_args: 'function with arguments'
+      },
+      de: {
+         list_brackets: 'eckige Klammern [ ]',
+         dict_brackets: 'geschweifte Klammern { }',
+         math_number: 'Zahlen',
+         var_assign: '= (Variablenzuweisung)',
+         def_args: 'Funktion mit Argumenten'
+      },
+      nl: {
+         list_brackets: 'vierkante haken [ ]',
+         dict_brackets: 'accolades { }',
+         math_number: 'getallen',
+         var_assign: '= (toekenning van een variabele)',
+         def_args: 'functie met argumenten'
+      },
+      es: {
+         list_brackets: 'corchetes [ ]',
+         dict_brackets: 'llaves { }',
+         math_number: 'números',
+         var_assign: '= (asignación de variable)',
+         def_args: 'función con argumentos'
+      },
+      it: {
+         list_brackets: 'parentesi quadre [ ]',
+         dict_brackets: 'parentesi graffe { }',
+         math_number: 'numeri',
+         var_assign: '= (assegnazione di variabile)',
+         def_args: 'funzione con argomenti'
+      },
+      sl: {
+         list_brackets: 'oglati oklepaji [ ]',
+         dict_brackets: 'zaviti oklepaji { }',
+         math_number: 'števila',
+         var_assign: '= (prireditev spremenljivke)',
+         def_args: 'funkcija z argumenti'
+      }
+   };
+   var pack = names[lang] || names.fr;
+   return pack[key] || key;
+}
+
 function pythonCount(text) {
    var remainingText = text;
    var nbBlocks = 0;
@@ -233,27 +297,27 @@ function pythonForbidden(code, includeBlocks) {
          var re = /[\[\]]/;
          if(re.exec(code)) {
             // Forbidden keyword found
-            return 'crochets [ ]'; // TODO :: i18n ?
+            return pythonSpecialKeywordName('list_brackets');
          }
       } else if(forbidden[i] == 'dict_brackets') {
          // Special pattern for dicts
          var re = /[\{\}]/;
          if(re.exec(code)) {
             // Forbidden keyword found
-            return 'accolades { }'; // TODO :: i18n ?
+            return pythonSpecialKeywordName('dict_brackets');
          }
       } else if(forbidden[i] == 'var_assign') {
          // Special pattern for var assignment
          var re = /[^=!<>]=[^=!<>]/;
          if(re.exec(code)) {
             // Forbidden keyword found
-            return '= (assignation de variable)'; // TODO :: i18n ?
+            return pythonSpecialKeywordName('var_assign');
          }
       } else if(forbidden[i] == 'def_args') {
          var re = /def\s*\w+\([^\s]+\)/;
          if(re.exec(code)) {
             // Forbidden keyword found
-            return 'fonction avec arguments'; // TODO :: i18n ?
+            return pythonSpecialKeywordName('def_args');
          }
       } else if (forbidden[i] == 'in') {
          var code2 = removeFromPatterns(code, [/(^|\W)for\s+\w+\s+in/]);
@@ -335,16 +399,9 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
          if(!usesCount[pointer]) { usesCount[pointer] = 0; }
          usesCount[pointer] += count;
          if(usesCount[pointer] > limitedUses[pointer].nbUses) {
-            // TODO :: i18n ?
-            if(pyKey == 'list_brackets') {
-               var name = 'crochets [ ]';
-            } else if(pyKey == 'dict_brackets') {
-               var name = 'accolades { }';
-            } else if(pyKey == 'math_number') {
-               var name = 'nombres';
-            } else {
-               var name = pyKey;
-            }
+            var name = (pyKey == 'list_brackets' || pyKey == 'dict_brackets' || pyKey == 'math_number')
+               ? pythonSpecialKeywordName(pyKey)
+               : pyKey;
             return {type: 'uses', name: name};
          }
       }

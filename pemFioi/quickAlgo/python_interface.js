@@ -108,23 +108,23 @@ function LogicController(maxInstructions, subTask) {
     }
 
     if(forbidden) {
-      display("Le mot-clé "+forbidden+" est interdit ici !");
+      display((this._strings.forbiddenKeyword || 'Le mot-clé {name} est interdit ici !').format({name: forbidden}));
       return false;
     }
     if(maxInstructions && pythonCount(code) > maxInstructions) {
-      display("Vous utilisez trop d'éléments Python !");
+      display(this._strings.tooManyBlocks || "Vous utilisez trop d'éléments Python !");
       return false;
     }
     var limited = this.findLimited(code);
     if(limited && limited.type == 'uses') {
-      display('Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited.name+'".');
+      display((this._strings.limitedUses || 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "{name}".').format({name: limited.name}));
       return false;
     } else if(limited && limited.type == 'assign') {
-      display('Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "'+limited.name+'".');
+      display((this._strings.limitedAssign || 'Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "{name}".').format({name: limited.name}));
       return false;
     }
     if(pythonCount(code) <= 0) {
-      display("Vous ne pouvez pas valider un programme vide !");
+      display(this._strings.emptyProgram || "Vous ne pouvez pas valider un programme vide !");
       return false;
     }
     var availableModules = this.getAvailableModules();
@@ -748,9 +748,9 @@ function LogicController(maxInstructions, subTask) {
     }
     var limited = this.findLimited(code);
     if(limited && limited.type == 'uses') {
-      return {text: 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited.name+'".', invalid: true, type: 'limited'};
+      return {text: (this._strings.limitedUses || 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "{name}".').format({name: limited.name}), invalid: true, type: 'limited'};
     } else if(limited && limited.type == 'assign') {
-      return {text: 'Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "'+limited.name+'".', invalid: true, type: 'limited'};
+      return {text: (this._strings.limitedAssign || 'Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "{name}".').format({name: limited.name}), invalid: true, type: 'limited'};
     } else if(remaining == 0) {
       return {text: text, warning: true, type: 'capacity'};
     }
