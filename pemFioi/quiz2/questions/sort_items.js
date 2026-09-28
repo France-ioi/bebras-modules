@@ -77,7 +77,9 @@
 
 
             displayFeedback: function(feedback) {
-                feedback.partial && Quiz.common.toggleAlertMessage(parent, lang.translate("wrong_partial"), 'error');
+                if (Quiz.params.feedback_on_wrong_choices != 'none') {
+                    feedback.partial && Quiz.common.toggleAlertMessage(parent, lang.translate("wrong_partial"), 'error');
+                }
 
                 var validAnswer = true;
                 for(var mist of feedback.mistakes){
