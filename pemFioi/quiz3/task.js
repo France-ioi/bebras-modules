@@ -522,6 +522,7 @@
                     var answerObject = JSON.parse(answer);
                     this.reloadAnswerObject(answerObject);
                     if (lastViews.solution || (quiz_settings.hide_restart && answerObject.validated)) {
+                        task_toolbar.freezeTask();
                         task_toolbar.setValidated(true);
                         task.gradeAnswer(answer, null, function () {});
                     }
