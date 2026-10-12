@@ -64,6 +64,8 @@ window.displayHelper = {
    sideZoneEnabled: false,
    updateLayoutCallbackStart: null,
    compactMode: false,  // for tabs & footer in responsive layout 3
+   layoutTaskDims: null,  // taskW x taskH when the layout was last chosen
+   tabsWhenTooSmall: false,  // in layout 2, use layout 3 (tabs) rather than scrolling a task narrower than minTaskW
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -1413,11 +1415,27 @@ window.displayHelper = {
          }
          $('#task, #main_header').addClass('layout_'+this.layout);
          if(this.layout == 2){   // bug fix
+            if(this.tabsWhenTooSmall){
+               // drop the vertical centering of layout 3 before measuring the instructions
+               $('#zone_1 > .consigne').css('margin-top','20px');
+            }
             var zone1H = $('#zone_1').height();
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
+            if(this.tabsWhenTooSmall && this.isBelowMinTaskW()){
+               // the task would be shrunk below minTaskW, then scrolled: use tabs instead
+               this.mobileMode = true;
+               this.layout = 3;
+               this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+               $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
+               $("#zone_3").removeClass("compact");
+               $("#tabsMenu").removeClass("compact");
+               this.compactMode = false;
+               $('#task, #main_header').removeClass('layout_2').addClass('layout_3');
+            }
          }
          $('#zone_12').css("height", "calc(100% - " + $('#zone_0').height() + "px)");
 
+         this.layoutTaskDims = this.taskW + 'x' + this.taskH;
          if (!this.taskFullPage) {
              this.updateTaskDimensions();
          }
@@ -1463,7 +1481,20 @@ window.displayHelper = {
       return scrollbarWidth;
    },
 
+   // same test as updateTaskDimensions: height-limited and scaled width below minTaskW
+   isBelowMinTaskW: function() {
+      var taskRatio = this.taskW/this.taskH;
+      return this.availableW/this.availableH > taskRatio && this.availableH*taskRatio < this.minTaskW;
+   },
+
    updateTaskDimensions: function() {
+      if(this.tabsWhenTooSmall && this.layoutTaskDims != this.taskW + 'x' + this.taskH){
+         // the layout was chosen for other task dimensions
+         this.updateLayout();
+         if(this.layoutTaskDims == this.taskW + 'x' + this.taskH){
+            return;
+         }
+      }
       $('#zone_2').css('min-height',this.availableH);
       var availableRatio = this.availableW/this.availableH;
       var taskRatio = this.taskW/this.taskH;
