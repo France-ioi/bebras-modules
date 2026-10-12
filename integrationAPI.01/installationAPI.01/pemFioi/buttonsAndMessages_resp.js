@@ -1426,12 +1426,15 @@ window.displayHelper = {
                this.mobileMode = true;
                this.layout = 3;
                this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-               $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
                $("#zone_3").removeClass("compact");
                $("#tabsMenu").removeClass("compact");
                this.compactMode = false;
                $('#task, #main_header').removeClass('layout_2').addClass('layout_3');
             }
+         }
+         if(this.tabsWhenTooSmall){
+            // set at the top of this function for the previous layout
+            $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
          }
          $('#zone_12').css("height", "calc(100% - " + $('#zone_0').height() + "px)");
 
@@ -1795,7 +1798,10 @@ window.displayHelper = {
       var self = this;
 
       var afterReload = function() {
-         if(displayHelper.reponsive){
+         if(displayHelper.responsive && displayHelper.tabsWhenTooSmall){
+            // the new level's instructions and dimensions are only known now
+            displayHelper.updateLayout();
+         }else if(displayHelper.reponsive){
             displayHelper.updateTaskDimensions();
             displayHelper.toggleTask();
          }
