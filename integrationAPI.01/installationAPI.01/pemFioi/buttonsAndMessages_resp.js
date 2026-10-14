@@ -1421,16 +1421,24 @@ window.displayHelper = {
             }
             var zone1H = $('#zone_1').height();
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH - zone1H;
-            if(this.tabsWhenTooSmall && this.isBelowMinTaskW()){
-               // the task would be shrunk below minTaskW, then scrolled: use tabs instead
-               this.mobileMode = true;
-               this.layout = 3;
-               this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
-               $("#zone_3").removeClass("compact");
-               $("#tabsMenu").removeClass("compact");
-               this.compactMode = false;
-               $('#task, #main_header').removeClass('layout_2').addClass('layout_3');
+         }
+         if(this.tabsWhenTooSmall && (this.layout == 1 || this.layout == 2) && this.isBelowMinTaskW()){
+            // the task would be shrunk below minTaskW, then scrolled: use tabs instead
+            $('#task, #main_header').removeClass('layout_' + this.layout).addClass('layout_3');
+            this.mobileMode = true;
+            this.layout = 3;
+            this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
+            this.availableW = w;
+            // undo what layout 1 set above
+            $('#zone_1').height('auto');
+            $('#zone_12').css("overflow-x", "auto");
+            $('#zone_12').css("overflow-y", "hidden");
+            if(this.sideZoneEnabled){
+               $('#side_zone').removeClass('show');
             }
+            $("#zone_3").removeClass("compact");
+            $("#tabsMenu").removeClass("compact");
+            this.compactMode = false;
          }
          if(this.tabsWhenTooSmall){
             // set at the top of this function for the previous layout
@@ -1485,9 +1493,10 @@ window.displayHelper = {
    },
 
    // same test as updateTaskDimensions: height-limited and scaled width below minTaskW
+   // (no height left at all when the instructions are taller than the window)
    isBelowMinTaskW: function() {
       var taskRatio = this.taskW/this.taskH;
-      return this.availableW/this.availableH > taskRatio && this.availableH*taskRatio < this.minTaskW;
+      return this.availableH <= 0 || (this.availableW/this.availableH > taskRatio && this.availableH*taskRatio < this.minTaskW);
    },
 
    updateTaskDimensions: function() {
@@ -1528,13 +1537,18 @@ window.displayHelper = {
       }
       this.scaleFactor = this.newTaskW/this.taskW;
       this.newTaskH = this.taskH*this.scaleFactor;
+      if(this.tabsWhenTooSmall){
+         // updateTaskCSS sizes zone_2 from it: not the value left by the previous window size
+         this.verticalScroll = Math.floor(this.newTaskH) > Math.ceil(this.availableH);
+      }
       this.updateTaskCSS(this.scaleFactor,limitingFactor);
 
       if(Math.floor(this.newTaskH) > Math.ceil(this.availableH)){
          $('#zone_3').addClass('vertical_scroll');
          this.verticalScroll = true;
          // console.log(limitingFactor);
-         if(this.layout != 1 && limitingFactor == 'H' && this.newTaskW < this.maxTaskW){
+         // (not with tabsWhenTooSmall: the task, only just taller than the tab, would be enlarged to the full width and scrolled a lot)
+         if(this.layout != 1 && limitingFactor == 'H' && this.newTaskW < this.maxTaskW && !this.tabsWhenTooSmall){
             this.newTaskW = Math.min(this.availableW,this.maxTaskW);
             this.scaleFactor = this.newTaskW/this.taskW;
             this.newTaskH = this.taskH*this.scaleFactor;
@@ -1599,10 +1613,20 @@ window.displayHelper = {
       var rtl = this.isRtl();
       var marginSide = rtl ? 'margin-right' : 'margin-left';
       $('#taskCont').width(this.taskW);
+      if(this.tabsWhenTooSmall){
+         // not taller than the task: an inline svg leaves room for descenders below it
+         $('#taskCont').height(this.taskH);
+         $('#taskCont > * > svg').css('vertical-align','top');
+      }
       // $('#taskCont').height(newTaskH);
       var fixingOffset = 0; // unnecessary?
       $('#taskCont').css('transform','scale('+scaleFactor+')');
       if(scaleFactor >= 1){
+         if(this.tabsWhenTooSmall){
+            // set below when scaled down
+            $('#taskCont').css('margin-bottom',0);
+            $('#taskCont').css(rtl ? 'margin-left' : 'margin-right','');
+         }
          if(this.availableH > this.taskH){
             $('#taskCont').css('margin-top',(this.availableH - this.taskH)/2 - fixingOffset);
          }else{
@@ -1624,6 +1648,11 @@ window.displayHelper = {
          }
       }else{
          // console.log('scale < 1')
+         if(this.tabsWhenTooSmall){
+            // the scale shrinks the box around its centre, but its layout keeps the unscaled height:
+            // take the space freed at the bottom back, as margin-top below does at the top
+            $('#taskCont').css('margin-bottom',this.availableH > this.taskH ? 0 : -this.taskH*(1 - scaleFactor)/2);
+         }
          if(this.availableH > this.taskH){
             $('#taskCont').css('margin-top',(this.availableH - this.taskH/**scaleFactor*/)/2);
          }else{
@@ -1651,6 +1680,11 @@ window.displayHelper = {
          }else{
             $('#taskCont').css(marginSide, 'auto');
          }
+         if(this.tabsWhenTooSmall){
+            // same on the other side, or the unscaled width sticks out there and scrolls
+            var otherSide = rtl ? 'margin-left' : 'margin-right';
+            $('#taskCont').css(otherSide, this.availableW < this.taskW ? $('#taskCont').css(marginSide) : '');
+         }
       }
       $('#zone_2').height(Math.max(this.availableH,this.verticalScroll ? this.newTaskH + 60 : this.newTaskH));
       $('#zone_2').width(Math.max(this.availableW,this.newTaskW));
@@ -1674,6 +1708,13 @@ window.displayHelper = {
          }
          $('#zone_1').width(zone1Perc+'%');
          $('#zone_2').width(zone2Perc+'%');
+         if(this.tabsWhenTooSmall && scaleFactor < 1){
+            // zone_2 can be narrower than the unscaled task, and auto margins cannot go negative:
+            // centre the scaled task in zone_2, as auto margins do at scale 1
+            var sideMargin = ($('#zone_2').width() - this.taskW)/2;
+            $('#taskCont').css('margin-left', sideMargin);
+            $('#taskCont').css('margin-right', sideMargin);
+         }
       }
       if(this.layout == 4 && this.availableW < this.newTaskW){
          $('#zone_2').width(this.newTaskW + 50);
