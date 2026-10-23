@@ -1327,6 +1327,12 @@ window.displayHelper = {
          return
       }
       var layout1Breakpoint = 1200;
+      // with the tabs fallback, landscape tablets get layout 1 when the task fits next to the instructions
+      // (from 1000px, so that the instructions column, 30% wide, keeps 300px)
+      var layout1FitBreakpoint = 1000;
+      var layout2Breakpoint = 800;
+      // the tabs fallback catches a task that doesn't fit: try layout 2 on portrait tablets too
+      var layout2PortraitBreakpoint = this.tabsWhenTooSmall ? 728 : layout2Breakpoint;
       if(!this.responsive){
          $('#valider').appendTo($('#displayHelper_validate'));
          if(window.innerWidth >= 1200) {
@@ -1362,7 +1368,13 @@ window.displayHelper = {
          if(!$('#zone_0 #tabsContainer').length){
             $('#zone_0 h1').after($('#tabsContainer'));
          }
-         if(w >= layout1Breakpoint) {
+         var useLayout1 = w >= layout1Breakpoint;
+         if(!useLayout1 && this.tabsWhenTooSmall && !this.sideZoneEnabled && !this.taskFullPage && w/h >= 1 && w >= layout1FitBreakpoint){
+            this.availableH = h - headerH - this.versionHeaderH[0] - this.footerH;
+            this.availableW = Math.floor(w*0.7);
+            useLayout1 = !this.isBelowMinTaskW();
+         }
+         if(useLayout1) {
             this.mobileMode = !!this.taskFullPage;
             this.layout = this.taskFullPage ? 5 : 1;
             this.availableH = h - headerH - this.versionHeaderH[0] - this.footerH;
@@ -1372,7 +1384,7 @@ window.displayHelper = {
             if(this.sideZoneEnabled){
                $('#side_zone').addClass('show');
             }
-         }else if(w >= 800){
+         }else if(w >= layout2Breakpoint || (w/h < 1 && w >= layout2PortraitBreakpoint)){
             this.mobileMode = !!this.taskFullPage;
             this.layout = this.taskFullPage ? 5 : 2;
             this.availableH = h - headerH - this.versionHeaderH[this.layout - 1] - this.footerH;
@@ -1436,9 +1448,9 @@ window.displayHelper = {
             if(this.sideZoneEnabled){
                $('#side_zone').removeClass('show');
             }
-            $("#zone_3").removeClass("compact");
-            $("#tabsMenu").removeClass("compact");
-            this.compactMode = false;
+            this.compactMode = w <= 650;
+            $("#zone_3").toggleClass("compact", this.compactMode);
+            $("#tabsMenu").toggleClass("compact", this.compactMode);
          }
          if(this.tabsWhenTooSmall){
             // set at the top of this function for the previous layout
