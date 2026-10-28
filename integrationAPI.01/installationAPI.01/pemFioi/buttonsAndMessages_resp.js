@@ -66,6 +66,9 @@ window.displayHelper = {
    compactMode: false,  // for tabs & footer in responsive layout 3
    layoutTaskDims: null,  // taskW x taskH when the layout was last chosen
    tabsWhenTooSmall: false,  // in layout 2, use layout 3 (tabs) rather than scrolling a task narrower than minTaskW
+   warnUnvalidatedLevelChange: false,  // when leaving a version whose answer would get full score but was not validated, warn first
+   unvalidatedLevelWarned: {},  // versions for which this warning was already shown
+   checkingLevelChange: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -126,6 +129,10 @@ window.displayHelper = {
          restart: "Recommencer",
          harderLevelSolved: "Attention : vous avez déjà résolu une version plus difficile. Vous ne pourrez pas gagner de points supplémentaires avec cette version.",
          showLevelAnyway: "Voir quand même",
+         notValidatedYet: "Attention, tu n'as pas encore validé. Valide bien avant de changer de version.",
+         notValidatedYetOk: "Ok",
+         changeVersion: "Changer de version",
+         stayOnVersion: "Rester",
          scoreObtained: "Score obtenu :",
          hardVersionTakesTime: "Résoudre une {0} peut vous prendre beaucoup de temps ; songez en priorité à répondre aux questions en {1} pour gagner des points rapidement.",
          illKeepThatInMind: "J'y prendrai garde",
@@ -200,6 +207,10 @@ window.displayHelper = {
          restart: "Restart",
          harderLevelSolved: "Warning: you already solved a harder version of this task. You won't be able to obtain extra points with this version.",
          showLevelAnyway: "Show it to me anyways.",
+         notValidatedYet: "Warning: you have not validated yet. Make sure to validate before changing version.",
+         notValidatedYetOk: "OK",
+         changeVersion: "Change version",
+         stayOnVersion: "Stay",
          scoreObtained: "Obtained score:",
          hardVersionTakesTime: "Solving a {0} can take a lot of time. Consider working on the {1} to gain points quickly.",
          illKeepThatInMind: "I'll consider it.",
@@ -274,6 +285,10 @@ window.displayHelper = {
          restart: "Börja om",
          harderLevelSolved: "Varning: du har redan löst en svårare version av den här uppgiften. Du kommer inte kunna få mer poäng med den här versionen.",
          showLevelAnyway: "Visa den ändå.",
+         notValidatedYet: "Varning: du har inte kontrollerat svaret ännu. Kontrollera det innan du byter version.",
+         notValidatedYetOk: "Okej",
+         changeVersion: "Byt version",
+         stayOnVersion: "Stanna",
          scoreObtained: "Uppnådd poäng:",
          hardVersionTakesTime: "Att lösa en {0} kan ta lång tid. Fundera på om du ska jobba med en {1} för att tjäna poäng snabbare.",
          illKeepThatInMind: "Jag ska tänka på det.",
@@ -348,6 +363,10 @@ window.displayHelper = {
          restart: "Aloita alusta",
          harderLevelSolved: "Varoitus: olet jo ratkaissut vaikeamman version tästä tehtävästä. Tämän helpomman version ratkaiseminen ei voi korottaa pistemäärääsi.",
          showLevelAnyway: "Siirry joka tapauksessa.",
+         notValidatedYet: "Varoitus: et ole vielä tarkistanut vastaustasi. Tarkista se ennen kuin vaihdat versiota.",
+         notValidatedYetOk: "Ok",
+         changeVersion: "Vaihda versiota",
+         stayOnVersion: "Pysy",
          scoreObtained: "Saatu pistemäärä:",
          hardVersionTakesTime: "{0} voi viedä runsaasti aikaa. {1} voi tuottaa pisteitä nopeammin.",
          illKeepThatInMind: "Ymmärrän tämän.",
@@ -422,6 +441,10 @@ window.displayHelper = {
          restart: "Neustarten",
          harderLevelSolved: "Achtung: Du hast schon eine schwerere Version gelöst. Du kannst mit dieser Version keine zusätzlichen Punkte bekommen.",
          showLevelAnyway: "Trotzdem anzeigen",
+         notValidatedYet: "Achtung: Du hast deine Antwort noch nicht bestätigt. Bestätige sie, bevor du die Version wechselst.",
+         notValidatedYetOk: "OK",
+         changeVersion: "Version wechseln",
+         stayOnVersion: "Bleiben",
          scoreObtained: "Erhaltene Punkte:",
          hardVersionTakesTime: "Eine {0} zu lösen kann dich viel Zeit kosten; Denke zunächst daran, die Fragen in {1} zu beantworten, um schnell Punkte zu bekommen.",
          illKeepThatInMind: "Ich hab das verstanden",
@@ -496,6 +519,10 @@ window.displayHelper = {
          restart: "Herbeginnen",
          harderLevelSolved: "Let op: je hebt al een moeilijkere versie opgelost. Je kan met deze versie geen extra punten halen.",
          showLevelAnyway: "Toon het mij toch",
+         notValidatedYet: "Let op: je hebt nog niet gevalideerd. Valideer eerst voordat je van versie wisselt.",
+         notValidatedYetOk: "OK",
+         changeVersion: "Van versie wisselen",
+         stayOnVersion: "Blijven",
          scoreObtained: "Behaalde score:",
          hardVersionTakesTime: "Het oplossen van {0} kan je veel tijd kosten; overweeg om eerst de vragen in {1} op te lossen om snel punten te halen.",
          illKeepThatInMind: "Ik zal er aan denken",
@@ -570,6 +597,10 @@ window.displayHelper = {
          restart: "ابدأ من جديد",
          harderLevelSolved: "لقد قمت بحل المستوى الأصعب في هذا السؤال, لن تتمكن من الحصول على درجات أعلى في هذا السؤال",
          showLevelAnyway: "اظهرها لي على أي حال",
+         notValidatedYet: "تنبيه: لم تتحقق من إجابتك بعد. تحقق منها قبل تغيير المستوى.",
+         notValidatedYetOk: "حسناً",
+         changeVersion: "تغيير المستوى",
+         stayOnVersion: "البقاء",
          scoreObtained: "النقاط المكتسبة:",
          hardVersionTakesTime: "Solving a {0} can take a lot of time. Consider working on the {1} to gain points quickly.",
          illKeepThatInMind: "I'll consider it.",
@@ -644,6 +675,10 @@ window.displayHelper = {
          restart: "Reiniciar",
          harderLevelSolved: "Atención: ya has resuelto una versión más difícil. No puedes ganar puntos extra con esta versión.",
          showLevelAnyway: "Mostrar el nivel de igual manera",
+         notValidatedYet: "Atención: todavía no has validado. Valida antes de cambiar de versión.",
+         notValidatedYetOk: "OK",
+         changeVersion: "Cambiar de versión",
+         stayOnVersion: "Quedarse",
          scoreObtained: "Puntuación obtenida:",
          hardVersionTakesTime: "Resolver una {0} puede tomar mucho tiempo; te aconsejamos priorizar el resolver las preguntas en {1} para ganar puntos más rápidamente.",
          illKeepThatInMind: "Lo tendré en mente",
@@ -718,6 +753,10 @@ window.displayHelper = {
          restart: "Ricomincia",
          harderLevelSolved: "Attenzione : hai già risolto una versione più difficile. Non potrai più ottenere punti supplementari con questa versione.",
          showLevelAnyway: "Vedi lo stesso",
+         notValidatedYet: "Attenzione: non hai ancora convalidato. Convalida prima di cambiare versione.",
+         notValidatedYetOk: "OK",
+         changeVersion: "Cambia versione",
+         stayOnVersion: "Rimani",
          scoreObtained: "Score ottenuto :",
          hardVersionTakesTime: "Risolvere una {0} ti può prendere molto tempo ; dai priorità alle risposte alle domande in {1} per guadagnare rapidamente punti.",
          illKeepThatInMind: "Me lo ricorderò",
@@ -792,6 +831,10 @@ window.displayHelper = {
          restart: "Začni znova",
          harderLevelSolved: "Opozorilo: Rešil(-a) si že težjo stopnjo te naloge. S to stopnjo ne boš dobil(-a) dodatnih točk.",
          showLevelAnyway: "Vseeno mi pokaži stopnjo.",
+         notValidatedYet: "Opozorilo: odgovora še nisi preveril(-a). Preveri ga, preden zamenjaš stopnjo.",
+         notValidatedYetOk: "V redu",
+         changeVersion: "Zamenjaj stopnjo",
+         stayOnVersion: "Ostani",
          scoreObtained: "Dobljeni rezultat:",
          hardVersionTakesTime: "Reševanje {0} lahko traja veliko časa. Razmisli o reševanju {1}, da boš hitro dobil(-a) točke.",
          illKeepThatInMind: "Razmislil(-a) bom.",
@@ -1108,7 +1151,9 @@ window.displayHelper = {
             $('#tabsMenu .li').on('click', function(event) {
                event.preventDefault();
                var newLevel = $(this).children().attr('href').split('#')[1];
-               displayHelper.setLevel(newLevel);
+               displayHelper.requestLevelChange(newLevel, function() {
+                  displayHelper.setLevel(newLevel);
+               });
             });
          }else{
             $('#tabsMenu .li').on('click', function(event) {
@@ -1122,11 +1167,13 @@ window.displayHelper = {
                }
                event.preventDefault();
                var newLevel = $(this).children().attr('href').split('#')[1];
-               displayHelper.setLevel(newLevel);
-               if(displayHelper.layout == 3 && !displayHelper.compactMode){
-                  displayHelper.toggle_task = false;  // change level => display new instructions
-                  displayHelper.toggleTask();
-               }
+               displayHelper.requestLevelChange(newLevel, function() {
+                  displayHelper.setLevel(newLevel);
+                  if(displayHelper.layout == 3 && !displayHelper.compactMode){
+                     displayHelper.toggle_task = false;  // change level => display new instructions
+                     displayHelper.toggleTask();
+                  }
+               });
             });
             /* version arrows in mobile mode */
             $('#tabsMenu .resp_version_arr').on('click', function(event) {
@@ -1135,17 +1182,21 @@ window.displayHelper = {
                }
                event.preventDefault();
                var newLevel = $(this).attr('href').split('#')[1];
-               displayHelper.setLevel(newLevel);
-               displayHelper.toggle_task = false; // change level => display new instructions
-               displayHelper.toggleTask();
+               displayHelper.requestLevelChange(newLevel, function() {
+                  displayHelper.setLevel(newLevel);
+                  displayHelper.toggle_task = false; // change level => display new instructions
+                  displayHelper.toggleTask();
+               });
             });
             /* click version in resp layout4 */
             $('#tabsMenuAlt [id^=stars_menu_]').click(function() {
                var newLevel = $(this).attr('id').split('stars_menu_')[1];
                $('.layout_4 #tabsMenuAlt').hide();
-               displayHelper.setLevel(newLevel);
-               displayHelper.toggle_task = false; // change level => display new instructions
-               displayHelper.toggleTask();
+               displayHelper.requestLevelChange(newLevel, function() {
+                  displayHelper.setLevel(newLevel);
+                  displayHelper.toggle_task = false; // change level => display new instructions
+                  displayHelper.toggleTask();
+               });
             });
          }
       }
@@ -1834,6 +1885,48 @@ window.displayHelper = {
       $('#tabsMenu .li.current').next().addClass('next');
       this.showSolution(false);
       this.updateLayout();
+   },
+
+   // Called when the user asks for another version. The answer of the version
+   // being left is graded silently: if it would get the full score but was not
+   // validated, the user is warned and stays; the next time, they can choose to
+   // leave anyway.
+   requestLevelChange: function(newLevel, changeLevel) {
+      var self = this;
+      var curLevel = this.taskLevel;
+      if (!this.warnUnvalidatedLevelChange || !this.hasLevels || this.hasSolution || !this.showScore ||
+          newLevel == curLevel || !this.levelsMaxScores || typeof task.getLevelGrade != 'function') {
+         changeLevel();
+         return;
+      }
+      var maxScore = this.levelsMaxScores[curLevel];
+      if (this.levelsScores[curLevel] >= maxScore - 0.001) {
+         changeLevel();
+         return;
+      }
+      if (this.checkingLevelChange) {
+         return;
+      }
+      this.checkingLevelChange = true;
+      task.getAnswer(function(strAnswer) {
+         task.getLevelGrade(strAnswer, null, function(score) {
+            self.checkingLevelChange = false;
+            if (self.taskLevel != curLevel) {
+               return;
+            }
+            if (!(+score >= maxScore - 0.001)) {
+               changeLevel();
+               return;
+            }
+            if (!self.unvalidatedLevelWarned[curLevel]) {
+               self.unvalidatedLevelWarned[curLevel] = true;
+               self.showPopupMessage(self.strings.notValidatedYet, 'blanket', self.strings.notValidatedYetOk, null, null, "warning");
+            } else {
+               self.showPopupMessage(self.strings.notValidatedYet, 'blanket', self.strings.changeVersion, changeLevel,
+                  self.strings.stayOnVersion, "warning");
+            }
+         }, curLevel);
+      });
    },
 
    setLevel: function(newLevel, force) {
