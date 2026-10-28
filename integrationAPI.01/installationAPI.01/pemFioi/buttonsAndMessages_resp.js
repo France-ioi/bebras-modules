@@ -1507,6 +1507,10 @@ window.displayHelper = {
             // set at the top of this function for the previous layout
             $('#zone_0').css("max-height", this.versionHeaderH[this.layout - 1]);
          }
+         if(this.layout != 4){
+            // the version menu of layout 4 may have been left open
+            $('#tabsMenuAlt').hide();
+         }
          $('#zone_12').css("height", "calc(100% - " + $('#zone_0').height() + "px)");
 
          this.layoutTaskDims = this.taskW + 'x' + this.taskH;
