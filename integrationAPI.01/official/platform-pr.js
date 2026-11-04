@@ -173,6 +173,8 @@ if (!isCrossDomain()) {
       chan.bind('task.updateToken', function(trans, token) {task.updateToken(token, trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.reloadAnswer', function(trans, answer) {task.reloadAnswer(answer, callAndTrigger(trans.complete, 'reloadAnswer', trans.error, [answer]), trans.error);trans.delayReturn(true);});
       chan.bind('task.reloadAnswerWithOptions', function(trans, params) {task.reloadAnswerWithOptions(params[0], params[1], callAndTrigger(trans.complete, 'reloadAnswerWithOptions', trans.error, params), trans.error);trans.delayReturn(true);});
+      chan.bind('task.getHistory', function(trans, options) {task.getHistory(options, trans.complete, trans.error);trans.delayReturn(true);});
+      chan.bind('task.reloadHistory', function(trans, options) {task.reloadHistory(options, callAndTrigger(trans.complete, 'reloadHistory', trans.error, [options]), trans.error);trans.delayReturn(true);});
       chan.bind('task.getAnswer', function(trans) {task.getAnswer(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getState', function(trans) {task.getState(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getResources', function(trans) {task.getResources(trans.complete, trans.error);trans.delayReturn(true);});
