@@ -5934,8 +5934,12 @@ es: {
       default:
    }
    
+   var hasGrid = function() {
+      return !!context.tiles;
+   };
+
    context.reset = function(gridInfos) {
-      if(gridInfos) {
+      if(gridInfos && gridInfos.tiles) {
          context.gridInfos = gridInfos;
          context.tiles = gridInfos.tiles;
          context.initItems = gridInfos.initItems;
@@ -5981,13 +5985,18 @@ es: {
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
             paper.remove();
-         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-         resetBoard();
-         resetItems();
-         context.updateScale();
+         if(hasGrid()) {
+            paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+            resetBoard();
+            resetItems();
+            context.updateScale();
+         }
+         else {
+            paper = undefined;
+         }
          $("#nbMoves").html(context.nbMoves);
       }
-      else {
+      else if(hasGrid()) {
          resetItems();
       }
    };
@@ -6145,8 +6154,9 @@ es: {
             }
          }
       }
-      for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
-         resetItem(context.initItems[iItem], false);
+      var initItems = context.initItems || [];
+      for(var iItem = initItems.length - 1;iItem >= 0;iItem--) {
+         resetItem(initItems[iItem], false);
       }
       
       if(context.display)
