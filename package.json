@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "loaders": "cd loaders && node makeloader.js"
+    "loaders": "cd loaders && node makeloader.js",
+    "test": "node --test pemFioi/test/*.js"
   },
   "dependencies": {
     "gulp": "^5.0.0",
