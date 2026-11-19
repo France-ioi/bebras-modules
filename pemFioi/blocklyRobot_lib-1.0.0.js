@@ -5058,8 +5058,8 @@ var getContext = function(display, infos, curLevel) {
                   strings: {
                     fr: {
                        label: translations["fr"][iColor],
-                       code: translations["fr"][iColor],
-                       description: translations["fr"][iColor] + "(): Peint la case en " + translations["fr"][iColor]
+                       code: translations["fr"][iColor].toLowerCase(),
+                       description: translations["fr"][iColor].toLowerCase() + "(): Peint la case en " + translations["fr"][iColor].toLowerCase()
                     },
                     en: {
                        label: translations["en"][iColor],
@@ -5120,7 +5120,7 @@ var getContext = function(display, infos, curLevel) {
                     fr: {
                        label: "Sur " + translations["fr"][iColor],
                        code: "sur" + translations["fr"][iColor],
-                       description: "sur" + translations["fr"][iColor] + "(): Teste si la case est en " + translations["fr"][iColor]
+                       description: "sur" + translations["fr"][iColor] + "(): Teste si la case est en " + translations["fr"][iColor].toLowerCase()
                     },
                     en: {
                        label: "On " + translations["en"][iColor],
