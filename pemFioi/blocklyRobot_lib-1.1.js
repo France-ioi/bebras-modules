@@ -3791,14 +3791,16 @@ es: {
             flag: { num: 3, img: "flag.png", side: 60, isExit: true, zOrder: 0},
             wall: { num: 4, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             number: { num: 5, side: 60, zOrder: 1 },
+            leafs: { num: 6, img: "leafs.png", side: 60, isWithdrawable: true, zOrder: 1 },
             horizontal_closed_door: { num: 7, img:  "horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
             vertical_closed_door: { num: 8, img:  "vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
             horizontal_open_door: { num: 11, img:  "horizontal_open_door.png", side: 60, zOrder: 1},
             vertical_open_door: { num: 12, img:  "vertical_open_door.png", side: 60, zOrder: 1},
             water: { num: 13, img: "water.png", side: 60, isObstacle: true, zOrder: 1 },
-            board: { num: 14, img: "water+board.png", side: 60, zOrder: 1 }
+            board: { num: 14, img: "water+board.png", side: 60, zOrder: 1 },
+            mask: { num: 15, img: "mask.png", side: 60, isMask: true, zOrder: 2 }
          },
-         checkEndCondition: robotEndConditions.checkReachExit
+         checkEndCondition: robotEndConditions.checkBothReachAndCollect
       },
       dominoes: {
          newBlocks: [
@@ -5425,7 +5427,16 @@ es: {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
       }
    });
-   
+
+   infos.newBlocks.push({
+      name: "onExit",
+      type: "sensors",
+      block: { name: "onExit", yieldsValue: 'bool' },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isExit === true;}));
+      }
+   });
+
    infos.newBlocks.push({
       name: "onNumber",
       type: "sensors",
