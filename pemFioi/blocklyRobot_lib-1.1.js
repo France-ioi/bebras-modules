@@ -205,6 +205,8 @@ var getContext = function(display, infos, curLevel) {
                tooManyObjects: "Le robot essaie de transporter trop d'objets à la fois !",
                emptyBag: "Le robot essaie de déposer un objet alors qu'il n'en transporte pas !",
                successReachExit: "Bravo, votre robot a atteint la sortie !",
+               successBothReachAndCollect: "Bravo, votre robot a tout ramassé et atteint la sortie !",
+               successBothReachAndCollectSingular: "Bravo, le robot a ramassé l'objet et atteint la sortie",
                failureReachExit: "Votre robot n'a pas atteint la sortie.",
                successPickedAllWithdrawables: "Bravo, votre robot a tout ramassé !",
                failurePickedAllWithdrawables: "Votre robot n'a pas tout ramassé.",
@@ -363,6 +365,8 @@ var getContext = function(display, infos, curLevel) {
                tooManyObjects: "The robot tries to transport too many objects at a time!",
                emptyBag: "The robot tries to drop an object but it doesn't carry one!",
                successReachExit: "Congratulations, your robot reached the exit!",
+               successBothReachAndCollect: "Congratulations, your robot collected everything and reached the exit!",
+               successBothReachAndCollectSingular: "Congratulations, your robot collected everything and reached the exit!",
                failureReachExit: "Your robot didn't reach the exit.",
                successPickedAllWithdrawables: "Congratulations, your robot picked up everything!",
                failurePickedAllWithdrawables: "Your robot didn't pick up everything.",
@@ -1552,8 +1556,25 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             messages: {
                successReachExit: "Bravo, le robot a atteint le drapeau !",
+               successBothReachAndCollect: "Bravo, votre robot a ramassé toutes les feuilles et atteint le drapeau !",
+               successBothReachAndCollectSingular: "Bravo, votre robot a ramassé toutes les feuilles et atteint le drapeau !",
                failureReachExit: "Le robot n'est pas arrivé sur la case du drapeau.",
                obstacle: "Le robot tente de foncer dans un buisson !"
+            },
+            label: {
+               withdrawObject: "ramasser les feuilles",
+               onObject: "sur des feuilles",
+               onExit: "sur un drapeau",
+            },
+            code: {
+               withdrawObject: "ramasserFeuilles",
+               onObject: "surFeuilles",
+               onExit: "surDrapeau",
+            },
+            description: {
+               withdrawObject: "ramasserFeuilles() ramasse les feuilles sur la case du robot",
+               onObject: "surFeuilles() indique s'il y a des feuilles sur la case",
+               onExit: "surDrapeau() indique s'il y a un drapeau sur la case"
             }
          },
          en: {
@@ -7319,13 +7340,14 @@ var robotEndConditions = {
       }
    },
    checkBothReachAndCollect: function(context, lastTurn) {
-      var filterCount = context.countFilter(function(obj) { return obj.isWithdrawable === true; });
+      var filter = context.infos.checkFilter || function(obj) { return true; };
+      var filterCount = context.countFilter(function(obj) { return obj.isWithdrawable === true && filter(obj); });
       var filterExitCount = context.countFilter(function(obj) { return obj.isExit === true; });
       if(0 === filterExitCount || context.isOn(function(obj) { return obj.isExit === true; })) {
          var solved = true;
          for(var row = 0;row < context.nbRows;row++) {
             for(var col = 0;col < context.nbCols;col++) {
-               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && filter(obj); })) {
                   solved = false;
                   throw(filterCount <= 1 && window.languageStrings.messages.failurePickedAllWithdrawablesSingular
                      ? window.languageStrings.messages.failurePickedAllWithdrawablesSingular
@@ -7336,9 +7358,13 @@ var robotEndConditions = {
          
          if(solved) {
             context.success = true;
-            throw(filterCount <= 1 && window.languageStrings.messages.successPickedAllWithdrawablesSingular
-                ? window.languageStrings.messages.successPickedAllWithdrawablesSingular
-                : window.languageStrings.messages.successPickedAllWithdrawables);
+            if(filterCount > 0) {
+               throw(filterCount <= 1 && window.languageStrings.messages.successBothReachAndCollectSingular
+                   ? window.languageStrings.messages.successBothReachAndCollectSingular
+                   : window.languageStrings.messages.successBothReachAndCollect);
+            } else {
+               throw(window.languageStrings.messages.successReachExit);
+            }
          }
       }
       if(lastTurn) {
