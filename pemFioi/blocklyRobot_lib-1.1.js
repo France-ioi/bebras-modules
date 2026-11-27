@@ -3306,7 +3306,12 @@ var getContext = function(display, infos, curLevel) {
    function imgUrlWithPrefix(url) {
       return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
    };
+   var localImgPrefix = "local:";
    function getImgPath(url) {
+      // "local:img.png" means the image is in the task folder (relative to the task page)
+      if (url.indexOf(localImgPrefix) === 0) {
+         return url.substring(localImgPrefix.length);
+      }
       if (window.modulesPath != undefined) {
          return window.modulesPath + "img/algorea/" + url;
       }
@@ -5204,9 +5209,21 @@ es: {
             infos[param] = contextParams[name][param];
          }
          if (param === 'itemTypes') {
+            // Item types already defined (by the task) take precedence, both
+            // by name and by num: a context item type whose num is already
+            // used is not added, so that the task's definition is displayed.
+            var usedNums = {};
+            for (var existingType in infos.itemTypes) {
+               var existingNum = infos.itemTypes[existingType].num;
+               if (existingNum !== undefined) {
+                  usedNums[existingNum] = true;
+               }
+            }
             for (var itemType in contextParams[name].itemTypes) {
-               if (infos.itemTypes[itemType] === undefined) {
-                  infos.itemTypes[itemType] = contextParams[name].itemTypes[itemType];
+               var contextItemType = contextParams[name].itemTypes[itemType];
+               if (infos.itemTypes[itemType] === undefined
+                  && (contextItemType.num === undefined || !usedNums[contextItemType.num])) {
+                  infos.itemTypes[itemType] = contextItemType;
                }
             }
          }
@@ -7178,16 +7195,12 @@ es: {
    };
 
    window.taskGetResourcesPost = function (res, callback) {
-      var typeData = contextParams[infos.contextType];
-      if (typeData.itemTypes) {
-         for (var key in typeData.itemTypes) {
-            var params = typeData.itemTypes[key];
+      // infos.itemTypes contains the task item types merged with the context ones
+      if (infos.itemTypes) {
+         for (var key in infos.itemTypes) {
+            var params = infos.itemTypes[key];
             if (params.img) {
-               var imgPath = params.img;
-               if (window.modulesPath) {
-                  imgPath = window.modulesPath + "img/algorea/" + imgPath;
-               }
-               res.task.push({ type: 'image', url: imgPath });
+               res.task.push({ type: 'image', url: getImgPath(params.img) });
             }
          }
       }
