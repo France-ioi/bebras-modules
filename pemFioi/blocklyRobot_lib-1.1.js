@@ -2091,6 +2091,33 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      iceFloe: {
+         fr: {
+            label: {
+               withdrawObject: "pêcher le poisson",
+               dropObject: "donner le poisson",
+               onObject: "sur un poisson",
+               onContainer: "chez un phoque"
+            },
+            code: {
+               withdrawObject: "pecherPoisson",
+               dropObject: "donnerPoisson",
+               onObject: "surPoisson",
+               onContainer: "chezPhoque"
+            },
+            description: {
+               withdrawObject: "pecherPoisson() pêche le poisson qui se trouve sur la case",
+               dropObject: "donnerPoisson() dépose sur la case le poisson transporté",
+               onObject: "surPoisson() indique s'il y a un poisson sur la case",
+               onContainer: "chezPhoque() indique s'il y a un phoque sur la case"
+            },
+            messages: {
+               successContainersFilled: "Tous les phoques sont nourris. Ils remercient votre robot !",
+               obstacle: "Le robot essaie de foncer dans un iceberg !",
+               failureContainersFilled: "Il y a au moins un phoque qui n'a pas de poisson."
+            }    
+         }
+      },
       marbles: {
          fr: {
             label: {
@@ -4781,6 +4808,33 @@ es: {
             board: { side: 60, isWritable: true, zOrder: 1 },
          },
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
+      },
+      iceFloe: {
+         bagSize: 1,
+         containerSize: 1,
+         backgroundColor: "#effafe",
+         borderColor: "#6bc1c0",
+         itemTypes: {
+            robot: { img: "ice_robot.png", side: 60, nbStates: 9, isRobot: true, zOrder: 4, customDisplay: function(obj) {
+               if(context.bag.length != 0)
+                  obj.img = "ice_robot_with_fish.png";
+               else
+                  obj.img = "ice_robot.png";
+            } },
+            seal: { num: 2, img: "seal.png", side: 60, isContainer: true, zOrder: 0, offsetY: 8, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
+            fish: { num: 3, img: "fish_ice.png", side: 60, isWithdrawable: true, zOrder: 1, offsetY: 8 },
+            iceberg: { num: 4, img: "iceberg.png", side: 60, isObstacle: true, zOrder: 0 },
+            fish_outside: { num: 5, img: "fish_ice.png", side: 60, isWithdrawable: true, zOrder: 1, offsetY: 8, customDisplay: function(obj) {
+               if(context.hasOn(obj.row, obj.col, function(item) { return item.num == 2; })) {
+                  obj.img = "seal_with_fish.png";
+               } else {
+                  obj.img = "fish_ice.png";
+               }
+            } },
+            hole: {num: 6, img: "ice_hole.png", side: 60, offsetY: 8, zOrder: 0 }
+            
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
       },
       help: {
          newBlocks: [
